@@ -39,7 +39,7 @@ class PhpTemplates
         $this->rfilepath = $this->requestName.'.template.php';
         $this->file = $this->options->src_path.$this->rfilepath;
         $this->timestamp = fileatime($this->file);
-        $this->slotsHash = $this->getSlotsHash($slots);
+        $this->slotsHash = $this->getSlotsHash();
         $this->destFile = $this->getDestFilePath(); // based on req file, timestamp, slotsHash
         
         $hasChanged = $this->syncDependencies($this->requestName);
@@ -69,8 +69,21 @@ class PhpTemplates
         return $updated;
     }
     
-    private function getSlotsHash(array $slots)
+    private function getSlotsHash()
     {
-        
+        $hash = '';
+        foreach ($slots as $slot) {
+            if (is_string($slot)) {
+                $hash .= md5($slot);
+            } 
+            elseif ($slot instanceof self) {
+                $hash .= fileatime($slot->getSrcFile());
+                $hash .= $slot->getSlotsHash();
+            } 
+            else {
+                
+            }
+        }
+        return substr(md5($string, true), 0, 12);
     }
 }
