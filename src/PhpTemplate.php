@@ -86,5 +86,9 @@ class PhpTemplates
         }
         return substr(md5($string, true), 0, 12);
     }
+<<<<<<< HEAD
     ggg
+=======
+    
+>>>>>>> branch 'dev' of https://github.com/florin-botea-1693/php-templates
 }
