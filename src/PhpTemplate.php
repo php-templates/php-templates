@@ -86,4 +86,5 @@ class PhpTemplates
         }
         return substr(md5($string, true), 0, 12);
     }
+    
 }
