@@ -69,7 +69,7 @@ class PhpTemplates
         return $updated;
     }
     
-    private function getSlotsHash()
+    private function getSlotsHash(): string
     {
         $hash = '';
         foreach ($slots as $slot) {
