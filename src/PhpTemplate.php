@@ -5,7 +5,7 @@ namespace HarmonyTools;
 class PhpTemplates
 {
     // requestName => [requestName => filetime, ...other components]
-    private static $dependencies;
+    private static $dependencies = null;
     
     private $options = [
         'prefix' => '@',
@@ -17,6 +17,9 @@ class PhpTemplates
     
     public function __construct(array $options = [])
     {
+        if (self::$dependencies === null) {
+            self::$dependencies = require_once('dependencies_map.php');
+        }
         $this->mergeOptions($options);
     }
     
@@ -47,9 +50,23 @@ class PhpTemplates
         
     }
     
-    private function syncDependencies(string $reqName)
+    private function syncDependencies(string $reqName): bool
     {
+        // ignoee self from list for avoíding infinite loop
+        if (in_array($reqName, $this->checkedDependencies)) {
+            return false;
+        }
+        $this->checkedDependencies[] = $reqName;
         
+        $dependencies = self::$dependencies[$reqName] ?? [];
+        $updated = false;
+        foreach ($dependencies as $_reqName => $timestamp) {
+            $nowstamp = fileatime($this->getSrcFile($_reqName));
+            self::$dependencies[$reqName][$_reqName] = $nowstamp;
+            $updated = $updated || $timestamp === $nowstamp;
+            $updated = $updated || $this->syncDependencies($reqName);
+        }
+        return $updated;
     }
     
     private function getSlotsHash(array $slots)
