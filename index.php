@@ -1,9 +1,9 @@
 <?php
 
-require('src/Parser.php');
+require('autoload.php');
 
-use PhpTemplates\Parser;
+use DomDocument\PhpTemplates\Facades\Template;
+
 header("Content-Type: text/plain");
-$parser = new Parser;
 $doc = 'simple';
-echo $parser->parse($doc);~~
+echo Template::load($doc);

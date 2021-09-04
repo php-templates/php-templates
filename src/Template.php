@@ -1,8 +1,8 @@
 <?php
 
-namespace HarmonyTools;
+namespace DomDocument\PhpTemplates;
 
-class PhpTemplates
+class Template
 {
     // requestName => [requestName => filetime, ...other components]
     private static $dependencies = null;

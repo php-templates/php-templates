@@ -1,14 +1,16 @@
 <?php
 
-namespace HarmonyTools\Facades;
+namespace DomDocument\PhpTemplates\Facades;
+
+use DomDocument\PhpTemplates\Template as PhpTemplate;
 
 class Template
 {
     private function __construct() {}
     
-    public static function gétInstance(): \HarmonyTools\PhpTemplates
+    public static function getInstance(): PhpTemplate
     {
-        return new \HarmonyTools\PhpTemplates();
+        return new PhpTemplate();
     }
     
     public static function __callStatic($name, $args)

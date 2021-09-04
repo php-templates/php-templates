@@ -1,6 +1,6 @@
 <?php
 
-namespace HarmonyTools;
+namespace DomDocument\PhpTemplates;
 
 class Parser
 {
