@@ -15,6 +15,6 @@ class Template
     
     public static function __callStatic($name, $args)
     {
-        return call_user_func([self::getInstance(), $args]);
+        return call_user_func_array([self::getInstance(), $name], $args);
     }
 }

@@ -2,7 +2,10 @@
 
 namespace DomDocument\PhpTemplates;
 
-class Parser
+use IvoPetkov\HTML5DOMDocument;
+use DomDocument\PhpTemplates\Template;
+
+class Parser extends HTML5DOMDocument
 {
     private $options = [
         
@@ -11,13 +14,16 @@ class Parser
     private $data;
     private $slots;
     
-    publoc function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
+    public function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
     {
-        parent::construct($srcFile);
+        parent::__construct($srcFile);
         
         // set slots set data, if q slots, set ukey then as name in slot
         // add slots too
+        $this->data = $data;
         $this->slots = $slots;
+        $this->options = (object) $options;
+
         $this->prepareSlots();
     }
     
@@ -26,57 +32,74 @@ class Parser
         //check if any dynamic slots and parse file for dynamic slots query and replace them with uniq name
         
         // parse this file, and foreach found slot call load m
-        foreach if tag name slot check in slots
-        slot will be a string as result of load with o to return string
-        if slot has data, replace slot with closure function if slot has slots, f will be unique, k => val
-        if slot has no data, replace slot with uname and k val global
-          foreach slots slots, call load
+        // foreach if tag name slot check in slots
+        // slot will be a string as result of load with o to return string
+        // if slot has data, replace slot with closure function if slot has slots, f will be unique, k => val
+        // if slot has no data, replace slot with uname and k val global
+        //   foreach slots slots, call load
           
     }
     
     private function prepareSlots()
     {
+        if (!$this->slots) {
+            return;
+        }
+
         foreach ($this->slots as $name => $slot) {
-            if (!is_array($slot) && !selfnslot type) {
-                throw 'Slots must be instances of x or array of instances of x';
-            }
-            $_slots = (array) $slot;
-            foreach ($_slots as $s) {
-                if (not instance of self $s) {
-                    throw 'ArraySlots must contain only instances of x';
-                }
-            }
+            $this->validateSlotType($slot);
             if (strpos($name, 'q:')) {
                 // is query slot
                 $this->addDynamicSlot(str_replace('q:', $name), $slot);
                 unset($this->slots[$name]);
             }
         }
-        
-        public function addDynamicSlot($q, $slot)
-        {
-            $o = $slot->getOptions();
-            $slot = $this->createNodeElement('slot');
-            $sname = 's'.uid();
-            $slot->addAttribute('name', $sname);
-            $this->slots[$sname] = $slot;
-            if ($o['all']) {
-                $ref = $this->querySelectorAll($q);
-            } else {
-                $ref = [$this->querySelector($q)];
+    }
+
+    public function addDynamicSlot($q, $slot)
+    {
+        $o = $slot->getOptions();
+        $slot = $this->createNodeElement('slot');
+        $sname = 's'.uid();
+        $slot->addAttribute('name', $sname);
+        $this->slots[$sname] = $slot;
+        if ($o['all']) {
+            $ref = $this->querySelectorAll($q);
+        } else {
+            $ref = [$this->querySelector($q)];
+        }
+        $pos = $o['position'] ?? null;
+        foreach ($ref as $node) {
+            if ($pos === 'before') {
+                $this->insertBefore($slot, $node);
             }
-            $pos = $o['position'] ?? null;
-            foreach ($ref as $node) {
-                if ($pos === 'before') {
-                    $this->insertBefore($slot, $node)
+            elseif ($pos === 'after') {
+                $this->insertAfter($slot, $node);
+            }
+            else {
+                $this->dom_node_insert_before();
+                $this->removeNode($node);
+            }
+        }
+    }
+
+    private function validateSlotType($slot)
+    {
+        if (!is_array($slot) && !($slot instanceof Template)) {
+            $t = gettype($slot);
+            if ($t === 'object') {
+                $t = get_class($slot) ?? $t;
+            }
+            throw new \Exception('Slots must be instances of '.Template::class.' or array of instances of '.Template::class. ', '.$t.' given');
+        }
+        $_slots = is_array($slot) ? $slot : [$slot];
+        foreach ($_slots as $s) {
+            if (!($s instanceof Template)) {
+                $t = gettype($s);
+                if ($t === 'object') {
+                    $t = get_class($s) ?? $t;
                 }
-                elseif ($pos === 'after') {
-                    $this->insertAfter($slot, $node)
-                }
-                else {
-                    $this->dom_node_insert_before();
-                    $this->removeNode($node);
-                }
+                throw new \Exception('ArraySlots must contain only instances of '.Template::class. ', '.$t.' given');
             }
         }
     }

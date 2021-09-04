@@ -2,16 +2,18 @@
 
 namespace DomDocument\PhpTemplates;
 
+use DomDocument\PhpTemplates\Parser;
+
 class Template
 {
-    // requestName => [requestName => filetime, ...other components]
+    // requestName => [requestName => filemtime, ...other components]
     private static $dependencies = null;
     private static $timestamps = []; // cache file $timestamps
     
     public static function getUpdatedAt(string $file)
     {
         if (!isset(self::$timestamps[$file])) {
-            self::$timestamps[$file] = filetime($file);
+            self::$timestamps[$file] = filemtime($file);
         }
         return self::$timestamps[$file];
     }
@@ -19,10 +21,15 @@ class Template
     private $options = [
         'prefix' => '@',
         'src_path' => 'views/',
-        'dest_path' => 'parsed/'
+        'dest_path' => 'parsed/',
+        'track_changes' => true,
     ];
     
-    private $rfilepath = '';
+    private $checkedDependencies = [];
+    private $requestName;
+    private $srcFile;
+    private $destFile;
+    private $slots = [];
     
     public function __construct(array $options = [])
     {
@@ -44,31 +51,36 @@ class Template
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        
-        $this->srcFile = $this->getSrcFile();
-        // $this->timestamp = fileatime($this->file);
-        // $this->slotsHash = $this->getSlotsHash();
-        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
-        
+        $this->prepare($rfilepath, $slots);
+
         $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
-        if (!$hasChanged && file_exists($this->destFile) {
-            return require($this->destFile;
+        if (!$hasChanged && file_exists($this->destFile)) {
+            return require($this->destFile);
         }
-        
-        new parser($cfg)->parse(file) intoarce str html
-        replaces urile salvate pe o statica
-        cand ajung la un comp, inlocuiesc nodul cu chemare funcie cf reqname.i
-        ii trec ca sloturi nodurile si intorc cu load() optiune sa imi intoarca string si am ajuns aici
-        save pe statica nume f => declarare function
-        la fel si cand dau de sloturi daca sunt, daca nu, delete nodurile
-        la final, trb doar sa fac replaceuri si output si sa curat staticele
+
+        $parser = (new Parser($this->srcFile, $data, $slots, (array) $options))->parse();
+        // new parser($cfg)->parse(file) intoarce str html
+        // replaces urile salvate pe o statica
+        // cand ajung la un comp, inlocuiesc nodul cu chemare funcie cf reqname.i
+        // ii trec ca sloturi nodurile si intorc cu load() optiune sa imi intoarca string si am ajuns aici
+        // save pe statica nume f => declarare function
+        // la fel si cand dau de sloturi daca sunt, daca nu, delete nodurile
+        // la final, trb doar sa fac replaceuri si output si sa curat staticele
+    }
+
+    private function prepare($rfilepath, $slots)
+    {
+        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+        $this->slots = $slots;
+
+        $this->srcFile = $this->getSrcFile();
+        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
     }
     
     private function getSrcFile()
     {
         if (!$this->srcFile) {
-            $f = $this->options->src_path.$this->rfilepath;
+            $f = $this->options->src_path;
             $this->srcFile = $f.$this->requestName.'.template.php';
         }
         return $this->srcFile;
@@ -101,7 +113,7 @@ class Template
         $dependencies = self::$dependencies[$reqName] ?? [];
         $updated = false;
         foreach ($dependencies as $_reqName => $timestamp) {
-            $nowstamp = fileatime($this->getSrcFile($_reqName));
+            $nowstamp = filemtime($this->getSrcFile($_reqName));
             self::$dependencies[$reqName][$_reqName] = $nowstamp;
             $updated = $updated || $timestamp === $nowstamp;
             $updated = $updated || $this->syncDependencies($reqName);
@@ -112,20 +124,25 @@ class Template
     private function getSlotsHash(): string
     {// if is qslot, add q, mode and (str hash/comp time)
         $hash = '';
-        foreach ($slots as $slot) {
-            if (is_string($slot)) {
-                $hash .= md5($slot);
-            } 
-            elseif ($slot instanceof self) {
-                $hash .= fileatime($slot->getSrcFile());
+        foreach ($this->slots as $slot) {
+            if ($slot instanceof self) {
+                $hash .= filemtime($slot->getSrcFile());
                 $hash .= $slot->getSlotsHash();
             } 
             else {
                 
             }
         }
-        return substr(md5($string, true), 0, 12);
+        if (!$hash) {
+            return '';
+        }
+        return substr(md5($hash, true), 0, 12);
     }
     
-    
+    public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    {
+        $this->prepare($rfilepath, $slots);
+
+        return $this;
+    }
 }
