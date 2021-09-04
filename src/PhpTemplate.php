@@ -110,7 +110,7 @@ class PhpTemplates
     }
     
     private function getSlotsHash(): string
-    {
+    {// if is qslot, add q, mode and (str hash/comp time)
         $hash = '';
         foreach ($slots as $slot) {
             if (is_string($slot)) {
