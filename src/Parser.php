@@ -17,7 +17,8 @@ class Parser
         
         // set slots set data, if q slots, set ukey then as name in slot
         // add slots too
-        $this->setSlots($slots);
+        $this->slots = $slots;
+        $this->prepareSlots();
     }
     
     public function parse()
@@ -47,14 +48,36 @@ class Parser
             }
             if (strpos($name, 'q:')) {
                 // is query slot
-                $this->addDynamicSlot($slot);
+                $this->addDynamicSlot(str_replace('q:', $name), $slot);
                 unset($this->slots[$name]);
             }
         }
         
-        public function addDynamicSlot($slot)
+        public function addDynamicSlot($q, $slot)
         {
-            
+            $o = $slot->getOptions();
+            $slot = $this->createNodeElement('slot');
+            $sname = 's'.uid();
+            $slot->addAttribute('name', $sname);
+            $this->slots[$sname] = $slot;
+            if ($o['all']) {
+                $ref = $this->querySelectorAll($q);
+            } else {
+                $ref = [$this->querySelector($q)];
+            }
+            $pos = $o['position'] ?? null;
+            foreach ($ref as $node) {
+                if ($pos === 'before') {
+                    $this->insertBefore($slot, $node)
+                }
+                elseif ($pos === 'after') {
+                    $this->insertAfter($slot, $node)
+                }
+                else {
+                    $this->dom_node_insert_before();
+                    $this->removeNode($node);
+                }
+            }
         }
     }
 }
