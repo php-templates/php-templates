@@ -25,7 +25,6 @@ class Template
         'track_changes' => true,
     ];
     
-    private $isMain = null;
     private $checkedDependencies = [];
     private $requestName;
     private $srcFile;
@@ -52,15 +51,10 @@ class Template
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->isMain = $this->isMain === null ? true : false;
-        $this->prepare($rfilepath, $slots);
+        $this->setData($rfilepath, $data, $slots);
 
-        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
-        if (!$hasChanged && file_exists($this->destFile)) {
-            return require($this->destFile);
-        }
+        $this->getParsedHtml();
 
-        $parser = (new Parser($this->srcFile, $data, $slots, (array) $options))->parse();
         // new parser($cfg)->parse(file) intoarce str html
         // replaces urile salvate pe o statica
         // cand ajung la un comp, inlocuiesc nodul cu chemare funcie cf reqname.i
@@ -70,15 +64,17 @@ class Template
         // la final, trb doar sa fac replaceuri si output si sa curat staticele
     }
 
-    private function prepare($rfilepath, $slots)
-    {
-        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        $this->slots = $slots;
-
-        $this->srcFile = $this->getSrcFile();
+    private function getParsedHtml() {
         $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
+
+        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
+        if (!$hasChanged && file_exists($this->destFile)) {
+            return require($this->destFile);
+        }
+
+        $parser = (new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options))->parse();
     }
-    
+
     private function getSrcFile()
     {
         if (!$this->srcFile) {
@@ -96,7 +92,7 @@ class Template
             if ($this->options->track_changes) {
                 $f .= '-'.self::getUpdatedAt($this->getSrcFile());
             }
-            if ($slotsHash = $this->getSlotsHash()) {
+            if ($slotsHash = $this->getHash()) {
                 $f .= '-'.$slotsHash;
             }
             $this->destFile = $f;
@@ -123,13 +119,13 @@ class Template
         return $updated;
     }
     
-    private function getSlotsHash(): string
+    private function getHash(): string
     {// if is qslot, add q, mode and (str hash/comp time)
-        $hash = $this->isMain ? '' : self::getUpdatedAt($this->getSrcFile());
+        $hash = self::getUpdatedAt($this->getSrcFile());
         foreach ($this->slots as $slot) {
             if ($slot instanceof self) {
                 $hash .= filemtime($slot->getSrcFile());
-                $hash .= $slot->getSlotsHash();
+                $hash .= $slot->getHash();
             } 
             else {
                 
@@ -143,9 +139,17 @@ class Template
     
     public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->isMain = false;
-        $this->prepare($rfilepath, $slots);
+        $this->setData($rfilepath, $data, $slots);
 
         return $this;
+    }
+
+    private function setData(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    {
+        $this->rfilepath = $rfilepath;
+        $this->data = $data;
+        $this->slots = $slots;
+        $this->requestName = preg_replace('(\.template|\.php)', '', $this->rfilepath);
+        $this->srcFile = $this->getSrcFile();
     }
 }

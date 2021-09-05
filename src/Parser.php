@@ -21,8 +21,6 @@ class Parser extends HTML5DOMDocument
         $file = file_get_contents($srcFile);
         $this->loadHtml($file);
         
-        echo $this->saveHtml();
-        die();
         // set slots set data, if q slots, set ukey then as name in slot
         // add slots too
         $this->data = $data;
@@ -46,13 +44,13 @@ class Parser extends HTML5DOMDocument
     }
     
     private function recursiveParse($node)
-    {echo $node->nodeName;
+    {
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         }
         
-        foreach ($this->childNodes as $node) {
-            $this->recursiveParse($node);
+        foreach ($node->childNodes as $_node) {
+            $this->recursiveParse($_node);
         }
     }
     
