@@ -7,6 +7,10 @@ use DomDocument\PhpTemplates\Template;
 
 class Parser extends HTML5DOMDocument
 {
+    public static $components = [];
+    public static $replaces = [];
+    public static $scoped_data = [];
+
     private $options = [
         
     ];
@@ -41,6 +45,8 @@ class Parser extends HTML5DOMDocument
         // if slot has no data, replace slot with uname and k val global
         //   foreach slots slots, call load
         $this->recursiveParse($this);
+
+        dd($this->saveHtml());
     }
     
     private function recursiveParse($node)
@@ -103,10 +109,23 @@ class Parser extends HTML5DOMDocument
         if (!isset($this->slots[$slotName])) {
             return;
         }
-        $this->insertBefore(
+
+        // if slot has childslots, function/replace will be unique name
+        $slotReplace = str_replace('-', '_', $slotName);
+        if ($this->slots[$slotName]->hasSlots()) {
+            $slotReplace .= uniqid();
+        }
+        // insert scoped slot if node's slot has data
+        if ($this->slots[$slotName]->hasData()) {
+            $slotReplace .= "()";
+            
+        }
+
+        $node->parentNode->insertBefore(
             $this->createTextNode('babababab'),
             $node
         );
+        $node->parentNode->removeChild($node);
     }
 
     private function validateSlotType($slot)
