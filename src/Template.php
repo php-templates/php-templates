@@ -61,7 +61,6 @@ class Template
         }
 
         $parser = (new Parser($this->srcFile, $data, $slots, (array) $options))->parse();
-        dd($parser);
         // new parser($cfg)->parse(file) intoarce str html
         // replaces urile salvate pe o statica
         // cand ajung la un comp, inlocuiesc nodul cu chemare funcie cf reqname.i

@@ -16,8 +16,13 @@ class Parser extends HTML5DOMDocument
     
     public function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
     {
-        parent::__construct($srcFile);
+        // parent::__construct($srcFile);
+        // $this->load($srcFile);
+        $file = file_get_contents($srcFile);
+        $this->loadHtml($file);
         
+        echo $this->saveHtml();
+        die();
         // set slots set data, if q slots, set ukey then as name in slot
         // add slots too
         $this->data = $data;
@@ -38,18 +43,16 @@ class Parser extends HTML5DOMDocument
         // if slot has no data, replace slot with uname and k val global
         //   foreach slots slots, call load
         $this->recursiveParse($this);
-        
-        dd($this->saveHtml());
     }
     
     private function recursiveParse($node)
-    {
+    {echo $node->nodeName;
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         }
         
         foreach ($this->childNodes as $node) {
-            $this-> recursiveParse($node);
+            $this->recursiveParse($node);
         }
     }
     
