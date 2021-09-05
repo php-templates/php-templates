@@ -37,7 +37,20 @@ class Parser extends HTML5DOMDocument
         // if slot has data, replace slot with closure function if slot has slots, f will be unique, k => val
         // if slot has no data, replace slot with uname and k val global
         //   foreach slots slots, call load
-          
+        $this->recursiveParse($this);
+        
+        dd($this->saveHtml());
+    }
+    
+    private function recursiveParse($node)
+    {
+        if ($node->nodeName === 'slot') {
+            $this->insertSlot($node);
+        }
+        
+        foreach ($this->childNodes as $node) {
+            $this-> recursiveParse($node);
+        }
     }
     
     private function prepareSlots()
@@ -81,6 +94,18 @@ class Parser extends HTML5DOMDocument
                 $this->removeNode($node);
             }
         }
+    }
+    
+    private function insertSlot($node)
+    {
+        $slotName = $node->getAttribute('name');
+        if (!isset($this->slots[$slotName])) {
+            return;
+        }
+        $this->insertBefore(
+            $this->createTextNode('babababab'),
+            $node
+        );
     }
 
     private function validateSlotType($slot)

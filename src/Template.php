@@ -25,6 +25,7 @@ class Template
         'track_changes' => true,
     ];
     
+    private $isMain = null;
     private $checkedDependencies = [];
     private $requestName;
     private $srcFile;
@@ -51,6 +52,7 @@ class Template
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
+        $this->isMain = $this->isMain === null ? true : false;
         $this->prepare($rfilepath, $slots);
 
         $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
@@ -59,6 +61,7 @@ class Template
         }
 
         $parser = (new Parser($this->srcFile, $data, $slots, (array) $options))->parse();
+        dd($parser);
         // new parser($cfg)->parse(file) intoarce str html
         // replaces urile salvate pe o statica
         // cand ajung la un comp, inlocuiesc nodul cu chemare funcie cf reqname.i
@@ -123,7 +126,7 @@ class Template
     
     private function getSlotsHash(): string
     {// if is qslot, add q, mode and (str hash/comp time)
-        $hash = '';
+        $hash = $this->isMain ? '' : self::getUpdatedAt($this->getSrcFile());
         foreach ($this->slots as $slot) {
             if ($slot instanceof self) {
                 $hash .= filemtime($slot->getSrcFile());
@@ -141,6 +144,7 @@ class Template
     
     public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
+        $this->isMain = false;
         $this->prepare($rfilepath, $slots);
 
         return $this;
