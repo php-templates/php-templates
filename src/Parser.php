@@ -7,16 +7,15 @@ use DomDocument\PhpTemplates\Template;
 
 class Parser extends HTML5DOMDocument
 {
-    public static $components = [];
-    public static $replaces = [];
-    public static $scoped_data = [];
-
+    public static $root = null;
     private $options = [
         
     ];
     
     private $data;
     private $slots;
+    public $components = [];
+    public $replaces = [];
     
     public function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
     {
@@ -24,13 +23,11 @@ class Parser extends HTML5DOMDocument
         // $this->load($srcFile);
         $file = file_get_contents($srcFile);
         $this->loadHtml($file);
-        
         // set slots set data, if q slots, set ukey then as name in slot
         // add slots too
         $this->data = $data;
         $this->slots = $slots;
         $this->options = (object) $options;
-
         $this->prepareSlots();
     }
     
@@ -46,16 +43,16 @@ class Parser extends HTML5DOMDocument
         //   foreach slots slots, call load
         $this->recursiveParse($this);
 
-        dd($this->saveHtml());
+        //dd($this->saveHtml());
     }
     
     private function recursiveParse($node)
-    {
+    {//return;
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         }
         
-        foreach ($node->childNodes as $_node) {
+        foreach ($node->childNodes ?? [] as $_node) {
             $this->recursiveParse($_node);
         }
     }
@@ -146,6 +143,15 @@ class Parser extends HTML5DOMDocument
                 }
                 throw new \Exception('ArraySlots must contain only instances of '.Template::class. ', '.$t.' given');
             }
+        }
+    }
+    
+    public function __get($property) {
+        if (property_exists($this, $property)) {
+            return $this->$property;
+        } 
+        elseif ($property === 'root') {
+            return self::root;
         }
     }
 }

@@ -52,6 +52,12 @@ class Template
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->setData($rfilepath, $data, $slots);
+check hhash, 
+if file found
+mount slots
+else
+mount parser
+mount slots
 
         $this->getParsedHtml();
 
@@ -64,7 +70,8 @@ class Template
         // la final, trb doar sa fac replaceuri si output si sa curat staticele
     }
 
-    private function getParsedHtml() {
+    private function getParsedHtml() 
+    {
         $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
         $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
@@ -72,7 +79,11 @@ class Template
             return require($this->destFile);
         }
 
-        $parser = (new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options))->parse();
+        $parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
+        if (!Parser::root) {
+            Parser::root = $parser;
+        }
+        $parser->parse();
     }
 
     private function getSrcFile()
@@ -136,6 +147,8 @@ class Template
         }
         return substr(md5($hash, true), 0, 12);
     }
+    
+    
     
     public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
