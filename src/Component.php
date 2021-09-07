@@ -4,8 +4,13 @@ namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Template;
 
-class Component extends Parser
+class Component extends Template
 {
+    public static function getUpdatedAt(string $file)
+    {
+        return Template::getUpdatedAt($file);
+    }
+    
     private static $index = 0;
     public static function resetId()
     {
@@ -18,9 +23,15 @@ class Component extends Parser
     private $data;
     private $slots;
     
-    public function __construct()
+    public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->uid = self::index++;
+        $this->uid = (self::$index++);
+        
+        $this->data = $data;
+        $this->slots = $slots;
+        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+        $this->srcFile = $this->getSrcFile();
+
     }
     
     public function getId()
@@ -38,8 +49,21 @@ class Component extends Parser
             // my job is done;
             return;
         }
+        // set data on dom root
+        return $this->loadParsed($root);
+    }
+    
+    private function loadParsed(Template $root)
+    {
+        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
+
+        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
+        if (!$hasChanged && file_exists($this->destFile)) {
+            return require($this->destFile);
+        }
         
-        
+        $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
+        $this->parser->parse($root);
     }
     
     private function getVariableName()

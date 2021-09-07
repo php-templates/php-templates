@@ -29,8 +29,8 @@ class Parser extends HTML5DOMDocument
     
     public function parse()
     {
-        aicisa fac parse peste ele. cand ajung la o componenta, o instantiez cu numele. daca are sloturi, ii fac nume unic si o pun pe replaces. daca are date, ii fac dunctie
-        recursivitatea se face in components
+        //aicisa fac parse peste ele. cand ajung la o componenta, o instantiez cu numele. daca are sloturi, ii fac nume unic si o pun pe replaces. daca are date, ii fac dunctie
+        //recursivitatea se face in components
         //check if any dynamic slots and parse file for dynamic slots query and replace them with uniq name
         
         // parse this file, and foreach found slot call load m

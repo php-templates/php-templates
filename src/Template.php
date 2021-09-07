@@ -31,6 +31,11 @@ class Template
     private $destFile;
     private $slots = [];
     
+    public function addData($k, $val)
+    {
+        $this->data[$k] = $val;
+    }
+    
     public function __construct(array $options = [])
     {
         if (self::$dependencies === null) {
@@ -60,13 +65,14 @@ class Template
 
         $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
         if (!$hasChanged && file_exists($this->destFile)) {
-            $this->mountSlots();
+            $this->mountSlots($this);
             return require($this->destFile);
         }
         
         $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
-        $this->mountSlots();
+        $this->mountSlots($this);
         $this->parser->parse($this);
+
 
         //$this->getParsedHtml();
 
@@ -81,9 +87,6 @@ class Template
 
     private function getParsedHtml() 
     {
-        if (!Parser::root) {
-            Parser::root = $parser;
-        }
         $parser->parse();
     }
 
@@ -144,6 +147,17 @@ class Template
             return '';
         }
         return substr(md5($hash, true), 0, 12);
+    }
+    
+    protected function mountSlots(Template $root)
+    {
+        foreach ($this->slots as $n => $slot) {
+            $slots = is_array($slot) ? $slot : [$slot];
+            foreach ($slots as $slot) {
+                $slot->mount($this);
+            }
+        }
+ 
     }
     
     public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
