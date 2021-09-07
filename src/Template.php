@@ -39,7 +39,7 @@ class Template
         $this->mergeOptions($options);
     }
     
-    private function mergeOptions($options)
+    protected function mergeOptions($options)
     {
         if (isset($options['prefix'])) {
             if (!trim($options['prefix'])) {
@@ -51,15 +51,24 @@ class Template
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->setData($rfilepath, $data, $slots);
-check hhash, 
-if file found
-mount slots
-else
-mount parser
-mount slots
+        $this->data = $data;
+        $this->slots = $slots;
+        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+        $this->srcFile = $this->getSrcFile();
 
-        $this->getParsedHtml();
+        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
+
+        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
+        if (!$hasChanged && file_exists($this->destFile)) {
+            $this->mountSlots();
+            return require($this->destFile);
+        }
+        
+        $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
+        $this->mountSlots();
+        $this->parser->parse($this);
+
+        //$this->getParsedHtml();
 
         // new parser($cfg)->parse(file) intoarce str html
         // replaces urile salvate pe o statica
@@ -72,21 +81,13 @@ mount slots
 
     private function getParsedHtml() 
     {
-        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
-
-        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
-        if (!$hasChanged && file_exists($this->destFile)) {
-            return require($this->destFile);
-        }
-
-        $parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
         if (!Parser::root) {
             Parser::root = $parser;
         }
         $parser->parse();
     }
 
-    private function getSrcFile()
+    protected function getSrcFile()
     {
         if (!$this->srcFile) {
             $f = $this->options->src_path;
@@ -96,7 +97,7 @@ mount slots
     }
     
     // based on this output, we decide if to recompile template
-    private function getDestFile()
+    protected function getDestFile()
     {
         if (!$this->destFile) {
             $f = str_replace('/', '_', $this->requestName);
@@ -111,7 +112,7 @@ mount slots
         return $this->destFile;
     }
     
-    private function syncDependencies(string $reqName): bool
+    protected function syncDependencies(string $reqName): bool
     {
         // ignoee self from list for avoíding infinite loop
         if (in_array($reqName, $this->checkedDependencies)) {
@@ -132,14 +133,11 @@ mount slots
     
     private function getHash(): string
     {// if is qslot, add q, mode and (str hash/comp time)
-        $hash = self::getUpdatedAt($this->getSrcFile());
-        foreach ($this->slots as $slot) {
-            if ($slot instanceof self) {
-                $hash .= filemtime($slot->getSrcFile());
-                $hash .= $slot->getHash();
-            } 
-            else {
-                
+        $hash = '';//self::getUpdatedAt($this->getSrcFile());
+        foreach ($this->slots as $n => $slot) {
+            $slots = is_array($slot) ? $slot : [$slot];
+            foreach ($slots as $slot) {
+                $hash .= $n.$slot->getHash();
             }
         }
         if (!$hash) {
@@ -147,8 +145,6 @@ mount slots
         }
         return substr(md5($hash, true), 0, 12);
     }
-    
-    
     
     public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
@@ -159,10 +155,5 @@ mount slots
 
     private function setData(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->rfilepath = $rfilepath;
-        $this->data = $data;
-        $this->slots = $slots;
-        $this->requestName = preg_replace('(\.template|\.php)', '', $this->rfilepath);
-        $this->srcFile = $this->getSrcFile();
     }
 }

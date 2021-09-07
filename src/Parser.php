@@ -19,20 +19,18 @@ class Parser extends HTML5DOMDocument
     
     public function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
     {
-        // parent::__construct($srcFile);
-        // $this->load($srcFile);
         $file = file_get_contents($srcFile);
         $this->loadHtml($file);
-        // set slots set data, if q slots, set ukey then as name in slot
-        // add slots too
         $this->data = $data;
         $this->slots = $slots;
         $this->options = (object) $options;
-        $this->prepareSlots();
+        $this->insertQuerySlots();
     }
     
     public function parse()
     {
+        aicisa fac parse peste ele. cand ajung la o componenta, o instantiez cu numele. daca are sloturi, ii fac nume unic si o pun pe replaces. daca are date, ii fac dunctie
+        recursivitatea se face in components
         //check if any dynamic slots and parse file for dynamic slots query and replace them with uniq name
         
         // parse this file, and foreach found slot call load m
@@ -47,7 +45,7 @@ class Parser extends HTML5DOMDocument
     }
     
     private function recursiveParse($node)
-    {//return;
+    {
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         }
@@ -57,14 +55,13 @@ class Parser extends HTML5DOMDocument
         }
     }
     
-    private function prepareSlots()
+    private function insertQuerySlots()
     {
         if (!$this->slots) {
             return;
         }
 
         foreach ($this->slots as $name => $slot) {
-            $this->validateSlotType($slot);
             if (strpos($name, 'q:')) {
                 // is query slot
                 $this->addDynamicSlot(str_replace('q:', $name), $slot);
@@ -123,35 +120,5 @@ class Parser extends HTML5DOMDocument
             $node
         );
         $node->parentNode->removeChild($node);
-    }
-
-    private function validateSlotType($slot)
-    {
-        if (!is_array($slot) && !($slot instanceof Template)) {
-            $t = gettype($slot);
-            if ($t === 'object') {
-                $t = get_class($slot) ?? $t;
-            }
-            throw new \Exception('Slots must be instances of '.Template::class.' or array of instances of '.Template::class. ', '.$t.' given');
-        }
-        $_slots = is_array($slot) ? $slot : [$slot];
-        foreach ($_slots as $s) {
-            if (!($s instanceof Template)) {
-                $t = gettype($s);
-                if ($t === 'object') {
-                    $t = get_class($s) ?? $t;
-                }
-                throw new \Exception('ArraySlots must contain only instances of '.Template::class. ', '.$t.' given');
-            }
-        }
-    }
-    
-    public function __get($property) {
-        if (property_exists($this, $property)) {
-            return $this->$property;
-        } 
-        elseif ($property === 'root') {
-            return self::root;
-        }
     }
 }
