@@ -176,6 +176,14 @@ class Template
         return $this->options;
     }
     
+    public function registerFunction($name, $body)
+    {
+        $this->components[$name] = "function {$name}(\$data) {
+            extract(\$data);
+            $content;
+        }";
+    }
+    
     protected function makeReplaces()
     {
         $content = $this->parser->saveHtml();
