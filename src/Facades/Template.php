@@ -21,6 +21,7 @@ class Template
     
     public static function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
+        $options = (array) self::getInstance()->getOptions();
         return new Component($rfilepath, $data, $slots, $options);
     }
 }

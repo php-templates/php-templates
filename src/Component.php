@@ -19,19 +19,15 @@ class Component extends Template
     
     private $uid = 0;
     private $name;
-    private $requestName;
-    private $data;
-    private $slots;
     
     public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->uid = (self::$index++);
-        
         $this->data = $data;
         $this->slots = $slots;
+        $this->options = (object) $options;
         $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
         $this->srcFile = $this->getSrcFile();
-
     }
     
     public function getId()
@@ -39,21 +35,19 @@ class Component extends Template
         return $this->uid;
     }
     
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+    
     // mount the slot on specific dom
     public function mount(Template $root)
     {
-        // montam datele pe Template::data
+        // montam datele pe Template::data daca exista
         $root->addData($this->getVariableName(), $this->data);
-        // daca exista si un parser, cream si entries pe replaces, html string
-        if (!$root->parser) {
-            // my job is done;
-            return;
-        }
-        // set data on dom root
-        return $this->loadParsed($root);
     }
     
-    private function loadParsed(Template $root)
+    public function loadParsed(Template $root): string
     {
         $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
@@ -63,12 +57,25 @@ class Component extends Template
         }
         
         $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
-        $this->parser->parse($root);
+        $result = $this->parser->parse($root);
+        $body = $result->getElementsByTagName('body')->item(0);
+        $content = '';
+        foreach ($body->childNodes as $node)
+        $content.= $result->saveHtml($node);
+        // save to file them
+        if ($this->hasData) {
+            $this->root->components[$name] = $content;
+            // comp name vor fi mai asa foo_bar si nu au cum avea conflict
+            return $name."($name)";
+        } else {
+            $root->replaces[$name] = $content;
+            return $name;
+        }
     }
     
     private function getVariableName()
     {
-        return $this->name . $this->uid;
+        return $this->name . $this->uid . '_';
     }
     
     public function getHash()
@@ -87,5 +94,15 @@ class Component extends Template
         }
     
         return substr(md5($hash, true), 0, 12);
+    }
+    
+    public function getSlots()
+    {
+        return $this->slots;
+    }
+    
+    public function getData()
+    {
+        return $this->data;
     }
 }

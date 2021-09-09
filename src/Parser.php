@@ -7,7 +7,7 @@ use DomDocument\PhpTemplates\Template;
 
 class Parser extends HTML5DOMDocument
 {
-    public static $root = null;
+    private $root = null;
     private $options = [
         
     ];
@@ -27,8 +27,9 @@ class Parser extends HTML5DOMDocument
         $this->insertQuerySlots();
     }
     
-    public function parse()
+    public function parse(Template $root)
     {
+        $this->root = $root;
         //aicisa fac parse peste ele. cand ajung la o componenta, o instantiez cu numele. daca are sloturi, ii fac nume unic si o pun pe replaces. daca are date, ii fac dunctie
         //recursivitatea se face in components
         //check if any dynamic slots and parse file for dynamic slots query and replace them with uniq name
@@ -40,8 +41,7 @@ class Parser extends HTML5DOMDocument
         // if slot has no data, replace slot with uname and k val global
         //   foreach slots slots, call load
         $this->recursiveParse($this);
-
-        //dd($this->saveHtml());
+        return $this;
     }
     
     private function recursiveParse($node)
@@ -64,13 +64,13 @@ class Parser extends HTML5DOMDocument
         foreach ($this->slots as $name => $slot) {
             if (strpos($name, 'q:')) {
                 // is query slot
-                $this->addDynamicSlot(str_replace('q:', $name), $slot);
+                $this->addSlotNode(str_replace('q:', $name), $slot);
                 unset($this->slots[$name]);
             }
         }
     }
 
-    public function addDynamicSlot($q, $slot)
+    public function addSlotNode($q, $slot)
     {
         $o = $slot->getOptions();
         $slot = $this->createNodeElement('slot');
@@ -104,15 +104,11 @@ class Parser extends HTML5DOMDocument
             return;
         }
 
-        // if slot has childslots, function/replace will be unique name
-        $slotReplace = str_replace('-', '_', $slotName);
-        if ($this->slots[$slotName]->hasSlots()) {
-            $slotReplace .= uniqid();
-        }
         // insert scoped slot if node's slot has data
-        if ($this->slots[$slotName]->hasData()) {
-            $slotReplace .= "()";
+        if ($this->slots[$slotName]->getData()) {
             
+        } else {// foreach slot cazul []
+            $this->root->replaces[$slotName] = $this->slots[$slotName->loadParsed($this->root)];
         }
 
         $node->parentNode->insertBefore(

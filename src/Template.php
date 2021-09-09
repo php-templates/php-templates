@@ -9,7 +9,6 @@ class Template
     // requestName => [requestName => filemtime, ...other components]
     private static $dependencies = null;
     private static $timestamps = []; // cache file $timestamps
-    
     public static function getUpdatedAt(string $file)
     {
         if (!isset(self::$timestamps[$file])) {
@@ -18,18 +17,21 @@ class Template
         return self::$timestamps[$file];
     }
     
-    private $options = [
+    protected $options = [
         'prefix' => '@',
         'src_path' => 'views/',
         'dest_path' => 'parsed/',
         'track_changes' => true,
     ];
     
-    private $checkedDependencies = [];
-    private $requestName;
-    private $srcFile;
-    private $destFile;
-    private $slots = [];
+    protected $checkedDependencies = [];
+    protected $requestName;
+    protected $srcFile;
+    protected $destFile;
+    protected $slots = [];
+    
+    public $components = [];
+    public $replaces = [];
     
     public function addData($k, $val)
     {
@@ -63,17 +65,25 @@ class Template
 
         $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
-        $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
-        if (!$hasChanged && file_exists($this->destFile)) {
-            $this->mountSlots($this);
-            return require($this->destFile);
-        }
+        //$hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
+        //if (!$hasChanged && file_exists($this->destFile)) {
+            //$this->mountSlots($this);
+            //return require($this->destFile);
+        //}
         
         $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
         $this->mountSlots($this);
         $this->parser->parse($this);
 
-
+        $result = $this->makeReplaces();
+        
+        echo $result;
+        
+        dd(
+            $this->components,
+            $this->replaces,
+            $this->parser->saveHtml()
+        );
         //$this->getParsedHtml();
 
         // new parser($cfg)->parse(file) intoarce str html
@@ -154,20 +164,26 @@ class Template
         foreach ($this->slots as $n => $slot) {
             $slots = is_array($slot) ? $slot : [$slot];
             foreach ($slots as $slot) {
+                $slot->setName($n);
                 $slot->mount($this);
             }
         }
  
     }
     
-    public function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    public function getOptions()
     {
-        $this->setData($rfilepath, $data, $slots);
-
-        return $this;
+        return $this->options;
     }
-
-    private function setData(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    
+    protected function makeReplaces()
     {
+        $content = $this->parser->saveHtml();
+        foreach ($this->replaces as $r) {
+            if ($replace = $this->replaces[$r] ?? false) {
+                $content = str_replace($r, $replace, $content);
+            }
+        }
+        return $content;
     }
 }
