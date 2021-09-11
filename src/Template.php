@@ -3,65 +3,42 @@
 namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Parser;
-
+/**
+ * Template is main class, the entry point.
+ * It will first gather recursively all slots scoped data.
+ * Instantiate parser with options and call ->loadCached
+ * parser will:
+ * chen check dependencies times
+ * Then will recursively compose slots hash
+ * If sum of inputfile, filetime, hash is an existing file, it returns it.
+ * else
+ * load root file on parser and recursively do the following
+ * create a root instance parser like new Parser(the four arguments as init)
+ * call parse loadCached with self as arg first time
+ * pass first instance root down to each parser, parser->loadCached(rootpparser)
+ * in parse process steps are
+ * check if file exists using step ln 10
+ * add dynamic slots as dom tags
+ * parse nodes
+ * add result to rootParser
+ * when a component/slot is encountered, repeat
+ * call replaces and register functions (functions will be on root, last one will be called only on root)
+ * return updated parser at the end
+ */
 class Template
 {
-    // requestName => [requestName => filemtime, ...other components]
-    private static $dependencies = null;
-    private static $timestamps = []; // cache file $timestamps
-    public static function getUpdatedAt(string $file)
-    {
-        if (!isset(self::$timestamps[$file])) {
-            self::$timestamps[$file] = filemtime($file);
-        }
-        return self::$timestamps[$file];
-    }
-    
-    protected $options = [
-        'prefix' => '@',
-        'src_path' => 'views/',
-        'dest_path' => 'parsed/',
-        'track_changes' => true,
-    ];
-    
-    protected $checkedDependencies = [];
-    protected $requestName;
-    protected $srcFile;
-    protected $destFile;
-    protected $slots = [];
-    
-    public $components = [];
-    public $replaces = [];
-    
     public function addData($k, $val)
     {
         $this->data[$k] = $val;
     }
     
-    public function __construct(array $options = [])
+    public function __construct(Parser $parser)
     {
-        if (self::$dependencies === null) {
-            self::$dependencies = require_once('dependencies_map.php');
-        }
-        $this->mergeOptions($options);
     }
     
-    protected function mergeOptions($options)
-    {
-        if (isset($options['prefix'])) {
-            if (!trim($options['prefix'])) {
-                unset($options['prefix']);
-            }
-        }
-        $this->options = (object) array_merge((array) $this->options, $options);
-    }
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $this->data = $data;
-        $this->slots = $slots;
-        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        $this->srcFile = $this->getSrcFile();
 
         $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
@@ -72,7 +49,7 @@ class Template
         //}
         
         $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
-        $this->mountSlots($this);
+        $this->mountSlotsData($this);
         $this->parser->parse($this);
 
         $result = $this->makeReplaces();
@@ -159,16 +136,15 @@ class Template
         return substr(md5($hash, true), 0, 12);
     }
     
-    protected function mountSlots(Template $root)
+    protected function mountSlotsData(Template $root)
     {
         foreach ($this->slots as $n => $slot) {
             $slots = is_array($slot) ? $slot : [$slot];
             foreach ($slots as $slot) {
                 $slot->setName($n);
-                $slot->mount($this);
+                $slot->addGlobalData($this);
             }
         }
- 
     }
     
     public function getOptions()

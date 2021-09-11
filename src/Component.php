@@ -11,15 +11,6 @@ class Component extends Template
         return Template::getUpdatedAt($file);
     }
     
-    private static $index = 0;
-    public static function resetId()
-    {
-        self::$index = 0;
-    }
-    
-    private $uid = 0;
-    private $name;
-    
     public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->uid = (self::$index++);
@@ -53,7 +44,7 @@ class Component extends Template
 
         $hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
         if (!$hasChanged && file_exists($this->destFile)) {
-            return require($this->destFile);
+            //return require($this->destFile);
         }
         
         $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
@@ -66,10 +57,10 @@ class Component extends Template
         if ($this->hasData) {
             $this->root->components[$name] = $content;
             // comp name vor fi mai asa foo_bar si nu au cum avea conflict
-            return $name."($name)";
+            return $this->name."($this->getVariableName())";
         } else {
             $root->replaces[$name] = $content;
-            return $name;
+            return $this->name;
         }
     }
     

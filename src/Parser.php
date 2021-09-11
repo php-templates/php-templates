@@ -7,6 +7,46 @@ use DomDocument\PhpTemplates\Template;
 
 class Parser extends HTML5DOMDocument
 {
+    // requestName => [requestName => filemtime, ...other components]
+    protected static $dependencies = null;
+    protected static $timestamps = []; // cache file $timestamps
+    protected static $index = 0;
+    protected static function getUpdatedAt(string $file)
+    {
+        if (!isset(self::$timestamps[$file])) {
+            self::$timestamps[$file] = filemtime($file);
+        }
+        return self::$timestamps[$file];
+    }
+    
+    public static function resetId()
+    {
+        self::$index = 0;
+    }
+    
+
+    protected $options = [
+        'prefix' => '@',
+        'src_path' => 'views/',
+        'dest_path' => 'parsed/',
+        'track_changes' => true,
+        'trim_html' => false
+    ];
+    
+    // instance variables
+    private $uid = 0;
+    private $name;
+    protected $checkedDependencies = [];
+    protected $requestName;
+    protected $srcFile;
+    protected $destFile;
+    protected $slots = [];
+
+    
+    
+    
+    
+    
     private $root = null;
     private $options = [
         
@@ -17,22 +57,62 @@ class Parser extends HTML5DOMDocument
     public $components = [];
     public $replaces = [];
     
-    public function __construct(string $srcFile, array $data = [], array $slots = [], array $options = [])
+    public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-        $file = file_get_contents($srcFile);
-        $this->loadHtml($file);
+        $this->uid = (self::$index++);
+        
+        if (self::$dependencies === null) {
+            self::$dependencies = require_once('dependencies_map.php');
+        }
+        
+        $this->options = $options;
         $this->data = $data;
         $this->slots = $slots;
-        $this->options = (object) $options;
-        $this->insertQuerySlots();
+        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+        $this->srcFile = $this->getSrcFile();
     }
     
-    public function parse(Template $root)
+    protected function mergeOptions($options)
     {
-        $this->root = $root;
-        //aicisa fac parse peste ele. cand ajung la o componenta, o instantiez cu numele. daca are sloturi, ii fac nume unic si o pun pe replaces. daca are date, ii fac dunctie
-        //recursivitatea se face in components
-        //check if any dynamic slots and parse file for dynamic slots query and replace them with uniq name
+        // in this phase, we already have seted all dom global datas
+        if (isset($options['prefix'])) {
+            if (!trim($options['prefix'])) {
+                unset($options['prefix']);
+            }
+        }
+        $this->options = array_merge($this->options, $options);
+    }
+    
+    public function parseCached(Parser $root): string
+    {
+        $this->destFile = $this->getDestFile();
+        
+        //$hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
+        //if (!$hasChanged && file_exists($this->destFile)) {
+            //$this->mountSlots($this);
+            //return require($this->destFile);
+        //}
+        //
+        $this->parse($root);
+        // set file content
+        return $root;
+    }
+    
+    public function addGlobalData(Template $root)
+    {
+        // montam datele pe Template::data daca exista
+        $root->data[$this->getVariableName()] = $this->data;
+    }
+
+    public function parse(Parser $root)
+    {
+        $this->loadHtml(require($this->destFile));
+        $this->insertQuerySlots();
+        // in this stage, we have a normalized template file to parse, data seted on globale
+        // load src file
+        // parse it
+        // return it trimmed
+        // if is root, mount don t, just return it
         
         // parse this file, and foreach found slot call load m
         // foreach if tag name slot check in slots
@@ -108,11 +188,11 @@ class Parser extends HTML5DOMDocument
         if ($this->slots[$slotName]->getData()) {
             
         } else {// foreach slot cazul []
-            $this->root->replaces[$slotName] = $this->slots[$slotName->loadParsed($this->root)];
+            $this->root->replaces[$slotName] = $this->slots[$slotName]->loadParsed($this->root);
         }
 
         $node->parentNode->insertBefore(
-            $this->createTextNode('babababab'),
+            $this->createTextNode($this->slots[$slotName]->loadParsed($this->root)),
             $node
         );
         $node->parentNode->removeChild($node);
