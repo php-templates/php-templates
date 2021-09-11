@@ -32,11 +32,6 @@ class Component extends Template
     }
     
     // mount the slot on specific dom
-    public function mount(Template $root)
-    {
-        // montam datele pe Template::data daca exista
-        $root->addData($this->getVariableName(), $this->data);
-    }
     
     public function loadParsed(Template $root): string
     {

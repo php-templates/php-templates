@@ -7,24 +7,12 @@ use DomDocument\PhpTemplates\Template;
 
 class Parser extends HTML5DOMDocument
 {
-    // requestName => [requestName => filemtime, ...other components]
-    protected static $dependencies = null;
-    protected static $timestamps = []; // cache file $timestamps
     protected static $index = 0;
-    protected static function getUpdatedAt(string $file)
-    {
-        if (!isset(self::$timestamps[$file])) {
-            self::$timestamps[$file] = filemtime($file);
-        }
-        return self::$timestamps[$file];
-    }
-    
     public static function resetId()
     {
         self::$index = 0;
     }
     
-
     protected $options = [
         'prefix' => '@',
         'src_path' => 'views/',
@@ -36,35 +24,16 @@ class Parser extends HTML5DOMDocument
     // instance variables
     private $uid = 0;
     private $name;
-    protected $checkedDependencies = [];
+    //protected $checkedDependencies = [];
     protected $requestName;
     protected $srcFile;
     protected $destFile;
     protected $slots = [];
-
-    
-    
-    
-    
-    
-    private $root = null;
-    private $options = [
-        
-    ];
-    
-    private $data;
-    private $slots;
-    public $components = [];
     public $replaces = [];
-    
+
     public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->uid = (self::$index++);
-        
-        if (self::$dependencies === null) {
-            self::$dependencies = require_once('dependencies_map.php');
-        }
-        
         $this->options = $options;
         $this->data = $data;
         $this->slots = $slots;
@@ -82,44 +51,11 @@ class Parser extends HTML5DOMDocument
         }
         $this->options = array_merge($this->options, $options);
     }
-    
-    public function parseCached(Parser $root): string
-    {
-        $this->destFile = $this->getDestFile();
-        
-        //$hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
-        //if (!$hasChanged && file_exists($this->destFile)) {
-            //$this->mountSlots($this);
-            //return require($this->destFile);
-        //}
-        //
-        $this->parse($root);
-        // set file content
-        return $root;
-    }
-    
-    public function addGlobalData(Template $root)
-    {
-        // montam datele pe Template::data daca exista
-        $root->data[$this->getVariableName()] = $this->data;
-    }
 
     public function parse(Parser $root)
     {
         $this->loadHtml(require($this->destFile));
         $this->insertQuerySlots();
-        // in this stage, we have a normalized template file to parse, data seted on globale
-        // load src file
-        // parse it
-        // return it trimmed
-        // if is root, mount don t, just return it
-        
-        // parse this file, and foreach found slot call load m
-        // foreach if tag name slot check in slots
-        // slot will be a string as result of load with o to return string
-        // if slot has data, replace slot with closure function if slot has slots, f will be unique, k => val
-        // if slot has no data, replace slot with uname and k val global
-        //   foreach slots slots, call load
         $this->recursiveParse($this);
         return $this;
     }
