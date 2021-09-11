@@ -27,20 +27,14 @@ use DomDocument\PhpTemplates\Parser;
  */
 class Template
 {
-    public function addData($k, $val)
-    {
-        $this->data[$k] = $val;
-    }
-    
-    public function __construct(Parser $parser)
-    {
-    }
-    
+    public $data = [];
+    public $slots = [];
     
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
-
-        $this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
+        $this->data = $data;
+        $this->slots = $slots;
+        //$this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
         //$hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
         //if (!$hasChanged && file_exists($this->destFile)) {
@@ -48,18 +42,25 @@ class Template
             //return require($this->destFile);
         //}
         
-        $this->parser = new Parser($this->srcFile, $this->data, $this->slots, (array) $this->options);
+        $this->parser = new Parser($rfilepath, $data, $slots, $options);
         $this->mountSlotsData($this);
-        $this->parser->parse($this);
-
+        $this->parser->parse($this->parser);
+        dd([
+            'data' => $this->data,
+            'components' => $this->parser->components,
+            'functions' => $this->parser->functions,
+            'result' => $this->parser->saveHtml()
+        ]);
+        echo $this->parser->saveHtml();
+        dd();
         $result = $this->makeReplaces();
         
         echo $result;
         
         dd(
-            $this->components,
-            $this->replaces,
-            $this->parser->saveHtml()
+            ///$this->components,
+            //$this->replaces,
+            //$this->parser->saveHtml()
         );
         //$this->getParsedHtml();
 
@@ -76,31 +77,7 @@ class Template
     {
         $parser->parse();
     }
-
-    protected function getSrcFile()
-    {
-        if (!$this->srcFile) {
-            $f = $this->options->src_path;
-            $this->srcFile = $f.$this->requestName.'.template.php';
-        }
-        return $this->srcFile;
-    }
     
-    // based on this output, we decide if to recompile template
-    protected function getDestFile()
-    {
-        if (!$this->destFile) {
-            $f = str_replace('/', '_', $this->requestName);
-            if ($this->options->track_changes) {
-                $f .= '-'.self::getUpdatedAt($this->getSrcFile());
-            }
-            if ($slotsHash = $this->getHash()) {
-                $f .= '-'.$slotsHash;
-            }
-            $this->destFile = $f;
-        }
-        return $this->destFile;
-    }
     
     protected function syncDependencies(string $reqName): bool
     {
@@ -142,7 +119,7 @@ class Template
             $slots = is_array($slot) ? $slot : [$slot];
             foreach ($slots as $slot) {
                 $slot->setName($n);
-                $slot->addGlobalData($this);
+                $this->data[$slot->getUniqueName()] = $slot->data;
             }
         }
     }

@@ -29,18 +29,68 @@ class Parser extends HTML5DOMDocument
     protected $srcFile;
     protected $destFile;
     protected $slots = [];
+    public $functions = [];
+    public $components = [];
     public $replaces = [];
 
     public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->uid = (self::$index++);
-        $this->options = $options;
+        //$this->options = $this->mergeOptions($options);
         $this->data = $data;
         $this->slots = $slots;
         $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
         $this->srcFile = $this->getSrcFile();
     }
     
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    protected function getSrcFile()
+    {
+        if (!$this->srcFile) {
+            $f = $this->options['src_path'];
+            $this->srcFile = $f.$this->requestName.'.template.php';
+        }
+        return $this->srcFile;
+    }
+    
+    // based on this output, we decide if to recompile template
+    protected function getDestFile()
+    {
+        if (!$this->destFile) {
+            $f = str_replace('/', '_', $this->requestName);
+            if ($this->options->track_changes) {
+                $f .= '-'.self::getUpdatedAt($this->getSrcFile());
+            }
+            if ($slotsHash = $this->getHash()) {
+                $f .= '-'.$slotsHash;
+            }
+            $this->destFile = $f;
+        }
+        return $this->destFile;
+    }
+    
+    
+    public function getHash()
+    {
+        $hash = filemtime($this->getSrcFile()).$this->uid;
+        foreach ($this->slots as $n => $slot) {
+            $slots = is_array($slot) ? $slot : [$slot];
+            foreach ($slots as $slot) {
+                if ($slot instanceof self) {
+                    $hash .= $n.$slot->getHash();
+                } 
+                else {
+                    throw new Exception('Non component detected');
+                }
+            }
+        }
+    
+        return substr(md5($hash, true), 0, 12);
+    }
+
     protected function mergeOptions($options)
     {
         // in this phase, we already have seted all dom global datas
@@ -51,24 +101,47 @@ class Parser extends HTML5DOMDocument
         }
         $this->options = array_merge($this->options, $options);
     }
+    
+    
+    public function getUniqueName()
+    {
+        return $this->name . $this->uid . '_';
+    }
 
     public function parse(Parser $root)
     {
-        $this->loadHtml(require($this->destFile));
+        $this->root = $root;
+        $this->loadHtml(file_get_contents($this->srcFile));
         $this->insertQuerySlots();
-        $this->recursiveParse($this);
-        return $this;
+        $html = $this->parseNode($this);
+        if ($this->name) {
+            $html = $this->trimHtml($html);
+        } else {
+            $html = $html->saveHtml();
+        }
+        if (!$this->slots && $this->name) {
+            $root->components[$this->requestName] = $html;
+        }
+        if ($this->data && $this->name) {
+            $fname = $this->slots ? $this->getUniqueName() : $this->requestName;
+            $root->functions[] = $fname;
+            $root->components[$fname] = $html;
+            return $fname."($fname)";
+        } else {
+            return $html;
+        }
     }
     
-    private function recursiveParse($node)
+    private function parseNode($node)
     {
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         }
         
         foreach ($node->childNodes ?? [] as $_node) {
-            $this->recursiveParse($_node);
+            $this->parseNode($_node);
         }
+        return $node;
     }
     
     private function insertQuerySlots()
@@ -86,7 +159,7 @@ class Parser extends HTML5DOMDocument
         }
     }
 
-    public function addSlotNode($q, $slot)
+    private function addSlotNode($q, $slot)
     {
         $o = $slot->getOptions();
         $slot = $this->createNodeElement('slot');
@@ -119,18 +192,27 @@ class Parser extends HTML5DOMDocument
         if (!isset($this->slots[$slotName])) {
             return;
         }
-
-        // insert scoped slot if node's slot has data
-        if ($this->slots[$slotName]->getData()) {
-            
-        } else {// foreach slot cazul []
-            $this->root->replaces[$slotName] = $this->slots[$slotName]->loadParsed($this->root);
-        }
-
+        $slot = $this->slots[$slotName];
         $node->parentNode->insertBefore(
-            $this->createTextNode($this->slots[$slotName]->loadParsed($this->root)),
+            $this->createTextNode($slot->parse($this->root)), // daca are data, intoarce function call, daca nu, intoarce string html. In ambele cazuri, recicleaza req name daca nu are sloturi si e comp pura
             $node
         );
         $node->parentNode->removeChild($node);
+    }
+    
+    public function trimHtml($dom)
+    {
+        $body = $dom->getElementsByTagName('body')->item(0);
+        $content = '';
+        foreach ($body->childNodes as $node)
+        {
+            $content.= $dom->saveHtml($node);
+        }
+        return $content;
+    }
+    
+    public function __get($prop)
+    {
+        return $this->$prop;
     }
 }

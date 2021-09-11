@@ -3,7 +3,7 @@
 namespace DomDocument\PhpTemplates\Facades;
 
 use DomDocument\PhpTemplates\Template as PhpTemplate;
-use DomDocument\PhpTemplates\Component;
+use DomDocument\PhpTemplates\Parser;
 
 class Template
 {
@@ -22,6 +22,6 @@ class Template
     public static function component(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $options = (array) self::getInstance()->getOptions();
-        return new Component($rfilepath, $data, $slots, $options);
+        return new Parser($rfilepath, $data, $slots, $options);
     }
 }
