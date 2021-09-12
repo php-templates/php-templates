@@ -43,13 +43,13 @@ class Template
         //}
         
         $this->parser = new Parser($rfilepath, $data, $slots, $options);
-        $this->mountSlotsData($this);
+        $this->mountSlotsData($this->slots);
         $this->parser->parse($this->parser);
         dd([
             'data' => $this->data,
             'components' => $this->parser->components,
             'functions' => $this->parser->functions,
-            'result' => $this->parser->saveHtml()
+            'result' => str_replace(['&lt;', '&gt;'],['<', '>'], $this->parser->saveHtml())
         ]);
         echo $this->parser->saveHtml();
         dd();
@@ -113,13 +113,16 @@ class Template
         return substr(md5($hash, true), 0, 12);
     }
     
-    protected function mountSlotsData(Template $root)
+    protected function mountSlotsData($slots)
     {
-        foreach ($this->slots as $n => $slot) {
+        foreach ($slots as $n => $slot) {
             $slots = is_array($slot) ? $slot : [$slot];
             foreach ($slots as $slot) {
                 $slot->setName($n);
-                $this->data[$slot->getUniqueName()] = $slot->data;
+                if ($slot->data) {
+                    $this->data[$slot->getUniqueName()] = $slot->data;
+                }
+                $this->mountSlotsData($slot->slots);
             }
         }
     }

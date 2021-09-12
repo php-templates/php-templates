@@ -33,14 +33,16 @@ class Parser extends HTML5DOMDocument
     public $components = [];
     public $replaces = [];
 
-    public function __construct(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    public function __construct($rfilepath, $data = [], array $slots = [], array $options = [])
     {
         $this->uid = (self::$index++);
         //$this->options = $this->mergeOptions($options);
         $this->data = $data;
         $this->slots = $slots;
-        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        $this->srcFile = $this->getSrcFile();
+        if ($rfilepath) {
+            $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+            $this->srcFile = $this->getSrcFile();
+        }
     }
     
     public function setName($name) {
@@ -49,6 +51,9 @@ class Parser extends HTML5DOMDocument
 
     protected function getSrcFile()
     {
+        if (!$this->requestName) {
+            return null;
+        }
         if (!$this->srcFile) {
             $f = $this->options['src_path'];
             $this->srcFile = $f.$this->requestName.'.template.php';
@@ -105,13 +110,18 @@ class Parser extends HTML5DOMDocument
     
     public function getUniqueName()
     {
-        return $this->name . $this->uid . '_';
+        return str_replace('-', '', $this->name) . $this->uid . '_';
     }
 
     public function parse(Parser $root)
     {
         $this->root = $root;
+        if ($this->srcFile) {
+            if (!file_exists($this->srcFile)) {
+                return '';
+            }
         $this->loadHtml(file_get_contents($this->srcFile));
+        }
         $this->insertQuerySlots();
         $html = $this->parseNode($this);
         if ($this->name) {
@@ -119,6 +129,7 @@ class Parser extends HTML5DOMDocument
         } else {
             $html = $html->saveHtml();
         }
+        //if ($this->name === 'components/component-slot') dd($html);
         if (!$this->slots && $this->name) {
             $root->components[$this->requestName] = $html;
         }
@@ -126,7 +137,9 @@ class Parser extends HTML5DOMDocument
             $fname = $this->slots ? $this->getUniqueName() : $this->requestName;
             $root->functions[] = $fname;
             $root->components[$fname] = $html;
-            return $fname."($fname)";
+            $bindVar = is_string($this->data) ? $this->data : $fname;
+            // daca data e string, ia l ca atare, ca e component. else e slot
+            return $fname."($bindVar)";
         } else {
             return $html;
         }
@@ -136,6 +149,9 @@ class Parser extends HTML5DOMDocument
     {
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
+        } 
+        elseif ($node->nodeName === 'component') {
+            $this->insertComponent($node);
         }
         
         foreach ($node->childNodes ?? [] as $_node) {
@@ -189,17 +205,58 @@ class Parser extends HTML5DOMDocument
     private function insertSlot($node)
     {
         $slotName = $node->getAttribute('name');
+        if (!$slotName) {
+            $slotName = 'default';
+        }
         if (!isset($this->slots[$slotName])) {
+            // stergem doar daca nu are default ceva
+            //$node->parentNode->removeChild($node);
             return;
         }
-        $slot = $this->slots[$slotName];
-        $node->parentNode->insertBefore(
-            $this->createTextNode($slot->parse($this->root)), // daca are data, intoarce function call, daca nu, intoarce string html. In ambele cazuri, recicleaza req name daca nu are sloturi si e comp pura
-            $node
-        );
-        $node->parentNode->removeChild($node);
+        $slots = $this->slots[$slotName];
+        if (!is_array($slots)) {
+            $slots = [$slots];
+        }
+        foreach ($slots as $slot) {
+            $node->parentNode->insertBefore(
+                $this->createTextNode($slot->parse($this->root)), // daca are data, intoarce function call, daca nu, intoarce string html. In ambele cazuri, recicleaza req name daca nu are sloturi si e comp pura
+                $node
+            );
+        }
+        //$node->parentNode->removeChild($node);
     }
     
+    private function insertComponent($node)
+    {
+        $rfilepath = $node->getAttribute('src');
+        $data = $node->getAttribute('data') ?? [];
+        $slots = [];
+        foreach ($node->childNodes as $slotNode) {
+            $sname = 'default';
+            $sdata = [];
+            if (method_exists($slotNode, 'getAttribute')) {
+                $sname = $slotNode->getAttribute('slot') ?? 'default';
+                $sdata = $slotNode->getAttribute('data') ?? [];
+            } 
+            elseif (!trim($slotNode->wholeText)) {
+                continue;
+            }
+            $slot = new Parser(null, $sdata);
+            $slot->setName($sname);
+            //dd(, $slotNode);
+            //dd($this->saveHtml($slotNode));
+            $slot->loadHtml($this->saveHtml($slotNode));
+            $slots[$sname][] = $slot;
+        }
+        $comp = new Parser($rfilepath, $data, $slots);
+        $comp->setName($comp->requestName);
+        $comp = $comp->parse($this->root);
+        $node->parentNode->insertBefore(
+            $this->createTextNode($comp), // daca are data, intoarce function call, daca nu, intoarce string html. In ambele cazuri, recicleaza req name daca nu are sloturi si e comp pura
+            $node
+        );
+    }
+
     public function trimHtml($dom)
     {
         $body = $dom->getElementsByTagName('body')->item(0);
