@@ -3,21 +3,24 @@
 namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Parser;
+use DOMDocument;
+use IvoPetkov\HTML5DOMDocument;
+//use DomDocument\PhpTeplates\Parsable;
+
 /**
  * Template is main class, the entry point.
+ * It will decide when parse process is required. Each programatic slot is a Template instance with an inc ID
+ * 
  * It will first gather recursively all slots scoped data.
- * Instantiate parser with options and call ->loadCached
- * parser will:
- * chen check dependencies times
+ * Then check dependencies times
  * Then will recursively compose slots hash
  * If sum of inputfile, filetime, hash is an existing file, it returns it.
  * else
- * load root file on parser and recursively do the following
- * create a root instance parser like new Parser(the four arguments as init)
- * call parse loadCached with self as arg first time
- * pass first instance root down to each parser, parser->loadCached(rootpparser)
+ * Template instances are parsers keepers ready to release them if any compile requires
+ * create a root instance parser like new Parser(dom, slots, options)
+ * where slots are -> foreach slot (template instance), instantiate a new parser calling root parser buildChildParser(dom, slots) and replaces the slot with it
+ * template will cache all loaded doms
  * in parse process steps are
- * check if file exists using step ln 10
  * add dynamic slots as dom tags
  * parse nodes
  * add result to rootParser
@@ -27,13 +30,39 @@ use DomDocument\PhpTemplates\Parser;
  */
 class Template
 {
-    public $data = [];
-    public $slots = [];
+    protected static $index = 0;
+    public static function resetId()
+    {
+        self::$index = 0;
+    }
     
+    public function __construct() {
+        $this->uid = (self::$index++);
+    }
+    
+    protected $options = [
+        'prefix' => '@',
+        'src_path' => 'views/',
+        'dest_path' => 'parsed/',
+        'track_changes' => true,
+        'trim_html' => false
+    ];
+    
+    // instance variables
+    private $uid = 0;
+    private $name;
+    //protected $checkedDependencies = [];
+    protected $requestName;
+    protected $srcFile;
+    protected $destFile;
+    protected $slots = [];
+
     public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
     {
         $this->data = $data;
         $this->slots = $slots;
+        $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+        $this->srcFile = $this->getSrcFile();
         //$this->destFile = $this->getDestFile(); // based on req file, timestamp, slotsHash
 
         //$hasChanged = $this->options->track_changes && $this->syncDependencies($this->requestName);
@@ -42,14 +71,34 @@ class Template
             //return require($this->destFile);
         //}
         
-        $this->parser = new Parser($rfilepath, $data, $slots, $options);
+
+        //$dom = new HTML5DOMDocument;
+        //$dom->registerNodeClass('DOMDocument', 'DomDocument\PhpTemplates\ExtendedDOMDocument');
+        //$dom->registerNodeClass('HTML5DOMDocument', 'DomDocument\PhpTemplates\ExtendedDOMDocument');
+        //$dom->loadHtml(file_get_contents($this->srcFile));
+        //d($slots);
+        $dom = new Parsable($this->srcFile, null, $slots, false);
+        $this->parser = new Parser($this->options);
+        //dd($this->parser->parse($dom, $this->slots));
+        //dd($this->parser->parse($dom, $dom));
+        //dd();
+        //dd($this->parser->parse($dom));
+        $dom = $this->parser->parse($dom);
+        //$dom = $dom[0];
+         // remove slots and components
+        foreach ($dom->getElementsByTagName('slot') as $slot) {
+            //$slot->parentNode->removeChild($slot);
+        }
+        $dom->formatOutput = true;
+        echo $dom->saveHtml(); dd();
         $this->mountSlotsData($this->slots);
-        $this->parser->parse($this->parser);
+        //$this->parser->parse($this->parser);
         dd([
             'data' => $this->data,
             'components' => $this->parser->components,
             'functions' => $this->parser->functions,
-            'result' => str_replace(['&lt;', '&gt;'],['<', '>'], $this->parser->saveHtml())
+            'replaces' => $this->parser->replaces,
+            'result' => str_replace(['&lt;', '&gt;', '&amp;amp;lt;', '&amp;amp;gt;', '&amp;lt;', '&amp;gt;'],['<', '>', '<', '>', '<', '>'], $this->parser->saveHtml())
         ]);
         echo $this->parser->saveHtml();
         dd();
@@ -76,6 +125,15 @@ class Template
     private function getParsedHtml() 
     {
         $parser->parse();
+    }
+    
+    protected function getSrcFile()
+    {
+        if (!$this->srcFile) {
+            $f = $this->options['src_path'];
+            $this->srcFile = $f.$this->requestName.'.template.php';
+        }
+        return $this->srcFile;
     }
     
     

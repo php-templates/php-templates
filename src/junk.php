@@ -51,3 +51,66 @@
         // if slot has data, replace slot with closure function if slot has slots, f will be unique, k => val
         // if slot has no data, replace slot with uname and k val global
         //   foreach slots slots, call load
+
+
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+    
+    public function setDom($dom) {
+        $this->dom = $dom;
+    }
+
+    
+    // based on this output, we decide if to recompile template
+    protected function getDestFile()
+    {
+        if (!$this->destFile) {
+            $f = str_replace('/', '_', $this->requestName);
+            if ($this->options->track_changes) {
+                $f .= '-'.self::getUpdatedAt($this->getSrcFile());
+            }
+            if ($slotsHash = $this->getHash()) {
+                $f .= '-'.$slotsHash;
+            }
+            $this->destFile = $f;
+        }
+        return $this->destFile;
+    }
+    
+    
+    public function getHash()
+    {
+        $hash = filemtime($this->getSrcFile()).$this->uid;
+        foreach ($this->slots as $n => $slot) {
+            $slots = is_array($slot) ? $slot : [$slot];
+            foreach ($slots as $slot) {
+                if ($slot instanceof self) {
+                    $hash .= $n.$slot->getHash();
+                } 
+                else {
+                    throw new Exception('Non component detected');
+                }
+            }
+        }
+    
+        return substr(md5($hash, true), 0, 12);
+    }
+
+    protected function mergeOptions($options)
+    {
+        // in this phase, we already have seted all dom global datas
+        if (isset($options['prefix'])) {
+            if (!trim($options['prefix'])) {
+                unset($options['prefix']);
+            }
+        }
+        $this->options = array_merge($this->options, $options);
+    }
+    
+    
+    public function getUniqueName()
+    {
+        return str_replace('-', '', $this->name) . $this->uid . '_';
+    }
