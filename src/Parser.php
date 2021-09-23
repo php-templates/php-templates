@@ -36,7 +36,15 @@ class Parser
     }
 
     public function parse(Parsable $root)
-    {d('--->',$root->nestLevel);
+    {
+        // get name unic in functie de hash sloturi
+        if ($root->data && in_array($root->getName(), $this->functions)) {
+            return //node cu string $root->getName()
+        } 
+        elseif (!$root->data && isset($this->components[$root->getName()])) {
+            return $this->components[$root->getName()]->cloneNode(true);
+        }
+        
         $dom = $root->getDom();
         if ($dom->nodeName === '#text' && !trim($dom->textContent)) {
             //d($dom, $dom->parentNode);
@@ -76,7 +84,7 @@ class Parser
             $node = array_pop($this->toberemoved);
                 //echo 'removing'; dom($node);
             try {
-                @$node->parentNode->removeChild($node);
+                @$node->parentNode && @$node->parentNode->removeChild($node);
             } catch (\Exception $e) {}
         }
         echo 'parse done';
@@ -87,6 +95,12 @@ class Parser
         }
         //d($dom->parentNode, $dom);
         dom($dom);
+        $this->components[$root->getName()] = $dom;
+        if ($root->data) {
+            $this->functions[] = $root->getName();
+            return function call cu data
+        }
+        $this->components[$root->getName()] = $dom->cloneNode(true);
         
         return $dom;
     }
@@ -167,7 +181,20 @@ class Parser
         dom($node);*/
         //$this->d($node->ownerDocument, [$node]);
         $rfilepath = $node->getAttribute('src');
-        $data = $node->getAttribute('data') ?? [];
+        $data = '';
+        $attrs = [];
+        // vor fi attr class, id, iar php-data= data scope, iar din attrs vor fi explodate alea pentru care se gaseste switch si se face cache unic in functie de hash de data switch 
+        foreach ($node->attributes as $attr) {
+            if ($attr->nodeName === 'src') {
+                continue;
+            }
+            if ($attr->nodeName === 'data') {
+                $data = $attr->nodeValue;
+            } else {
+                $attrs['attributes'][$attr->nodeName] = $attr->nodeValue;
+            }
+        }
+        
         $slots = [];
         foreach ($node->childNodes as $slot) {
             $sname = 'default';
@@ -184,9 +211,9 @@ class Parser
             }
 
             $slots[$sname][] = new Parsable($slot);
-        }
+        }//d($attrs);
         
-        $comp = $this->getComponent($rfilepath, $slots);
+        $comp = $this->getComponent($rfilepath, $data, $slots, $attrs);
         //d($comp->item(0)->ownerDocument, $comp->item(0));
         $parsed = $this->parse($comp);
         if (!is_iterable($parsed)) {
@@ -216,13 +243,13 @@ class Parser
         //$this->toberemoved[] = $node;
     }
     
-    private function getComponent(string $rfilepath, array $slots = []) // node list
+    private function getComponent(string $rfilepath, $data, array $slots = [], $options = []) // node list
     {
         $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
         //dd($requestName, $rfilepath);
         $f = $this->options['src_path'];
         $srcFile = $f.$requestName.'.template.php';
-        return new Parsable($srcFile, null, $slots);
+        return new Parsable($srcFile, $data, $slots, $options);
     }
     
     

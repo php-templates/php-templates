@@ -77,7 +77,7 @@ class Template
         //$dom->registerNodeClass('HTML5DOMDocument', 'DomDocument\PhpTemplates\ExtendedDOMDocument');
         //$dom->loadHtml(file_get_contents($this->srcFile));
         //d($slots);
-        $dom = new Parsable($this->srcFile, null, $slots, false);
+        $dom = new Parsable($this->srcFile, null, $slots, [], false);
         $this->parser = new Parser($this->options);
         //dd($this->parser->parse($dom, $this->slots));
         //dd($this->parser->parse($dom, $dom));

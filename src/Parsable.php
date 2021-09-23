@@ -7,14 +7,15 @@ use IvoPetkov\HTML5DOMDocument;
 class Parsable
 {
     protected static $last_id = 1;
+    protected static $cache = [];
     
     protected $id;
     
     protected $attrs = [
-        //'nestLevel' => 0
+        
     ];
     
-    public function __construct($srcFile, $data = null, $slots = [], $comp = true)
+    public function __construct($srcFile, $data = null, $slots = [], array $options = [], $comp = true)
     {
         $this->id = (self::$last_id++);
         
@@ -33,6 +34,7 @@ class Parsable
         }
         
         $this->slots = $slots;
+        $this->attributes = $options['attributes'] ?? [];
         $this->is_component = $comp;
     }
     
@@ -49,15 +51,19 @@ class Parsable
     public function getDom()
     {
         if (!$this->dom && $this->srcFile) {
-            $dom = new HTML5DOMDocument;//d($this->srcFile);
-            $dom->formatOutput = true;
-            $html = file_get_contents($this->srcFile);
-            $html = $this->removeHtmlComments($html);
-            $dom->loadHtml($html);
-            if ($this->is_component) {
-                $dom = $this->trimHtml($dom);
+            if (!isset(self::$cache[$this->srcFile])) {
+                $dom = new HTML5DOMDocument;//d($this->srcFile);
+                $dom->formatOutput = true;
+                $html = file_get_contents($this->srcFile);
+                $html = $this->removeHtmlComments($html);
+                $dom->loadHtml($html);
+                if ($this->is_component) {
+                    $dom = $this->trimHtml($dom);
+                }
+                self::$cache[$this->srcFile] = $dom;
             }
-            $this->dom = $dom;
+            $this->dom = self::$cache[$this->srcFile]->cloneNode(true);
+            $this->addDynamicAttrs();
         }
 
         return $this->dom;
@@ -90,13 +96,10 @@ class Parsable
     }
     
   
-    private function addDynamicAttr()
+    private function addDynamicAttrs()
     {
-        $body = $this->getElementsByTagName('body')->item(0);
-        if ($body->childNodes && $body->childNodes->count() === 1 && method_exists($body->firstChild, 'setAttribute')) {
-            foreach ($this->attrs as $attr => $value) {
-                //$body->firstChild->setAttribute($attr, $value);
-            }
+        foreach ($this->attributes as $key => $value) {
+            $this->dom->setAttribute($key, $value);
         }
     }
     
