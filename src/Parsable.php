@@ -77,6 +77,11 @@ class Parsable
         return '__slot_data'.$this->id;
     }
     
+    public function getName()
+    {
+        return str_replace(['.template.php', '/', '-'], ['', '_', ''], $this->srcFile);
+    }
+    
     public function trimHtml($dom)
     {
         $body = $dom->getElementsByTagName('body')->item(0);

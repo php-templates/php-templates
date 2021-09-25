@@ -15,8 +15,6 @@ class Parser
     public $components = [];
     public $replaces = [];
     private $toberemoved = [];
-    
-    private $x = false;
 
     public function __construct(array $options = [])
     {
@@ -39,7 +37,7 @@ class Parser
     {
         // get name unic in functie de hash sloturi
         if ($root->data && in_array($root->getName(), $this->functions)) {
-            return //node cu string $root->getName()
+            return $root->getDom()->ownerDocument->createTextNode($funcCall);
         } 
         elseif (!$root->data && isset($this->components[$root->getName()])) {
             return $this->components[$root->getName()]->cloneNode(true);
@@ -98,7 +96,8 @@ class Parser
         $this->components[$root->getName()] = $dom;
         if ($root->data) {
             $this->functions[] = $root->getName();
-            return function call cu data
+            $funcCall = $root->getName().'('.$root->getDataKey().')';
+            return $dom->ownerDocument->createTextNode($funcCall);
         }
         $this->components[$root->getName()] = $dom->cloneNode(true);
         

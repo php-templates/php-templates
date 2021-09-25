@@ -28,13 +28,13 @@
             This component has scoped data
             <component src="components/component"></component>
         </component>
-        <!-- component src="components/component-slot" data="['foo' => [1,2,3]]">
+        <component src="components/component-slot" data="['foo' => [1,2,3]]">
             This component has scoped data
             <component src="components/component-slot" data="['bar' = $foo[0]]">
                 This one has data too
             </component>
         </component>
-        <component src="components/component-slot" data="['foo' => [1,2,3]]">
+        <!--component src="components/component-slot" data="['foo' => [1,2,3]]">
             This component has scoped data and subcomponent loop
             <component src="components/component-slot" php-for="$foo as $bar">{{ $bar }}</component>
             <component src="components/component-slot" php-for="$foo as $bar" data"['bar' => $bar]">{{ $bar }}</component>
