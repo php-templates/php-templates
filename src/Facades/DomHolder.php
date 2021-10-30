@@ -21,10 +21,7 @@ class DomHolder
         $html = file_get_contents($srcFile);
         $html = self::removeHtmlComments($html);
         $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
-        if (isset(self::$cached['switches'][$rpath]) && !count(self::$cached['switches'][$rpath])) {
-            return $dom;
-        }
-        
+        //switches aici
         return self::domVariant($dom, $attrs);
         // caching and always returns a clone
     }
@@ -46,8 +43,17 @@ class DomHolder
     
     public function switchesOf($rpath): array
     {
-        // caching
-        return [];
+        if (!isset(self::$cached['switches'][$path])) {
+            $dom = self::get($rpath);
+            $switches = [];
+            $switchNodes = $dom->getElementsByTagName('switch');dom($dom);d($switchNodes);
+            foreach ($switchNodes as $node) {
+                $of = $node->getAttribute('of');
+                $switches[] = $of->nodeValue;
+            }
+            self::$cached['switches'][$path] = $switches;
+        }
+        return self::$cached['switches'][$path];
     }
     
     protected function domVariant($dom, $data)
@@ -75,11 +81,13 @@ class DomHolder
     {
         $switches = self::switchesOf($rpath);
         $hash = substr(md5($rpath), 0, 5);
-        $oName = array_intersect($switches, array_keys($attrs));
+        $oName = array_intersect_key($attrs, array_flip($switches));
+        d(123, $switches);
         $oName = implode('_', $oName);
         $name = str_replace(['/', '\\'], '_', $rpath);
         $name = preg_replace('/(?![a-zAZ0-9_]+)./', '', $name);
-        
-        return join('_', array_filter([$name, $hash, $oName]));
+        $name = join('_', array_filter([$name, $hash, $oName]));
+        d($rpath, $switches, $attrs, $oname, $name);
+        return $name;
     }
 }
