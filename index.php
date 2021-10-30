@@ -24,14 +24,11 @@ function d(...$data) {
         echo PHP_EOL;
     } 
 }
-    $i = 1;
+
     function dom($d)
     {
         $x = debug_backtrace();
         //print_r($x[0]['file'].'->'.$x[0]['line']);
-        echo '
-        ---'.$i.'
-        ';$i++;
         if (!is_iterable($d)) {
             $d = [$d];
         }

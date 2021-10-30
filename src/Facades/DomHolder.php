@@ -13,32 +13,39 @@ class DomHolder
     
     public static function get($rpath, $attrs = [])
     {
-        $requestName = preg_replace('(\.template|\.php)', '', $rpath);
-        $f = Config::get('src_path');
-        $srcFile = $f.$requestName.'.template.php';
-        $dom = new HTML5DOMDocument;//d($this->srcFile);
-        $dom->formatOutput = true;
-        $html = file_get_contents($srcFile);
-        $html = self::removeHtmlComments($html);
-        $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
+        if (!isset(self::$cached['doms'][$rpath])) {
+            $requestName = preg_replace('(\.template|\.php)', '', $rpath);
+            $f = Config::get('src_path');
+            $srcFile = $f.$requestName.'.template.php';
+            $dom = new HTML5DOMDocument;//d($this->srcFile);
+            $dom->formatOutput = true;
+            $html = file_get_contents($srcFile);
+            $html = self::removeHtmlComments($html);
+            $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
+            self::$cached['doms'][$rpath] = $dom;
+        }
         //switches aici
+        $dom = self::$cached['doms'][$rpath]->cloneNode(true);
         return self::domVariant($dom, $attrs);
         // caching and always returns a clone
     }
     
     public function switchesOf($rpath): array
     {
-        if (!isset(self::$cached['switches'][$path])) {
-            $dom = self::get($rpath);
+        if (!isset(self::$cached['switches'][$rpath])) {
+            if (!isset(self::$cached['doms'][$rpath])) {
+                self::get($rpath);
+            }
+            $dom = self::$cached['doms'][$rpath];
             $switches = [];
-            $switchNodes = $dom->getElementsByTagName('switch');dom($dom);d($switchNodes);
+            $switchNodes = $dom->getElementsByTagName('switch');//dom($dom);//
             foreach ($switchNodes as $node) {
                 $of = $node->getAttribute('of');
-                $switches[] = $of->nodeValue;
+                $switches[] = $of;
             }
-            self::$cached['switches'][$path] = $switches;
+            self::$cached['switches'][$rpath] = $switches;
         }
-        return self::$cached['switches'][$path];
+        return self::$cached['switches'][$rpath];
     }
     
     protected function domVariant($dom, $data)
@@ -47,9 +54,9 @@ class DomHolder
         $switchNodes = $dom->getElementsByTagName('switch');
         foreach ($switchNodes as $node) {
             $of = $node->getAttribute('of');
-            $switches[] = $of->nodeValue;
+            $switches[] = $of;
             if (isset($data[$of])) {
-                $val = $data[$of];
+                $val = $data[$of];d($node);d(get_class_methods($node));
                 $variant = $node->querySelector('[case="'.$val.'"]');
                 if ($variant) {
                     $variant->removeAttribute('case');
@@ -67,12 +74,12 @@ class DomHolder
         $switches = self::switchesOf($rpath);
         $hash = substr(md5($rpath), 0, 5);
         $oName = array_intersect_key($attrs, array_flip($switches));
-        d(123, $switches);
+        // d(123, $switches);
         $oName = implode('_', $oName);
         $name = str_replace(['/', '\\'], '_', $rpath);
         $name = preg_replace('/(?![a-zAZ0-9_]+)./', '', $name);
         $name = join('_', array_filter([$name, $hash, $oName]));
-        d($rpath, $switches, $attrs, $oname, $name);
+        //d(123, $rpath, $switches, $attrs, $oName, $name);
         return $name;
     }
 
