@@ -21,9 +21,9 @@ function d(...$data) {
         //echo '<pre>';
         print_r($d);
         //echo '</pre>';
+        echo PHP_EOL;
     } 
 }
-
     $i = 1;
     function dom($d)
     {
@@ -68,12 +68,17 @@ require('autoload.php');
 
 use DomDocument\PhpTemplates\Facades\Template;
 
+if ($_GET['plain'] ?? false) {
 header("Content-Type: text/plain");
+}
 $doc = 'simple';
 //$doc = 'test-nested-component';
 //$x = (new IvoPetkov\HTML5DOMDocument);
 //$x->loadHtml(file_get_contents('views/component-1.template.php'));
 //dd($x->getElementsByTagName('body')->item(0)->childNodes);
+echo Template::load('test');
+die();
+
 echo Template::load($doc, ['rootData' => 123], [
     'slot1' => Template::component('simple-component', ['s1' => 123]),
     'slot-array' => [

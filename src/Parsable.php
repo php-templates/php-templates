@@ -3,6 +3,7 @@
 namespace DomDocument\PhpTemplates;
 
 use IvoPetkov\HTML5DOMDocument;
+use DomDocument\PhpTemplates\Facades\Config;
 
 class Parsable
 {
@@ -15,15 +16,23 @@ class Parsable
         
     ];
     
+<<<<<<< HEAD
+    public function __construct($rfilepath, $data = null, $slots = [], $comp = true)
+=======
     public function __construct($srcFile, $data = null, $slots = [], array $options = [], $comp = true)
+>>>>>>> refs/heads/dev
     {
         $this->id = (self::$last_id++);
-        
         //d($this->id);
-        if (is_string($srcFile)) {
+        if (is_string($rfilepath)) {
+            $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+            $name = str_replace(['/', '\\'], '_', $requestName);
+            $this->name = preg_replace('/(?![a-zAZ0-9_]+)./', '', $name);
+            $f = Config::get('src_path');
+            $srcFile = $f.$requestName.'.template.php';
             $this->srcFile = $srcFile;
         } else {
-            $this->dom = $srcFile;
+            $this->dom = $rfilepath;
         }
         $this->data = $data;
         foreach ($slots as $slot) {
@@ -50,7 +59,22 @@ class Parsable
     
     public function getDom()
     {
+        // load dom and check for switches on data and add them to name
         if (!$this->dom && $this->srcFile) {
+<<<<<<< HEAD
+            // se va face pe main root, cu acces la acelasi codebuffer
+            // verificam daca e deja incarcata
+            // compunem numele cu req si data cu switches
+            // verificam daca nu cumva e deja parsata... e deja prea tarziu... trebuie facut lucrul asta in Parser
+            // 
+            $dom = new HTML5DOMDocument;//d($this->srcFile);
+            $dom->formatOutput = true;
+            $html = file_get_contents($this->srcFile);
+            $html = $this->removeHtmlComments($html);
+            $dom->loadHtml($html);
+            if ($this->is_component) {
+                $dom = $this->trimHtml($dom);
+=======
             if (!isset(self::$cache[$this->srcFile])) {
                 $dom = new HTML5DOMDocument;//d($this->srcFile);
                 $dom->formatOutput = true;
@@ -61,12 +85,26 @@ class Parsable
                     $dom = $this->trimHtml($dom);
                 }
                 self::$cache[$this->srcFile] = $dom;
+>>>>>>> refs/heads/dev
             }
             $this->dom = self::$cache[$this->srcFile]->cloneNode(true);
             $this->addDynamicAttrs();
         }
 
         return $this->dom;
+    }
+    
+    public function getName()
+    {
+        if (!$this->name) {
+            if ($this->srcFile) {
+ 
+            }
+            else {
+                $this->name = 'custom_slot_'.uniqid();
+            } 
+        }
+        return $this->name;
     }
     
     public function getDataKey()
@@ -149,5 +187,4 @@ class Parsable
             }
         }
     }
-    
 }

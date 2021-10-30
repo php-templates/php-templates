@@ -4,7 +4,9 @@ namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Parser;
 use DOMDocument;
+use Component;
 use IvoPetkov\HTML5DOMDocument;
+use DomDocument\PhpTemplates\Facades\DomHolder;
 //use DomDocument\PhpTeplates\Parsable;
 
 /**
@@ -40,14 +42,6 @@ class Template
         $this->uid = (self::$index++);
     }
     
-    protected $options = [
-        'prefix' => '@',
-        'src_path' => 'views/',
-        'dest_path' => 'parsed/',
-        'track_changes' => true,
-        'trim_html' => false
-    ];
-    
     // instance variables
     private $uid = 0;
     private $name;
@@ -77,20 +71,34 @@ class Template
         //$dom->registerNodeClass('HTML5DOMDocument', 'DomDocument\PhpTemplates\ExtendedDOMDocument');
         //$dom->loadHtml(file_get_contents($this->srcFile));
         //d($slots);
-        $dom = new Parsable($this->srcFile, null, $slots, [], false);
-        $this->parser = new Parser($this->options);
+        $dom = new Parsable($rfilepath, null, $slots, false);
+        $doc = new Document;
+        $this->parser = new Parser($doc, new CodeBuffer);
         //dd($this->parser->parse($dom, $this->slots));
         //dd($this->parser->parse($dom, $dom));
         //dd();
         //dd($this->parser->parse($dom));
-        $dom = $this->parser->parse($dom);
+        $this->parser->parse(DomHolder::get($rfilepath, false));
+        //dd($doc->getFunctions(), $dom);
         //$dom = $dom[0];
          // remove slots and components
-        foreach ($dom->getElementsByTagName('slot') as $slot) {
+        //foreach ($dom->getElementsByTagName('slot') as $slot) {
             //$slot->parentNode->removeChild($slot);
+        //}
+        //$dom->formatOutput = true;
+        
+        file_put_contents('./parsed/test.php', $doc->getContent());
+        if ($_GET['plain'] ?? false) {
+        echo $doc->getContent();
+        } else {
+        require('./parsed/test.php');
         }
-        $dom->formatOutput = true;
-        echo $dom->saveHtml(); dd();
+        dd();
+        
+        
+        
+        
+        
         $this->mountSlotsData($this->slots);
         //$this->parser->parse($this->parser);
         dd([
@@ -100,8 +108,10 @@ class Template
             'replaces' => $this->parser->replaces,
             'result' => str_replace(['&lt;', '&gt;', '&amp;amp;lt;', '&amp;amp;gt;', '&amp;lt;', '&amp;gt;'],['<', '>', '<', '>', '<', '>'], $this->parser->saveHtml())
         ]);
-        echo $this->parser->saveHtml();
-        dd();
+        $content = $this->parser->saveHtml();
+        file_put_contents('./parsed/test.php', $content);
+        echo $content;
+        dd(134);
         $result = $this->makeReplaces();
         
         echo $result;
@@ -128,7 +138,7 @@ class Template
     }
     
     protected function getSrcFile()
-    {
+    {return;
         if (!$this->srcFile) {
             $f = $this->options['src_path'];
             $this->srcFile = $f.$this->requestName.'.template.php';
