@@ -8,19 +8,14 @@ use DomDocument\PhpTemplates\Facades\Config;
 class Parsable
 {
     protected static $last_id = 1;
-    protected static $cache = [];
     
     protected $id;
     
     protected $attrs = [
-        
+        //'nestLevel' => 0
     ];
     
-<<<<<<< HEAD
     public function __construct($rfilepath, $data = null, $slots = [], $comp = true)
-=======
-    public function __construct($srcFile, $data = null, $slots = [], array $options = [], $comp = true)
->>>>>>> refs/heads/dev
     {
         $this->id = (self::$last_id++);
         //d($this->id);
@@ -43,7 +38,6 @@ class Parsable
         }
         
         $this->slots = $slots;
-        $this->attributes = $options['attributes'] ?? [];
         $this->is_component = $comp;
     }
     
@@ -61,7 +55,6 @@ class Parsable
     {
         // load dom and check for switches on data and add them to name
         if (!$this->dom && $this->srcFile) {
-<<<<<<< HEAD
             // se va face pe main root, cu acces la acelasi codebuffer
             // verificam daca e deja incarcata
             // compunem numele cu req si data cu switches
@@ -74,21 +67,8 @@ class Parsable
             $dom->loadHtml($html);
             if ($this->is_component) {
                 $dom = $this->trimHtml($dom);
-=======
-            if (!isset(self::$cache[$this->srcFile])) {
-                $dom = new HTML5DOMDocument;//d($this->srcFile);
-                $dom->formatOutput = true;
-                $html = file_get_contents($this->srcFile);
-                $html = $this->removeHtmlComments($html);
-                $dom->loadHtml($html);
-                if ($this->is_component) {
-                    $dom = $this->trimHtml($dom);
-                }
-                self::$cache[$this->srcFile] = $dom;
->>>>>>> refs/heads/dev
             }
-            $this->dom = self::$cache[$this->srcFile]->cloneNode(true);
-            $this->addDynamicAttrs();
+            $this->dom = $dom;
         }
 
         return $this->dom;
@@ -115,11 +95,6 @@ class Parsable
         return '__slot_data'.$this->id;
     }
     
-    public function getName()
-    {
-        return str_replace(['.template.php', '/', '-'], ['', '_', ''], $this->srcFile);
-    }
-    
     public function trimHtml($dom)
     {
         $body = $dom->getElementsByTagName('body')->item(0);
@@ -139,10 +114,13 @@ class Parsable
     }
     
   
-    private function addDynamicAttrs()
+    private function addDynamicAttr()
     {
-        foreach ($this->attributes as $key => $value) {
-            $this->dom->setAttribute($key, $value);
+        $body = $this->getElementsByTagName('body')->item(0);
+        if ($body->childNodes && $body->childNodes->count() === 1 && method_exists($body->firstChild, 'setAttribute')) {
+            foreach ($this->attrs as $attr => $value) {
+                //$body->firstChild->setAttribute($attr, $value);
+            }
         }
     }
     

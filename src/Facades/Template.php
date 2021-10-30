@@ -27,11 +27,6 @@ class Template
     
     public static function component(string $rfilepath, array $data = [], array $slots = [])
     {
-        $options = (new PhpTemplate)->getOptions();
-        $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        $f = $options['src_path'];
-        $srcFile = $f.$requestName.'.template.php';
-
-        return new Parsable($srcFile, $data, $slots);
+        return new Parsable($rfilepath, $data, $slots);
     }
 }
