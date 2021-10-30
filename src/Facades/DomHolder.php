@@ -26,21 +26,6 @@ class DomHolder
         // caching and always returns a clone
     }
     
-    public function trimHtml($dom)
-    {
-        $body = $dom->getElementsByTagName('body')->item(0);
-        $content = '';
-        foreach ($body->childNodes as $node)
-        {
-            $content.= $dom->saveHtml($node);
-        }
-        return $content;
-    }
-            
-    public function removeHtmlComments($content = '') {//d($content);
-    	return preg_replace('~<!--.+?-->~ms', '', $content);
-    }
-    
     public function switchesOf($rpath): array
     {
         if (!isset(self::$cached['switches'][$path])) {
@@ -89,5 +74,20 @@ class DomHolder
         $name = join('_', array_filter([$name, $hash, $oName]));
         d($rpath, $switches, $attrs, $oname, $name);
         return $name;
+    }
+
+    public function trimHtml($dom)
+    {
+        $body = $dom->getElementsByTagName('body')->item(0);
+        $content = '';
+        foreach ($body->childNodes as $node)
+        {
+            $content.= $dom->saveHtml($node);
+        }
+        return $content;
+    }
+            
+    public function removeHtmlComments($content = '') {//d($content);
+    	return preg_replace('~<!--.+?-->~ms', '', $content);
     }
 }
