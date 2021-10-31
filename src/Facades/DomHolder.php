@@ -4,6 +4,7 @@ namespace DomDocument\PhpTemplates\Facades;
 
 use IvoPetkov\HTML5DOMDocument;
 use DomDocument\PhpTemplates\Facades\Config;
+use DomDocument\PhpTemplates\Helper;
 
 class DomHolder
 {
@@ -53,14 +54,16 @@ class DomHolder
         $switches = [];
         $switchNodes = $dom->getElementsByTagName('switch');
         foreach ($switchNodes as $node) {
-            $of = $node->getAttribute('of');
+            $of = $node->getAttribute('of');// or default
             $switches[] = $of;
-            if (isset($data[$of])) {
-                $val = $data[$of];d($node);d(get_class_methods($node));
-                $variant = $node->querySelector('[case="'.$val.'"]');
-                if ($variant) {
-                    $variant->removeAttribute('case');
-                    $node->parentNode->insertBefore($variant, $node);
+            $val = isset($data[$of]) ? $data[$of] : 'default';
+            foreach ($node->childNodes as $cn) {
+                if (Helper::isEmptyNode($cn)) {
+                    continue;
+                }
+                if ($cn->getAttribute('case') === $val) {
+                    $cn->removeAttribute('case');
+                    $node->parentNode->insertBefore($cn, $node);
                 }
             }
             $node->parentNode->removeChild($node);
@@ -75,7 +78,10 @@ class DomHolder
         $hash = substr(md5($rpath), 0, 5);
         $oName = array_intersect_key($attrs, array_flip($switches));
         // d(123, $switches);
-        $oName = implode('_', $oName);
+        $oName = http_build_query($oName);
+        if ($oName) {
+            $oName = substr(md5($oName), 0, 5);
+        }
         $name = str_replace(['/', '\\'], '_', $rpath);
         $name = preg_replace('/(?![a-zAZ0-9_]+)./', '', $name);
         $name = join('_', array_filter([$name, $hash, $oName]));
