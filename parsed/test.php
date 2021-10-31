@@ -31,15 +31,12 @@ extract($data);?>
         foreach ($slots["default"] as $slot) {
         $slot->render([]);}
         }
-        else  {
-         ?>
-                <?php }
          ?>
 </span>
-        <?php } ?><?php function slot_617edfebb2940($data, $slots) {
+        <?php } ?><?php function slot_default_617f0cacdbbb9($data, $slots) {
 extract($data);?>
         This is a simple helper
-        <?php } ?><?php function slot_617edfebb29f4($data, $slots) {
+        <?php } ?><?php function slot_label_617f0cacdbc48($data, $slots) {
 extract($data);?>
         <div slot="label">
         {{ $label }}
@@ -47,12 +44,12 @@ extract($data);?>
             
         $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
         $comp1 = new Component('components_helper_7bc48', []);
-                $comp2 = $comp1->addSlot('default', new Component('slot_617edfebb2940', []));
+                $comp2 = $comp1->addSlot('default', new Component('slot_default_617f0cacdbbb9', []));
         $comp0->render(); ?>
     </div>
         <?php } ?><!DOCTYPE html>
 <html>
 <body><?php
             
-                $comp1 = $comp0->addSlot('label', new Component('slot_617edfebb29f4', []));
+                $comp1 = $comp0->addSlot('label', new Component('slot_label_617f0cacdbc48', []));
         $comp0->render(); ?></body></html>

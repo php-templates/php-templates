@@ -75,11 +75,7 @@ class Parser
                 $slotName = 'default';
             }
             
-            $slot = null;
-            if (isset($root->slots[$slotName])) {
-                $slot = $root->slots[$slotName];
-            }
-            $this->insertSlot($node, $slot);
+            $this->insertSlot($node);
         } 
         elseif (Helper::isComponent($node)) {
             $this->insertComponent($node);
@@ -89,7 +85,7 @@ class Parser
         }
         
         foreach ($node->childNodes ?? [] as $_node) {//d($_node);
-            $this->parseNode($_node, $root);
+            $this->parseNode($_node);
         }
         return $node;
     }
@@ -109,8 +105,8 @@ class Parser
                 });
             });
         });
-        
-        if ($node->childNodes) {
+
+        if ($node->childNodes && $node->childNodes->length) {
             $this->codebuffer->else(null, function() use ($node) {
                 $this->codebuffer->push(' ?>');
                 foreach ($node->childNodes as $cn) {//d($cn);
@@ -163,7 +159,7 @@ class Parser
                 }
             } else {
                 $htmlString = (new Parser($this->document, $this->codebuffer))->parse($slotNode);
-                $fnName = 'slot_'.uniqid();
+                $fnName = 'slot_'.$attrs['slot'].'_'.uniqid();
                 $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                 $this->document->registerFunction($fnName, $htmlString);
             }
