@@ -64,16 +64,21 @@ function dif($if, ...$data) {
 require('autoload.php');
 
 use DomDocument\PhpTemplates\Facades\Template;
+use DomDocument\PhpTemplates\Facades\Config;
 
 if ($_GET['plain'] ?? false) {
 header("Content-Type: text/plain");
 }
 $doc = 'simple';
-//$doc = 'test-nested-component';
-//$x = (new IvoPetkov\HTML5DOMDocument);
-//$x->loadHtml(file_get_contents('views/component-1.template.php'));
-//dd($x->getElementsByTagName('body')->item(0)->childNodes);
-echo Template::load('test');
+
+Config::set('aliased', [
+    'x-form-group' => 'components/form-group',
+    'x-input-group' => 'components/input-group',
+    'x-card' => 'components/card',
+    'x-helper' => 'components/helper',
+]);
+
+echo Template::load($doc);
 die();
 
 echo Template::load($doc, ['rootData' => 123], [
@@ -81,19 +86,5 @@ echo Template::load($doc, ['rootData' => 123], [
     'slot-array' => [
         Template::component('simple-component'),
         Template::component('simple-component', ['s1' => 123]),
-    ],
-    'slot-nested' => Template::component('simple-component', [], [
-        'default' => Template::component('simple-component', ['s1' => 123]),
-    ]),
-    'slot-array-nested' => Template::component('simple-component', ['foo' => 124], [
-        'default' => [
-            Template::component('simple-component', ['s1' => 123]),
-            Template::component('simple-component', [], [
-                'default' => [
-                    Template::component('simple-component'),
-                    Template::component('simple-component', ['s1' => 123]),
-                ]
-            ]),
-        ]
-    ]),
+    ]
 ]);

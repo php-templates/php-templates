@@ -71,7 +71,7 @@ class Parser
         if ($node->nodeName === 'slot') {
             $this->insertSlot($node);
         } 
-        elseif ($node->nodeName === 'component') {
+        elseif (Helper::isComponent($node->nodeName)) {
             $this->insertComponent($node);
         }
         else {
@@ -125,12 +125,7 @@ class Parser
     private function insertComponent($node)
     {
         $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
-
-        $rfilepath = $data['is'];
-        //$buffer = e init buffer actual sau nu e prim child ? new codebuffer si initiem cu new comp : this buffer
-        //daca fn nu exista, new parser($buffer, doc)->parse(newhtml load comp);
-        //this buffer put some conten
-        // check existance of fn using switchof and attrs and compname
+        $rfilepath = Helper::isComponent($node);
         $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
         if (!$this->document->hasFunction($fnName)) {
             $dom = DomHolder::get($rfilepath, $data['attrs']);

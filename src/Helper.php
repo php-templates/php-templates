@@ -56,7 +56,7 @@ class Helper {
             return null;
         }
 
-        return Config::get('aliased.'.$node->nodeName);
+        return Config::getComponentByAlias($node->nodeName);
     }
     
     public function removeNodeAttributes($node, $all = true)

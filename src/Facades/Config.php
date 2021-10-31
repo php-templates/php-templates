@@ -45,4 +45,13 @@ class Config
         }
         return $fback;
     }
+
+    public function getComponentByAlias($name)
+    {
+        if (!isset(self::$data['aliased']) || !isset(self::$data['aliased'][$name])) {
+            return null;
+        }
+
+        return self::$data['aliased'][$name];
+    }
 }
