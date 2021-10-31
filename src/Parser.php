@@ -52,7 +52,8 @@ class Parser
             //$this->functions[$root->getName()] = $this->codebuffer->getTemplateFunction($root->getName(), $dom);
         } else {
             $tpl = '<?php use DomDocument\PhpTemplates\Component; ?>';
-            foreach ($this->document->getFunctions() as $fn) {
+            foreach ($this->document->getFunctions() as $key => $fn) {
+                d('---', $fn);
                 $tpl .= $fn;
             }
             $tpl.= $htmlString;
@@ -80,7 +81,7 @@ class Parser
             }
             $this->insertSlot($node, $slot);
         } 
-        elseif (Helper::isComponent($node->nodeName)) {
+        elseif (Helper::isComponent($node)) {
             $this->insertComponent($node);
         }
         else {

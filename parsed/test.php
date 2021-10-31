@@ -23,22 +23,9 @@ extract($data);?>
          ?>
     <?php if (!empty($error)) { ?><span class="error">{{ $error }}</span><?php } ?>
 </div>
-        <?php } ?><?php function slot_617e844f822b0($data, $slots) {
+        <?php } ?><?php function components_helper_7bc48($data, $slots) {
 extract($data);?>
-        <div slot="label">Form label</div>
-        <?php } ?><?php function components_formgroup_40b1d($data, $slots) {
-extract($data);?>
-        <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
-    <?php
-            if (!empty($slots["label"])) {
-        foreach ($slots["label"] as $slot) {
-        $slot->render(['name' => 'label']);}
-        }
-        else  {
-         ?>
-                    <label class="form-label">{{ $label }}</label>
-                <?php }
-         ?>
+        <span class="help-circle">
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
@@ -48,21 +35,24 @@ extract($data);?>
          ?>
                 <?php }
          ?>
-    <?php if (!empty($error)) { ?><span class="error">{{ $error }}</span><?php } ?>
-</div>
+</span>
+        <?php } ?><?php function slot_617edfebb2940($data, $slots) {
+extract($data);?>
+        This is a simple helper
+        <?php } ?><?php function slot_617edfebb29f4($data, $slots) {
+extract($data);?>
+        <div slot="label">
+        {{ $label }}
+        <?php
+            
+        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
+        $comp1 = new Component('components_helper_7bc48', []);
+                $comp2 = $comp1->addSlot('default', new Component('slot_617edfebb2940', []));
+        $comp0->render(); ?>
+    </div>
         <?php } ?><!DOCTYPE html>
 <html>
 <body><?php
             
-        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
-                $comp1 = $comp0->addSlot('label', new Component('slot_617e844f822b0', []));
-        $comp0->render(); ?>
-
-<?php
-            
-        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
-        $comp0->render(); ?>
-<?php
-            
-        $comp0 = new Component('components_formgroup_40b1d', []);
+                $comp1 = $comp0->addSlot('label', new Component('slot_617edfebb29f4', []));
         $comp0->render(); ?></body></html>

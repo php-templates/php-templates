@@ -69,7 +69,7 @@ use DomDocument\PhpTemplates\Facades\Config;
 if ($_GET['plain'] ?? false) {
 header("Content-Type: text/plain");
 }
-$doc = 'simple';
+$doc = 'test';
 
 Config::set('aliased', [
     'x-form-group' => 'components/form-group',

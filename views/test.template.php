@@ -1,8 +1,8 @@
-<component is="components/form-group" type="text">
+<!-- component is="components/form-group" type="text">
     <div slot="label">Form label</div>
 </component>
 
-<x-form-group type="text"></x-form-group>
+<x-form-group type="text"></x-form-group -->
 
 <x-form-group type="text">
     <div slot="label">
