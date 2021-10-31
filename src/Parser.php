@@ -69,7 +69,16 @@ class Parser
     private function parseNode($node)
     {
         if ($node->nodeName === 'slot') {
-            $this->insertSlot($node);
+            $slotName = $node->getAttribute('name');
+            if (!$slotName) {
+                $slotName = 'default';
+            }
+            
+            $slot = null;
+            if (isset($root->slots[$slotName])) {
+                $slot = $root->slots[$slotName];
+            }
+            $this->insertSlot($node, $slot);
         } 
         elseif ($node->nodeName === 'component') {
             $this->insertComponent($node);
@@ -79,7 +88,7 @@ class Parser
         }
         
         foreach ($node->childNodes ?? [] as $_node) {//d($_node);
-            $this->parseNode($_node);
+            $this->parseNode($_node, $root);
         }
         return $node;
     }
