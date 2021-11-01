@@ -53,10 +53,10 @@ class Parser
         } else {
             $tpl = '<?php use DomDocument\PhpTemplates\Component; ?>';
             foreach ($this->document->getFunctions() as $key => $fn) {
-                d('---', $fn);
-                $tpl .= $fn;
+                //d('---', $fn);
+                $tpl .= (PHP_EOL.$fn);
             }
-            $tpl.= $htmlString;
+            $tpl.= (PHP_EOL.$htmlString);
             $this->document->setContent($tpl);
         }
         
@@ -133,32 +133,32 @@ class Parser
         $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
         $rfilepath = Helper::isComponent($node);
         $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
+        $dataArrString = Helper::arrayToEval($data['attrs']);
+        $this->codebuffer->push('
+        $comp'.self::$depth." = new Component('$fnName', $dataArrString);");
         if (!$this->document->hasFunction($fnName)) {
             $dom = DomHolder::get($rfilepath, $data['attrs']);
             $htmlString = (new Parser($this->document, new CodeBuffer))->parse($dom, true);
             $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
             $this->document->registerFunction($fnName, $htmlString);
         }
-        $dataArrString = Helper::arrayToEval($data['attrs']);
-        $this->codebuffer->push('
-        $comp'.self::$depth." = new Component('$fnName', $dataArrString);");
         
         foreach ($node->childNodes as $slotNode) {
             if (Helper::isEmptyNode($slotNode)) {
                 continue;
             }
-            $attrs = Helper::getClassifiedNodeAttributes($slotNode);
+            $attrs = Helper::getClassifiedNodeAttributes($slotNode, 2);
             // recursive register if and for stmnts nested
             if ($rfilepath = Helper::isComponent($slotNode)) {
                 $fnName = DomHolder::getTemplateName($rfilepath, Helper::getNodeAttributes($slotNode));
                 if (!$this->document->hasFunction($fnName)) {
-                    // unpack
-                    $htmlString = (new Parser($this->document, $this->codebuffer))->parse($slotNode);
+                    $slotNode = DomDocument::get($rfilepath);
+                    $htmlString = (new Parser($this->document, new CodeBuffer))->parse($slotNode);
                     $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                     $this->document->registerFunction($fnName, $htmlString);
                 }
             } else {
-                $htmlString = (new Parser($this->document, $this->codebuffer))->parse($slotNode);
+                $htmlString = (new Parser($this->document, new CodeBuffer))->parse($slotNode);
                 $fnName = 'slot_'.$attrs['slot'].'_'.uniqid();
                 $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                 $this->document->registerFunction($fnName, $htmlString);
@@ -170,7 +170,7 @@ class Parser
             });
         }
         $this->codebuffer->push('
-        $comp0->render();');
+        $comp'.self::$depth.'->render();');
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
             $node

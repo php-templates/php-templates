@@ -1,4 +1,5 @@
-<?php use DomDocument\PhpTemplates\Component; ?><?php function components_formgroup_40b1d_84ae1($data, $slots) {
+<?php use DomDocument\PhpTemplates\Component; ?>
+<?php function components_formgroup_40b1d_84ae1($data, $slots) {
 extract($data);?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
@@ -23,7 +24,12 @@ extract($data);?>
          ?>
     <?php if (!empty($error)) { ?><span class="error">{{ $error }}</span><?php } ?>
 </div>
-        <?php } ?><?php function components_helper_7bc48($data, $slots) {
+        <?php } ?>
+<?php function slot_label_617f972ecfb99($data, $slots) {
+extract($data);?>
+        <div>Form label</div>
+        <?php } ?>
+<?php function components_helper_7bc48($data, $slots) {
 extract($data);?>
         <span class="help-circle">
     <?php
@@ -33,23 +39,37 @@ extract($data);?>
         }
          ?>
 </span>
-        <?php } ?><?php function slot_default_617f0cacdbbb9($data, $slots) {
+        <?php } ?>
+<?php function slot_default_617f972ed051e($data, $slots) {
 extract($data);?>
         This is a simple helper
-        <?php } ?><?php function slot_label_617f0cacdbc48($data, $slots) {
+        <?php } ?>
+<?php function slot_label_617f972ed05b4($data, $slots) {
 extract($data);?>
-        <div slot="label">
+        <div>
         {{ $label }}
         <?php
             
-        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
         $comp1 = new Component('components_helper_7bc48', []);
-                $comp2 = $comp1->addSlot('default', new Component('slot_default_617f0cacdbbb9', []));
-        $comp0->render(); ?>
+                $comp2 = $comp1->addSlot('default', new Component('slot_default_617f972ed051e', []));
+        $comp1->render(); ?>
     </div>
-        <?php } ?><!DOCTYPE html>
+        <?php } ?>
+<!DOCTYPE html>
 <html>
 <body><?php
             
-                $comp1 = $comp0->addSlot('label', new Component('slot_label_617f0cacdbc48', []));
+        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
+                $comp1 = $comp0->addSlot('label', new Component('slot_label_617f972ecfb99', []));
+        $comp0->render(); ?>
+
+<?php
+            
+        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
+        $comp0->render(); ?>
+
+<?php
+            
+        $comp0 = new Component('components_formgroup_40b1d_84ae1', ['type' => 'text']);
+                $comp1 = $comp0->addSlot('label', new Component('slot_label_617f972ed05b4', []));
         $comp0->render(); ?></body></html>

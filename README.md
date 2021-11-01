@@ -1,9 +1,6 @@
 # php-templates
 
 TODO:
-<slot></slot> rezulta else gol pe fn declaration.. verifica la parsare pe insert slot clauza de else
-<component>text slot</component> ar trebui sa verifice daca nodul e text si sa il parseze si treaca ca si string, nu sa creeze o noua fn inutila
-
 
 nestLevel per parser instance ++ on accessing childnodes and reset on body reached
 
@@ -21,3 +18,5 @@ html
   html
   
 3:comp recursivity
+
+v 4: comp slot ca dom node cu componente

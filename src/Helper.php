@@ -10,15 +10,24 @@ class Helper {
         
     }
     
-    public function getNodeAttributes($node) {
+    public function getNodeAttributes($node, $reset = 0) {
         $attrs = [];
+        $special = array_merge(Config::allowedControlStructures, [
+            'slot', 'is',
+        ]);
         foreach ($node->attributes ?? [] as $attr) {
             $attrs[$attr->nodeName] = $attr->nodeValue;
+            if ($reset === 1) {
+                $node->removeAttribute($attr->nodeName);
+            } 
+            elseif ($reset === 2 && in_array($attr->nodeName, $special)) {
+                $node->removeAttribute($attr->nodeName);
+            }
         }
         return $attrs;
     }
     
-    public function getClassifiedNodeAttributes($node) {
+    public function getClassifiedNodeAttributes($node, $reset = 0) {
         $attrs = [
             'c_structs' => [],
             'is' => '',
@@ -26,7 +35,7 @@ class Helper {
             'slot' => 'default',
         ];
         
-        foreach (self::getNodeAttributes($node) as $attr => $value) {
+        foreach (self::getNodeAttributes($node, $reset) as $attr => $value) {
             if ($attr === 'is') {
                 $attrs['is'] = $value;
             } 
