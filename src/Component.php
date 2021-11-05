@@ -25,9 +25,10 @@ class Component
         $this->slots[$pos][] = $renderable;
     }
     
-    public function render()
+    public function render($parentScope)
     {
         $func = $this->func;//d(1122, $this->data);
-        $func($this->data, $this->slots);
+        $this->data['_attrs'] = array_keys($this->data);
+        $func(array_merge($parentScope, $this->data), $this->slots);
     }
 }

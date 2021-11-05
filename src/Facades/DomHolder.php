@@ -57,6 +57,7 @@ class DomHolder
             $of = $node->getAttribute('of');// or default
             $switches[] = $of;
             $val = isset($data[$of]) ? $data[$of] : 'default';
+            //d(123,$val,$data);
             foreach ($node->childNodes as $cn) {
                 if (Helper::isEmptyNode($cn)) {
                     continue;

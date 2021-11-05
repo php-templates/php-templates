@@ -66,8 +66,9 @@ class Template
         file_put_contents('./parsed/test.php', $doc->getContent());
         if ($_GET['plain'] ?? false) {
         echo $doc->getContent();
-        } else {
-        require('./parsed/test.php');
+        } else {//d($data);
+            extract($data);
+        include './parsed/test.php';
         }
         dd();
         

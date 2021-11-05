@@ -13,7 +13,9 @@ class Parser
     private $document;
     private $codebuffer;
     
-    private $tobereplaced = [];
+    private $tobereplaced = [
+        '="__empty__"' => ''
+    ];
     private $toberemoved = [];
     
     protected static $depth = -1;
@@ -25,8 +27,15 @@ class Parser
     }
 
     public function parse($dom, $trimHtml = false)
-    {
+    {//dom($dom);
         self::$depth++;
+        // anything that is not DOMDocument will be scoped to avoid insertbefore.after situations reference confusion
+        if ($dom->nodeName !== '#document') {
+            $temp = new HTML5DOMDocument;
+            $dom = $temp->importNode($dom, true);
+            $temp->appendChild($dom);
+            $dom = $temp;
+        }//dom($dom);
 //d('parsing');dom($dom);
         $this->parseNode($dom);
 
@@ -61,7 +70,13 @@ class Parser
         }
         
         $htmlString = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $htmlString);
-        
+        $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php echo htmlspecialchars($eval); ?>";
+            }
+            return '';
+        }, $htmlString);
+        //if (strpos($htmlString, 'label') !== false) dd($htmlString);
         self::$depth--;
         
         return $htmlString;
@@ -101,11 +116,12 @@ class Parser
             $this->codebuffer->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs) {
                 $this->codebuffer->foreach('$slots["'.$sname.'"] as $slot', function() use ($attrs) {
                     $dataArrString = Helper::arrayToEval($attrs['attrs']);
-                    $this->codebuffer->push('$slot->render('.$dataArrString.');');
+                    $this->codebuffer->push('$slot->render($data);');
                 });
             });
         });
-
+        //$this->codebuffer->else('x', function() {});
+//d(124, $this->codebuffer->getStream());
         if ($node->childNodes && $node->childNodes->length) {
             $this->codebuffer->else(null, function() use ($node) {
                 $this->codebuffer->push(' ?>');
@@ -113,13 +129,15 @@ class Parser
                     if (Helper::isEmptyNode($cn)) {
                         continue;
                     }
-                    
+                    //dom($cn);
+                    // verifica intai daca e comp
                     $this->codebuffer->push('
                     '.(new Parser($this->document, new CodeBuffer))->parse($cn));
                 }
                 $this->codebuffer->push('
                 <?php ');
             });
+            //dd(12, $this->codebuffer->getStream());
         }
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
@@ -152,8 +170,8 @@ class Parser
             if ($rfilepath = Helper::isComponent($slotNode)) {
                 $fnName = DomHolder::getTemplateName($rfilepath, Helper::getNodeAttributes($slotNode));
                 if (!$this->document->hasFunction($fnName)) {
-                    $slotNode = DomDocument::get($rfilepath);
-                    $htmlString = (new Parser($this->document, new CodeBuffer))->parse($slotNode);
+                    $slotNode = DomHolder::get($rfilepath, $attrs['attrs']);
+                    $htmlString = (new Parser($this->document, new CodeBuffer))->parse($slotNode, true);
                     $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                     $this->document->registerFunction($fnName, $htmlString);
                 }
@@ -170,7 +188,7 @@ class Parser
             });
         }
         $this->codebuffer->push('
-        $comp'.self::$depth.'->render();');
+        $comp'.self::$depth.'->render($data);');
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
             $node
@@ -181,20 +199,34 @@ class Parser
     
     private function parseSimpleNode($node)
     {
+        $toberemoved = [];
         $cstructs = [];
         $pf = Config::get('prefix');
         $bpf = ':';
         foreach ($node->attributes ?? [] as $attr) {//d($attr);
-            $k = $attr->nodeName;
-            if (strpos($k, $pf) === 0) {
+            $k = $attr->nodeName;// d($k);
+            if (strpos($k, $pf) === 0) {//d($k, $pf);
                 $expr = substr($k, strlen($pf));
-                //d(112, $expr);
+                if ($expr === 'raw') {
+                    $rid = '__r'.uniqid();
+                    $this->tobereplaced[$rid] = "<?php echo ({$attr->nodeValue}); ?>";
+                    $node->setAttribute($rid, '__empty__');
+                    $toberemoved[] = $k;
+                    continue;
+                }
+                elseif ($expr === 'bind') {
+                    $rid = '__r'.uniqid();
+                    $this->tobereplaced[$rid] = "<?php foreach({$attr->nodeValue} as ".'$k=>$v) echo "$k=\"$v\" "; ?>';
+                    $node->setAttribute($rid, '__empty__');
+                    $toberemoved[] = $k;
+                    continue;
+                }
                 if (!in_array($expr, Config::allowedControlStructures)) {
                     continue;
                 }
                 if ($attr->nodeValue) {
                     $expr .= " ({$attr->nodeValue})";
-                }
+                }//d($node->parentNode);
                 $this->insertBefore(
                     $node->ownerDocument->createTextNode("<?php $expr { ?>"),
                     $node
@@ -203,7 +235,7 @@ class Parser
                     $node->ownerDocument->createTextNode("<?php } ?>"),
                     $node
                 );
-                $node->removeAttribute($k);
+                $toberemoved[] = $k;
             }
             elseif (strpos($k, ':') === 0) {
                 $a = substr($k, 1);
@@ -211,12 +243,16 @@ class Parser
                 if ($nattr = $node->getAttribute($a)) {
                     $node->setAttribute($a, $nattr." $rid");
                 } else {
-                    $node->addAttribute($a, $rid);
+                    $node->setAttribute($a, $rid);
                 }
                 $this->tobereplaced[$rid] = "<?php echo {$attr->nodeValue} ;?>";
-                $node->removeAttribute($k);
+                $toberemoved[] = $k;
             }
         }
+        foreach ($toberemoved as $attr) {
+            $node->removeAttribute($attr);
+        }
+        //if ($node->nodeName === 'option') dd(134);
           // foreach attrs as attr, 
             // conditionating
             // check for special attrs

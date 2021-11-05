@@ -15,7 +15,7 @@ class Config
     ];
     
     const allowedControlStructures = [
-        'if', 'elseif', 'else', 'for', 'foreach'
+        'if', 'elseif', 'else', 'for', 'foreach', 'raw'
     ];
     
     const attrCumulative = [

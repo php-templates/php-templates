@@ -1,12 +1,9 @@
-<component is="components/form-group" type="text">
-    <div slot="label">Form label</div>
-</component>
-
-<x-form-group type="text"></x-form-group>
-
-<x-form-group type="text">
-    <div slot="label">
-        {{ $label }}
-        <x-helper>This is a simple helper</x-helper>
-    </div>
-</x-form-group>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+    
+    <body>
+        <component is="user-profile-form"/>
+    </body>
+</html>
