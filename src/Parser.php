@@ -146,7 +146,7 @@ class Parser
         $this->toberemoved[] = $node;
     }
     
-    private function insertComponent($node)
+    private function insertComponent($node)// param2slotnodelist pentru recursivitate
     {
         $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
         $rfilepath = Helper::isComponent($node);
@@ -180,12 +180,23 @@ class Parser
                 $fnName = 'slot_'.$attrs['slot'].'_'.uniqid();
                 $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                 $this->document->registerFunction($fnName, $htmlString);
-            }
+            }//d(333, $fnName);
             $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($fnName, $attrs) {
                 $dataArrString = Helper::arrayToEval($attrs['attrs']);
                 $this->codebuffer->push('
                 $comp'.(self::$depth+1).' = $comp'.self::$depth."->addSlot('{$attrs['slot']}', new Component('$fnName', $dataArrString));");
+                // pentru fiecare child, facem parse, daca am avut comp
+                if ($rfilepath) {
+                    foreach ($slotNode->childNodes as $snode) {
+                        if (Helper::isEmptyNode($slotNode)) {
+                            continue;
+                        }
+                        // insert component
+                        //$this->parseNode();
+                    }
+                }
             });
+            //d($this->codebuffer->getStream());
         }
         $this->codebuffer->push('
         $comp'.self::$depth.'->render($data);');

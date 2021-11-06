@@ -21,12 +21,12 @@ class Component
     }
     
     public function addSlot($pos, $renderable)
-    {
+    {d($pos);
         $this->slots[$pos][] = $renderable;
     }
     
     public function render($parentScope)
-    {
+    {//d($this->slots);
         $func = $this->func;//d(1122, $this->data);
         $this->data['_attrs'] = array_keys($this->data);
         $func(array_merge($parentScope, $this->data), $this->slots);
