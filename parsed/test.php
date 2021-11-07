@@ -1,15 +1,20 @@
 <?php use DomDocument\PhpTemplates\Component; ?>
 <?php function components_card_110b0($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-  0 => 'slots',
-  2 => 'slot',
-  4 => 'data',
-  5 => 'title',
+  0 => 'comp0',
+  1 => 'comp2',
+  2 => 'comp1',
+  3 => 'slots',
+  5 => 'slot',
+  7 => 'data',
+  8 => 'title',
 )))); ?>
         <div class="card">
     <div class="card-body">
         <?php
-            if (!empty($slots["title"])) {
+            
+            $comp0 = new Component('userprofileform_11181', []);
+            $comp2 = $comp1->addSlot('components_card_110b0', []);if (!empty($slots["title"])) {
         foreach ($slots["title"] as $slot) {
         $slot->render($data);}
         }
@@ -65,54 +70,10 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php if (!empty($error)) { ?><span class="error"><?php echo htmlspecialchars($error); ?></span><?php } ?>
 </div>
         <?php } ?>
-<?php function components_helper_7bc48($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-  0 => 'slots',
-  2 => 'slot',
-  4 => 'data',
-)))); ?>
-        <span class="help-circle">
-    <?php
-            if (!empty($slots["default"])) {
-        foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
-        }
-         ?>
-</span>
-        <?php } ?>
-<?php function slot_default_61856cd96dacf($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-)))); ?>
-        Helper
-        <?php } ?>
-<?php function slot_label_61856cd96dc81($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-  0 => 'comp2',
-  1 => 'comp3',
-  4 => 'data',
-)))); ?>
-        <label><?php
-            
-        $comp2 = new Component('components_helper_7bc48', []);
-                $comp3 = $comp2->addSlot('default', new Component('slot_default_61856cd96dacf', []));
-        $comp2->render($data); ?> Label with helper</label>
-        <?php } ?>
-<?php function slot_default_61856cd96de9a($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-)))); ?>
-        Helper
-        <?php } ?>
 <?php function userprofileform_11181($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-  0 => 'comp1',
-  1 => 'comp2',
-  4 => 'data',
 )))); ?>
-        <?php
-            
-        $comp1 = new Component('components_card_110b0', []);
-                $comp2 = $comp1->addSlot('default', new Component('components_formgroup_40b1d_8b4ba', ['type' => 'textarea', 'rows' => '10', 'name' => 'textarea', 'value' => 'some text']));
-        $comp1->render($data); ?>
+        
         <?php } ?>
 <!DOCTYPE html>
 <html>
@@ -123,7 +84,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <body>
         <?php
             
-        $comp0 = new Component('userprofileform_11181', []);
-        $comp0->render($data); ?>
+                $comp2 = $comp1->addSlot('default', new Component('components_formgroup_40b1d_8b4ba', ['type' => 'textarea', 'rows' => '10', 'name' => 'textarea', 'value' => 'some text']));
+            $comp0->render($data); ?>
     </body>
 </html>

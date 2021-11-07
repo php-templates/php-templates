@@ -58,7 +58,7 @@ class Template
         $this->requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
         $this->srcFile = $this->getSrcFile();
 
-        $dom = new Parsable($rfilepath, null, $slots, false);
+        //$dom = new Parsable($rfilepath, null, $slots, false);
         $doc = new Document;
         $this->parser = new Parser($doc, new CodeBuffer);
         $this->parser->parse(DomHolder::get($rfilepath, false));
