@@ -25,13 +25,15 @@ function d(...$data) {
     } 
 }
 
-    function dom($d)
-    {
-        $x = debug_backtrace();
-        //print_r($x[0]['file'].'->'.$x[0]['line']);
+function dom($d, $name = '', $depth = 0)
+{
+    $x = debug_backtrace();
+    if (is_string($d)) {
+        $content = $d;
+    } else {
         if (!is_iterable($d)) {
             $d = [$d];
-        }
+        } 
         $content = '';
         foreach ($d as $node)
         {
@@ -43,11 +45,23 @@ function d(...$data) {
                 $content.= $node->saveHtml();
             }
         }
-        echo $content;
-        echo '
-        ---
-        ';
     }
+    //print_r($x[0]['file'].'->'.$x[0]['line']);
+
+
+    echo '<div style="background:#f4ff9a; border: 1px solid black; margin-bottom:10px; padding:5px; margin-left:'.($depth*10).'px">';
+    echo '<div><b>'. $name .'</b></div>';
+    echo htmlspecialchars($content);
+    echo '</div>';
+}   
+
+function buf($self, $name = '', $depth = 0)
+{
+    echo '<div style="background:#e6e6e6; border: 1px solid black; margin-bottom:10px; padding:5px; margin-left:'.($depth*10).'px">';
+    echo '<div><b>'. $name .'</b></div>';
+    echo htmlspecialchars($self->codebuffer->getStream());
+    echo '</div>';
+}
 
 function dif($if, ...$data) {
     if (!$if) {

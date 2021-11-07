@@ -37,6 +37,7 @@ class CodeBuffer
             $r .= ' ?>';
             $this->buffer = null;
         }
+
         return $r;
     }
     

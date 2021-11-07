@@ -20,7 +20,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         }
         else  {
          ?>
-                    <?php if (isset($title)) { ?><h5 class="card-title"><?php echo htmlspecialchars($title); ?></h5><?php } ?>
+                    <?php if (isset($title)) { ?><h5 class="card-title"><?php echo htmlspecialchars($title); ?></h5><?php } ?><html></html>
                 <?php }
          ?>
         <?php
@@ -54,7 +54,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         }
         else  {
          ?>
-                    <label class="form-label"><?php echo htmlspecialchars($label); ?></label>
+                    <label class="form-label"><?php echo htmlspecialchars($label); ?></label><html></html>
                 <?php }
          ?>
     <?php
@@ -64,27 +64,9 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         }
         else  {
          ?>
-                    <textarea class="form-control" placeholder="<?php echo $placeholder ?? $label ;?>" <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>><?php echo htmlspecialchars($value); ?></textarea>
+                    <textarea class="form-control" placeholder="<?php echo $placeholder ?? $label ;?>" <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>><?php echo htmlspecialchars($value); ?></textarea><html></html>
                 <?php }
          ?>
     <?php if (!empty($error)) { ?><span class="error"><?php echo htmlspecialchars($error); ?></span><?php } ?>
 </div>
         <?php } ?>
-<?php function userprofileform_11181($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
-)))); ?>
-        
-        <?php } ?>
-<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    </head>
-    
-    <body>
-        <?php
-            
-                $comp2 = $comp1->addSlot('default', new Component('components_formgroup_40b1d_8b4ba', ['type' => 'textarea', 'rows' => '10', 'name' => 'textarea', 'value' => 'some text']));
-            $comp0->render($data); ?>
-    </body>
-</html>

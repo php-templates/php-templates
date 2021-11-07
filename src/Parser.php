@@ -37,6 +37,7 @@ class Parser
         }//dom($dom);
 //d('parsing');dom($dom);
         self::$depth++;
+        dom($dom, 'parsing on depth '.self::$depth, self::$depth);
         $this->parseNode($dom);
         self::$depth--;
 
@@ -77,6 +78,7 @@ class Parser
             }
             return '';
         }, $htmlString);
+        dom($htmlString, 'resulting', self::$depth+1);
         //if (strpos($htmlString, 'label') !== false) dd($htmlString);
         //d('---',$htmlString);
         return $htmlString;
@@ -110,6 +112,7 @@ class Parser
   
     private function insertSlot($node)
     {
+        dom($node, 'insertSlot', self::$depth);
         $sname = $node->getAttribute('name');//dom($node);
         if (empty($sname)) {
             $sname = 'default';
@@ -142,6 +145,7 @@ class Parser
             });
             //dd(12, $this->codebuffer->getStream());
         }
+        buf($this, 'init _slot_', self::$depth);
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
             $node
@@ -151,6 +155,7 @@ class Parser
     
     private function insertComponent($node)// param2slotnodelist pentru recursivitate
     {
+        dom($node, 'insertComponent', self::$depth);
         $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
         $rfilepath = Helper::isComponent($node);
         $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
@@ -166,13 +171,14 @@ class Parser
             $dom = DomHolder::get($rfilepath, $data['attrs']);
             $htmlString = (new Parser($this->document, $this->codebuffer))->parse($dom, true);
             $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
-            $this->document->registerFunction($fnName, $htmlString);d('---', $htmlString);
+            $this->document->registerFunction($fnName, $htmlString);//d('---', $htmlString);
         }
-        
+        buf($this, 'init component', self::$depth);
         foreach ($node->childNodes as $slotNode) {//d('777');dom($slotNode);
             if (Helper::isEmptyNode($slotNode)) {
                 continue;
             }
+            dom($slotNode, ' slot node detected', self::$depth);
             $attrs = Helper::getClassifiedNodeAttributes($slotNode);
             // recursive register if and for stmnts nested
             if ($rfilepath = Helper::isComponent($slotNode)) {
@@ -189,11 +195,12 @@ class Parser
                 $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                 $this->document->registerFunction($fnName, $htmlString);
             }
-            d($fnName);
-            $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($fnName, $attrs) {d(234, $fnName);
+            // d($fnName);
+            $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($fnName, $attrs) {//d(234, $fnName);
                 $dataArrString = Helper::arrayToEval($attrs['attrs']);
                 $this->codebuffer->push('
                 $comp'.(self::$depth+1).' = $comp'.self::$depth."->addSlot('{$attrs['slot']}', new Component('$fnName', $dataArrString));");
+                buf($this, 'init slot', self::$depth);
             });//d($this->codebuffer->getStream());
 
             //d(333, $fnName);
@@ -234,12 +241,12 @@ class Parser
         if (!self::$depth) {
             $this->codebuffer->push('
             $comp'.self::$depth.'->render($data);');//d(345,$this->codebuffer->getStream());
+            buf($this, 'resulting ', self::$depth);
             $node->parentNode->insertBefore(
                 $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
                 $node
             );
         }
-        
         $this->toberemoved[] = $node;
     }
     
