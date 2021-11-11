@@ -11,7 +11,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         <?php
             if (!empty($slots["title"])) {
         foreach ($slots["title"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -21,7 +21,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
          ?>
     </div>
@@ -34,15 +34,16 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'value',
-  14 => 'placeholder',
-  16 => 'error',
+  13 => 'type',
+  14 => 'value',
+  15 => 'placeholder',
+  17 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -52,7 +53,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -62,7 +63,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php if (!empty($error)) { ?><span class="error"><?php echo htmlspecialchars($error); ?></span><?php } ?>
 </div>
         <?php } ?>
-<?php function slot_default_618c0384a7e62($data, $slots) {
+<?php function slot_default_618cc1f3c60ba($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
   0 => 'comp0',
   1 => 'entry_firstname',
@@ -89,15 +90,16 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'value',
-  14 => 'placeholder',
-  16 => 'error',
+  13 => 'type',
+  14 => 'value',
+  15 => 'placeholder',
+  17 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -107,7 +109,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -124,16 +126,17 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'options',
-  14 => 'val',
-  18 => 'value',
-  20 => 'error',
+  13 => 'type',
+  14 => 'options',
+  15 => 'val',
+  19 => 'value',
+  21 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -143,7 +146,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -162,16 +165,17 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'options',
-  14 => 'name',
-  17 => 'values',
-  19 => 'error',
+  13 => 'type',
+  14 => 'options',
+  15 => 'name',
+  18 => 'values',
+  20 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -181,7 +185,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -201,17 +205,18 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'options',
-  14 => 'val',
-  16 => 'name',
-  18 => 'value',
-  21 => 'error',
+  13 => 'type',
+  14 => 'options',
+  15 => 'val',
+  17 => 'name',
+  19 => 'value',
+  22 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -221,7 +226,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -241,18 +246,19 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
   4 => 'slot',
   6 => 'data',
   7 => 'label',
-  13 => 'placeholder',
-  15 => '_attrs',
-  16 => 'k',
-  17 => 'v',
-  20 => 'value',
-  21 => 'error',
+  13 => 'type',
+  14 => 'placeholder',
+  16 => '_attrs',
+  17 => 'k',
+  18 => 'v',
+  21 => 'value',
+  22 => 'error',
 )))); ?>
         <div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php
             if (!empty($slots["label"])) {
         foreach ($slots["label"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
         else  {
          ?>
@@ -262,7 +268,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
     <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, ['type' => $type]));}
         }
         else  {
          ?>
@@ -282,16 +288,16 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
 <?php
             if (!empty($slots["default"])) {
         foreach ($slots["default"] as $slot) {
-        $slot->render($data);}
+        $slot->render(array_merge($data, []));}
         }
          ?>
         <?php } ?>
-<?php function slot_default_618c0384b4f0e($data, $slots) {
+<?php function slot_default_618cc1f3d1173($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
 )))); ?>
         Helper
         <?php } ?>
-<?php function slot_label_618c0384b3415($data, $slots) {
+<?php function slot_label_618cc1f3cfe69($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
   0 => 'comp0',
   1 => 'comp1',
@@ -300,15 +306,15 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         <label slot="label"><?php
             
             $comp0 = new Component('components_helper_7bc48', []);
-            $comp1 = $comp0->addSlot('default', new Component('slot_default_618c0384b4f0e', []));
+            $comp1 = $comp0->addSlot('default', new Component('slot_default_618cc1f3d1173', []));
             $comp0->render($data); ?> Label with helper</label>
         <?php } ?>
-<?php function slot_default_618c0384b5a3d($data, $slots) {
+<?php function slot_default_618cc1f3d165d($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
 )))); ?>
         Helper
         <?php } ?>
-<?php function slot_default_618c0384b5cc6($data, $slots) {
+<?php function slot_default_618cc1f3d17a9($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, array (
 )))); ?>
          Label with helper
@@ -335,7 +341,7 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
         <?php
             
             $comp0 = new Component('components_card_110b0', []);
-            $comp1 = $comp0->addSlot('default', new Component('slot_default_618c0384a7e62', ['class' => 'row']));
+            $comp1 = $comp0->addSlot('default', new Component('slot_default_618cc1f3c60ba', ['class' => 'row']));
             $comp2 = $comp1->addSlot('default', new Component('components_formgroup_40b1d_84ae1', ['type' => 'text', 'class' => 'col-6', 'name' => 'firstname', 'label' => $entry_firstname, 'value' => $firstname]));
             $comp2 = $comp1->addSlot('default', new Component('components_formgroup_40b1d_84ae1', ['type' => 'text', 'class' => 'col-6', 'name' => 'firstname', 'label' => $entry_lastname, 'value' => $lastname]));
             $comp1 = $comp0->addSlot('default', new Component('components_formgroup_40b1d_41dbf', ['type' => 'email', 'name' => 'email', 'label' => $entry_email, 'value' => $email]));
@@ -343,10 +349,10 @@ extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_att
             $comp1 = $comp0->addSlot('default', new Component('components_formgroup_40b1d_530dc', ['type' => 'checkbox', 'options' => ['o1' => 'A', 'o2' => 'B'], 'name' => 'options', 'label' => 'Options', 'values' => ['o1']]));
             $comp1 = $comp0->addSlot('default', new Component('components_formgroup_40b1d_ba80a', ['type' => 'radio', 'options' => ['1' => 'A', '2' => 'B'], 'name' => 'radio', 'label' => 'Radio', 'value' => '2']));
             $comp1 = $comp0->addSlot('default', new Component('components_formgroup_40b1d_8b4ba', ['type' => 'textarea', 'rows' => '10', 'name' => 'textarea', 'value' => 'some text']));
-            $comp2 = $comp1->addSlot('label', new Component('slot_label_618c0384b3415', []));
+            $comp2 = $comp1->addSlot('label', new Component('slot_label_618cc1f3cfe69', []));
             $comp3 = $comp2->addSlot('default', new Component('components_helper_7bc48', []));
-            $comp4 = $comp3->addSlot('default', new Component('slot_default_618c0384b5a3d', []));
-            $comp3 = $comp2->addSlot('default', new Component('slot_default_618c0384b5cc6', []));
+            $comp4 = $comp3->addSlot('default', new Component('slot_default_618cc1f3d165d', []));
+            $comp3 = $comp2->addSlot('default', new Component('slot_default_618cc1f3d17a9', []));
             $comp0->render($data); ?>
         <?php } ?>
 <!DOCTYPE html>

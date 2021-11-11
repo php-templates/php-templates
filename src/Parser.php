@@ -100,7 +100,7 @@ class Parser
     }
     
     private function parseNode($node, $asFunction = null)
-    {//dom($node, 'pn');
+    {
         $attrs = Helper::getClassifiedNodeAttributes($node);
         $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($node) {
             if ($node->nodeName === 'slot') {
@@ -138,7 +138,7 @@ class Parser
             $cbf->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs, $cbf) {
                 $cbf->foreach('$slots["'.$sname.'"] as $slot', function() use ($attrs, $cbf) {
                     $dataArrString = Helper::arrayToEval($attrs['attrs']);
-                    $cbf->push('$slot->render($data);');
+                    $cbf->push('$slot->render(array_merge($data, '.$dataArrString.'));');
                 });
             });
         });

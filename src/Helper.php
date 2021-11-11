@@ -15,6 +15,9 @@ class Helper {
         $special = array_merge(Config::allowedControlStructures, [
             'slot', 'is',
         ]);
+        if ($node->nodeName === 'slot') {
+            $special[] = 'name';
+        }
         foreach ($node->attributes ?? [] as $attr) {
             $attrs[$attr->nodeName] = $attr->nodeValue;
             if ($reset === 1) {
@@ -33,6 +36,7 @@ class Helper {
             'is' => '',
             'attrs' => [],
             'slot' => 'default',
+            'name' => 'default',
         ];
         
         foreach (self::getNodeAttributes($node, $reset) as $attr => $value) {
@@ -41,6 +45,9 @@ class Helper {
             } 
             elseif ($attr === 'slot') {
                 $attrs['slot'] = $value;
+            }
+            elseif ($node->nodeName === 'slot' && $attr === 'name') {
+                $attrs['name'] = $value;
             }
             elseif (in_array($attr, Config::allowedControlStructures)) {
                 $attrs['c_structs'][$attr] = $value;

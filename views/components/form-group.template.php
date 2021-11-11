@@ -2,7 +2,7 @@
     <slot name="label">
         <label class="form-label">{{ $label }}</label>
     </slot>
-    <slot>
+    <slot :type="$type">
         <switch of="type">
             <input case="text" type="text" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
             <input case="number" type="number" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
