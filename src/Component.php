@@ -21,8 +21,9 @@ class Component
     }
     
     public function addSlot($pos, $renderable)
-    {d($pos);
+    {
         $this->slots[$pos][] = $renderable;
+        return $renderable;
     }
     
     public function render($parentScope)

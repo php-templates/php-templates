@@ -14,7 +14,7 @@ class Parser
     private $codebuffer;
     
     private $tobereplaced = [
-        '="__empty__"' => ''
+        '="__empty__"' => '',
     ];
     private $toberemoved = [];
     
@@ -27,19 +27,23 @@ class Parser
     }
 
     public function parse($dom, $trimHtml = false)
-    {//dom($dom);
+    {
         // anything that is not DOMDocument will be scoped to avoid insertbefore.after situations reference confusion
-        if ($dom->nodeName !== '#document') {
+        if ($dom->nodeName !== '#document' && $dom->nodeName !== '#text') {
             $temp = new HTML5DOMDocument;
+            //$body = $temp->createnode('body');
+            //$temp->childNodes->item(0)->appendChild();
+            //$temp->removeChild($temp->childNodes->item(0));
             $dom = $temp->importNode($dom, true);
-            $temp->appendChild($dom);
+            $temp->appendChild($dom);//dom($temp, 33);die();
             $dom = $temp;
         }//dom($dom);
 //d('parsing');dom($dom);
         self::$depth++;
+        echo str_pad('', self::$depth+1, 'I').'<div style="border:1px solid gray;margin-left:'.(self::$depth*30).'px">';
+        buf($this, 'starting from', self::$depth);
         dom($dom, 'parsing on depth '.self::$depth, self::$depth);
         $this->parseNode($dom);
-        self::$depth--;
 
         while ($this->toberemoved) {
             $node = array_pop($this->toberemoved);
@@ -49,9 +53,16 @@ class Parser
             } catch (\Exception $e) {}
         }
         
-        if ($trimHtml) {
+        if ($trimHtml && $dom->nodeName !== '#text') {
+            //dom($dom, 123);
             $htmlString = DomHolder::trimHtml($dom);
-        } elseif ($dom->ownerDocument) {
+        } /*
+        elseif (isset($temp)) {
+            $htmlString = '';
+            foreach ($dom->childNodes as $cn) {
+                $htmlString.= $dom->saveHtml($cn);
+            }
+        }*/ elseif ($dom->ownerDocument) {
             $htmlString = $dom->ownerDocument->saveHtml($dom);
         } else {
             $htmlString = $dom->saveHtml();
@@ -59,6 +70,18 @@ class Parser
         
         // make replaces
         $htmlString = html_entity_decode($htmlString);
+        
+        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
+        $htmlString = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $htmlString);
+        $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php echo htmlspecialchars($eval); ?>";
+            }
+            return '';
+        }, $htmlString);
+        dom($htmlString, 'resulting', self::$depth+1);
+        echo '</div>';
+       
         if (self::$depth) {
             //$this->functions[$root->getName()] = $this->codebuffer->getTemplateFunction($root->getName(), $dom);
         } else {
@@ -70,22 +93,14 @@ class Parser
             $tpl.= (PHP_EOL.$htmlString);
             $this->document->setContent($tpl);
         }
-        
-        $htmlString = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $htmlString);
-        $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
-            if ($eval = trim($m[1])) {
-                return "<?php echo htmlspecialchars($eval); ?>";
-            }
-            return '';
-        }, $htmlString);
-        dom($htmlString, 'resulting', self::$depth+1);
         //if (strpos($htmlString, 'label') !== false) dd($htmlString);
+        self::$depth--;
         //d('---',$htmlString);
         return $htmlString;
     }
     
     private function parseNode($node, $asFunction = null)
-    {
+    {//dom($node, 'pn');
         $attrs = Helper::getClassifiedNodeAttributes($node);
         $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($node) {
             if ($node->nodeName === 'slot') {
@@ -112,80 +127,88 @@ class Parser
   
     private function insertSlot($node)
     {
+        $cbf = new CodeBuffer;
         dom($node, 'insertSlot', self::$depth);
         $sname = $node->getAttribute('name');//dom($node);
         if (empty($sname)) {
             $sname = 'default';
         }
         $attrs = Helper::getClassifiedNodeAttributes($node);
-        $this->codebuffer->if('!empty($slots["'.$sname.'"])', function() use ($sname, $attrs) {
-            $this->codebuffer->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs) {
-                $this->codebuffer->foreach('$slots["'.$sname.'"] as $slot', function() use ($attrs) {
+        $cbf->if('!empty($slots["'.$sname.'"])', function() use ($sname, $attrs, $cbf) {
+            $cbf->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs, $cbf) {
+                $cbf->foreach('$slots["'.$sname.'"] as $slot', function() use ($attrs, $cbf) {
                     $dataArrString = Helper::arrayToEval($attrs['attrs']);
-                    $this->codebuffer->push('$slot->render($data);');
+                    $cbf->push('$slot->render($data);');
                 });
             });
         });
         //$this->codebuffer->else('x', function() {});
 //d(124, $this->codebuffer->getStream());
         if ($node->childNodes && $node->childNodes->length) {
-            $this->codebuffer->else(null, function() use ($node) {
-                $this->codebuffer->push(' ?>');
+            $cbf->else(null, function() use ($node, $cbf) {
+                $cbf->push(' ?>');
                 foreach ($node->childNodes as $cn) {//d($cn);
                     if (Helper::isEmptyNode($cn)) {
                         continue;
                     }
                     //dom($cn);
                     // verifica intai daca e comp
-                    $this->codebuffer->push('
-                    '.(new Parser($this->document, new CodeBuffer))->parse($cn));
+                    $cbf->push('
+                    '.(new Parser($this->document, $cbf))->parse($cn));
                 }
-                $this->codebuffer->push('
+                $cbf->push('
                 <?php ');
             });
             //dd(12, $this->codebuffer->getStream());
         }
-        buf($this, 'init _slot_', self::$depth);
+        buf((object)['codebuffer'=>$cbf], 'init _slot_', self::$depth);
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
+            $node->ownerDocument->createTextNode($cbf->getStream(true)),
             $node
         );
         $this->toberemoved[] = $node;
     }
     
-    private function insertComponent($node)// param2slotnodelist pentru recursivitate
+    private function insertComponent($node, $nestLvl = 0)// param2slotnodelist pentru recursivitate
     {
-        dom($node, 'insertComponent', self::$depth);
+        dom($node, 'insertComponent', $nestLvl);
         $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
         $rfilepath = Helper::isComponent($node);
-        $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
+        if ($rfilepath) {
+            $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
+        } else {
+            $fnName = 'slot_'.($data['slot'] ?? 'default').'_'.uniqid();
+        }
         $dataArrString = Helper::arrayToEval($data['attrs']);
-        if (self::$depth) {
+        if ($nestLvl) {
+            $pos = $data['slot'] ?? 'default';
             $this->codebuffer->push('
-            $comp'.(self::$depth+1).' = $comp'.self::$depth."->addSlot('$fnName', $dataArrString);");   
+            $comp'.($nestLvl).' = $comp'.($nestLvl-1)."->addSlot('$pos', new Component('$fnName', $dataArrString));");   
         } else {//d(124);
             $this->codebuffer->push('
-            $comp'.self::$depth." = new Component('$fnName', $dataArrString);");
+            $comp'.$nestLvl." = new Component('$fnName', $dataArrString);");
         }
         if (!$this->document->hasFunction($fnName)) {
-            $dom = DomHolder::get($rfilepath, $data['attrs']);
-            $htmlString = (new Parser($this->document, $this->codebuffer))->parse($dom, true);
+            $dom = $rfilepath ? DomHolder::get($rfilepath, $data['attrs']) : $node;
+            $htmlString = (new Parser($this->document, new CodeBuffer))->parse($dom, $rfilepath == true);
             $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
             $this->document->registerFunction($fnName, $htmlString);//d('---', $htmlString);
         }
         buf($this, 'init component', self::$depth);
-        foreach ($node->childNodes as $slotNode) {//d('777');dom($slotNode);
+        foreach ($node->childNodes ?? [] as $slotNode) {//d('777');dom($slotNode);
             if (Helper::isEmptyNode($slotNode)) {
                 continue;
             }
-            dom($slotNode, ' slot node detected', self::$depth);
+            dom($slotNode, ' slot node detected', $nestLvl);
+            $this->insertComponent($slotNode, $nestLvl+1);
+/*
             $attrs = Helper::getClassifiedNodeAttributes($slotNode);
             // recursive register if and for stmnts nested
             if ($rfilepath = Helper::isComponent($slotNode)) {
                 $fnName = DomHolder::getTemplateName($rfilepath, Helper::getNodeAttributes($slotNode));
                 if (!$this->document->hasFunction($fnName)) {
-                    $slotNode = DomHolder::get($rfilepath, $attrs['attrs']);
-                    $htmlString = (new Parser($this->document, $this->codebuffer))->parse($slotNode, true);
+                    //$slotNode = DomHolder::get($rfilepath, $attrs['attrs']);
+                    $htmlString = (new Parser($this->document, $buffer))->parse($slotNode, true);
                     $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
                     $this->document->registerFunction($fnName, $htmlString);
                 }
@@ -202,7 +225,7 @@ class Parser
                 $comp'.(self::$depth+1).' = $comp'.self::$depth."->addSlot('{$attrs['slot']}', new Component('$fnName', $dataArrString));");
                 buf($this, 'init slot', self::$depth);
             });//d($this->codebuffer->getStream());
-
+*/
             //d(333, $fnName);
             /*
             $attrs = Helper::getClassifiedNodeAttributes($slotNode, 2);
@@ -238,9 +261,9 @@ class Parser
             });*/
             //d($this->codebuffer->getStream());
         }
-        if (!self::$depth) {
+        if (!$nestLvl) {
             $this->codebuffer->push('
-            $comp'.self::$depth.'->render($data);');//d(345,$this->codebuffer->getStream());
+            $comp0->render($data);');//d(345,$this->codebuffer->getStream());
             buf($this, 'resulting ', self::$depth);
             $node->parentNode->insertBefore(
                 $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
@@ -251,7 +274,7 @@ class Parser
     }
     
     private function parseSimpleNode($node)
-    {
+    {//dom($node,34);
         $toberemoved = [];
         $cstructs = [];
         $pf = Config::get('prefix');

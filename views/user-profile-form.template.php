@@ -1,5 +1,5 @@
 <x-card>
-    <!--div class="row">
+    <div class="row">
         <x-form-group type="text" class="col-6"
             name="firstname"
             :label="$entry_firstname"
@@ -30,7 +30,7 @@
         name="radio"
         label="Radio"
         value="2"
-        /-->
+        />
     <x-form-group type="textarea" rows="10"
         name="textarea"
         value="some text">

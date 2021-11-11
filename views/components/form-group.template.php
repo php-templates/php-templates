@@ -16,7 +16,7 @@
                 {{ $label }}
             </label>
             <select case="select" class="form-control">
-                <option p-foreach="$options as $val => $label" :value="$val" p-raw="$val == $value ? `checked='checked` : ''">{{ $label }}</option>
+                <option p-foreach="$options as $val => $label" :value="$val" p-raw="$val == $value ? 'checked' : ''">{{ $label }}</option>
             </select>
             <textarea case="textarea" class="form-control" :placeholder="$placeholder ?? $label" p-bind="$_attrs">{{ $value }}</textarea>
         </switch>

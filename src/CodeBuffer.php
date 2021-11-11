@@ -6,6 +6,11 @@ class CodeBuffer
 {
     private $buffer = null;
     
+    public function isInit()
+    {
+        return $this->buffer !== null;
+    }
+    
     private function checkInit()
     {
         if ($this->buffer === null) {

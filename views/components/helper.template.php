@@ -1,3 +1,2 @@
-<span class="help-circle">
-    <slot></slot>
-</span>
+<i class="fas fa-question-circle"></i></i>
+<slot></slot>
