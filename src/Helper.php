@@ -46,6 +46,9 @@ class Helper {
             elseif ($attr === 'slot') {
                 $attrs['slot'] = $value;
             }
+            elseif ($attr === 'bind') {
+                $attrs['bind'] = $value;
+            }
             elseif ($node->nodeName === 'slot' && $attr === 'name') {
                 $attrs['name'] = $value;
             }
@@ -60,6 +63,56 @@ class Helper {
         }
         
         return $attrs;
+    }
+    
+    public function nodeStdClass($node, $context = '')
+    {
+        $specials = ['is', 'slot'];
+        if ($node->nodeName === 'slot') {
+            array_push($specials, 'name', 'bind');
+        }
+        if ($context === 'slot') {
+            array_push($specials, 'slot', 'bind');
+        }
+        $result = new \stdClass;
+        $result->statements = [];
+        $result->attributes = [];
+        foreach ($specials as $spec) {
+            $result->$spec = null;
+        }
+        $result->slot = 'default';
+        
+        foreach (self::getNodeAttributes($node) as $k => $val) {
+            if (in_array($k, $specials)) {
+                $result->$k = $val;
+            }
+            elseif (in_array($k, Config::allowedControlStructures)) {
+                if (isset($result->statements[$k])) {
+                    throw new \Exception("Baaaa, vezi ca ai doua cstructs la fel");
+                }
+                $result->statements[$k] = $val;
+            }
+            elseif (in_array($k, Config::attrCumulative) && !empty($result->attributes[$k])) {
+                $result->attributes[$k] .= ' '.$val;
+            } else {
+                $result->attributes[$k] = $val;
+            }
+        }
+        
+        // validari
+        if ($node->nodeName === 'component') {
+            if (empty($result->is)) {
+                //dd($result);
+                throw new \Exception('aaaa');
+            }
+        }
+        if ($node->nodeName === 'slot') {
+            if (!$result->name) {
+                $result->name = 'default';
+            }
+        }
+        
+        return $result;
     }
     
     public static function isComponent($node)

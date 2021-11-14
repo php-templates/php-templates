@@ -5,6 +5,8 @@
     </head>
     
     <body>
-        <component is="user-profile-form"/>
+        <component is="user-profile-form">
+            <div slot="mytitle">mytitle</div>
+        </component>
     </body>
 </html>

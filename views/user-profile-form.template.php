@@ -1,4 +1,5 @@
 <x-card>
+    <slot slot="title" bind="mytitle"></slot>
     <div class="row">
         <x-form-group type="text" class="col-6"
             name="firstname"

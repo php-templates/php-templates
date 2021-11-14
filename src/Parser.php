@@ -101,13 +101,13 @@ class Parser
     
     private function parseNode($node, $asFunction = null)
     {
-        $attrs = Helper::getClassifiedNodeAttributes($node);
-        $this->codebuffer->nestedExpression($attrs['c_structs'], function() use ($node) {
+        $data = Helper::nodeStdClass($node);
+        $this->codebuffer->nestedExpression($data->statements, function() use ($node, $data) {
             if ($node->nodeName === 'slot') {
-                $slotName = $node->getAttribute('name');
+                /*$slotName = $node->getAttribute('name');
                 if (!$slotName) {
                     $slotName = 'default';
-                }
+                }*/
                 $this->insertSlot($node);
             } 
             elseif (Helper::isComponent($node)) {
@@ -125,26 +125,31 @@ class Parser
         return $node;
     }
   
-    private function insertSlot($node)
+    private function insertSlot($node, $nestLvl = 0)
     {
         $cbf = new CodeBuffer;
         dom($node, 'insertSlot', self::$depth);
-        $sname = $node->getAttribute('name');//dom($node);
-        if (empty($sname)) {
-            $sname = 'default';
-        }
-        $attrs = Helper::getClassifiedNodeAttributes($node);
-        $cbf->if('!empty($slots["'.$sname.'"])', function() use ($sname, $attrs, $cbf) {
-            $cbf->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs, $cbf) {
-                $cbf->foreach('$slots["'.$sname.'"] as $slot', function() use ($attrs, $cbf) {
-                    $dataArrString = Helper::arrayToEval($attrs['attrs']);
-                    $cbf->push('$slot->render(array_merge($data, '.$dataArrString.'));');
+        $data = Helper::nodeStdClass($node);
+        $slotName = $nestLvl ? $data->bind : $data->name;
+        $cbf->if('!empty($slots["'.$slotName.'"])', function() use ($data, $cbf, $nestLvl, $slotName) {
+            //$cbf->nestedExpression($attrs['c_structs'], function () use ($sname, $attrs, $cbf) {
+                $cbf->foreach('$slots["'.$slotName.'"] as $slot', function() use ($data, $cbf, $nestLvl, $slotName) {
+                    $dataArrString = Helper::arrayToEval($data->attributes);
+                    if ($nestLvl) {
+                        $this->codebuffer->foreach("\$slots['$slotName'] as \$slot", function() use ($data, $nestLvl, $slotName) {
+                            $i = $nestLvl -1;
+                            $this->codebuffer->push("\$comp{$i}->addSlot('{$data->slot}', \$slot);");
+                        });
+                    } else {
+                        $cbf->push('$slot->render(array_merge($data, '.$dataArrString.'));');
+                    }
                 });
-            });
+            //});
         });
         //$this->codebuffer->else('x', function() {});
 //d(124, $this->codebuffer->getStream());
         if ($node->childNodes && $node->childNodes->length) {
+            // check for empty cn first
             $cbf->else(null, function() use ($node, $cbf) {
                 $cbf->push(' ?>');
                 foreach ($node->childNodes as $cn) {//d($cn);
@@ -172,24 +177,25 @@ class Parser
     private function insertComponent($node, $nestLvl = 0)// param2slotnodelist pentru recursivitate
     {
         dom($node, 'insertComponent', $nestLvl);
-        $data = Helper::getClassifiedNodeAttributes($node);// si le si stergem
+        $data = Helper::nodeStdClass($node);// si le si stergem
         $rfilepath = Helper::isComponent($node);
         if ($rfilepath) {
-            $fnName = DomHolder::getTemplateName($rfilepath, $data['attrs']);
+            $fnName = DomHolder::getTemplateName($rfilepath, $data->attributes);
         } else {
-            $fnName = 'slot_'.($data['slot'] ?? 'default').'_'.uniqid();
+            //$isSlot = empty($data->slot) ? 'default' : $data->slot;
+            $fnName = "slot_{$data->slot}_".uniqid();
         }
-        $dataArrString = Helper::arrayToEval($data['attrs']);
-        if ($nestLvl) {
-            $pos = $data['slot'] ?? 'default';
+        $dataArrString = Helper::arrayToEval($data->attributes);
+        if ($nestLvl) {//d($data);
+            //$pos = $data['slot'] ?? 'default';
             $this->codebuffer->push('
-            $comp'.($nestLvl).' = $comp'.($nestLvl-1)."->addSlot('$pos', new Component('$fnName', $dataArrString));");   
-        } else {//d(124);
+            $comp'.($nestLvl).' = $comp'.($nestLvl-1)."->addSlot('{$data->slot}', new Component('$fnName', $dataArrString));");   
+        } else {
             $this->codebuffer->push('
             $comp'.$nestLvl." = new Component('$fnName', $dataArrString);");
         }
         if (!$this->document->hasFunction($fnName)) {
-            $dom = $rfilepath ? DomHolder::get($rfilepath, $data['attrs']) : $node;
+            $dom = $rfilepath ? DomHolder::get($rfilepath, $data->attributes) : $node;
             $htmlString = (new Parser($this->document, new CodeBuffer))->parse($dom, $rfilepath == true);
             $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
             $this->document->registerFunction($fnName, $htmlString);//d('---', $htmlString);
@@ -200,9 +206,13 @@ class Parser
                 continue;
             }
             dom($slotNode, ' slot node detected', $nestLvl);
-            $this->insertComponent($slotNode, $nestLvl+1);
-/*
-            $attrs = Helper::getClassifiedNodeAttributes($slotNode);
+            if ($slotNode->nodeName === 'slot') {
+                $this->insertSlot($slotNode, $nestLvl+1);
+            } else {
+                $this->insertComponent($slotNode, $nestLvl+1);
+            }
+/*          
+            $attrs = Helper::nodeStdClass($slotNode);
             // recursive register if and for stmnts nested
             if ($rfilepath = Helper::isComponent($slotNode)) {
                 $fnName = DomHolder::getTemplateName($rfilepath, Helper::getNodeAttributes($slotNode));
@@ -228,7 +238,7 @@ class Parser
 */
             //d(333, $fnName);
             /*
-            $attrs = Helper::getClassifiedNodeAttributes($slotNode, 2);
+            $attrs = Helper::nodeStdClass($slotNode, 2);
             // recursive register if and for stmnts nested
             if ($rfilepath = Helper::isComponent($slotNode)) {
                 $fnName = DomHolder::getTemplateName($rfilepath, Helper::getNodeAttributes($slotNode));
