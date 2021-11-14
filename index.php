@@ -27,6 +27,7 @@ function d(...$data) {
 
 function dom($d, $name = '', $depth = 0)
 {
+    if (empty($_GET['debug'])) return;
     $x = debug_backtrace();
     if (is_string($d)) {
         $content = $d;
@@ -57,6 +58,7 @@ function dom($d, $name = '', $depth = 0)
 
 function buf($self, $name = '', $depth = 0)
 {
+    if (empty($_GET['debug'])) return;
     echo '<div style="padding-left:'.($depth*0).'px"><div style="background:#e6e6e6; border: 1px solid black; margin-bottom:10px; padding:5px;">';
     echo '<div><b>'. $name .'</b></div>';
     echo htmlspecialchars($self->codebuffer->getStream());

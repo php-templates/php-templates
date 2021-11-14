@@ -1,3 +1,4 @@
+<slot name="ascomp"><x-helper>slot with default as comp</x-helper></slot>
 <x-card>
     <slot slot="title" bind="mytitle"></slot>
     <div class="row">

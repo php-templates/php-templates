@@ -40,7 +40,9 @@ class Parser
         }//dom($dom);
 //d('parsing');dom($dom);
         self::$depth++;
-        echo str_pad('', self::$depth+1, 'I').'<div style="border:1px solid gray;margin-left:'.(self::$depth*30).'px">';
+        if (!empty($_GET['debug'])) {
+            echo str_pad('', self::$depth+1, 'I').'<div style="border:1px solid gray;margin-left:'.(self::$depth*30).'px">';
+        }
         buf($this, 'starting from', self::$depth);
         dom($dom, 'parsing on depth '.self::$depth, self::$depth);
         $this->parseNode($dom);
@@ -80,7 +82,9 @@ class Parser
             return '';
         }, $htmlString);
         dom($htmlString, 'resulting', self::$depth+1);
-        echo '</div>';
+        if (!empty($_GET['debug'])) {
+            echo '</div>';
+        }
        
         if (self::$depth) {
             //$this->functions[$root->getName()] = $this->codebuffer->getTemplateFunction($root->getName(), $dom);
@@ -151,18 +155,19 @@ class Parser
         if ($node->childNodes && $node->childNodes->length) {
             // check for empty cn first
             $cbf->else(null, function() use ($node, $cbf) {
-                $cbf->push(' ?>');
+                //$cbfDefault = new codebuffer;
                 foreach ($node->childNodes as $cn) {//d($cn);
                     if (Helper::isEmptyNode($cn)) {
                         continue;
                     }
                     //dom($cn);
-                    // verifica intai daca e comp
-                    $cbf->push('
-                    '.(new Parser($this->document, $cbf))->parse($cn));
+                    if (Helper::isComponent($cn)) {
+                        (new Parser($this->document, $cbf))->parse($cn);
+                    } else {
+                        $cbf->push(PHP_EOL.(new Parser($this->document, $cbf))->parse($cn));
+                    }
                 }
-                $cbf->push('
-                <?php ');
+                //$cbf->push($cbfDefault->getStream());
             });
             //dd(12, $this->codebuffer->getStream());
         }
