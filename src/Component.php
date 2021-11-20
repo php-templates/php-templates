@@ -8,7 +8,7 @@ class Component
     protected $data;
     protected $slots;
     
-    public function __construct($func, $data)
+    public function __construct($func, $data = [])
     {
         //$this->uid = (self::$index++);
         $this->func = $func;

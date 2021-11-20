@@ -48,7 +48,7 @@ class CodeBuffer
     
     public function getTemplateFunction(string $name, $templateString) {
         preg_match_all('/\$([a-zA-Z0-9_]+)/', $templateString, $m);
-        $used = var_export(array_unique($m[1]), true);
+        $used = Helper::arrayToEval(array_values(array_unique($m[1])));
         $fnDeclaration = 
         '<?php function '.$name.'($data, $slots) {
 extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, '.$used.'))); ?>';

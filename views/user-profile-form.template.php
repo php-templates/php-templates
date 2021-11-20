@@ -1,6 +1,7 @@
-<slot name="ascomp"><x-helper>slot with default as comp</x-helper></slot>
+<slot name="ascomp"><x-helper>h</x-helper>Slot with default as comp</slot>
 <x-card>
     <slot slot="title" bind="mytitle"></slot>
+    <slot slot="title" bind="x"><x-helper>-x-</x-helper></slot>
     <div class="row">
         <x-form-group type="text" class="col-6"
             name="firstname"

@@ -133,13 +133,22 @@ class Helper {
         // remove all attrs, or all special project attrs
     }
     
-    public function arrayToEval(array $array, $unescape = ':')
+    public function arrayToEval(array $arr, $unescape = ':')
     {
+        if (!$arr) {
+            return '[]';
+        }
+        $isAssoc = array_keys($arr) !== range(0, count($arr) - 1);
+        if (!$isAssoc) {
+            $arr = var_export($arr, true);
+            $arr = str_replace(['array (', ')', '\n', '\r', PHP_EOL], ['[', ']', '', '', ''], $arr);
+            $arr = preg_replace('/\d+[ ]*\\=>[ ]*/', '', $arr);
+            //var_dump(utf8_encode ($arr));dd();
+            return trim($arr, ',');
+        }
+        
         $stream = [];
-        foreach ($array as $key => $value) {
-            if ($key === 'data') {
-                continue; // gasim o solutie.. merge, ceva
-            }
+        foreach ($arr as $key => $value) {
             if (strpos($key, $unescape) === 0) {
                 $key = str_replace($unescape, '', $key);
             } else {
