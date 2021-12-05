@@ -6,14 +6,15 @@ class Component
 {
     public static $templates = [];
 
-    protected $func;
+    protected $name;
     protected $data;
     protected $slots;
+    protected $rendered = false;
     
-    public function __construct($func, $data = [])
+    public function __construct($name, $data = [])
     {
         //$this->uid = (self::$index++);
-        $this->func = $func;
+        $this->name = $name;
         $this->data = $data;
     }
     
@@ -29,8 +30,16 @@ class Component
     }
     
     public function render($parentScope)
-    {//d($this->slots);
-        $func = self::$templates[$this->func];//d(1122, $this->data);
+    {
+        if (!$this->rendered) {
+            $this->rendered = true; // stop infinite loop
+            $continue = DomEvent::event('rendering', $this->name, $this, $data);
+            if (!$continue) {
+                return;
+            }
+        }
+
+        $func = self::$templates[$this->name];
         $this->data['_attrs'] = array_keys($this->data);
         $func(array_merge($parentScope, $this->data), $this->slots);
     }

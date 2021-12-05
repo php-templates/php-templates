@@ -44,7 +44,17 @@ class Parser
             $html = $this->removeHtmlComments($html);
             $trimHtml = strpos($html, '<body') === false; // trim doar daca nu exista html definit de user
             $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
-            $dom = DomHolder::get($this->name);
+            if ($extends = $dom->querySelector('extends')) {
+                $extendedLayout = $extends->getAttribute('layout');
+                $extendedTemplate = $extends->getAttribute('template');
+                $extendMethod = $extendedLayout ? 'getLayout' : 'getTemplate';
+                // document registerEvent( cu urmatorul format)
+                DomEvent::rendering($this->name, function($template, $data) {
+                    // template va asimila Component si are un event pe new care se asigura ca parseaza ce primeste, in cazul in care nu exista inregistrat (sloturile fac register mai inainte)
+                    $comp = Template::$extendMethod($t); // actualul component
+                    return false;
+                });
+            }
         }
         // cbf e baza avum
         // doar if daca e as slot, bfr primit e initiat deja, si aici, mai jos, declar html parsat ca fn si push i
@@ -173,9 +183,7 @@ class Parser
             // check for empty cn first
             $cbf->else(null, function() use ($slotDefault, $cbf) {
                 $fnName = 'slot_def_'.uniqid();
-                $htmlString = (new Parser($this->document, $fnName))->parse($slotDefault);
-                $htmlString = $this->codebuffer->getTemplateFunction($fnName, $htmlString);
-                $this->document->registerFunction($fnName, $htmlString);
+                (new Parser($this->document, $fnName))->parse($slotDefault);
                 $cbf->raw("\$comp = new Component('$fnName', \$data);");
                 $cbf->raw('$comp->render($data);');
                 //$cbf->raw($cbfDefault->getStream());

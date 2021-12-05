@@ -6,13 +6,16 @@ class DomEvent
 {
     private static $events = [];
 
-    public function event($ev, $name, $result, &$data)
+    public function event($ev, $name, $template, &$data)
     {
+        $continueExecution = true;
         if (isset(self::$events[$ev][$name])) {
             foreach (self::$events[$ev][$name] as $cb) {
-                return $cb($result, $data);
+                $continueExecution = $continueExecution && $cb($template, $data) !== false; // cb should always return false if stop execution is required
             }
         }
+
+        return $continueExecution;
     }
 
     public static function rendering($name, $cb)

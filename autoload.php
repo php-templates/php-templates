@@ -11,3 +11,4 @@ require_once('src/Helper.php');
 require_once('src/CodeBuffer.php');
 require_once('src/Document.php');
 require_once('src/Facades/DomHolder.php');
+require_once('src/DomEvent.php');

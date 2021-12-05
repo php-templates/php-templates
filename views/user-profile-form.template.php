@@ -38,6 +38,7 @@
         />
     <x-form-group type="textarea" rows="10"
         name="textarea"
+        label="Label"
         value="some text">
         <label slot="label"><x-helper>Helper</x-helper> Label with helper</label>
     </x-form-group>
