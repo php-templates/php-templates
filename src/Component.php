@@ -4,6 +4,8 @@ namespace DomDocument\PhpTemplates;
 
 class Component
 {
+    public static $templates = [];
+
     protected $func;
     protected $data;
     protected $slots;
@@ -28,7 +30,7 @@ class Component
     
     public function render($parentScope)
     {//d($this->slots);
-        $func = $this->func;//d(1122, $this->data);
+        $func = self::$templates[$this->func];//d(1122, $this->data);
         $this->data['_attrs'] = array_keys($this->data);
         $func(array_merge($parentScope, $this->data), $this->slots);
     }

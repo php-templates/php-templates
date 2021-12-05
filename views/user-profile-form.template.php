@@ -1,3 +1,5 @@
+<extends layout="layouts/app"/>
+
 <slot name="ascomp"><x-helper>h</x-helper>Slot with default as comp</slot>
 <x-card>
     <slot slot="title" bind="mytitle"></slot>

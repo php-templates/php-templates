@@ -61,11 +61,12 @@ class Template
         //$dom = new Parsable($rfilepath, null, $slots, false);
         $doc = new Document;
         $this->parser = new Parser($doc, new CodeBuffer);
-        $this->parser->parse(DomHolder::get($rfilepath, false));
+        $parsed = $this->parser->parse(DomHolder::get($rfilepath, false));
+        DomEvent::event('rendering', $rfilepath, $parsed, $data);
         
         file_put_contents('./parsed/test.php', $doc->getContent());
         if ($_GET['plain'] ?? false) {
-        echo $doc->getContent();
+        // echo $doc->getContent();
         } else {//d($data);
             extract($data);
         include './parsed/test.php';

@@ -14,25 +14,25 @@ class CodeBuffer
     private function checkInit()
     {
         if ($this->buffer === null) {
-            $this->buffer = '<?php
-            ';
+            $this->buffer = '<?php';
         }
     }
     
-    public function push($expr) {
+    public function raw($expr) {
         $this->checkInit();
-        $this->buffer .= ($expr);
+        $this->buffer .= "
+    $expr";
     }
     
     public function __call($expr, $args) {
         $param = $args[0] ? '('.$args[0].')' : '';
         $callback = $args[1];
         $this->checkInit();
-        $this->buffer .= "$expr $param {
-        ";
+        $this->buffer .= "
+    $expr $param {";
         $callback();
-        $this->buffer .= '}
-        ';
+    $this->buffer .= '
+    }';
     }
     
     public function getStream($reset = false)
@@ -48,14 +48,13 @@ class CodeBuffer
     
     public function getTemplateFunction(string $name, $templateString) {
         preg_match_all('/\$([a-zA-Z0-9_]+)/', $templateString, $m);
-        $used = Helper::arrayToEval(array_values(array_unique($m[1])));
+        $used = Helper::arrayToEval(array_values(array_unique($m[1])));//var_dump($used);die();
+        $used = preg_replace('/\s*[\r\n]*\s*/', '', $used);
         $fnDeclaration = 
-        '<?php function '.$name.'($data, $slots) {
-extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, '.$used.'))); ?>';
-        $fnDeclaration .= "
-        $templateString";
-        $fnDeclaration .= '
-        <?php } ?>';
+        "<?php Component::\$templates['$name'] = function (\$data, \$slots) {
+    extract(\$data); \$_attrs = array_intersect_key(\$data, array_flip(array_diff(\$_attrs, $used))); ?>
+    $templateString
+<?php } ?>";
         return $fnDeclaration;
     }
     

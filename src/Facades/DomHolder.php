@@ -44,6 +44,8 @@ class DomHolder
     public function trimHtml($dom)
     {
         $body = $dom->getElementsByTagName('body')->item(0);
+        // $body = $body ? $body : $dom;
+
         $content = '';
         foreach ($body->childNodes as $node)
         {
