@@ -60,10 +60,18 @@ class Template
 
         //$dom = new Parsable($rfilepath, null, $slots, false);
         $doc = new Document;
-        $this->parser = new Parser($doc, new CodeBuffer);
-        $parsed = $this->parser->parse(DomHolder::get($rfilepath, false));
-        DomEvent::event('rendering', $rfilepath, $parsed, $data);
-        
+        $parser = new Parser($doc, $rfilepath);
+        $parser->parse();
+
+        $tpl = '<?php use DomDocument\PhpTemplates\Component; ?>';
+        foreach ($doc->getFunctions() as $key => $fn) {
+            //d('---', $fn);
+            $tpl .= (PHP_EOL.$fn);
+        }
+        $tpl .= (PHP_EOL."<?php (new Component('$rfilepath'))->render(\$data); ?>");
+        // $tpl.= (PHP_EOL.$htmlString);
+        $doc->setContent($tpl);
+        // $doc->save();
         file_put_contents('./parsed/test.php', $doc->getContent());
         if ($_GET['plain'] ?? false) {
         // echo $doc->getContent();
