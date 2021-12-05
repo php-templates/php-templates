@@ -33,10 +33,7 @@ class Parser
      */
     public function parse($dom = null)
     {
-        $trimHtml = true;
-        if (!$dom || $dom->nodeName === '#text') {
-            $trimHtml = false;
-        }
+        $trimHtml = false;
         if (!$dom) {
             $requestName = preg_replace('(\.template|\.php)', '', $rpath);
             $f = Config::get('src_path');
@@ -45,11 +42,10 @@ class Parser
             $dom->formatOutput = true;
             $html = file_get_contents($srcFile);
             $html = $this->removeHtmlComments($html);
+            $trimHtml = strpos($html, '<body') === false; // trim doar daca nu exista html definit de user
             $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
             $dom = DomHolder::get($this->name);
         }
-
-        $trimHtml = $dom->nodeName !== '#text';//(bool) $dom->ownerDocument;
         // cbf e baza avum
         // doar if daca e as slot, bfr primit e initiat deja, si aici, mai jos, declar html parsat ca fn si push i
         // will accept only one root
