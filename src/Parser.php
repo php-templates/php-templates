@@ -35,7 +35,7 @@ class Parser
     {
         $trimHtml = false;
         if (!$dom) {
-            $requestName = preg_replace('(\.template|\.php)', '', $rpath);
+            $requestName = preg_replace('(\.template|\.php)', '', $this->name);
             $f = Config::get('src_path');
             $srcFile = $f.$requestName.'.template.php';
             $dom = new HTML5DOMDocument;//d($this->srcFile);
