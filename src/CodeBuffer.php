@@ -46,15 +46,18 @@ class CodeBuffer
         return $r;
     }
     
-    public function getTemplateFunction(string $name, $templateString) {
+    public static function getTemplateFunction(string $templateString, $html = true) {
         preg_match_all('/\$([a-zA-Z0-9_]+)/', $templateString, $m);
         $used = Helper::arrayToEval(array_values(array_unique($m[1])));//var_dump($used);die();
         $used = preg_replace('/\s*[\r\n]*\s*/', '', $used);
+        if ($html) {
+            $templateString = " ?>$templateString<?php ";
+        }
         $fnDeclaration = 
-        "<?php Component::\$templates['$name'] = function (\$data, \$slots) {
-    extract(\$data); \$_attrs = array_intersect_key(\$data, array_flip(array_diff(\$_attrs, $used))); ?>
+        "function (\$data, \$slots) {
+    extract(\$data); \$_attrs = array_intersect_key(\$data, array_flip(array_diff(\$_attrs, $used)));
     $templateString
-<?php } ?>";
+}";
         return $fnDeclaration;
     }
     

@@ -1,4 +1,4 @@
-<extends layout="layouts/app"/>
+<extends template="layouts/app"/>
 
 <slot name="ascomp"><x-helper>h</x-helper>Slot with default as comp</slot>
 <x-card>

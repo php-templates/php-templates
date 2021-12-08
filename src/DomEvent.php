@@ -18,8 +18,8 @@ class DomEvent
         return $continueExecution;
     }
 
-    public static function rendering($name, $cb)
+    public function __construct($ev, $name, $cb)
     {
-        self::$events['rendering'][$name][] = $cb;
+        self::$events[$ev][$name][] = $cb;
     }
 }

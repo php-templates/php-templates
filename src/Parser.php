@@ -45,15 +45,7 @@ class Parser
             $trimHtml = strpos($html, '<body') === false; // trim doar daca nu exista html definit de user
             $dom->loadHtml($html);//d($srcFile, $html,  $dom->saveHtml());
             if ($extends = $dom->querySelector('extends')) {
-                $extendedLayout = $extends->getAttribute('layout');
-                $extendedTemplate = $extends->getAttribute('template');
-                $extendMethod = $extendedLayout ? 'getLayout' : 'getTemplate';
-                // document registerEvent( cu urmatorul format)
-                DomEvent::rendering($this->name, function($template, $data) {
-                    // template va asimila Component si are un event pe new care se asigura ca parseaza ce primeste, in cazul in care nu exista inregistrat (sloturile fac register mai inainte)
-                    $comp = Template::$extendMethod($t); // actualul component
-                    return false;
-                });
+                $this->extends($extends);
             }
         }
         // cbf e baza avum
@@ -127,8 +119,8 @@ class Parser
         self::$depth--;
 
         // default register aici
-        $htmlString = $this->codebuffer->getTemplateFunction($this->name, $htmlString);
-        $this->document->registerFunction($this->name, $htmlString);
+        $htmlString = CodeBuffer::getTemplateFunction($htmlString);
+        $this->document->templates[$this->name] = $htmlString;
     }
     
     private function parseNode($node, $asFunction = null)
@@ -184,7 +176,7 @@ class Parser
             $cbf->else(null, function() use ($slotDefault, $cbf) {
                 $fnName = 'slot_def_'.uniqid();
                 (new Parser($this->document, $fnName))->parse($slotDefault);
-                $cbf->raw("\$comp = new Component('$fnName', \$data);");
+                $cbf->raw("\$comp = Parsed::template('$fnName', \$data);");
                 $cbf->raw('$comp->render($data);');
                 //$cbf->raw($cbfDefault->getStream());
             });
@@ -205,9 +197,9 @@ class Parser
         $fnName = Helper::isComponent($node);
 
         $dataString = Helper::arrayToEval($data->attributes);
-        $this->codebuffer->raw("\$comp = new Component('$fnName', $dataString);");
+        $this->codebuffer->raw("\$comp = Parsed::template('$fnName', $dataString);");
 
-        if (!$this->document->hasFunction($fnName)) {
+        if (!isset($this->document->templates[$fnName])) {
             (new Parser($this->document, $fnName))->parse();
         }
 
@@ -219,7 +211,7 @@ class Parser
         foreach ($slots as $slotPosition => $slotNode) {
             $fnName = $slotOf.'_'.uniqid().'_slot_'.$slotPosition;
             (new Parser($this->document, $fnName))->parse($slotNode);
-            $this->codebuffer->raw("\$comp->addSlot('$slotPosition', new Component('$fnName', \$data));");
+            $this->codebuffer->raw("\$comp->addSlot('$slotPosition', Parsed::template('$fnName', \$data));");
         }
         $this->codebuffer->raw('$comp->render($data);');//d(345,$this->codebuffer->getStream());
         buf($this, 'resulting ', self::$depth);
@@ -336,6 +328,61 @@ class Parser
     
     public function removeHtmlComments($content = '') {//d($content);
     	return preg_replace('~<!--.+?-->~ms', '', $content);
+    }
+    
+    protected function extends($extends)
+    {
+        //$extendedLayout = $extends->getAttribute('layout');
+        $extendedTemplate = $extends->getAttribute('template');
+        //$extendMethod = $extendedLayout ? 'getLayout' : 'getTemplate';
+        //$extended = $extendedLayout ? $extendedLayout : $extendedTemplate;
+        // document registerEvent( cu urmatorul format)
+            // template va asimila Component si are un event pe new care se asigura ca parseaza ce primeste, in cazul in care nu exista inregistrat (sloturile fac register mai inainte)
+        // actualul component
+        (new Parser($this->document, $extendedTemplate))->parse();
+        
+        $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
+            \$comp = Parsed::template('$extendedTemplate');
+            \$comp->addSlot('default', \$template);
+            \$comp->render(\$data);
+            return false;
+        }");
+    }
+    
+    protected function getTemplate($rfilepath)
+    {
+        // fac parse folosind acelasi document si automat ca va face register componentei
+        if (!isset($this->document->templates[$rfilepath])) {
+            (new Parser($this->document, $rfilepath))->parse();
+        }
+    }
+    
+    protected function getLayout($name)
+    {
+        $layout = Config::getLayout($name);
+        if (!$layout || empty($layout['base'])) {
+            throw new Exception("Layout $name not found");
+        }
+        
+        // parse componenta schela folosind acelasi document,
+        // facem parse si la sloturi, iar la final inregistram asamblarea layout ului intr o functie cadru
+        $rfilepath = $layoutFn = $layout['base'];
+        (new Parser($this->document, $rfilepath))->parse();
+        $cbf = new CodeBuffer;
+        $cbf->raw("\$comp = new Template('$layoutFn');");
+        foreach ($layout['slots'] ?? [] as $pos => $slots) {
+            $slots = (array) $slots;
+            foreach ($slots as $rfilepath) {
+                if (!isset($this->document->templates[$rfilepath])) {
+                    (new Parser($this->document, $rfilepath))->parse();
+                }
+                $slotFn = $rfilepath;
+                $cbf->raw("\$comp->addSlot('$pos', new Template('$rfilepath'));");
+            }
+        }
+        $htmlString = $cbf->outputStream(true);
+        $htmlString = CodeBuffer::getTemplateFunction($htmlString, false);
+        $this->document->layouts[$layoutFn] = $htmlString;
     }
 
     public function __get($prop)

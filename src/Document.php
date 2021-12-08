@@ -9,31 +9,47 @@ use DomDocument\PhpTemplates\Facades\Config;
 
 class Document
 {
-    protected $functions = [];
-    protected $content = '';
+    protected $name;
+    public $templates = [];
+    protected $layouts = [];
+    protected $eventListeners = [];
     
-    public function registerFunction($name, $content)
+    public function __construct(string $name)
     {
-        $this->functions[$name] = $content;
+        $this->name = $name;
     }
     
-    public function hasFunction($fnName)
+    public function addEventListener($ev, $target, $cb)
     {
-        return isset($this->functions[$fnName]);
+        $this->eventListeners[$ev][$target][] = $cb;
     }
     
-    public function getFunctions()
+    public function render(): string
     {
-        return $this->functions;
+        $tpl = '<?php ';
+        $tpl .= "\nuse DomDocument\PhpTemplates\Parsed;";
+        $tpl .= "\nuse DomDocument\PhpTemplates\DomEvent;";
+        foreach ($this->templates as $name => $fn) {
+            $tpl .= "\nParsed::\$templates['$name'] = $fn;";
+        }
+        foreach ($this->layouts as $name => $fn) {
+            $tpl .= "\nParsed::\$layouts['$name'] = $fn;";
+        }
+        foreach ($this->eventListeners as $ev => $listeners) {
+            foreach ($listeners as $target => $cbcks) {
+                foreach ($cbcks as $cb) {
+                    $tpl .= "\nnew DomEvent('$ev', '$target', $cb);";
+                }
+            }
+        }
+        $tpl .= "\nParsed::template('$this->name', \$data)->render();";
+        $tpl .= ' ?>';
+        
+        return $tpl;
     }
     
-    public function getContent()
+    public function save(string $outFile)
     {
-        return $this->content;
-    }
-    
-    public function setContent($c)
-    {
-        $this->content = $c;
+        file_put_contents($outFile, $this->render());
     }
 }
