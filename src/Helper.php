@@ -68,7 +68,7 @@ class Helper {
     public function nodeStdClass($node, $context = '')
     {
         $specials = ['is', 'slot'];
-        if ($node->nodeName === 'slot') {
+        if (in_array($node->nodeName, ['slot', 'block'])) {
             array_push($specials, 'name', 'bind');
         }
         if ($context === 'slot') {

@@ -42,4 +42,12 @@
         value="some text">
         <label slot="label"><x-helper>Helper</x-helper> Label with helper</label>
     </x-form-group>
+    
+    <block name="extra-fields">
+        <x-form-group type="text"
+            name="ef1"
+            label="ef1"
+            value=""
+            />
+    </block>
 </x-card>

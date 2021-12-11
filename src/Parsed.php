@@ -42,6 +42,7 @@ class Parsed
     public function render($parentScope = [])
     {
         $this->data['_attrs'] = array_keys($this->data);
+        $this->data['_name'] = $this->name;
         $data = array_merge($parentScope, $this->data);
         if (!$this->rendered) {
             $this->rendered = true; // stop infinite loop

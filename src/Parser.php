@@ -131,6 +131,9 @@ class Parser
             if ($node->nodeName === 'slot') {
                 $this->insertSlot($node);
             } 
+            elseif ($node->nodeName === 'block') {
+                $this->insertBlock($node);
+            } 
             elseif (Helper::isComponent($node)) {
                 $this->insertComponent($node);
                 // to prevent removing body
@@ -160,7 +163,7 @@ class Parser
                     if ($nestLvl) {
                         $this->codebuffer->foreach("\$slots['$slotName'] as \$slot", function() use ($data, $nestLvl, $slotName) {
                             $i = $nestLvl -1;
-                            $this->codebuffer->raw("\$comp{$i}->addSlot('{$data->slot}', \$slot);");
+                            $this->codebuffer->raw("\$comp->addSlot('{$data->slot}', \$slot);");
                         });
                     } else {
                         $cbf->raw('$slot->render(array_merge($data, '.$dataString.'));');
@@ -189,6 +192,39 @@ class Parser
         );
         $this->toberemoved[] = $node;
     }
+
+    private function insertBlock($node)
+    {
+        $data = Helper::nodeStdClass($node);
+        $cbf = new CodeBuffer;
+        $cbf->raw('$blocks = [];echo $_name;');
+        foreach ($node->childNodes as $childNode) {
+            $rfilepath = Helper::isComponent($childNode);
+            $fnName = $rfilepath ? $rfilepath : 'block_'.$data->name.'_slot_'.uniqid();
+            $_data = Helper::nodeStdClass($childNode);
+            $dataString = Helper::arrayToEval($_data->attributes);
+            if (!isset($this->document->templates[$fnName])) {
+                (new Parser($this->document, $fnName))->parse($rfilepath ? null : $childNode);
+            }
+            $cbf->raw("\$blocks[] = Parsed::template('$fnName', $dataString);");
+        }
+        $cbf->if("isset(\$slots['{$data->name}'])", function() use ($data, $cbf) {
+            //push slots
+            $cbf->foreach("\$slots['{$data->name}'] as \$slot", function() use ($cbf) {
+                $cbf->raw("\$blocks[] = \$slot;");
+            });
+        });
+        //$cbf->raw('sort $blocks');
+        $cbf->foreach('$blocks as $block', function() use ($cbf) {
+            $cbf->raw('$block->render($data);');
+        });
+        
+        $node->parentNode->insertBefore(
+            $node->ownerDocument->createTextNode($cbf->getStream(true)),
+            $node
+        );
+        $this->toberemoved[] = $node;
+    }
     
     private function insertComponent($node, $nestLvl = 0)// param2slotnodelist pentru recursivitate
     {
@@ -209,9 +245,25 @@ class Parser
       
         $slotOf = $fnName;
         foreach ($slots as $slotPosition => $slotNode) {
-            $fnName = $slotOf.'_'.uniqid().'_slot_'.$slotPosition;
-            (new Parser($this->document, $fnName))->parse($slotNode);
-            $this->codebuffer->raw("\$comp->addSlot('$slotPosition', Parsed::template('$fnName', \$data));");
+            if ($slotNode->nodeName === 'slot') {
+                $this->insertSlot($slotNode, true);
+                ///is slotnode, comp addslot if exist din slots.position
+                /*
+                $bound = $slotNode->getAttribute('name');
+                $this->codebuffer->if("isset(\$slots['$bound'])", function() use ($bound, $slotPosition) {
+                    $this->codebuffer->foreach("\$slots['$bound'] as \$bound", function() use ($slotPosition) {
+                        $this->codebuffer->raw("\$comp->addSlot('$slotPosition', \$bound");
+                    });
+                });*/
+            }
+            elseif ($slotNode->nodeName === 'block') {
+                $this->insertBlock($slotNode);
+            }
+            else {
+                $fnName = $slotOf.'_'.uniqid().'_slot_'.$slotPosition;
+                (new Parser($this->document, $fnName))->parse($slotNode);
+                $this->codebuffer->raw("\$comp->addSlot('$slotPosition', Parsed::template('$fnName', \$data));");
+            }
         }
         $this->codebuffer->raw('$comp->render($data);');//d(345,$this->codebuffer->getStream());
         buf($this, 'resulting ', self::$depth);
@@ -355,34 +407,6 @@ class Parser
         if (!isset($this->document->templates[$rfilepath])) {
             (new Parser($this->document, $rfilepath))->parse();
         }
-    }
-    
-    protected function getLayout($name)
-    {
-        $layout = Config::getLayout($name);
-        if (!$layout || empty($layout['base'])) {
-            throw new Exception("Layout $name not found");
-        }
-        
-        // parse componenta schela folosind acelasi document,
-        // facem parse si la sloturi, iar la final inregistram asamblarea layout ului intr o functie cadru
-        $rfilepath = $layoutFn = $layout['base'];
-        (new Parser($this->document, $rfilepath))->parse();
-        $cbf = new CodeBuffer;
-        $cbf->raw("\$comp = new Template('$layoutFn');");
-        foreach ($layout['slots'] ?? [] as $pos => $slots) {
-            $slots = (array) $slots;
-            foreach ($slots as $rfilepath) {
-                if (!isset($this->document->templates[$rfilepath])) {
-                    (new Parser($this->document, $rfilepath))->parse();
-                }
-                $slotFn = $rfilepath;
-                $cbf->raw("\$comp->addSlot('$pos', new Template('$rfilepath'));");
-            }
-        }
-        $htmlString = $cbf->outputStream(true);
-        $htmlString = CodeBuffer::getTemplateFunction($htmlString, false);
-        $this->document->layouts[$layoutFn] = $htmlString;
     }
 
     public function __get($prop)

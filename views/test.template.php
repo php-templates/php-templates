@@ -7,6 +7,11 @@
     <body>
         <component is="user-profile-form">
             <div slot="mytitle">mytitle</div>
+            <x-form-group type="text" class="extra-fields"
+                name="firstname"
+                label="ef2"
+                value="ef2"
+                />
         </component>
     </body>
 </html>
