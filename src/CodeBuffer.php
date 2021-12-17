@@ -23,6 +23,19 @@ class CodeBuffer
         $this->buffer .= "
     $expr";
     }
+     
+    public function component(string $name, array $data = []) {
+        $data = Helper::arrayToEval($data);
+        $this->checkInit();
+        $this->buffer .= "\$comp0 = Parsed::template('$name', $data);".PHP_EOL;
+    }
+     
+    public function slot(int $i, string $pos, string $name, array $data = []) {
+        $data = Helper::arrayToEval($data);
+        $this->checkInit();
+        $next = $i+1;
+        $this->buffer .= "\$comp{$next} = \$comp{$i}->addSlot('$pos', Parsed::template('$name', $data));".PHP_EOL;
+    }
     
     public function __call($expr, $args) {
         $param = $args[0] ? '('.$args[0].')' : '';

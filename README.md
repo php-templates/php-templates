@@ -50,3 +50,15 @@ function comp2() {
     comp3->addSlot(this slot)
     comp3->render()
 }
+
+addSlot va pastra referinta catre Parent, functia e binduita cu this de Parsed, iar sloturile nested sunt preluate folosind this parent ... 
+facem asa
+cand vine primul comp, incepem calatoria:
+facem new parser parse cu nest++:
+la primul e cu nest 0
+pentru fiecare slotnode, new Parser, deep trecut in constructir
+in aceat moment, 
+de fiecare data cand intalnesc un comp slot direct al unei comp, deep devine 0+1
+de fiecare data cand intalnesc un nod normal ca slot al unui component, deep se reseteaza la 0
+
+trb ca parse sa aiba si un cbf extern...
