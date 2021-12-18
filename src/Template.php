@@ -70,15 +70,17 @@ class Template
         } else {//d($data);
             extract($data);
             // for dev
-            ob_start();
+            //ob_start();
             include './parsed/test.php';
+            /*
             $x = ob_get_clean();
             $x = str_replace(['<', '>'], ["\n<", ">\n"], $x);
             $y = new HTML5DOMDocument();
             $y->loadHtml($x);
             $y->formatOutput = true;
-            echo $y->saveHtml();
+            echo $y->saveHtml();*/
         }
+        return;
         dd();
         
         

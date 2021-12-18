@@ -29,9 +29,14 @@ class Config
     const attrDataBindEager = 'data';
     const attrIsComponent = 'is';
     
+    public static function all()
+    {
+        return self::$data;
+    }
+    
     public static function set($key, $value = null)
     {
-        if (is_array($key)) {
+        if (is_array($key)) {// nu merge // todo
             self::$data = array_merge_recursive(self::$data, $key);
         } else {
             self::$data[$key] = $value;
