@@ -1,5 +1,8 @@
 # php-templates
 
+php templates won't defend you against infinite recursions, yet
+
+
 TODO:
 
 later: fix bind attrs din Component render daca se poate

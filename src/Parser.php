@@ -35,6 +35,7 @@ class Parser
     {
         //d($this->name);
         self::$depth++;
+        
         $trimHtml = false;
         if (!$dom || Helper::isComponent($dom)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
@@ -127,7 +128,6 @@ class Parser
     
     private function parseNode($node, $asFunction = null)
     {
-        
         $data = Helper::nodeStdClass($node);
         $this->codebuffer->nestedExpression($data->statements, function() use ($node, $data) {
             if ($node->nodeName === 'slot') {
@@ -180,10 +180,25 @@ class Parser
             $slotDefault = $slotDefault['default'];
             // check for empty cn first
             $cbf->else(null, function() use ($slotDefault, $cbf) {
-                $fnName = 'slot_def_'.uniqid();
-                (new Parser($this->document, $fnName))->parse($slotDefault);
-                $cbf->raw("\$comp = Parsed::template('$fnName', \$data);");
-                $cbf->raw('$comp->render($data);');
+                foreach ($slotDefault as $sd) {
+                    if ($sd->nodeName === 'slot') {
+                        continue;
+                    }
+                    $rfilepath = Helper::isComponent($sd);
+                    $fnName = $rfilepath ?? 'slot_def_'.uniqid();
+                    if ($rfilepath) {
+                        // toggle buffers
+                        $tmp = $this->codebuffer;
+                        $this->codebuffer = $cbf;
+                        $this->insertComponent($sd, true);//cbf....
+                        $this->codebuffer = $tmp;
+                        //d($this->codebuffer->getStream()); // e resetat...
+                    } else {
+                        (new Parser($this->document, $fnName))->parse($rfilepath ? null : $sd);
+                        $cbf->raw("\$comp = Parsed::template('$fnName', \$data);");
+                        $cbf->raw('$comp->render($data);');
+                    }
+                }
                 //$cbf->raw($cbfDefault->getStream());
             });
             //dd(12, $this->codebuffer->getStream());
@@ -277,6 +292,9 @@ class Parser
         //if (!$i) {
         $this->codebuffer->raw('$comp'.$i.'->render($data);');//d(345,$this->codebuffer->getStream());
         buf($this, 'resulting ', self::$depth);
+        if ($nestLvl) {
+            return;
+        }
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
             $node

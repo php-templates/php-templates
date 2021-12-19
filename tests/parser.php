@@ -36,7 +36,7 @@ foreach($files as $f) {
     $doc = new Document($rfilepath);
     $parser = new Parser($doc, $rfilepath);
     $dom = new HTML5DOMDocument;
-    $dom->loadHtml($test);
+    $dom->loadHtml($parser->removeHtmlComments($test));
     $parser->parse($dom);
     $dest = './results/'.str_replace('.template', '', $f);
     $doc->save($dest);
@@ -50,12 +50,14 @@ foreach($files as $f) {
         if (empty($expected[$i])) {
             continue;
         }
-        $result = preg_replace('/[\n\r\t\s]*/', '', $result);
+        $_result = preg_replace('/[\n\r\t\s]*/', '', $result);
         $_expected = preg_replace('/[\n\r\t\s]*/', '', $expected[$i]);
-        if ($result === $_expected) {
+        if ($_result === $_expected) {
             echo $f."[$i] passed \n";
         } else {
-            echo $f."[$i] failed \n"; die();
+            echo $f."[$i] failed \n";
+            echo "\nexpected\n{$expected[$i]}\ngained\n";
+            echo $result; die();
         }
     }
 }

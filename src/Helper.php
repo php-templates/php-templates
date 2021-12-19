@@ -117,6 +117,9 @@ class Helper {
     
     public static function isComponent($node)
     {
+        if (!@$node->nodeName) {
+            return null;
+        }
         if ($node->nodeName === 'component') {
             $attrs = self::getNodeAttributes($node);
             if (isset($attrs['is'])) {
