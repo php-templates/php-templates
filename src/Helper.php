@@ -82,11 +82,12 @@ class Helper {
         }
         $result->slot = 'default';
         
-        foreach (self::getNodeAttributes($node) as $k => $val) {
+        foreach (self::getNodeAttributes($node) as $k => $val) {//d(str_replace('p-', '', $k), Config::allowedControlStructures);
             if (in_array($k, $specials)) {
                 $result->$k = $val;
             }
-            elseif (in_array($k, Config::allowedControlStructures)) {
+            elseif (strpos($k, 'p-') === 0 && in_array(str_replace('p-', '', $k), Config::allowedControlStructures)) {
+                $k = str_replace('p-', '', $k);
                 if (isset($result->statements[$k])) {
                     throw new \Exception("Baaaa, vezi ca ai doua cstructs la fel");
                 }

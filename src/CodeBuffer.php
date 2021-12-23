@@ -14,7 +14,7 @@ class CodeBuffer
     private function checkInit()
     {
         if ($this->buffer === null) {
-            $this->buffer = '<?php';
+            $this->buffer = '<?php ';
         }
     }
     
@@ -24,14 +24,15 @@ class CodeBuffer
     $expr";
     }
      
-    public function component(string $name, array $data = []) {
-        $data = Helper::arrayToEval($data);
+    public function component(string $name, array $nodeData = []) {
+        //nu trb sa fie asa, trb scos la suprafata na
+        $data = Helper::arrayToEval($nodeData);
         $this->checkInit();
         $this->buffer .= "\$comp0 = Parsed::template('$name', $data);".PHP_EOL;
     }
      
-    public function slot(int $i, string $pos, string $name, array $data = []) {
-        $data = Helper::arrayToEval($data);
+    public function slot(int $i, string $pos, string $name, $nodeData) {
+        $data = Helper::arrayToEval($nodeData);
         $this->checkInit();
         $next = $i+1;
         $this->buffer .= "\$comp{$next} = \$comp{$i}->addSlot('$pos', Parsed::template('$name', $data));".PHP_EOL;

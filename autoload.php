@@ -28,8 +28,8 @@ function d(...$data) {
 
 function dom($d, $name = '', $depth = 0)
 {
-    if (empty($_GET['debug'])) return;
-    $x = debug_backtrace();
+    //if (empty($_GET['debug'])) return;
+    
     if (is_string($d)) {
         $content = $d;
     } else {

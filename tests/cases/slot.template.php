@@ -61,7 +61,7 @@
 <component is="comp/nested_slot">
     <span class="x" slot="sn"></span>
     <span class="y" slot="sn1"></span>
-    <p slot="sn3"></p>
+    <p slot="sn3">3</p>
     <component is="comp/simple" slot="sn5"></component>
     <span slot="sn8">8</span>
     <p slot="sn9">9</p>
@@ -88,7 +88,9 @@
 </div>
 <div class="comp_slot">
     <span>
-        <div class="x"><span>8</span></div>
+        <div class="x">
+            <span>8</span>
+        </div>
     </span>
 </div>
 <div class="comp_slot">

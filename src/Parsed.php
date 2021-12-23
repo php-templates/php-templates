@@ -36,6 +36,11 @@ class Parsed
         return $renderable;
     }
     
+    public function setSlots($slots)
+    {
+        $this->slots = $slots;
+    }
+    
     public function setParent(self $parent)
     {
         if (!$this->parent) {

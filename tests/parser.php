@@ -22,6 +22,9 @@ $files = scandir('./cases');
 $files = array_diff($files, ['..', './']);
 //dd(Config::all());
 foreach($files as $f) {
+    if (isset($_GET['t']) && $f !== $_GET['t']) {
+        continue;
+    }
     $file = './cases/'.$f;
     $content = file_get_contents($file);
     $cases = explode('-----', $content);
@@ -57,7 +60,9 @@ foreach($files as $f) {
         } else {
             echo $f."[$i] failed \n";
             echo "\nexpected\n{$expected[$i]}\ngained\n";
-            echo $result; die();
+            echo $result;
+            echo "\n$_expected\n$_result";
+            die();
         }
     }
 }
