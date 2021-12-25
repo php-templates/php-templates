@@ -39,6 +39,7 @@ class Parsed
     public function setSlots($slots)
     {
         $this->slots = $slots;
+        return $this;
     }
     
     public function setParent(self $parent)

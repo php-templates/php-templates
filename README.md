@@ -4,8 +4,17 @@ php templates won't defend you against infinite recursions, yet
 
 
 TODO:
+block fara nume trb sa throw error
 
 later: fix bind attrs din Component render daca se poate
+
+
+
+
+
+
+
+
 
 
 note: slot in slot va fi imposibil pt ca nu pot sti la ce nivel de nest pot fi, pot fi ascunse intr un component definit, iar atunci... nu am cum sti cine ii da slots

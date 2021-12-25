@@ -27,6 +27,7 @@ foreach($files as $f) {
     }
     $file = './cases/'.$f;
     $content = file_get_contents($file);
+    $content = preg_replace('~<!--.+?-->~ms', '', $content);//dd($content)
     $cases = explode('-----', $content);
     $test = '';
     $expected = [];
@@ -42,7 +43,9 @@ foreach($files as $f) {
     $dom->loadHtml($parser->removeHtmlComments($test));
     $parser->parse($dom);
     $dest = './results/'.str_replace('.template', '', $f);
-    $doc->save($dest);
+    if (!isset($_GET['edit'])) {
+        $doc->save($dest);
+    }
     ob_start();
     $data = [];
     include $dest;

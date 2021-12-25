@@ -95,4 +95,9 @@ class CodeBuffer
             $this->nestedExpression($expr, $cb);
         });
     }
+    
+    public function __toString()
+    {
+        return $this->buffer;
+    }
 }

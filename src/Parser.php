@@ -128,13 +128,15 @@ class Parser
     
     private function parseNode($node, $asFunction = null)
     {
-        //$data = Helper::nodeStdClass($node);
+        $nodeData = Helper::nodeStdClass($node);
         //$this->codebuffer->nestedExpression($data->statements, function() use ($node, $data) {
             if ($node->nodeName === 'slot') {
                 $this->insertSlot($node);
             } 
             elseif ($node->nodeName === 'block') {
-                $this->insertBlock($node);
+                $name = "block_$nodeData->name".'_'.uniqid();
+                $this->insertBlock($node, $name);
+                return;
             } 
             elseif (Helper::isComponent($node)) {
                 $this->insertComponent($node);// d('---comp');
@@ -220,12 +222,25 @@ class Parser
         $this->toberemoved[] = $node;
     }
 
-    private function insertBlock($node)
-    {
+    private function insertBlock($node, $blockName)
+    {// fiecare bloc trb compilat in scop propriu
+        // init
+        $nest = !empty($cbf);
         $data = Helper::nodeStdClass($node);
         $cbf = new CodeBuffer;
-        $cbf->raw('$blocks = [];echo $_name;');
+        $cbf->raw('$blocks = [];');
         foreach ($node->childNodes as $childNode) {
+            if (Helper::isEmptyNode($childNode)) {
+                continue;
+            }
+            //if e block, insertblock cu nestlvl, ia
+            if ($childNode->nodeName === 'block') {
+                $b = Helper::nodeStdClass($childNode);
+                $bname = "block_$b->name".'_'.uniqid();
+                $this->insertBlock($childNode, $bname);
+                $cbf->raw("\$blocks[] = Parsed::template('$bname', []);");
+                continue;
+            }
             $rfilepath = Helper::isComponent($childNode);
             $fnName = $rfilepath ? $rfilepath : 'block_'.$data->name.'_slot_'.uniqid();
             $_data = Helper::nodeStdClass($childNode);
@@ -246,8 +261,16 @@ class Parser
             $cbf->raw('$block->render($data);');
         });
         
+        $htmlString = CodeBuffer::getTemplateFunction($cbf->getStream(true));
+        $this->document->templates[$blockName] = $htmlString;
+        
+        if ($nest) {
+            //dd($cbf);
+            return;
+        }
+        
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($cbf->getStream(true)),
+            $node->ownerDocument->createTextNode("<?php Parsed::template('$blockName', [])->setSlots(\$slots)->render(\$data); ?>"),
             $node
         );
         $this->toberemoved[] = $node;

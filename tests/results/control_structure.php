@@ -7,7 +7,7 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
     comp/simple
 </div><?php 
 };
-Parsed::$templates['slotOf_61c42110219de_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f692c3_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>comp/simple<?php 
 };
@@ -44,19 +44,19 @@ Parsed::$templates['comp/csf'] = function ($data, $slots) {
     } ?>
 </div><?php 
 };
-Parsed::$templates['slotOf_61c421102473e_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f6c956_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>x2<?php 
 };
-Parsed::$templates['slotOf_61c4211024add_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f6ccbf_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>1</p><?php 
 };
-Parsed::$templates['slot_def_61c4211025b7c'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f6de61'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>compslotdefault</p><?php 
 };
-Parsed::$templates['slot_def_61c4211025f91'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f6e2ca'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>slot1<?php 
 };
@@ -71,19 +71,19 @@ Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     } ?></span>
 </div><?php 
 };
-Parsed::$templates['slotOf_61c4211027366_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f6f693_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>foo<?php 
 };
-Parsed::$templates['slotOf_61c421102769f_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f6fa01_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>foo<?php 
 };
-Parsed::$templates['slotOf_61c4211027a55_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f6feb6_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>bar<?php 
 };
-Parsed::$templates['slotOf_61c4211027e2b_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f7020d_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>bar<?php 
 };
@@ -98,7 +98,7 @@ Parsed::$templates['comp/csdf'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c4211025b7c', $data);
+    $comp = Parsed::template('slot_def_61c4242f6de61', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     }
@@ -111,7 +111,7 @@ Parsed::$templates['comp/csdf'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c4211025f91', $data);
+    $comp = Parsed::template('slot_def_61c4242f6e2ca', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     }
@@ -136,7 +136,7 @@ Parsed::$templates['comp/csdf'] = function ($data, $slots) {
     }
     else  {
     foreach ([1,2] as $a) {$comp0 = Parsed::template('comp/comp_slot', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4211027366_slot_default', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f6f693_slot_default', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data);
@@ -151,7 +151,7 @@ $comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4211027366_slot_
     else  {
     foreach ([1,2] as $a) {$comp0 = Parsed::template('comp/comp_slot', []);
 $comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot', []));
-$comp2 = $comp1->addSlot('default', Parsed::template('slotOf_61c4211027a55_slot_default', []));
+$comp2 = $comp1->addSlot('default', Parsed::template('slotOf_61c4242f6feb6_slot_default', []));
 
     $comp2->setSlots($slots);
     $comp0->render($data);
@@ -159,7 +159,7 @@ $comp2 = $comp1->addSlot('default', Parsed::template('slotOf_61c4211027a55_slot_
     } ?>
 </div><?php } ?><?php 
 };
-Parsed::$templates['slot_def_61c4211029646'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f71eda'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data',])));
      ?><span><?php 
     if (!empty($slots["sn"])) {
@@ -168,11 +168,11 @@ Parsed::$templates['slot_def_61c4211029646'] = function ($data, $slots) {
     }
     } ?></span><?php 
 };
-Parsed::$templates['slot_def_61c4211029bff'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f725ac'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>foo<?php 
 };
-Parsed::$templates['slot_def_61c4211029b64'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f724e5'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp',])));
      ?><span><?php 
     if (!empty($slots["sn2"])) {
@@ -181,12 +181,12 @@ Parsed::$templates['slot_def_61c4211029b64'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c4211029bff', $data);
+    $comp = Parsed::template('slot_def_61c4242f725ac', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     } ?></span><?php 
 };
-Parsed::$templates['slot_def_61c421102a1d5'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f72d0f'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp0',])));
      ?><span><?php 
     if (!empty($slots["sn4"])) {
@@ -199,7 +199,7 @@ Parsed::$templates['slot_def_61c421102a1d5'] = function ($data, $slots) {
     $comp0->render($data);
     } ?></span><?php 
 };
-Parsed::$templates['slotOf_61c421102a9fe_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f73720_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp0',])));
      ?><div class="x">
         <?php 
@@ -214,15 +214,15 @@ Parsed::$templates['slotOf_61c421102a9fe_slot_default'] = function ($data, $slot
     } ?>
     </div><?php 
 };
-Parsed::$templates['slotOf_61c421102afd7_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f73de7_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>xjd</p><?php 
 };
-Parsed::$templates['slot_def_61c421102b2e3'] = function ($data, $slots) {
+Parsed::$templates['slot_def_61c4242f740d4'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?>djdh<?php 
 };
-Parsed::$templates['slotOf_61c421102b579_slot_default'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f74355_slot_default'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>hdhd</p><?php 
 };
@@ -236,7 +236,7 @@ Parsed::$templates['comp/cns'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c4211029646', $data);
+    $comp = Parsed::template('slot_def_61c4242f71eda', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     } ?>
@@ -248,7 +248,7 @@ Parsed::$templates['comp/cns'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c4211029b64', $data);
+    $comp = Parsed::template('slot_def_61c4242f724e5', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     } ?>
@@ -260,7 +260,7 @@ Parsed::$templates['comp/cns'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_def_61c421102a1d5', $data);
+    $comp = Parsed::template('slot_def_61c4242f72d0f', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     } ?>
@@ -275,37 +275,37 @@ Parsed::$templates['comp/cns'] = function ($data, $slots) {
     $comp0->addSlot('default', $slot);
     }
     $comp0->render($data);  $comp0 = Parsed::template('comp/comp_slot', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c421102a9fe_slot_default', ['class' => 'x']));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f73720_slot_default', ['class' => 'x']));
 
     $comp1->setSlots($slots);
     $comp0->render($data);  $comp0 = Parsed::template('comp/comp_slot', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c421102afd7_slot_default', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f73de7_slot_default', []));
 
     $comp1->setSlots($slots);
     foreach ($this->slots["sn9"] ?? [] as $slot) {
     $comp0->addSlot('default', $slot);
-    }$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c421102b579_slot_default', []));
+    }$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f74355_slot_default', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?><?php 
 };
-Parsed::$templates['slotOf_61c421102cdb8_slot_sn'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f75b13_slot_sn'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><span class="x"></span><?php 
 };
-Parsed::$templates['slotOf_61c421102d0ad_slot_sn1'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f75ee3_slot_sn1'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><span class="y"></span><?php 
 };
-Parsed::$templates['slotOf_61c421102d336_slot_sn3'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f7619b_slot_sn3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>3</p><?php 
 };
-Parsed::$templates['slotOf_61c421102d638_slot_sn8'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f7650f_slot_sn8'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><span>8</span><?php 
 };
-Parsed::$templates['slotOf_61c421102d8b5_slot_sn9'] = function ($data, $slots) {
+Parsed::$templates['slotOf_61c4242f76781_slot_sn9'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><p>9</p><?php 
 };
@@ -346,7 +346,7 @@ $false = false;
 
 <?php 
     foreach ($array as $a) {$comp0 = Parsed::template('comp/simple', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c42110219de_slot_default', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f692c3_slot_default', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data);
@@ -364,7 +364,7 @@ $comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c42110219de_slot_
 
 
 <?php $comp0 = Parsed::template('comp/csf', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c421102473e_slot_default', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f6c956_slot_default', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?>
@@ -373,7 +373,7 @@ $comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c421102473e_slot_
 
 
 <?php $comp0 = Parsed::template('comp/csf', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4211024add_slot_default', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4242f6ccbf_slot_default', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?>
@@ -391,17 +391,17 @@ $comp1 = $comp0->addSlot('default', Parsed::template('slotOf_61c4211024add_slot_
 
 <?php $comp0 = Parsed::template('comp/cns', []);
 
-    for ($i=0;$i<2;$i++) {$comp1 = $comp0->addSlot('sn', Parsed::template('slotOf_61c421102cdb8_slot_sn', ['class' => 'x']));
+    for ($i=0;$i<2;$i++) {$comp1 = $comp0->addSlot('sn', Parsed::template('slotOf_61c4242f75b13_slot_sn', ['class' => 'x']));
 
     $comp1->setSlots($slots);
-    }$comp1 = $comp0->addSlot('sn1', Parsed::template('slotOf_61c421102d0ad_slot_sn1', ['class' => 'y']));
+    }$comp1 = $comp0->addSlot('sn1', Parsed::template('slotOf_61c4242f75ee3_slot_sn1', ['class' => 'y']));
 
-    $comp1->setSlots($slots);$comp1 = $comp0->addSlot('sn3', Parsed::template('slotOf_61c421102d336_slot_sn3', []));
+    $comp1->setSlots($slots);$comp1 = $comp0->addSlot('sn3', Parsed::template('slotOf_61c4242f7619b_slot_sn3', []));
 
     $comp1->setSlots($slots);$comp1 = $comp0->addSlot('sn5', Parsed::template('comp/simple', []));
-$comp1 = $comp0->addSlot('sn8', Parsed::template('slotOf_61c421102d638_slot_sn8', []));
+$comp1 = $comp0->addSlot('sn8', Parsed::template('slotOf_61c4242f7650f_slot_sn8', []));
 
-    $comp1->setSlots($slots);$comp1 = $comp0->addSlot('sn9', Parsed::template('slotOf_61c421102d8b5_slot_sn9', []));
+    $comp1->setSlots($slots);$comp1 = $comp0->addSlot('sn9', Parsed::template('slotOf_61c4242f76781_slot_sn9', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?>
