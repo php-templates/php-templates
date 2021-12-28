@@ -1,4 +1,4 @@
-<!--
+
 <component is="block/a">
     <a22 slot="a2">a22</a22>
 </component>
@@ -23,7 +23,7 @@
 </a>
 
 -----
--->
+
 <!-- block in block la infinit -->
 <component is="block/b">
     <b12 slot="b1"></b12>
