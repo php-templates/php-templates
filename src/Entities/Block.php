@@ -59,11 +59,13 @@ class Block extends Parser implements Mountable
         $dataString = Helper::arrayToEval($nodeData->attributes);
         $this->codebuffer->raw('$blocks = [];');
         // insert child blocks/slots/components
+        $i = -1;
         foreach ($node->childNodes as $childNode) {
             if (Helper::isEmptyNode($childNode)) {
                 continue;
             }
-            
+
+            $i++;
             $_nodeData = Helper::nodeStdClass($childNode);
             $_dataString = Helper::arrayToEval($_nodeData->attributes);
             
@@ -71,7 +73,7 @@ class Block extends Parser implements Mountable
             if ($childNode->nodeName === 'block') {
                 // insert block nested
                 $_name = (new Block($this->document))->_mount($childNode);
-                $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $_dataString);");
+                $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $_dataString)->setSlots(\$slots)->setIndex($i);");
                 continue;
             }
 
@@ -82,7 +84,7 @@ class Block extends Parser implements Mountable
                 //TODO: new component
                 (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
             }
-            $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $dataString);");
+            $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $dataString)->setIndex($i);");
         }
 
         //push slots
@@ -96,7 +98,7 @@ class Block extends Parser implements Mountable
             $i1 = isset($a->data["_index"]) ? $a->data["_index"] : 0;
             $i2 = isset($b->data["_index"]) ? $b->data["_index"] : 0;
             return $i1 - $i2;
-        })');
+        });');
 
         $this->codebuffer->foreach('$blocks as $block', function() {
             $this->codebuffer->raw('$block->render($data);');

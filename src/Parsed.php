@@ -45,6 +45,12 @@ class Parsed
             $this->parent = $parent;
         }
     }
+
+    public function setIndex($i)
+    {
+        $this->data['_index'] = $i;
+        return $this;
+    }
     
     public function render($parentScope = [])
     {
