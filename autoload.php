@@ -74,6 +74,7 @@ spl_autoload_register(function ($class) {
     if (strpos($class, $path) === 0) {
         $class = str_replace($path, '', $class);
         $file = __DIR__.'/src/'.$class.'.php';
+        $file = str_replace('\\', '/', $file);
         if (file_exists($file)) {
             require_once($file);
         }
