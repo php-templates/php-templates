@@ -43,7 +43,7 @@ class Config
         }
     }
     
-    public function get($key, $fback = null)
+    public static function get($key, $fback = null)
     {
         if (isset(self::$data[$key])) {
             return self::$data[$key];
@@ -51,7 +51,7 @@ class Config
         return $fback;
     }
 
-    public function getComponentByAlias($name)
+    public static function getComponentByAlias($name)
     {
         if (!isset(self::$data['aliased']) || !isset(self::$data['aliased'][$name])) {
             return null;

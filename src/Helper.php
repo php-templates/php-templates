@@ -10,7 +10,7 @@ class Helper {
         
     }
     
-    public function getNodeAttributes($node, $reset = 0) {
+    public static function getNodeAttributes($node, $reset = 0) {
         $attrs = [];
         $special = array_merge(Config::allowedControlStructures, [
             'slot', 'is',
@@ -30,42 +30,7 @@ class Helper {
         return $attrs;
     }
     
-    public function getClassifiedNodeAttributes($node, $reset = 0) {
-        $attrs = [
-            'c_structs' => [],
-            'is' => '',
-            'attrs' => [],
-            'slot' => 'default',
-            'name' => 'default',
-        ];
-        
-        foreach (self::getNodeAttributes($node, $reset) as $attr => $value) {
-            if ($attr === 'is') {
-                $attrs['is'] = $value;
-            } 
-            elseif ($attr === 'slot') {
-                $attrs['slot'] = $value;
-            }
-            elseif ($attr === 'bind') {
-                $attrs['bind'] = $value;
-            }
-            elseif ($node->nodeName === 'slot' && $attr === 'name') {
-                $attrs['name'] = $value;
-            }
-            elseif (in_array($attr, Config::allowedControlStructures)) {
-                $attrs['c_structs'][$attr] = $value;
-            }
-            elseif (in_array($attr, Config::attrCumulative) && !empty($attrs['attrs'][$attr])) {
-                $attrs['attrs'][$attr] .= ' '.$value;
-            } else {
-                $attrs['attrs'][$attr] = $value;
-            }
-        }
-        
-        return $attrs;
-    }
-    
-    public function nodeStdClass($node, $context = '')
+    public static function nodeStdClass($node, $context = '')
     {
         $specials = ['is', 'slot'];
         if (in_array($node->nodeName, ['slot', 'block'])) {
@@ -137,7 +102,7 @@ class Helper {
         // remove all attrs, or all special project attrs
     }
     
-    public function arrayToEval(array $arr, $unescape = ':')
+    public static function arrayToEval(array $arr, $unescape = ':')
     {
         if (!$arr) {
             return '[]';
