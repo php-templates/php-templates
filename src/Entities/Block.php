@@ -84,7 +84,7 @@ class Block extends Parser implements Mountable
                 //TODO: new component
                 (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
             }
-            $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $dataString)->setIndex($i);");
+            $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $dataString)->setSlots(\$slots)->setIndex($i);");
         }
 
         //push slots

@@ -109,7 +109,7 @@ class Parser
     
     private function parseSimpleNode($node)
     {
-        $toberemoved = ['slot'];
+        $toberemoved = ['slot', '_index'];
         $cstructs = [];
         $pf = Config::get('prefix');
         $bpf = ':';
