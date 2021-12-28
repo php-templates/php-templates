@@ -67,17 +67,15 @@ function buf($self, $name = '', $depth = 0)
 }
 
 require_once(__DIR__.'/html5-dom-document-php/autoload.php');
-require_once(__DIR__.'/src/Parser.php');
-require_once(__DIR__.'/src/Template.php');
-require_once(__DIR__.'/src/Parsed.php');
-//require_once(__DIR__.'/src/Parsable.php');
-require_once(__DIR__.'/src/Facades/Template.php');
-require_once(__DIR__.'/src/Facades/Config.php');
-require_once(__DIR__.'/src/Helper.php');
-require_once(__DIR__.'/src/CodeBuffer.php');
-require_once(__DIR__.'/src/Document.php');
-require_once(__DIR__.'/src/Facades/DomHolder.php');
-require_once(__DIR__.'/src/DomEvent.php');
 
-
-
+spl_autoload_register(function ($class) {
+    $class = trim($class, '\\');
+    $path = 'DomDocument\\PhpTemplates\\';
+    if (strpos($class, $path) === 0) {
+        $class = str_replace($path, '', $class);
+        $file = __DIR__.'/src/'.$class.'.php';
+        if (file_exists($file)) {
+            require_once($file);
+        }
+    }
+});

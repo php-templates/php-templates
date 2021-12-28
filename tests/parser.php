@@ -2,7 +2,6 @@
 
 require('../autoload.php');
 
-use DomDocument\PhpTemplates\Facades\Template;
 use DomDocument\PhpTemplates\Facades\Config;
 use DomDocument\PhpTemplates\Document;
 use DomDocument\PhpTemplates\Parser;
@@ -19,7 +18,7 @@ Config::set('src_path', './');
 Config::set('dest_path', './results/');
 
 $files = scandir('./cases');
-$files = array_diff($files, ['..', './']);
+$files = array_diff($files, ['.', '..', './']);
 //dd(Config::all());
 foreach($files as $f) {
     if (isset($_GET['t']) && $f !== $_GET['t']) {

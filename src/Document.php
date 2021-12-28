@@ -10,9 +10,11 @@ use DomDocument\PhpTemplates\Facades\Config;
 class Document
 {
     protected $name;
+
     public $templates = [];
-    protected $layouts = [];
-    protected $eventListeners = [];
+    public $eventListeners = [];
+    public $tobereplaced = ['="__empty__"' => ''];
+    public $toberemoved = [];
     
     public function __construct(string $name)
     {
@@ -32,9 +34,6 @@ class Document
         foreach ($this->templates as $name => $fn) {
             $tpl .= "\nParsed::\$templates['$name'] = $fn;";
         }
-        foreach ($this->layouts as $name => $fn) {
-            $tpl .= "\nParsed::\$layouts['$name'] = $fn;";
-        }
         foreach ($this->eventListeners as $ev => $listeners) {
             foreach ($listeners as $target => $cbcks) {
                 foreach ($cbcks as $cb) {
@@ -51,5 +50,9 @@ class Document
     public function save(string $outFile)
     {
         file_put_contents($outFile, $this->render());
+    }
+
+    public function __get($prop) {
+        return $this->$prop;
     }
 }

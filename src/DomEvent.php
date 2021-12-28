@@ -6,7 +6,7 @@ class DomEvent
 {
     private static $events = [];
 
-    public function event($ev, $name, $template, &$data)
+    public static function event($ev, $name, $template, &$data)
     {
         $continueExecution = true;
         if (isset(self::$events[$ev][$name])) {

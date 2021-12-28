@@ -6,7 +6,6 @@ class Parsed
 {
     public static $templates = [];
 
-    protected $type;
     protected $parent = null;
     protected $name;
     protected $data;
@@ -16,15 +15,13 @@ class Parsed
     
     public static function template($name, $data = [])
     {
-        return new self('template', $name, $data);
+        return new self($name, $data);
     }
     
-    public function __construct($type, $name, $data = [])
+    public function __construct($name, $data = [])
     {
-        $this->type = $type;
         $this->name = $name;
         $this->data = $data;
-        //d('init '.$this->name, $data);
         
         $this->func = \Closure::bind(self::$templates[$this->name], $this);
     }
@@ -47,7 +44,6 @@ class Parsed
         if (!$this->parent) {
             $this->parent = $parent;
         }
-        //d($this->name, $this->parent->name, 1);
     }
     
     public function render($parentScope = [])
@@ -61,12 +57,6 @@ class Parsed
             if (!$continue) {
                 return;
             }
-        }
-        
-        if ($this->type === 'template') {
-            //$func = self::$templates[$this->name];
-        } elseif ($this->type === 'layout') {
-            //$func = self::$layouts[$this->name];
         }
         
         $func = $this->func;
@@ -84,7 +74,7 @@ class Parsed
         while ($op->parent) {
             $op = $op->parent;
         }
-        //dd($op->name);
+
         return $op;
     }
 }
