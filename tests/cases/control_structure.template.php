@@ -239,3 +239,9 @@ $false = false;
 2<div p-if="$false" p-foreach="[1, 2] as $a" p-if="$a == 2">{{ $a }}</div>
 =====
 2
+
+<!-- foreach de block  -->
+
+<!-- if block -->
+
+<!-- foreach de block din block -->

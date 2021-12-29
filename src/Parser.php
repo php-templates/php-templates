@@ -109,11 +109,18 @@ class Parser
     
     private function parseSimpleNode($node)
     {
+        if (empty($node->attributes)) {
+            return;
+        }
+        
         $toberemoved = ['slot', '_index'];
         $cstructs = [];
         $pf = Config::get('prefix');
         $bpf = ':';
-        foreach ($node->attributes ?? [] as $attr) {
+        $x = Helper::nodeStdClass($node);
+        d($x);
+        d(Helper::arrayToEval($x->attributes));
+        foreach ($node->attributes as $attr) {
             $k = $attr->nodeName;
             if (strpos($k, $pf) === 0) {
                 $expr = substr($k, strlen($pf));
