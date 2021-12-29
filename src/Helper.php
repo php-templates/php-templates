@@ -42,23 +42,24 @@ class Helper {
         $result = new \stdClass;
         $result->statements = [];
         $result->attributes = [];
+        $result->bind = null;
         foreach ($specials as $spec) {
             $result->$spec = null;
         }
         $result->slot = 'default';
         
-        foreach (self::getNodeAttributes($node) as $k => $val) {//d(str_replace('p-', '', $k), Config::allowedControlStructures);
+        foreach (self::getNodeAttributes($node) as $k => $val) {
             if (in_array($k, $specials)) {
                 $result->$k = $val;
             }
-            elseif (strpos($k, 'p-') === 0 && in_array(str_replace('p-', '', $k), Config::allowedControlStructures)) {
-                $k = str_replace('p-', '', $k);
-                if (isset($result->statements[$k])) {
-                    throw new \Exception("Baaaa, vezi ca ai doua cstructs la fel");
+            elseif (strpos($k, 'p-') === 0) 
+            {
+                $k = substr($k, 2);
+                if (in_array($k, Config::allowedControlStructures)) {
+                    $result->statements[$k] = $val;
                 }
-                $result->statements[$k] = $val;
             }
-            elseif (in_array($k, Config::attrCumulative) && !empty($result->attributes[$k])) {
+            elseif (in_array(trim($k, ':'), Config::attrCumulative) && !empty($result->attributes[$k])) {
                 $result->attributes[$k] .= ' '.$val;
             } else {
                 $result->attributes[$k] = $val;
@@ -66,12 +67,12 @@ class Helper {
         }
         
         // validari
-        if ($node->nodeName === 'component') {
-            if (empty($result->is)) {
-                //dd($result);
-                throw new \Exception('aaaa');
-            }
-        }
+        // if ($node->nodeName === 'component') {
+        //     if (empty($result->is)) {
+        //         //dd($result);
+        //         throw new \Exception('aaaa');
+        //     }
+        // }
         if ($node->nodeName === 'slot') {
             if (!$result->name) {
                 $result->name = 'default';

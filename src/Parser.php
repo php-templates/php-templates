@@ -2,12 +2,14 @@
 
 namespace DomDocument\PhpTemplates;
 
+use DomDocument\PhpTemplates\Entities\AnonymousComponent;
 use DomDocument\PhpTemplates\Entities\Block;
 use DomDocument\PhpTemplates\Entities\Component;
 use DomDocument\PhpTemplates\Entities\Slot;
 use IvoPetkov\HTML5DOMDocument;
 use DomDocument\PhpTemplates\Facades\Config;
 use DomDocument\PhpTemplates\Facades\DomHolder;
+use IvoPetkov\HTML5DOMElement;
 
 class Parser
 {
@@ -93,6 +95,9 @@ class Parser
         elseif ($name = Helper::isComponent($node)) {
             (new Component($this->document, $name))->mount($node);
         }
+        elseif ($node->nodeName === 'component') {
+            (new AnonymousComponent($this->document))->mount($node);
+        }
         else {
             $this->parseSimpleNode($node);
             $return = false;
@@ -114,12 +119,9 @@ class Parser
         }
         
         $toberemoved = ['slot', '_index'];
-        $cstructs = [];
         $pf = Config::get('prefix');
-        $bpf = ':';
-        $x = Helper::nodeStdClass($node);
-        d($x);
-        d(Helper::arrayToEval($x->attributes));
+        $bpf = ':'; // bind prefix
+
         foreach ($node->attributes as $attr) {
             $k = $attr->nodeName;
             if (strpos($k, $pf) === 0) {
@@ -138,23 +140,13 @@ class Parser
                     $toberemoved[] = $k;
                     continue;
                 }
-                if (!in_array($expr, Config::allowedControlStructures)) {
-                    continue;
+                elseif (in_array($expr, Config::allowedControlStructures)) {
+                    $this->controlStructure($expr, $attr->nodeValue, $node);
                 }
-                if ($attr->nodeValue) {
-                    $expr .= " ({$attr->nodeValue})";
-                }
-                $this->insertBefore(
-                    $node->ownerDocument->createTextNode("<?php $expr { ?>"),
-                    $node
-                );
-                $this->insertAfter(
-                    $node->ownerDocument->createTextNode("<?php } ?>"),
-                    $node
-                );
+
                 $toberemoved[] = $k;
             }
-            elseif (strpos($k, ':') === 0) {
+            elseif (strpos($k, $bpf) === 0) {
                 $a = substr($k, 1);
                 $rid = '__r'.uniqid();
                 if ($nattr = $node->getAttribute($a)) {
@@ -172,18 +164,25 @@ class Parser
             }
         }
     }
-    
-    public function insertBefore($newNode, $ref)
+
+    protected function controlStructure($statement, $args, $node)
     {
-        $ref->parentNode->insertBefore($newNode, $ref);
-    }
-    
-    public function insertAfter($newNode, $ref)
-    {
-        if ($ref->nextSibling) {
-            $ref->parentNode->insertBefore($newNode, $ref->nextSibling);
+        if ($args) {
+            $statement .= " ($args)";
+        }
+
+        $node->parentNode->insertBefore(
+            $node->ownerDocument->createTextNode("<?php $statement { ?>"),
+            $node
+        );
+
+        if ($node->nextSibling) {
+            $node->parentNode->insertBefore(
+                $node->ownerDocument->createTextNode("<?php } ?>"), 
+                $node->nextSibling
+            );
         } else {
-            $ref->parentNode->appendChild($newNode);
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode("<?php } ?>"));
         }
     }
     
