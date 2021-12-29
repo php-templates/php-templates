@@ -1,7 +1,7 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['slot_default_61cc703d2fdde'] = function ($data, $slots) {
+Parsed::$templates['slot_default_61ccae437b2c3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><div>123</div><?php 
 };
@@ -15,7 +15,7 @@ Parsed::$templates['extends/parent'] = function ($data, $slots) {
     }
     }
     else  {
-    $comp = Parsed::template('slot_default_61cc703d2fdde', $data);
+    $comp = Parsed::template('slot_default_61ccae437b2c3', $data);
     $comp->setSlots($slots);
     $comp->render($data);
     }  

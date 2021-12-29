@@ -20,7 +20,7 @@ class Parsed
     
     public function __construct($name, $data = [])
     {
-        $this->name = $name;
+        $this->name = trim($name, './');
         $this->data = $data;
         
         $this->func = \Closure::bind(self::$templates[$this->name], $this);
@@ -57,6 +57,7 @@ class Parsed
         $this->data['_attrs'] = array_keys($this->data);//d($this->data);
         $this->data['_name'] = $this->name;
         $data = array_merge($parentScope, $this->data);
+        
         if (!$this->rendered) {
             $this->rendered = true; // stop infinite loop
             $continue = DomEvent::event('rendering', $this->name, $this, $data);
@@ -65,6 +66,12 @@ class Parsed
             }
         }
         
+        if (!isset($data['_cpath'])) {
+            $data['_cpath'] = $this->name;
+        } else {
+            $data['_cpath'] .= '.'.$this->name;
+        }
+        //d('_cpath', $data['_cpath']);
         $func = $this->func;
         $func($data, $this->slots);
     }

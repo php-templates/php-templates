@@ -22,4 +22,6 @@ de gasit o solutie pentru bind attrs mai elegant? prefix a- gen a-rows/:a-rows p
 
 
 de testat event-urile daca merg:
-event-uri care sa fie globale pe o componenta, sau locale (in cazul in care o componenta se rendereaza intr-un anumnit scope)... va trebui sa aiba acces la numele scopului superior... o variabila ceva...
+event-uri care sa fie globale pe o componenta, sau locale (in cazul in care o componenta se rendereaza intr-un anumnit scope)
+... va trebui sa aiba acces la numele scopului superior... o variabila ceva... sau sa pastrez si Is pe data... dar daca e aliasat.. 
+de testat cum merge <@> in textul documentului

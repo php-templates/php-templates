@@ -24,7 +24,7 @@ Parsed::$templates['props/c'] = function ($data, $slots) {
     } ?>
 </c><?php 
 };
-Parsed::$templates['61cc702fe2b8b'] = function ($data, $slots) {
+Parsed::$templates['61ccae4386a22'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['val','v','name',])));
      ?>
         <?php foreach ($val as $v) { ?><div><?php echo htmlspecialchars($name.$v); ?></div><?php } ?>
@@ -41,7 +41,7 @@ Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     } ?></span>
 </div><?php 
 };
-Parsed::$templates['props/c_slot_default_61cc702fe41d4'] = function ($data, $slots) {
+Parsed::$templates['props/c_slot_default_61ccae4387c5b'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['name',])));
      ?><?php echo htmlspecialchars($name); ?><?php 
 };
@@ -79,7 +79,7 @@ $false = 0;
 
 
 <?php $comp0 = Parsed::template('props/c', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('61cc702fe2b8b', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('61ccae4386a22', []));
 
     $comp0->render($data); ?>
 
@@ -89,7 +89,7 @@ $comp1 = $comp0->addSlot('default', Parsed::template('61cc702fe2b8b', []));
 
 <?php $comp0 = Parsed::template('props/c', []);
 $comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot', []));
-$comp2 = $comp1->addSlot('default', Parsed::template('props/c_slot_default_61cc702fe41d4', []));
+$comp2 = $comp1->addSlot('default', Parsed::template('props/c_slot_default_61ccae4387c5b', []));
 
     $comp2->setSlots($slots);
     $comp0->render($data); ?>
