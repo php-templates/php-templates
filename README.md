@@ -20,14 +20,6 @@ de modificat tag de <component> in <template>
 
 de gasit o solutie pentru bind attrs mai elegant? prefix a- gen a-rows/:a-rows pare cel mai ok pana acum
 
-block in block lease (indirect) nu are acces la slotur...
-cam confuz modul in care se index...
 
-make template with no is sa mearga ca un layer invisible, va crea un scope
-
-<b><b11></b11><b12></b12><b121></b121><b122></b122><n><b1221></b1221><b1222></b1222></n></b><b21></b21>
-<b><b11></b11><b12></b12><b121></b121><n><b1221></b1221></n><b122></b122></b><b21></b21>
-
-
-<b><b11></b11><b12></b12><b121></b121><b122></b122><n><b1221></b1221><b1222></b1222></n></b><b21></b21>
-<b><b11></b11><b12></b12><b121></b121><b122></b122><n><b1221></b1221></n></b><b21></b21>
+de testat event-urile daca merg:
+event-uri care sa fie globale pe o componenta, sau locale (in cazul in care o componenta se rendereaza intr-un anumnit scope)... va trebui sa aiba acces la numele scopului superior... o variabila ceva...
