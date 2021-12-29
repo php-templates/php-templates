@@ -41,7 +41,7 @@ class Document
                 }
             }
         }
-        $tpl .= "\nParsed::template('$this->name', \$data)->render();";
+        $tpl .= "\nParsed::template('$this->name', [])->render(\$data);";
         $tpl .= ' ?>';
         
         return $tpl;

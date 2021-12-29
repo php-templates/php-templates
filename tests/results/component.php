@@ -39,4 +39,4 @@ Parsed::$templates['./cases/component'] = function ($data, $slots) {
 
 -----</body></html><?php 
 };
-Parsed::template('./cases/component', $data)->render(); ?>
+Parsed::template('./cases/component', [])->render($data); ?>

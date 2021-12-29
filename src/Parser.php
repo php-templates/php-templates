@@ -8,8 +8,6 @@ use DomDocument\PhpTemplates\Entities\Component;
 use DomDocument\PhpTemplates\Entities\Slot;
 use IvoPetkov\HTML5DOMDocument;
 use DomDocument\PhpTemplates\Facades\Config;
-use DomDocument\PhpTemplates\Facades\DomHolder;
-use IvoPetkov\HTML5DOMElement;
 
 class Parser
 {
@@ -40,6 +38,7 @@ class Parser
             $html = $this->removeHtmlComments($html);
             $trimHtml = strpos($html, '<body') === false;
             $dom->loadHtml($html);
+
             if ($extends = $dom->querySelector('extends')) {
                 $this->extends($extends);
             }
@@ -225,11 +224,13 @@ class Parser
         (new Parser($this->document, $extendedTemplate))->parse();
         
         $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
-            \$comp = Parsed::template('$extendedTemplate');
+            \$comp = Parsed::template('$extendedTemplate', \$data);
             \$comp->addSlot('default', \$template);
             \$comp->render(\$data);
             return false;
         }");
+
+        $extends->parentNode->removeChild($extends);
     }
 
     public function trimHtml($dom)

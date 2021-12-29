@@ -40,11 +40,14 @@ class Block extends Parser implements Mountable
         $this->document->toberemoved[] = $node;
     }
 
-    protected function _mount(HTML5DOMElement $node): string
+    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf = null): string
     {
         $nodeData = Helper::nodeStdClass($node);
         $this->name = $this->getName($nodeData->name);
         $this->insertBlock($node);
+        if ($cbf) {
+            $cbf->slot(0, $nodeData->slot, $this->name, $nodeData->attributes);
+        }
 
         return $this->name;
     }
@@ -54,54 +57,55 @@ class Block extends Parser implements Mountable
      */
     private function insertBlock($node)
     {
-        $nest = !empty($name);
         $nodeData = Helper::nodeStdClass($node);
-        $dataString = Helper::arrayToEval($nodeData->attributes);
-        $this->codebuffer->raw('$blocks = [];');
-        // insert child blocks/slots/components
-        $i = -1;
-        foreach ($node->childNodes as $childNode) {
-            if (Helper::isEmptyNode($childNode)) {
-                continue;
+        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
+            $dataString = Helper::arrayToEval($nodeData->attributes);
+            $this->codebuffer->raw('$blocks = [];');
+            // insert child blocks/slots/components
+            $i = -1;
+            foreach ($node->childNodes as $childNode) {
+                if (Helper::isEmptyNode($childNode)) {
+                    continue;
+                }
+
+                $i++;
+                $_nodeData = Helper::nodeStdClass($childNode);
+                $_dataString = Helper::arrayToEval($_nodeData->attributes);
+                
+                // case block
+                if ($childNode->nodeName === 'block') {
+                    // insert block nested
+                    $_name = (new Block($this->document))->_mount($childNode);
+                    $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
+                    continue;
+                }
+
+                // case component or not
+                $_name = $isComponent = Helper::isComponent($childNode);
+                $_name = $_name ? $_name : 'block_'.$nodeData->name.'_slot_'.uniqid();
+                if (!isset($this->document->templates[$_name])) {
+                    //TODO: new component
+                    (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
+                }
+                $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
             }
 
-            $i++;
-            $_nodeData = Helper::nodeStdClass($childNode);
-            $_dataString = Helper::arrayToEval($_nodeData->attributes);
-            
-            // case block
-            if ($childNode->nodeName === 'block') {
-                // insert block nested
-                $_name = (new Block($this->document))->_mount($childNode);
-                $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $_dataString)->setSlots(\$slots)->setIndex($i);");
-                continue;
-            }
-
-            // case component or not
-            $_name = $isComponent = Helper::isComponent($childNode);
-            $_name = $_name ? $_name : 'block_'.$nodeData->name.'_slot_'.uniqid();
-            if (!isset($this->document->templates[$_name])) {
-                //TODO: new component
-                (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
-            }
-            $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', $dataString)->setSlots(\$slots)->setIndex($i);");
-        }
-
-        //push slots
-        $this->codebuffer->if("isset(\$slots['{$nodeData->name}'])", function() use ($nodeData) {
-            $this->codebuffer->foreach("\$slots['{$nodeData->name}'] as \$slot", function() {
-                $this->codebuffer->raw("\$blocks[] = \$slot;");
+            //push slots
+            $this->codebuffer->if("isset(\$slots['{$nodeData->name}'])", function() use ($nodeData) {
+                $this->codebuffer->foreach("\$slots['{$nodeData->name}'] as \$slot", function() {
+                    $this->codebuffer->raw("\$blocks[] = \$slot;");
+                });
             });
-        });
-        // sort slots by _index
-        $this->codebuffer->raw('usort($blocks, function($a, $b) {
-            $i1 = isset($a->data["_index"]) ? $a->data["_index"] : 0;
-            $i2 = isset($b->data["_index"]) ? $b->data["_index"] : 0;
-            return $i1 - $i2;
-        });');
+            // sort slots by _index
+            $this->codebuffer->raw('usort($blocks, function($a, $b) {
+                $i1 = isset($a->data["_index"]) ? $a->data["_index"] : 0;
+                $i2 = isset($b->data["_index"]) ? $b->data["_index"] : 0;
+                return $i1 - $i2;
+            });');
 
-        $this->codebuffer->foreach('$blocks as $block', function() {
-            $this->codebuffer->raw('$block->render($data);');
+            $this->codebuffer->foreach('$blocks as $block', function() {
+                $this->codebuffer->raw('$block->render($data);');
+            });
         });
         
         $htmlString = CodeBuffer::getTemplateFunction($this->codebuffer->getStream(true));

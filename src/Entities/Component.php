@@ -62,7 +62,7 @@ class Component extends Parser implements Mountable
                         (new AnonymousComponent($this->document))->_mount($slotNode, $this->codebuffer);
                     }
                     elseif ($slotNode->nodeName === 'block') {
-                        (new Block($this->document))->mount($slotNode);
+                        (new Block($this->document))->_mount($slotNode, $this->codebuffer);
                     }
                     else {
                         $this->insertComponentSlot($slotPosition, $slotNode);
