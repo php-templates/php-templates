@@ -20,7 +20,7 @@ class Parsed
     
     public function __construct($name, $data = [])
     {
-        $this->name = trim($name, './');
+        $this->name = $name;
         $this->data = $data;
         
         $this->func = \Closure::bind(self::$templates[$this->name], $this);

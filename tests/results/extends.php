@@ -1,12 +1,12 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['slot_default_61ccae437b2c3'] = function ($data, $slots) {
+Parsed::$templates['slot_default_61cd94d3080cf'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><div>123</div><?php 
 };
 Parsed::$templates['extends/parent'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp0',])));
      ?><parent>
     <?php 
     if (!empty($slots["d1"])) {
@@ -14,10 +14,10 @@ Parsed::$templates['extends/parent'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {
-    $comp = Parsed::template('slot_default_61ccae437b2c3', $data);
-    $comp->setSlots($slots);
-    $comp->render($data);
+    else  {$comp0 = Parsed::template('slot_default_61cd94d3080cf', []);
+
+    $comp0->setSlots($slots);
+    $comp0->render($data);
     }  
     if (!empty($slots["default"])) {
     foreach ($slots['default'] as $slot) {
