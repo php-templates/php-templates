@@ -1,9 +1,6 @@
 <extends template="layouts/app"/>
 
-<slot name="ascomp"><x-helper>h</x-helper>Slot with default as comp</slot>
-<x-card>
-    <slot slot="title" bind="mytitle"></slot>
-    <slot slot="title" bind="x"><x-helper>-x-</x-helper></slot>
+<x-card title="My form">
     <div class="row">
         <x-form-group type="text" class="col-6"
             name="firstname"
@@ -42,12 +39,4 @@
         value="some text">
         <label slot="label"><x-helper>Helper</x-helper> Label with helper</label>
     </x-form-group>
-    
-    <block name="extra-fields">
-        <x-form-group type="text"
-            name="ef1"
-            label="ef1"
-            value=""
-            />
-    </block>
 </x-card>

@@ -2,7 +2,7 @@
     <slot name="label">
         <label class="form-label">{{ $label }}</label>
     </slot>
-    <slot :type="$type">
+    <slot>
         <input p-if="$type === 'text'" type="text" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
         <input p-elseif="$type === 'number'" type="number" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
         <input p-elseif="$type === 'email'" type="email" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">

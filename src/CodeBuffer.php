@@ -39,7 +39,7 @@ class CodeBuffer
     }
     
     public function __call($expr, $args) {
-        $param = $args[0] ? '('.$args[0].')' : '';
+        $param = $args[0] || $args[0] === '0' ? '('.$args[0].')' : '';
         $callback = $args[1];
         $this->checkInit();
         $this->buffer .= "
@@ -90,7 +90,7 @@ class CodeBuffer
             return;
         }
         
-        $this->$i($expr[$i], function() use ($expr, $i) {
+        $this->$i($expr[$i], function() use ($expr, $i, $cb) {
             unset($expr[$i]);
             $this->nestedExpression($expr, $cb);
         });

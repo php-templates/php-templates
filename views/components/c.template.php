@@ -1,1 +1,0 @@
-<div p-bind="$_attrs"><slot></slot></div>

@@ -59,30 +59,17 @@ class Template
         $this->srcFile = $this->getSrcFile();
 
         if (!isset($_GET['edit'])) {
-        //$dom = new Parsable($rfilepath, null, $slots, false);
-        $doc = new Document($this->requestName);
-        $parser = new Parser($doc, $rfilepath);
-        $parser->parse();
-        $doc->save('./parsed/test.php');
+            $doc = new Document($this->requestName);
+            $parser = new Parser($doc, $rfilepath);
+            $parser->parse();
+            $doc->save('./parsed/test.php');
         }
-        if ($_GET['plain'] ?? false) {
-        // echo $doc->getContent();
-        } else {//d($data);
-            extract($data);
-            // for dev
-            //ob_start();
-            include './parsed/test.php';
-            /*
-            $x = ob_get_clean();
-            $x = str_replace(['<', '>'], ["\n<", ">\n"], $x);
-            $y = new HTML5DOMDocument();
-            $y->loadHtml($x);
-            $y->formatOutput = true;
-            echo $y->saveHtml();*/
-        }
+
+        extract($data);
+        include './parsed/test.php';
+
         return;
-        dd();
-        
+
         
         $this->mountSlotsData($this->slots);
     }

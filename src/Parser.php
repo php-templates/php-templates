@@ -166,7 +166,7 @@ class Parser
 
     protected function controlStructure($statement, $args, $node)
     {
-        if ($args) {
+        if ($args || $args === '0') {
             $statement .= " ($args)";
         }
 
