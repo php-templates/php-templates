@@ -33,4 +33,3 @@ new DomEvent('rendering', 'extends/b', function($template, $data) {
             $comp->render($data);
             return false;
         });
-Parsed::template('./cases/4', [])->render($data); ?>

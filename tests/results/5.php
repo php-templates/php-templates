@@ -53,4 +53,3 @@ new DomEvent('rendering', 'extends/c', function($template, $data) {
             $comp->render($data);
             return false;
         });
-Parsed::template('./cases/5', [])->render($data); ?>

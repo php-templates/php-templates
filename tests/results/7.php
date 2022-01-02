@@ -1,11 +1,11 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61d044a0eead8'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d18e5d01736'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['label',])));
      ?><label class="form-label"><?php echo htmlspecialchars($label); ?></label><?php 
 };
-Parsed::$templates['slot_default?id=61d044a0ef383'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d18e5d01c55'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['type','value','placeholder','label','options','name','values','val','_attrs','k','v',])));
      ?><?php if ($type === 'text') { ?><input type="text" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'number') { ?><input type="number" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'email') { ?><input type="email" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'checkbox') {  foreach ($options as $name => $label) { ?><label>
             <input type="checkbox" value="1" <?php echo (in_array($name, $values) ? 'checked' : ''); ?>>
@@ -26,7 +26,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d044a0eead8', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d18e5d01736', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -36,7 +36,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d044a0ef383', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d18e5d01c55', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -53,4 +53,3 @@ Parsed::$templates['./cases/7'] = function ($data, $slots) {
 
 -----</body></html><?php 
 };
-Parsed::template('./cases/7', [])->render($data); ?>

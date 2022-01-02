@@ -18,7 +18,7 @@ class Parsed
         return new self($name, $data);
     }
     
-    public function __construct($name, $data = [])
+    private function __construct($name, $data = [])
     {
         $this->name = $name;
         $this->data = $data;

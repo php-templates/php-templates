@@ -1,5 +1,5 @@
-<?php
 
+<?php
 namespace DomDocument\PhpTemplates\Entities;
 
 use DomDocument\PhpTemplates\CodeBuffer;
