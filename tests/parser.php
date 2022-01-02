@@ -5,6 +5,7 @@ require('../autoload.php');
 use DomDocument\PhpTemplates\Facades\Config;
 use DomDocument\PhpTemplates\Document;
 use DomDocument\PhpTemplates\Parser;
+use DomDocument\PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
 
 Config::set('aliased', [
@@ -48,7 +49,8 @@ foreach($files as $f) {
     ob_start();
     $data = [];
     include $dest;
-    $results = ob_get_clean();//dd($results);
+    Parsed::template($rfilepath)->render();
+    $results = ob_get_clean();
     $results = str_replace(["<!DOCTYPE html>\n<html>\n<body>"], '', $results);//dd($results);
     $results = explode('-----',$results);
     foreach ($results as $i => $result) {
