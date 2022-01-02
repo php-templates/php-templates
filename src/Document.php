@@ -4,8 +4,7 @@ namespace DomDocument\PhpTemplates;
 
 use IvoPetkov\HTML5DOMDocument;
 use DomDocument\PhpTemplates\Facades\Config;
-//use DomDocument\PhpTemplates\Template;
-//use DomDocument\PhpTeplates\Parsable;
+use DomDocument\PhpTemplates\DependenciesMap;
 
 class Document
 {
@@ -41,18 +40,56 @@ class Document
                 }
             }
         }
-        $tpl .= "\nParsed::template('$this->name', [])->render(\$data);";
-        $tpl .= ' ?>';
+        
         
         return $tpl;
     }
     
-    public function save(string $outFile)
+    public function save(string $outFile = null)
     {
+        if (!$outFile) {
+            $outFile = $this->getDestFile();
+        }
+        ///dd($outFile);
         file_put_contents($outFile, $this->render());
+        DependenciesMap::save();
+        
+        return $outFile;
     }
 
     public function __get($prop) {
         return $this->$prop;
+    }
+    
+    public function exists()
+    {
+        $f = $this->getDestFile();
+        if (file_exists($f)) {
+            return $f;
+        }
+        return false;
+    }
+    
+    protected function getDestFile()
+    {
+        $dependencies = DependenciesMap::get($this->name);
+        $pf = Config::get('src_path');
+        asort($dependencies);
+        $hash = [$this->name];
+        foreach ($dependencies as $f) {
+            $file = $pf.$f.'.template.php';
+            $hash[] = $f.':'.filemtime($file);
+        }
+        
+        $pf = Config::get('dest_path');
+        $name = str_replace('/', '_', $this->name);// todo
+        $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
+    
+        return $outFile.'.php';
+    }
+    
+    public function registerDependency($name) 
+    {
+        DependenciesMap::add($this->name, $name);
     }
 }

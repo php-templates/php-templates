@@ -48,6 +48,9 @@ class Slot extends Parser implements Mountable
         $this->name = $nodeData->name;
 
         $this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $node) {
+            if (!$this->nest) {
+                //$this->codebuffer->raw("DomEvent::event('renderingSlots', '$this->name', \$slots['$this->name'] ?? [], []);");
+            }
             $this->codebuffer->if('!empty($slots["'.$this->name.'"])', function() use ($nodeData) {
                 $this->codebuffer->foreach("\$slots['$this->name'] as \$slot", function() use ($nodeData) {
                     $dataString = Helper::arrayToEval($nodeData->attributes);
@@ -69,7 +72,7 @@ class Slot extends Parser implements Mountable
                         }
                         
                         $_name = $isComponent = Helper::isComponent($_node);
-                        $_name = $_name ? $_name : 'slot_default_'.uniqid();
+                        $_name = $_name ? $_name : 'slot_default?id='.uniqid();
                         if ($isComponent) {
                             (new Component($this->document, $_name))->_mount($_node, $this->codebuffer);
                         } else {

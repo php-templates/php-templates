@@ -76,9 +76,9 @@ class Component extends Parser implements Mountable
     protected function insertComponentSlot($slotPosition, $slotNode, $i = 0)
     {
         $nodeData = Helper::nodeStdClass($slotNode);
-        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $slotNode, $slotPosition, $i) {
+        //$this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $slotNode, $slotPosition, $i) {
             $name = $isComponent = Helper::isComponent($slotNode);
-            $name = $name ? $name : $this->name.'_slot_'.$slotPosition.'_'.uniqid();
+            $name = $name ? $name : $this->name.'_slot_'.$slotPosition.'?id='.uniqid();
  
             // ->addSlot()
             $this->codebuffer->slot($i, $slotPosition, $name, $nodeData->attributes);
@@ -87,7 +87,7 @@ class Component extends Parser implements Mountable
                 //TODO: data here
             }
             if ($slotNode->nodeName !== '#text') {
-                $slotNode->removeAttribute('slot');
+                //$slotNode->removeAttribute('slot');
             }
             
             if ($isComponent) {
@@ -101,6 +101,6 @@ class Component extends Parser implements Mountable
                 $next = $i+1; // anticipam urmatoarea variabila pentru 
                 $this->codebuffer->raw("\$comp{$next}->setSlots(\$slots);");
             }
-        });
+        //});
     }
 }

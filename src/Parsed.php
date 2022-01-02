@@ -9,7 +9,7 @@ class Parsed
     protected $parent = null;
     protected $name;
     protected $data;
-    protected $slots;
+    public $slots;
     protected $func;
     protected $rendered = false;
     
@@ -58,20 +58,22 @@ class Parsed
         $this->data['_name'] = $this->name;
         $data = array_merge($parentScope, $this->data);
         
+        $name = trim(explode('?', $this->name)[0], './\\');
+        if (!isset($data['_cpath'])) {
+            $data['_cpath'] = $event = $name;
+        } else {
+            $event = explode('.', $data['_cpath'])[0].'.'.$name;
+            $data['_cpath'] .= '.'.$name;
+            $event = $data['_cpath'];
+        }
+        //d('evvvvv',$event);
         if (!$this->rendered) {
             $this->rendered = true; // stop infinite loop
-            $continue = DomEvent::event('rendering', $this->name, $this, $data);
+            $continue = DomEvent::event('rendering', $event, $this, $data);
             if (!$continue) {
                 return;
             }
         }
-        
-        if (!isset($data['_cpath'])) {
-            $data['_cpath'] = $this->name;
-        } else {
-            $data['_cpath'] .= '.'.$this->name;
-        }
-        //d('_cpath', $data['_cpath']);
         $func = $this->func;
         $func($data, $this->slots);
     }

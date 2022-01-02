@@ -82,7 +82,7 @@ class Block extends Parser implements Mountable
 
                 // case component or not
                 $_name = $isComponent = Helper::isComponent($childNode);
-                $_name = $_name ? $_name : 'block_'.$nodeData->name.'_slot_'.uniqid();
+                $_name = $_name ? $_name : 'block_'.$nodeData->name.'_slot?id='.uniqid();
                 if (!isset($this->document->templates[$_name])) {
                     //TODO: new component
                     (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);

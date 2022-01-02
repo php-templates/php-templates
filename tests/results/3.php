@@ -1,16 +1,16 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['block_b1_slot_61cd94c37bbfe'] = function ($data, $slots) {
+Parsed::$templates['block_b1_slot?id=61d044a0d22d9'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['k',])));
      ?><b11><?php echo htmlspecialchars($k); ?></b11><?php 
 };
-Parsed::$templates['b1?id=61cd94c37bb8b'] = function ($data, $slots) {
+Parsed::$templates['b1?id=61d044a0d21ac'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['k','blocks','slots','slot','a','b','i1','i2','block','data',])));
      ?><?php 
     foreach ([1,2] as $k) {
     $blocks = [];
-    $blocks[] = Parsed::template('block_b1_slot_61cd94c37bbfe', array_merge(['k' => $k], []))->setSlots($slots)->setIndex(0);
+    $blocks[] = Parsed::template('block_b1_slot?id=61d044a0d22d9', array_merge(['k' => $k], []))->setSlots($slots)->setIndex(0);
     if (isset($slots['b1'])) {
     foreach ($slots['b1'] as $slot) {
     $blocks[] = $slot;
@@ -30,7 +30,7 @@ Parsed::$templates['./cases/3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
      ?><!DOCTYPE html>
 <html>
-<body><?php Parsed::template('b1?id=61cd94c37bb8b', [])->setSlots($slots)->render($data); ?>
+<body><?php Parsed::template('b1?id=61d044a0d21ac', [])->setSlots($slots)->render($data); ?>
 
 -----</body></html><?php 
 };

@@ -21,7 +21,7 @@ Parsed::$templates['layouts/app'] = function ($data, $slots) {
     </body>
 </html><?php 
 };
-Parsed::$templates['slot_default?id=61d077c5aa1f7'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d18be65de74'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['title',])));
      ?><?php if (isset($title)) { ?><h5 class="card-title"><?php echo htmlspecialchars($title); ?></h5><?php } ?><?php 
 };
@@ -35,7 +35,7 @@ Parsed::$templates['components/card'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d077c5aa1f7', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d18be65de74', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -48,11 +48,11 @@ Parsed::$templates['components/card'] = function ($data, $slots) {
     </div>
 </div><?php 
 };
-Parsed::$templates['slot_default?id=61d077c5ad5ad'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d18be66325a'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['label',])));
      ?><label class="form-label"><?php echo htmlspecialchars($label); ?></label><?php 
 };
-Parsed::$templates['slot_default?id=61d077c5adc08'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d18be663a2d'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['type','value','placeholder','label','options','name','values','val','_attrs','k','v',])));
      ?><?php if ($type === 'text') { ?><input type="text" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'number') { ?><input type="number" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'email') { ?><input type="email" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'checkbox') {  foreach ($options as $name => $label) { ?><label>
             <input type="checkbox" value="1" <?php echo (in_array($name, $values) ? 'checked' : ''); ?>>
@@ -73,7 +73,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d077c5ad5ad', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d18be66325a', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -83,14 +83,14 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d077c5adc08', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d18be663a2d', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
     }  if (!empty($error)) { ?><span class="error"><?php echo htmlspecialchars($error); ?></span><?php } ?>
 </div><?php 
 };
-Parsed::$templates['block_form-fields_slot?id=61d077c5ac05c'] = function ($data, $slots) {
+Parsed::$templates['block_form-fields_slot?id=61d18be661897'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','entry_firstname','firstname','data','entry_lastname','lastname',])));
      ?><div class="row">
             <?php $comp0 = Parsed::template('components/form-group', ['type' => 'text', 'class' => 'col-6', 'name' => 'firstname', 'label' => $entry_firstname, 'value' => $firstname]);
@@ -100,11 +100,11 @@ Parsed::$templates['block_form-fields_slot?id=61d077c5ac05c'] = function ($data,
     $comp0->render($data); ?>
         </div><?php 
 };
-Parsed::$templates['form-fields?id=61d077c5abf5c'] = function ($data, $slots) {
+Parsed::$templates['form-fields?id=61d18be661778'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['blocks','slots','entry_email','email','entry_male','entry_female','entry_gender','gender','slot','a','b','i1','i2','block','data',])));
      ?><?php 
     $blocks = [];
-    $blocks[] = Parsed::template('block_form-fields_slot?id=61d077c5ac05c', array_merge([], ['class' => 'row']))->setSlots($slots)->setIndex(0);
+    $blocks[] = Parsed::template('block_form-fields_slot?id=61d18be661897', array_merge([], ['class' => 'row']))->setSlots($slots)->setIndex(0);
     $blocks[] = Parsed::template('components/form-group', array_merge([], ['type' => 'email', 'name' => 'email', 'label' => $entry_email, 'value' => $email]))->setSlots($slots)->setIndex(1);
     $blocks[] = Parsed::template('components/form-group', array_merge([], ['type' => 'select', 'options' => ['male' => $entry_male, 'female' => $entry_female], 'name' => 'gender', 'label' => $entry_gender, 'value' => $gender]))->setSlots($slots)->setIndex(2);
     $blocks[] = Parsed::template('components/form-group', array_merge([], ['type' => 'checkbox', 'options' => ['o1' => 'A', 'o2' => 'B'], 'name' => 'options', 'label' => 'Options', 'values' => ['o1']]))->setSlots($slots)->setIndex(3);
@@ -124,14 +124,14 @@ Parsed::$templates['form-fields?id=61d077c5abf5c'] = function ($data, $slots) {
     $block->render($data);
     } ?><?php 
 };
-Parsed::$templates['components/card_slot_default?id=61d077c5aae6e'] = function ($data, $slots) {
+Parsed::$templates['components/card_slot_default?id=61d18be65f326'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
-     ?><?php Parsed::template('form-fields?id=61d077c5abf5c', [])->setSlots($slots)->render($data); ?><?php 
+     ?><?php Parsed::template('form-fields?id=61d18be661778', [])->setSlots($slots)->render($data); ?><?php 
 };
 Parsed::$templates['user-profile-form'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','comp1','slots','data',])));
      ?><?php $comp0 = Parsed::template('components/card', ['title' => 'My form']);
-$comp1 = $comp0->addSlot('default', Parsed::template('components/card_slot_default?id=61d077c5aae6e', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('components/card_slot_default?id=61d18be65f326', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?><?php 

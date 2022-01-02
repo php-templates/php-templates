@@ -30,6 +30,7 @@ class Parser
         $trimHtml = false;
         if (!$dom || Helper::isComponent($dom)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
+            $this->document->registerDependency($requestName);
             $f = Config::get('src_path');
             $srcFile = $f.$requestName.'.template.php';
             $dom = new HTML5DOMDocument;
@@ -42,6 +43,12 @@ class Parser
             if ($extends = $dom->querySelector('extends')) {
                 $this->extends($extends);
             }
+        } elseif ($dom->nodeName !== '#document') {
+            // create extra scope to ensure safe insertbefore and insertafter
+            $container = new HTML5DOMDocument;
+            $dom = $container->importNode($dom, true);
+            $container->appendChild($dom);
+            $dom = $container; unset($container);
         }
 
         $this->parseNode($dom);
@@ -98,6 +105,7 @@ class Parser
             (new AnonymousComponent($this->document))->mount($node);
         }
         else {
+            //d($this->name, $node->nodeName, Helper::nodeStdClass($node)->statements);
             $this->parseSimpleNode($node);
             $return = false;
         }
@@ -192,17 +200,40 @@ class Parser
             return $slots;
         }
         
+        // slots bound together using if else stmt should be keeped together
+        $lastPos = null;
         foreach ($node->childNodes as $slotNode) {
             if (Helper::isEmptyNode($slotNode)) {
                 continue;
             }
             
-           $slotPosition = $slotNode->nodeName !== '#text' ? $slotNode->getAttribute('slot') : 'default';
+           $slotPosition = null;
+           if ($slotNode->nodeName !== '#text') {
+               $slotPosition = $slotNode->getAttribute('slot');
+               $slotNode->removeAttribute('slot');
+           }
             if ($forceDefault || !$slotPosition) {
                 $slotPosition = 'default';
             }
-
-            $slots[$slotPosition][] = $slotNode;
+            
+            if ($slotNode->nodeName === '#text') {
+                $slots[$slotPosition][] = $slotNode;
+            }
+            elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
+                // stands its own
+                $container = new HTML5DOMDocument;
+                $slotNode = $container->importNode($slotNode, true);
+                $container->appendChild($slotNode);
+                $slots[$slotPosition][] = $container;
+                $lastPos = $slotPosition;
+            } else {
+                // has dependencies above
+                if (isset($slots[$lastPos])) {
+                    $i = count($slots[$lastPos]) -1;
+                    $slotNode = $slots[$lastPos][$i]->importNode($slotNode, true);
+                    $slots[$lastPos][$i]->appendChild($slotNode);
+                }
+            }
         }
         
         return $slots;
