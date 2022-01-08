@@ -7,6 +7,7 @@
       1 => 'layouts/app',
       2 => 'components/card',
       3 => 'components/form-group',
+      4 => 'components/navbar',
     ),
     'components/input-group' => 
     array (
@@ -99,6 +100,10 @@
       3 => 'comp/slot_default_in_slot_default',
       4 => 'comp/simple',
       5 => 'comp/nested_slot',
+    ),
+    'components/dropdown' => 
+    array (
+      0 => 'components/dropdown',
     ),
   ),
 );

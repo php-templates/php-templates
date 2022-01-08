@@ -66,4 +66,17 @@ new DomEvent('rendering', 'user-profile-form.form-fields', function($t, $data) {
     $removed->render($data);
 });
 
+new DomEvent('rendering', 'components/navbar.nav-items', function($t, $data) {
+    $navItem = $t->addSlot('nav-items', Template::get('components/dropdown', [
+        '_index' => 99,
+        'text' => 'Event Added'
+    ]));
+    $navItem->addSlot('default', Template::raw(function() { ?>
+      <a class="dropdown-item" href="#">Action</a>
+      <a class="dropdown-item" href="#">Another action</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="#">Something else here</a> <?php
+    }));
+});
+
 Template::load('user-profile-form', $data);
