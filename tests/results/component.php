@@ -9,7 +9,7 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
 };
 Parsed::$templates['comp/composed'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
-     ?><?php $comp0 = Parsed::template('comp/simple', []);
+      $comp0 = Parsed::template('comp/simple', []);
 
     $comp0->render($data); ?><div class="comp/composed">
     <?php $comp0 = Parsed::template('comp/simple', []);

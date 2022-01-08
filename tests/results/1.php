@@ -12,13 +12,13 @@ Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     } ?></span>
 </div><?php 
 };
-Parsed::$templates['block_b1_slot?id=61d95e3d972a8'] = function ($data, $slots) {
+Parsed::$templates['block_b1_slot?id=61d9d558b7485'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b11>123</b11><?php 
 };
-Parsed::$templates['b1?id=61d95e3d971d9'] = function ($data, $slots) {
+Parsed::$templates['b1?id=61d9d558b740c'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
-     ?><?php $this->block['b1'] = Parsed::raw('b1', function($data, $slots) {
+      $this->block['b1'] = Parsed::raw('b1', function($data, $slots) {
             extract($data);
             if (isset($slots['b1'])) {
                 usort($slots['b1'], function($a, $b) {
@@ -31,18 +31,18 @@ Parsed::$templates['b1?id=61d95e3d971d9'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61d95e3d972a8', ['_index' => '0']))->setSlots($slots);
-$this->block['b1']->render($data); ?><?php 
+$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61d9d558b7485', ['_index' => '0']))->setSlots($slots);
+$this->block['b1']->render($data);  
 };
-Parsed::$templates['comp/comp_slot_slot_default?id=61d95e3d96040'] = function ($data, $slots) {
+Parsed::$templates['comp/comp_slot_slot_default?id=61d9d558b687f'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
-     ?><?php Parsed::template('b1?id=61d95e3d971d9', [])->setSlots($slots)->render($data); ?><?php 
+      Parsed::template('b1?id=61d9d558b740c', [])->setSlots($slots)->render($data);  
 };
 Parsed::$templates['./cases/1'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','comp1','slots','data',])));
      ?><!DOCTYPE html>
 <html><body><?php $comp0 = Parsed::template('comp/comp_slot', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot_slot_default?id=61d95e3d96040', []));
+$comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot_slot_default?id=61d9d558b687f', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?>

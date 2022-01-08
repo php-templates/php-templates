@@ -4,8 +4,7 @@ use DomDocument\PhpTemplates\DomEvent;
 Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
      ?><parent2>
-    <?php echo htmlspecialchars($bind_me); ?>
-    <?php 
+    <?php echo htmlspecialchars($bind_me);  
     if (!empty($slots["default"])) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));

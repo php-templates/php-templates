@@ -5,8 +5,7 @@ Parsed::$templates['extends/parent4'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
      ?><parent4>
     parent4
-    <?php echo htmlspecialchars($bind_me); ?>
-    <?php 
+    <?php echo htmlspecialchars($bind_me);  
     if (!empty($slots["default"])) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
@@ -17,8 +16,7 @@ Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
      ?><parent3>
     parent3
-    <?php echo htmlspecialchars($bind_me); ?>
-    <?php 
+    <?php echo htmlspecialchars($bind_me);  
     if (!empty($slots["default"])) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));

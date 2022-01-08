@@ -1,22 +1,22 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61d95e3dadb9b'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d9d558cca81'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['label',])));
      ?><label class="form-label"><?php echo htmlspecialchars($label); ?></label><?php 
 };
-Parsed::$templates['slot_default?id=61d95e3dadea6'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['type','value','placeholder','label','options','name','values','val','_attrs','k','v',])));
-     ?><?php if ($type === 'text') { ?><input type="text" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'number') { ?><input type="number" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'email') { ?><input type="email" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'checkbox') {  foreach ($options as $name => $label) { ?><label>
+Parsed::$templates['slot_default?id=61d9d558ccd75'] = function ($data, $slots) {
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['type','options','name','label','val','value',])));
+      if ($type === 'text') { ?><input type="text" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'number') { ?><input type="number" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'email') { ?><input type="email" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'checkbox') {  foreach ($options as $name => $label) { ?><label>
             <input type="checkbox" value="1" <?php echo (in_array($name, $values) ? 'checked' : ''); ?>>
             <?php echo htmlspecialchars($label); ?>
         </label><?php }  }  elseif ($type === 'radio') {  foreach ($options as $val => $label) { ?><label>
             <input type="radio" name="<?php echo $name ;?>" <?php echo ($val == $value ? 'checked' : ''); ?> value="<?php echo $val ;?>">
             <?php echo htmlspecialchars($label); ?>
-        </label><?php }  }  elseif ($type === 'select') { ?><select class="form-control"><?php foreach ($options as $val => $label) { ?><option value="<?php echo $val ;?>" <?php echo ($val == $value ? 'checked' : ''); ?>><?php echo htmlspecialchars($label); ?></option><?php } ?></select><?php }  elseif ($type === 'textarea') { ?><textarea class="form-control" placeholder="<?php echo $placeholder ?? $label ;?>" <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>><?php echo htmlspecialchars($value); ?></textarea><?php } ?><?php 
+        </label><?php }  }  elseif ($type === 'select') { ?><select class="form-control"><?php foreach ($options as $val => $label) { ?><option value="<?php echo $val ;?>" <?php echo ($val == $value ? 'checked' : ''); ?>><?php echo htmlspecialchars($label); ?></option><?php } ?></select><?php }  elseif ($type === 'textarea') { ?><textarea class="form-control" placeholder="<?php echo $placeholder ?? $label ;?>" <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>><?php echo htmlspecialchars($value); ?></textarea><?php }  
 };
 Parsed::$templates['components/form-group'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['class','slots','slot','data','comp0','error',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp0','error',])));
      ?><div class="form-group <?php echo !empty($class) ? $class : '' ;?>">
     <?php 
     if (!empty($slots["label"])) {
@@ -24,7 +24,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d95e3dadb9b', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d9d558cca81', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -34,7 +34,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d95e3dadea6', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d9d558ccd75', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
