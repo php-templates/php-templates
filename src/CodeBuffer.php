@@ -38,6 +38,34 @@ class CodeBuffer
         $this->buffer .= "\$comp{$next} = \$comp{$i}->addSlot('$pos', Parsed::template('$name', $data));".PHP_EOL;
     }
     
+    public function block($name) {
+        $this->checkInit();
+        $this->buffer .= "\$this->block['$name'] = Parsed::raw('$name', function(\$data, \$slots) {
+            extract(\$data);
+            if (isset(\$slots['$name'])) {
+                usort(\$slots['$name'], function(\$a, \$b) {
+                    \$i1 = isset(\$a->data['_index']) ? \$a->data['_index'] : 0;
+                    \$i2 = isset(\$b->data['_index']) ? \$b->data['_index'] : 0;
+                    return \$i1 - \$i2;
+                });
+                foreach (\$slots['$name'] as \$slot) {
+                    \$slot->render(\$data);
+                }
+            }
+        })->setSlots(\$slots);";
+    }
+    
+    public function blockItem($bname, $name, $data)
+    {
+        $data = Helper::arrayToEval($data);
+        $this->buffer .= PHP_EOL."\$this->block['$bname']->addSlot('$bname', Parsed::template('$name', $data))->setSlots(\$slots);";
+    }
+    
+    public function render($type, $name)
+    {
+        $this->buffer .= PHP_EOL."\$this->$type"."['$name']->render(\$data);";
+    }
+    
     public function __call($expr, $args) {
         $param = $args[0] || $args[0] === '0' ? '('.$args[0].')' : '';
         $callback = $args[1];

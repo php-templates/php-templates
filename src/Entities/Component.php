@@ -75,12 +75,13 @@ class Component extends Parser implements Mountable
     
     protected function insertComponentSlot($slotPosition, $slotNode, $i = 0)
     {
-        $nodeData = Helper::nodeStdClass($slotNode);
+        $nodeData = Helper::nodeStdClass($slotNode->childNodes->item(0) ?? $slotNode);
         //$this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $slotNode, $slotPosition, $i) {
             $name = $isComponent = Helper::isComponent($slotNode);
             $name = $name ? $name : $this->name.'_slot_'.$slotPosition.'?id='.uniqid();
  
             // ->addSlot()
+            //dd($nodeData, $slotNode->childNodes-);
             $this->codebuffer->slot($i, $slotPosition, $name, $nodeData->attributes);
             if (!isset($this->document->templates[$name])) {
                 (new Parser($this->document, $name))->parse($isComponent ? null : $slotNode);

@@ -103,13 +103,13 @@ class Helper {
         // remove all attrs, or all special project attrs
     }
     
-    public static function arrayToEval(array $arr, $unescape = ':')
-    {
+    public static function arrayToEval(array $arr, $simple = false, $unescape = ':')
+    {// todo nu va mergw cu array de genul [$foo, $bar]
         if (!$arr) {
             return '[]';
         }
         $isAssoc = array_keys($arr) !== range(0, count($arr) - 1);
-        if (!$isAssoc) {
+        if (!$isAssoc || $simple) {
             $arr = var_export($arr, true);
             $arr = str_replace(['array (', ')', '\n', '\r', PHP_EOL], ['[', ']', '', '', ''], $arr);
             $arr = preg_replace('/\d+[ ]*\\=>[ ]*/', '', $arr);

@@ -15,6 +15,12 @@ Config::set('aliased', [
     'x-helper' => 'components/helper',
 ]);
 
+$folder_path = Config::get('dest_path').'*';
+$files = glob($folder_path);//dd($folder_path);
+foreach($files as $file) {
+    if (is_file($file)) unlink($file);
+}
+
 $data['entry_firstname'] = 'Firstname';
 $data['firstname'] = 'Florin';
 $data['entry_lastname'] = 'Lastname';
@@ -45,11 +51,19 @@ new DomEvent('rendering', 'user-profile-form.form-fields', function($t, $data) {
         'type' => 'select',
         'options' => ['o1' => 'o1', 'o2' => 'o2'],
         'value' => 'o2',
-        //'class' => 'bg-success',
-        //'_index' => 3,
     ]));
+    $btn = Template::raw(function() {
+        echo '<div class="text-right bg-success">
+            <button class="btn btn-primary">Submit</button>
+        </div>';
+    }, ['_index' => 999]);
+    $removed = $t->slots['form-fields'][4];
+    unset($t->slots['form-fields'][4]);
     $t->slots['form-fields'][] = $extraField;
     $t->slots['form-fields'][] = $extraField2;
+    $t->slots['form-fields'][] = $btn;
+    $removed->data['class'] = 'bg-danger';
+    $removed->render($data);
 });
 
 Template::load('user-profile-form', $data);

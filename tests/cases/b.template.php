@@ -1,8 +1,8 @@
 <!-- block in block la infinit -->
 <component is="block/b">
-    <b12 slot="b1"></b12>
-    <b122 slot="b12" _index="0"></b122>
-    <b1222 slot="b122"></b1222>
+    <b12 slot="b1" _index="1.5"></b12>
+    <b122 slot="b12" _index="1.5"></b122>
+    <b1222 slot="b122" _index="99"></b1222>
 </component>
 =====
 <b>

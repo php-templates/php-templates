@@ -26,7 +26,7 @@ class Parser
      * as root, comp, slot
      */
     public function parse($dom = null)
-    {
+    {//doc va fi cel care incarca fisierele cu file get content, ii face replace uri escape si isi pune replace list
         $trimHtml = false;
         if (!$dom || Helper::isComponent($dom)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
@@ -34,8 +34,10 @@ class Parser
             $f = Config::get('src_path');
             $srcFile = $f.$requestName.'.template.php';
             $dom = new HTML5DOMDocument;
+            $dom->substituteEntities = false;
             $dom->formatOutput = true;
             $html = file_get_contents($srcFile);
+            $html = $this->escapeSpecialCharacters($html);
             $html = $this->removeHtmlComments($html);
             $trimHtml = strpos($html, '<body') === false;
             $dom->loadHtml($html);
@@ -68,13 +70,12 @@ class Parser
         } else {
             $htmlString = $dom->saveHtml();
         }
-        
         // make replaces
-        $htmlString = html_entity_decode($htmlString);
-        
-        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
-        $htmlString = preg_replace('/\?>[ \n\r]*<\?php/', '', $htmlString);
-        $htmlString = str_replace(array_keys($this->document->tobereplaced), array_values($this->document->tobereplaced), $htmlString);
+        //$htmlString = html_entity_decode($htmlString);
+        //cel mai safe, fac parse la tot ce e intre tag uri de php cu preg replace callback si deco
+        //apoi decode dupa pattern ul :\w="", sau '', decode
+        //dd(11, $htmlString);
+        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);//dd($htmlString);
         $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 return "<?php echo htmlspecialchars($eval); ?>";
@@ -96,7 +97,7 @@ class Parser
             (new Slot($this->document))->mount($node);
         } 
         elseif ($node->nodeName === 'block') {
-            (new Block($this->document))->mount($node);
+            (new Block($this->document, $this->name))->mount($node);// this name, iar mount zice: compx are sloturile y, sunt pe parsed
         } 
         elseif ($name = Helper::isComponent($node)) {
             (new Component($this->document, $name))->mount($node);
@@ -279,5 +280,9 @@ class Parser
     public function __get($prop)
     {
         return $this->$prop;
+    }
+    
+    public function escapeSpecialCharacters($html) {
+        return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
     }
 }

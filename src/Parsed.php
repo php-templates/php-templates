@@ -5,25 +5,35 @@ namespace DomDocument\PhpTemplates;
 class Parsed
 {
     public static $templates = [];
+    public static $templateBlocks = [];
 
     protected $parent = null;
     protected $name;
-    protected $data;
+    public $data;
+    public $block = [];
     public $slots;
     protected $func;
     protected $rendered = false;
     
     public static function template($name, $data = [])
     {
-        return new self($name, $data);
+        return new self($name, self::$templates[$name], $data);
     }
     
-    private function __construct($name, $data = [])
+    public static function raw($name, \Closure $fn, $data = [])
+    {
+        if (!$name) {
+            $name = uniqid();
+        }
+        return new self($name, $fn, $data);
+    }
+    
+    private function __construct($name, \Closure $fn, $data = [])
     {
         $this->name = $name;
         $this->data = $data;
         
-        $this->func = \Closure::bind(self::$templates[$this->name], $this);
+        $this->func = \Closure::bind($fn, $this);
     }
     
     public function addSlot($pos, self $renderable)
@@ -54,11 +64,12 @@ class Parsed
     
     public function render($parentScope = [])
     {
+        //if ($this->name === 'a2') dd($this->slots['a2']);
         $this->data['_attrs'] = array_keys($this->data);//d($this->data);
         $this->data['_name'] = $this->name;
         $data = array_merge($parentScope, $this->data);
         
-        $name = trim(explode('?', $this->name)[0], './\\');
+        $name = trim($this->name, './\\');
         if (!isset($data['_cpath'])) {
             $data['_cpath'] = $event = $name;
         } else {

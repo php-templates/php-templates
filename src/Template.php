@@ -37,4 +37,9 @@ class Template
             return Parsed::template($requestName, $data);
         }
     }
+    
+    public function raw(\Closure $cb, $data = [])
+    {
+        return Parsed::raw(null, $cb, $data);
+    }
 }

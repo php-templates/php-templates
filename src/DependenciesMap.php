@@ -23,7 +23,7 @@ class DependenciesMap
         }
     }
     
-    public function save()
+    public static function save()
     {
         file_put_contents(__DIR__.'/dependencies_map.php', '<?php return '.var_export(self::$map, true).';');
     }

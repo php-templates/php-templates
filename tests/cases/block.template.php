@@ -1,6 +1,6 @@
 
 <component is="block/a">
-    <a22 slot="a2">a22</a22>
+    <a22 slot="a2" _index="99">a22</a22>
 </component>
 =====
 <a>
@@ -12,7 +12,7 @@
 -----
 
 <component is="block/a">
-    <a22 slot="a2" p-foreach="[1,2] as $a">a22</a22>
+    <a22 slot="a2" p-foreach="[1,2] as $a" _index="99">a22</a22>
 </component>
 =====
 <a>
@@ -26,9 +26,9 @@
 
 <!-- block in block la infinit -->
 <component is="block/b">
-    <b12 slot="b1"></b12>
-    <b122 slot="b12"></b122>
-    <b1222 slot="b122"></b1222>
+    <b12 slot="b1" _index="1.5"></b12>
+    <b122 slot="b12" _index="1.5"></b122>
+    <b1222 slot="b122" _index="99"></b1222>
 </component>
 =====
 <b>

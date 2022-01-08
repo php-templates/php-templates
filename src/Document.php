@@ -12,8 +12,19 @@ class Document
 
     public $templates = [];
     public $eventListeners = [];
-    public $tobereplaced = ['="__empty__"' => ''];
+    public $tobereplaced = [
+        '="__empty__"' => '', 
+        '&gt;' => '>',
+        '&amp;\gt;' => '&gt;',
+        '&lt;' => '<',
+        '&amp;\lt;' => '&lt;',
+        '&amp;' => '&',
+        '&amp;\amp;' => '&amp;',
+        /*'?&gt;' => '?>',
+        '-&gt;' => '->',*/
+    ];
     public $toberemoved = [];
+    public $templateBlocks = [];
     
     public function __construct(string $name)
     {
@@ -33,6 +44,11 @@ class Document
         foreach ($this->templates as $name => $fn) {
             $tpl .= "\nParsed::\$templates['$name'] = $fn;";
         }
+        foreach ($this->templateBlocks as $t => $block) {
+            foreach ($block as $name => $fn) {
+                $tpl .= "\nParsed::\$templateBlocks['$t']['$name'] = $fn;";
+            }
+        }
         foreach ($this->eventListeners as $ev => $listeners) {
             foreach ($listeners as $target => $cbcks) {
                 foreach ($cbcks as $cb) {
@@ -41,6 +57,8 @@ class Document
             }
         }
         
+        $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
+        $tpl = preg_replace('/\?>[ \n\r]*<\?php/', '', $tpl);
         
         return $tpl;
     }

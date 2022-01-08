@@ -22,7 +22,7 @@ $files = scandir('./cases');
 $files = array_diff($files, ['.', '..', './']);
 //dd(Config::all());
 foreach($files as $f) {
-    if (isset($_GET['t']) && $f !== $_GET['t']) {
+    if (isset($_GET['t']) && explode('.', $f)[0] !== $_GET['t']) {
         continue;
     }
     $file = './cases/'.$f;
@@ -40,7 +40,7 @@ foreach($files as $f) {
     $doc = new Document($rfilepath);
     $parser = new Parser($doc, $rfilepath);
     $dom = new HTML5DOMDocument;
-    $dom->loadHtml($parser->removeHtmlComments($test));
+    $dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
     $parser->parse($dom);
     $dest = './results/'.str_replace('.template', '', $f);
     if (!isset($_GET['edit'])) {
@@ -51,7 +51,8 @@ foreach($files as $f) {
     include $dest;
     Parsed::template($rfilepath)->render();
     $results = ob_get_clean();
-    $results = str_replace(["<!DOCTYPE html>\n<html>\n<body>"], '', $results);//dd($results);
+    $results = explode('<body>', $results);
+    $results = end($results);
     $results = explode('-----',$results);
     foreach ($results as $i => $result) {
         if (empty($expected[$i])) {

@@ -1,20 +1,19 @@
 <?php 
 use DomDocument\PhpTemplates\Parsed;
 use DomDocument\PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61d18e5d45c05'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61d750842b658'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><div>123</div><?php 
 };
 Parsed::$templates['extends/parent'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data','comp0',])));
-     ?><parent>
-    <?php 
+     ?><parent><?php 
     if (!empty($slots["d1"])) {
     foreach ($slots['d1'] as $slot) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$comp0 = Parsed::template('slot_default?id=61d18e5d45c05', []);
+    else  {$comp0 = Parsed::template('slot_default?id=61d750842b658', []);
 
     $comp0->setSlots($slots);
     $comp0->render($data);
@@ -23,14 +22,12 @@ Parsed::$templates['extends/parent'] = function ($data, $slots) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
-    } ?>
-</parent><?php 
+    } ?></parent><?php 
 };
 Parsed::$templates['extends/a'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><a>
-    <foo></foo>
-</a><?php 
+    <foo></foo></a><?php 
 };
 Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
@@ -41,8 +38,7 @@ Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
-    } ?>
-</parent2><?php 
+    } ?></parent2><?php 
 };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
@@ -58,8 +54,7 @@ Parsed::$templates['extends/parent4'] = function ($data, $slots) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
-    } ?>
-</parent4><?php 
+    } ?></parent4><?php 
 };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
@@ -71,8 +66,7 @@ Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
-    } ?>
-</parent3><?php 
+    } ?></parent3><?php 
 };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
@@ -81,8 +75,7 @@ Parsed::$templates['extends/c'] = function ($data, $slots) {
 Parsed::$templates['./cases/extends'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
      ?><!DOCTYPE html>
-<html>
-<body><?php $comp0 = Parsed::template('extends/a', []);
+<html><body><?php $comp0 = Parsed::template('extends/a', []);
 
     $comp0->render($data); ?>
 

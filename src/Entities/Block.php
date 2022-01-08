@@ -59,8 +59,9 @@ class Block extends Parser implements Mountable
     {
         $nodeData = Helper::nodeStdClass($node);
         $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
+            $this->codebuffer->block($nodeData->name);// declaration, set slots, set sort slots, 
             $dataString = Helper::arrayToEval($nodeData->attributes);
-            $this->codebuffer->raw('$blocks = [];');
+            //$this->codebuffer->raw('$blocks = [];');
             // insert child blocks/slots/components
             $i = -1;
             foreach ($node->childNodes as $childNode) {
@@ -76,7 +77,8 @@ class Block extends Parser implements Mountable
                 if ($childNode->nodeName === 'block') {
                     // insert block nested
                     $_name = (new Block($this->document))->_mount($childNode);
-                    $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
+                    $this->codebuffer->blockItem($nodeData->name, $_name, array_merge($nodeData->attributes, $_nodeData->attributes, ['_index' => $i]));// de fapt data merged cu i presetat
+                    //$this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
                     continue;
                 }
 
@@ -87,9 +89,10 @@ class Block extends Parser implements Mountable
                     //TODO: new component
                     (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
                 }
-                $this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
+                $this->codebuffer->blockItem($nodeData->name, $_name, array_merge($nodeData->attributes, $_nodeData->attributes, ['_index' => $i]));
+                //$this->codebuffer->raw("\$blocks[] = Parsed::template('$_name', array_merge($dataString, $_dataString))->setSlots(\$slots)->setIndex($i);");
             }
-
+/*
             //push slots
             $this->codebuffer->if("isset(\$slots['{$nodeData->name}'])", function() use ($nodeData) {
                 $this->codebuffer->foreach("\$slots['{$nodeData->name}'] as \$slot", function() {
@@ -103,9 +106,11 @@ class Block extends Parser implements Mountable
                 return $i1 - $i2;
             });');
 
+            // block render //<---
             $this->codebuffer->foreach('$blocks as $block', function() {
                 $this->codebuffer->raw('$block->render($data);');
-            });
+            });*/
+            $this->codebuffer->render('block', $nodeData->name);
         });
         
         $htmlString = CodeBuffer::getTemplateFunction($this->codebuffer->getStream(true));
