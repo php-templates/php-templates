@@ -10,7 +10,7 @@ use DomDocument\PhpTemplates\Facades\DomHolder;
 
 class Template
 {
-    public function load(string $rfilepath, array $data = [], array $slots = [], array $options = [])
+    public function load(string $rfilepath, array $data = [])
     {
         $start_time = microtime(true);
         $template = $this->get($rfilepath);

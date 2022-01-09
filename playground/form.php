@@ -18,7 +18,7 @@ Config::set('aliased', [
 $folder_path = Config::get('dest_path').'*';
 $files = glob($folder_path);//dd($folder_path);
 foreach($files as $file) {
-    if (is_file($file)) unlink($file);
+    //if (is_file($file)) unlink($file);
 }
 
 $data['entry_firstname'] = 'Firstname';
@@ -76,6 +76,51 @@ new DomEvent('rendering', 'components/navbar.nav-items', function($t, $data) {
       <a class="dropdown-item" href="#">Another action</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="#">Something else here</a> <?php
+    }));
+});
+
+$x = false;
+new DomEvent('rendering', 'user-profile-form.components/card', function($t, $data) use (&$x) {
+    if ($x) {
+        return;
+    }
+    $x = true;
+    
+    $tabs = Template::get('components/tabs', [
+        'tabs' => [
+            'user-profile-form' => 'Form',
+            'stats' => 'Stats'
+        ]
+    ]);
+    $tabs->addSlot('default', Template::raw(function() use ($t, $data) { ?>
+        <div class="tab-pane fade show active" id="user-profile-form" role="tabpanel">
+            <?php $t->render($data); ?>
+        </div> <?php
+    }));
+    $tabs->addSlot('default', Template::raw(function() use ($t, $data) { ?>
+        <div class="tab-pane fade show" id="stats" role="tabpanel">
+            <?php Template::get('stats', $data)->render($data); ?>
+        </div> <?php
+    }));
+    $tabs->render($data);
+    
+    return false;
+});
+
+for ($i=0;$i<=50;$i++) {
+    $products[] = [
+        'name' => uniqid(),
+        'price' => rand(0, 100)
+    ];
+}
+
+new DomEvent('rendering', 'user-profile-form.components/tabs', function($t, &$data) use($products) {
+    $data['tabs']['pics'] = 'Pictures';
+    $data['products'] = $products;
+    $t->addSlot('default', Template::raw(function() use ($t, $data) { ?>
+        <div class="tab-pane fade show" id="pics" role="tabpanel">
+            <?php Template::get('products', $data)->render($data); ?>
+        </div> <?php
     }));
 });
 

@@ -11,10 +11,6 @@ class Template
 {
     private function __construct() {}
     
-    protected $options = [
-        
-    ];
-    
     public static function getInstance(): PhpTemplate
     {
         return new PhpTemplate();
@@ -23,10 +19,5 @@ class Template
     public static function __callStatic($name, $args)
     {
         return call_user_func_array([self::getInstance(), $name], $args);
-    }
-    
-    public static function component(string $rfilepath, array $data = [], array $slots = [])
-    {
-        return new Parsable($rfilepath, $data, $slots);
     }
 }

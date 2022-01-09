@@ -22,10 +22,6 @@ class Config
         'class', 'id'
     ];
     
-    const attrIf = [
-        ''
-    ];
-    
     const attrDataBindEager = 'data';
     const attrIsComponent = 'is';
     

@@ -105,5 +105,24 @@
     array (
       0 => 'components/dropdown',
     ),
+    'user-profile-form.components/card' => 
+    array (
+      0 => 'user-profile-form.components/card',
+    ),
+    'components/tabs' => 
+    array (
+      0 => 'components/tabs',
+    ),
+    'stats' => 
+    array (
+      0 => 'stats',
+      1 => 'components/card',
+      2 => 'components/table',
+    ),
+    'products' => 
+    array (
+      0 => 'products',
+      1 => 'components/product_item',
+    ),
   ),
 );
