@@ -1,7 +1,21 @@
 ## Introduction
-Php-templates is the simple, yet powerful templating engine that is easy to implement in almost any PHP app, due to its easy and flexible configuration process. Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax. Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`).
+Php-templates is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed on desired tag, like in React/Vue.js syntax. Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`).
 
-Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to 
+Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to call `PhpTemplates\Template::load({path}, $data)` (path will be relative to `src_path`, without extension `template.php`) to render it. If you only want a template instance to render it later, you can call `Template::get({path}, $attrs)`, then call `render($data)`. `$attrs` will be described later, in Components section.
+
+## Displaying data
+Like in most template engines, data is escaped against html entities and displayed using `{{}}`. You can anytime call php pure echo in order to display raw data.
+Html nodes ttributes are set using `:` bind syntax.
+The following:
+`<div class="card" :class="$myVar" :class="$foo === 1 ? 'active' : ''"></div>``
+will produce:
+`<div class="card <?php echo $myVar; ?> <?php echo $foo === 1 ? 'active' : ''; ?>"></div>`
+
+As you can see, any valid continuing `echo ` php syntax is allowed between "" -> :attr="echo {php_syntax}".
+
+## Control structures
+You can place any of this allowed control structures prefixed with `p-` on html node targeted to control.
+
 
 -----
 
