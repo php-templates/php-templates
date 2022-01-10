@@ -7,9 +7,9 @@ Each template will become a closure function indexed on Parsed global object by 
 Like in most template engines, data is escaped against html entities and displayed using `{{}}`. You can anytime call php pure echo in order to display raw data.
 Html nodes ttributes are set using `:` bind syntax.
 The following:
-```<div class="card" :class="$myVar" :class="$foo === 1 ? 'active' : ''"></div>```
+```markdown <div class="card" :class="$myVar" :class="$foo === 1 ? 'active' : ''"></div>```
 will produce:
-```<div class="card <?php echo $myVar; ?> <?php echo $foo === 1 ? 'active' : ''; ?>"></div>```
+```markdown <div class="card <?php echo $myVar; ?> <?php echo $foo === 1 ? 'active' : ''; ?>"></div>```
 
 As you can see, any valid continuing `echo ` php syntax is allowed between "" -> :attr="echo {php_syntax}".
 
