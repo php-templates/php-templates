@@ -20,5 +20,6 @@ de modificat tag de <component> in <template>
 
 directive custom
 cover empty templat or c load... childnodes of null...
+index.html documentarie
 
 de gasit o solutie pentru bind attrs mai elegant? prefix a- gen a-rows/:a-rows pare cel mai 
