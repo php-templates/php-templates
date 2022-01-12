@@ -41,4 +41,9 @@ class DomEvent
     {
         self::$events[$ev][$name][] = $cb;
     }
+    
+    public static function on($ev, $name, $cb)
+    {
+        self::$events[$ev][$name][] = $cb;
+    }
 }

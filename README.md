@@ -5,6 +5,8 @@ php templates won't defend you against infinite recursions, yet
 
 TODO:
 block fara nume trb sa throw error
+de modificat sintaxa de new DomEvent in DomEvent::on()
+modificat mesaje erori, afisat sintaxa erori de elseif si else daca el de deasupra nu are if
 
 events vor fi de 2 tipuri: parsing si rendering
 
@@ -17,6 +19,8 @@ DomEvent::creating(viewName, function(html5domdocument $dom) {
 })
 
 de modificat tag de <component> in <template>
+slot pass aliased value to instance attr pe  slot deci
+i bloc sa inceapa de la 1
 
 directive custom
 cover empty templat or c load... childnodes of null...
