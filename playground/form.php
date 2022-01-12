@@ -32,7 +32,13 @@ $data['gender'] = 'male';
 $data['entry_male'] = 'Male';
 $data['entry_female'] = 'Femele';
 
-new DomEvent('rendering', 'user-profile-form.form-fields', function($t, $data) {
+// DomEvents to manipulate the original
+// add an event on rendering user-profile-form.form-fields block
+DomEvent::on('rendering', 'user-profile-form.form-fields', function($t, $data) {
+    // $t is the block instance and we can add slots to any position using index
+   // we can pass $data by reference and manipulate it too, manipulating $t->data won't take any effect in that stage 
+   
+    // we call Template::get to load a template with data. If the template is already loaded above, in user-profile-form, won't be done a new file request
     $extraField = Template::get('components/form-group', [
         'type' => 'text',
         'label' => 'Event added',
@@ -47,26 +53,30 @@ new DomEvent('rendering', 'user-profile-form.form-fields', function($t, $data) {
         'class' => 'bg-success',
         '_index' => 3,
     ]);
+    // we can add slots programatically like this, in this case the compoment will be parsed&cached separate from the rest
     $extraField2->addSlot('default', Template::get('components/input-group', [
         'type' => 'select',
         'options' => ['o1' => 'o1', 'o2' => 'o2'],
         'value' => 'o2',
     ]));
+    // we can have a non parsable template like this (pure php and html). It will produce a Parsed instance with no name
     $btn = Template::raw(function() {
         echo '<div class="text-right bg-success">
             <button class="btn btn-primary">Submit</button>
         </div>';
     }, ['_index' => 999]);
+    // we can remove an element
     $removed = $t->slots['form-fields'][4];
     unset($t->slots['form-fields'][4]);
     $t->slots['form-fields'][] = $extraField;
     $t->slots['form-fields'][] = $extraField2;
     $t->slots['form-fields'][] = $btn;
+    // we can change an element context and position
     $removed->data['class'] = 'bg-danger';
     $removed->render($data);
 });
 
-new DomEvent('rendering', 'components/navbar.nav-items', function($t, $data) {
+DomEvent::on('rendering', 'components/navbar.nav-items', function($t, $data) {
     $navItem = $t->addSlot('nav-items', Template::get('components/dropdown', [
         '_index' => 99,
         'text' => 'Event Added'
@@ -79,13 +89,16 @@ new DomEvent('rendering', 'components/navbar.nav-items', function($t, $data) {
     }));
 });
 
+// we can limitate by index renders like this
+// Info: returning false on event rendering component will cancel its rendering
 $x = false;
-new DomEvent('rendering', 'user-profile-form.components/card', function($t, $data) use (&$x) {
+DomEvent::on('rendering', 'user-profile-form.components/card', function($t, $data) use (&$x) {
     if ($x) {
         return;
     }
     $x = true;
     
+    // we can fully change layout, wrapping template in tabs
     $tabs = Template::get('components/tabs', [
         'tabs' => [
             'user-profile-form' => 'Form',
@@ -114,7 +127,7 @@ for ($i=0;$i<=50;$i++) {
     ];
 }
 
-new DomEvent('rendering', 'user-profile-form.components/tabs', function($t, &$data) use($products) {
+DomEvent::on('rendering', 'user-profile-form.components/tabs', function($t, &$data) use($products) {
     $data['tabs']['pics'] = 'Pictures';
     $data['products'] = $products;
     $t->addSlot('default', Template::raw(function() use ($t, $data) { ?>
@@ -123,5 +136,7 @@ new DomEvent('rendering', 'user-profile-form.components/tabs', function($t, &$da
         </div> <?php
     }));
 });
+// dom events end
 
+// the original
 Template::load('user-profile-form', $data);
