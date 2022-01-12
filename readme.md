@@ -1,4 +1,27 @@
 ## Introduction
+Tired of writing syntax like:
+```markdown
+@if | {% if %}
+    <div class="foo {{ bar }}">
+        @if | {% if %}
+            <div>
+            </div
+        @endif | {% endif %}
+    </div
+@endif | {% endif %}
+```
+in any php template engine you are using?
+If you indent control structures, soon, you will have an unreadable document. If you don't indent, you will have ambiguous control structures to follow. Where it starts. Where it ends? Want a simplified and pleasant syntax that is easy to follow and mentain? Want reusable components like form groups that are easy to interact with and set values?
+What about:
+```markdown
+<div p-if="$foo" class="foo" :class="$bar">
+    <div p-if="isset($bar)">
+        <x-form-group type="text" label="Name" :value="$name">
+    </div>
+</div>
+```
+? Is a vue.js|react.js like syntax, but in PHP.
+
 Php-templates is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax. Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). 
 
 Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to call `PhpTemplates\Template::load({path}, $data)` (path will be relative to `src_path`, without extension `template.php`) to render it. If you only want a template instance to render it later, you can call `Template::get({path}, $attrs)`, then call `render($data)`. `$attrs` will be described later, in Components section.
