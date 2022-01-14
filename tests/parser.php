@@ -18,6 +18,10 @@ Config::set('aliased', [
 Config::set('src_path', './');
 Config::set('dest_path', './results/');
 
+Config::addDirective('checked', function($eval) {
+    return $eval.' ? "checked" : ""';
+});
+
 $files = scandir('./cases');
 $files = array_diff($files, ['.', '..', './']);
 //dd(Config::all());

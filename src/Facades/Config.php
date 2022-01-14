@@ -39,6 +39,15 @@ class Config
         }
     }
     
+    public static function add($key, $value = null)
+    {
+        if (!isset(self::$data[$key])) {
+            self::$data[$key] = [$value];
+        } else {
+            self::$data[$key][] = $value;
+        }
+    }
+    
     public static function get($key, $fback = null)
     {
         if (isset(self::$data[$key])) {
@@ -54,5 +63,22 @@ class Config
         }
 
         return self::$data['aliased'][$name];
+    }
+    
+    public static function addDirective($name, $value = null)
+    {
+        self::$data['directives'][$name] = $value;
+    }
+    
+    public static function directive($name, $val)
+    {
+        if (empty(self::$data['directives'][$name])) {
+            return false;
+        }
+        $directive = self::$data['directives'][$name];
+        if (is_callable($directive)) {
+            return $directive($val);
+        }
+        return $directive;
     }
 }

@@ -3,32 +3,9 @@
 namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Facades\Config;
+use DomDocument\PhpTemplates\InvalidNodeException;
 
 class Helper {
-    public static function getTemplateName()
-    {
-        
-    }
-    
-    public static function getNodeAttributes($node, $reset = 0) {
-        $attrs = [];
-        $special = array_merge(Config::allowedControlStructures, [
-            'slot', 'is',
-        ]);
-        if ($node->nodeName === 'slot') {
-            $special[] = 'name';
-        }
-        foreach ($node->attributes ?? [] as $attr) {
-            $attrs[$attr->nodeName] = $attr->nodeValue;
-            if ($reset === 1) {
-                $node->removeAttribute($attr->nodeName);
-            } 
-            elseif ($reset === 2 && in_array($attr->nodeName, $special)) {
-                $node->removeAttribute($attr->nodeName);
-            }
-        }
-        return $attrs;
-    }
     
     public static function nodeStdClass($node, $context = '')
     {
@@ -48,7 +25,10 @@ class Helper {
         }
         $result->slot = 'default';
         
-        foreach (self::getNodeAttributes($node) as $k => $val) {
+        $attrs = $node->attributes ? $node->attributes : [];
+        foreach ($attrs as $attr) {
+            $k = $attr->nodeName;
+            $val = $attr->nodeValue;
             if (in_array($k, $specials)) {
                 $result->$k = $val;
             }
@@ -66,17 +46,14 @@ class Helper {
             }
         }
         
-        // validari
-        // if ($node->nodeName === 'component') {
-        //     if (empty($result->is)) {
-        //         //dd($result);
-        //         throw new \Exception('aaaa');
-        //     }
-        // }
         if ($node->nodeName === 'slot') {
             if (!$result->name) {
                 $result->name = 'default';
             }
+        }
+        
+        if ($node->nodeName === 'block' && empty($result->name)) {
+            throw new InvalidNodeException("Block node should have a 'name=\"value\"' attribute", $node);
         }
         
         return $result;
@@ -88,19 +65,10 @@ class Helper {
             return null;
         }
         if ($node->nodeName === 'component') {
-            $attrs = self::getNodeAttributes($node);
-            if (isset($attrs['is'])) {
-                return $attrs['is'];
-            }
-            return null;
+            return $node->getAttribute('is');
         }
 
         return Config::getComponentByAlias($node->nodeName);
-    }
-    
-    public function removeNodeAttributes($node, $all = true)
-    {
-        // remove all attrs, or all special project attrs
     }
     
     public static function arrayToEval(array $arr, $simple = false, $unescape = ':')

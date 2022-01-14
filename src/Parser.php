@@ -26,7 +26,7 @@ class Parser
      * as root, comp, slot
      */
     public function parse($dom = null)
-    {//doc va fi cel care incarca fisierele cu file get content, ii face replace uri escape si isi pune replace list
+    {
         $trimHtml = false;
         if (!$dom || Helper::isComponent($dom)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
@@ -71,11 +71,7 @@ class Parser
             $htmlString = $dom->saveHtml();
         }
         // make replaces
-        //$htmlString = html_entity_decode($htmlString);
-        //cel mai safe, fac parse la tot ce e intre tag uri de php cu preg replace callback si deco
-        //apoi decode dupa pattern ul :\w="", sau '', decode
-        //dd(11, $htmlString);
-        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);//dd($htmlString);
+        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
         $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 return "<?php echo htmlspecialchars($eval); ?>";
@@ -83,7 +79,6 @@ class Parser
             return '';
         }, $htmlString);
 
-        // default register aici
         $htmlString = CodeBuffer::getTemplateFunction($htmlString);
         $this->document->templates[$this->name] = $htmlString;
     }
@@ -92,7 +87,6 @@ class Parser
     {
         $return = true;
         $nodeData = Helper::nodeStdClass($node);
-        // daca e un deep, degeaba il montez
         if ($node->nodeName === 'slot') {
             (new Slot($this->document))->mount($node);
         } 
@@ -106,7 +100,6 @@ class Parser
             (new AnonymousComponent($this->document))->mount($node);
         }
         else {
-            //d($this->name, $node->nodeName, Helper::nodeStdClass($node)->statements);
             $this->parseSimpleNode($node);
             $return = false;
         }
@@ -138,18 +131,19 @@ class Parser
                     $rid = '__r'.uniqid();
                     $this->document->tobereplaced[$rid] = "<?php echo ({$attr->nodeValue}); ?>";
                     $node->setAttribute($rid, '__empty__');
-                    $toberemoved[] = $k;
-                    continue;
                 }
                 elseif ($expr === 'bind') {
                     $rid = '__r'.uniqid();
                     $this->document->tobereplaced[$rid] = "<?php foreach({$attr->nodeValue} as ".'$k=>$v) echo "$k=\"$v\" "; ?>';
                     $node->setAttribute($rid, '__empty__');
-                    $toberemoved[] = $k;
-                    continue;
                 }
                 elseif (in_array($expr, Config::allowedControlStructures)) {
                     $this->controlStructure($expr, $attr->nodeValue, $node);
+                }
+                elseif ($custom = Config::directive($expr, $attr->nodeValue)) {
+                    $rid = '__r'.uniqid();
+                    $this->document->tobereplaced[$rid] = "<?php echo $custom; ?>";
+                    $node->setAttribute($rid, '__empty__');
                 }
 
                 $toberemoved[] = $k;
@@ -246,13 +240,7 @@ class Parser
     
     protected function extends($extends)
     {
-        //$extendedLayout = $extends->getAttribute('layout');
         $extendedTemplate = $extends->getAttribute('template');
-        //$extendMethod = $extendedLayout ? 'getLayout' : 'getTemplate';
-        //$extended = $extendedLayout ? $extendedLayout : $extendedTemplate;
-        // document registerEvent( cu urmatorul format)
-            // template va asimila Component si are un event pe new care se asigura ca parseaza ce primeste, in cazul in care nu exista inregistrat (sloturile fac register mai inainte)
-        // actualul component
         (new Parser($this->document, $extendedTemplate))->parse();
         
         $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
