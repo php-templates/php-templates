@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpTemplates\Facades;
+namespace PhpTemplates;
 
 class Config
 {

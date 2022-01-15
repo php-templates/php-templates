@@ -63,7 +63,7 @@ class Helper {
         if (!@$node->nodeName) {
             return null;
         }
-        if ($node->nodeName === 'component') {
+        if ($node->nodeName === 'template') {
             return $node->getAttribute('is');
         }
 

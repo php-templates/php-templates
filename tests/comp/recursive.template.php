@@ -1,5 +1,5 @@
 <div>
     <div>
-        <component is="comp/recursive"></component>
+        <template is="comp/recursive"></template>
     </div>
 </div>

@@ -10,7 +10,7 @@
     </head>
     
     <body>
-        <component is="components/navbar"></component>
+        <template is="components/navbar"></template>
         <slot></slot>
     </body>
 </html>

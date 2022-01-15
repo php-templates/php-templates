@@ -19,7 +19,7 @@ $false = false;
 -----
 
 <div class="x" p-foreach="$array as $a">
-    <component is="comp/simple"></component>
+    <template is="comp/simple"></template>
 </div>
 =====
 <div class="x">
@@ -36,7 +36,7 @@ $false = false;
 -----
 
 <div class="x">
-    <component is="comp/simple" p-foreach="$array as $a"></component>
+    <template is="comp/simple" p-foreach="$array as $a"></template>
 </div>
 =====
 <div class="x">
@@ -50,9 +50,9 @@ $false = false;
 
 -----
 
-<component is="comp/simple" p-foreach="$array as $a">
+<template is="comp/simple" p-foreach="$array as $a">
     comp/simple
-</component>
+</template>
 =====
 <div class="comp/simple">
     comp/simple
@@ -64,7 +64,7 @@ $false = false;
 -----
 
 <!-- composed component, lvl1 -->
-<component is="comp/c"></component>
+<template is="comp/c"></template>
 =====
 <div class="comp/simple">
     comp/simple
@@ -103,20 +103,20 @@ $false = false;
 
 -----
 
-<component is="comp/csf">x2</component>
+<template is="comp/csf">x2</template>
 =====
 <div class="comp_slot">x2x2</div>
 
 -----
 
-<component is="comp/csf"><p>1</p></component>
+<template is="comp/csf"><p>1</p></template>
 =====
 <div class="comp_slot"><p>1</p><p>1</p></div>
 
 -----
 
 <!-- slot default csdf -->
-<component is="comp/csdf"></component>
+<template is="comp/csdf"></template>
 =====
 <div class="comp_slot_default">
     <span>
@@ -158,14 +158,14 @@ $false = false;
 
 -----
 
-<component is="comp/cns">
+<template is="comp/cns">
     <span class="x" slot="sn" p-for="$i=0;$i<2;$i++"></span>
     <span class="y" slot="sn1"></span>
     <p slot="sn3">3</p>
-    <component is="comp/simple" slot="sn5"></component>
+    <template is="comp/simple" slot="sn5"></template>
     <span slot="sn8">8</span>
     <p slot="sn9">9</p>
-</component>
+</template>
 =====
 <div class="sdefsdef">
     <span>
@@ -214,7 +214,7 @@ $false = false;
 
 -----
 
-<component is="comp/simple" p-if="$true"></component>
+<template is="comp/simple" p-if="$true"></template>
 <elseif p-elseif="$true"></elseif>
 =====
 <div class="comp/simple">
@@ -223,7 +223,7 @@ $false = false;
 
 -----
 
-<component is="comp/simple" p-if="$false"></component>
+<template is="comp/simple" p-if="$false"></template>
 <elseif p-elseif="$true"></elseif>
 =====
 <elseif></elseif>

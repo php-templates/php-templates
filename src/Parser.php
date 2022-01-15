@@ -98,7 +98,7 @@ class Parser
         elseif ($name = Helper::isComponent($node)) {
             (new Component($this->document, $name))->mount($node);
         }
-        elseif ($node->nodeName === 'component') {
+        elseif ($node->nodeName === 'template') {
             (new AnonymousComponent($this->document))->mount($node);
         }
         else {

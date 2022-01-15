@@ -1,4 +1,4 @@
-<component is="extends/a"></component>
+<template is="extends/a"></template>
 =====
 <parent>
     <div>123</div>
@@ -11,7 +11,7 @@
 
 <!-- pass data to extended template -->
 <?php $data['bind_me'] = 'bound'; ?>
-<component is="extends/b"></component>
+<template is="extends/b"></template>
 =====
 <parent2>
     bound
@@ -21,7 +21,7 @@
 -----
 
 <!-- multi-extends -->
-<component is="extends/c"></component>
+<template is="extends/c"></template>
 =====
 <parent4>
     parent4

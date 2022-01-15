@@ -7,7 +7,7 @@
 -----
 
 <!-- composed component, lvl1 -->
-<component is="comp/composed"></component>
+<template is="comp/composed"></template>
 =====
 <div class="comp/simple">
     comp/simple

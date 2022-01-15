@@ -19,13 +19,15 @@ Parsed::$templates['comp/composed'] = function ($data, $slots) {
     <span>
         <?php $comp0 = Parsed::template('comp/simple', []);
 
-    $comp0->render($data); ?></span>
+    $comp0->render($data); ?>
+    </span>
 </div><?php 
 };
 Parsed::$templates['./cases/component'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
      ?><!DOCTYPE html>
-<html><body><div class="comp/simple">     comp/simple </div>
+<html>
+<body><div class="comp/simple">     comp/simple </div>
 
 -----
 

@@ -1,3 +1,3 @@
 <x-card>
-    <component is="components/table"></component>
+    <template is="components/table"></template>
 </x-card>

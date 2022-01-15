@@ -1,7 +1,7 @@
 
-<component is="block/a">
+<template is="block/a">
     <a22 slot="a2" _index="99">a22</a22>
-</component>
+</template>
 =====
 <a>
     <a11></a11>
@@ -11,9 +11,9 @@
 
 -----
 
-<component is="block/a">
+<template is="block/a">
     <a22 slot="a2" p-foreach="[1,2] as $a" _index="99">a22</a22>
-</component>
+</template>
 =====
 <a>
     <a11></a11>
@@ -25,11 +25,11 @@
 -----
 
 <!-- block in block la infinit -->
-<component is="block/b">
+<template is="block/b">
     <b12 slot="b1" _index="1.5"></b12>
     <b122 slot="b12" _index="1.5"></b122>
     <b1222 slot="b122" _index="99"></b1222>
-</component>
+</template>
 =====
 <b>
     <b11></b11>
@@ -46,11 +46,11 @@
 -----
 
 <!-- block as direct slot -->
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <block name="b1">
         <b11>123</b11>
     </block>
-</component>
+</template>
 =====
 <div class="comp_slot">
     <span><b11>123</b11></span>
@@ -59,13 +59,13 @@
 -----
 
 <!-- block as indirect slot -->
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <div>
         <block name="b1">
             <b11>123</b11>
         </block>
     </div>
-</component>
+</template>
 =====
 <div class="comp_slot">
     <span>
@@ -91,7 +91,7 @@
 
 <!-- component as block item -->
 <block name="b1" p-foreach="[1,2] as $k" :k="$k">
-    <component is="comp/simple"></component>
+    <template is="comp/simple"></template>
 </block>
 =====
 <div class="comp/simple">

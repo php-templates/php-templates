@@ -9,7 +9,8 @@ Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     foreach ($slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
-    } ?></parent2><?php 
+    } ?>
+</parent2><?php 
 };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
@@ -18,7 +19,8 @@ Parsed::$templates['extends/b'] = function ($data, $slots) {
 Parsed::$templates['./cases/4'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['data','comp0',])));
      ?><!DOCTYPE html>
-<html><body><?php $data['bind_me'] = 'bound';  $comp0 = Parsed::template('extends/b', []);
+<html>
+<body><?php $data['bind_me'] = 'bound';  $comp0 = Parsed::template('extends/b', []);
 
     $comp0->render($data); ?>
 

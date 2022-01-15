@@ -1,10 +1,8 @@
 modificat mesaje erori, afisat sintaxa erori de elseif si else daca el de deasupra nu are if
 
-de modificat tag de <component> in <template>
 slot pass aliased value to instance attr pe  slot deci
 i bloc sa inceapa de la 1
 comp va deveni this comp
-modifica ns
 
 docs:
     limitari, totul sa se intample in tag urri, valide attrs

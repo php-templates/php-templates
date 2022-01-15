@@ -1,6 +1,6 @@
 <!-- pass data to extended template -->
 <?php $data['bind_me'] = 'bound'; ?>
-<component is="extends/b"></component>
+<template is="extends/b"></template>
 =====
 <parent2>
     bound

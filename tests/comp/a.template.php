@@ -1,8 +1,8 @@
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <p>xjd</p>
     <slot name="sn9">
         djdh
-        <component is="comp/simple"></component>
+        <template is="comp/simple"></template>
     </slot>
     <p>hdhd</p>
-</component>
+</template>

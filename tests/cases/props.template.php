@@ -13,25 +13,25 @@ $false = 0;
 -----
 
 <!-- component with extra props -->
-<component is="props/a" foo="$foo" :bar="$bar" :true="$true"></component>
+<template is="props/a" foo="$foo" :bar="$bar" :true="$true"></template>
 =====
 <a true="1"></a>
 
 -----
 
 <!-- bindings in component -->
-<component is="props/b" :true="$true" false="$false" foo="$foo"></component>
+<template is="props/b" :true="$true" false="$false" foo="$foo"></template>
 =====
 <b true="1"><bind false="$false" foo="$foo"></bind></b>
 
 -----
 
 <!-- bind from slot to surface -->
-<component is="props/c">
-    <component>
+<template is="props/c">
+    <template>
         <div p-foreach="$val as $v">{{ $name.$v }}</div>
-    </component>
-</component>
+    </template>
+</template>
 =====
 <c>
     <div>myname1</div>
@@ -41,9 +41,9 @@ $false = 0;
 -----
 
 <!-- bind data to a component slot -->
-<component is="props/c">
-    <component is="comp/comp_slot">{{ $name }}</component>
-</component>
+<template is="props/c">
+    <template is="comp/comp_slot">{{ $name }}</template>
+</template>
 =====
 <c>
     <div class="comp_slot">

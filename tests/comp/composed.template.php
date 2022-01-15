@@ -1,8 +1,8 @@
-<component is="comp/simple"></component>
+<template is="comp/simple"></template>
 <div class="comp/composed">
-    <component is="comp/simple"></component>
+    <template is="comp/simple"></template>
     comp/simple
     <span>
-        <component is="comp/simple"></component>
+        <template is="comp/simple"></template>
     </span>
 </div>

@@ -12,11 +12,11 @@ Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     } ?></span>
 </div><?php 
 };
-Parsed::$templates['block_b1_slot?id=61df0d3b2791d'] = function ($data, $slots) {
+Parsed::$templates['block_b1_slot?id=61e31666100da'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b11>123</b11><?php 
 };
-Parsed::$templates['b1?id=61df0d3b278bf'] = function ($data, $slots) {
+Parsed::$templates['b1?id=61e3166610079'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
       $this->block['b1'] = Parsed::raw('b1', function($data, $slots) {
             extract($data);
@@ -31,19 +31,21 @@ Parsed::$templates['b1?id=61df0d3b278bf'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61df0d3b2791d', ['_index' => '0']))->setSlots($slots);
+$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61e31666100da', ['_index' => '0']))->setSlots($slots);
 $this->block['b1']->render($data);  
 };
-Parsed::$templates['comp/comp_slot_slot_default?id=61df0d3b277da'] = function ($data, $slots) {
+Parsed::$templates['comp/comp_slot_slot_default?id=61e316660ffca'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
      ?><div>
-        <?php Parsed::template('b1?id=61df0d3b278bf', [])->setSlots($slots)->render($data); ?></div><?php 
+        <?php Parsed::template('b1?id=61e3166610079', [])->setSlots($slots)->render($data); ?>
+    </div><?php 
 };
 Parsed::$templates['./cases/2'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','comp1','slots','data',])));
      ?><!DOCTYPE html>
-<html><body><?php $comp0 = Parsed::template('comp/comp_slot', []);
-$comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot_slot_default?id=61df0d3b277da', []));
+<html>
+<body><?php $comp0 = Parsed::template('comp/comp_slot', []);
+$comp1 = $comp0->addSlot('default', Parsed::template('comp/comp_slot_slot_default?id=61e316660ffca', []));
 
     $comp1->setSlots($slots);
     $comp0->render($data); ?>

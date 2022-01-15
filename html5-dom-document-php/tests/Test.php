@@ -266,9 +266,9 @@ class Test extends PHPUnit\Framework\TestCase
 
         // Custom tag
         $dom = new HTML5DOMDocument();
-        $dom->insertHTML('<component></component>');
+        $dom->insertHTML('<template></template>');
         $expectedSource = '<!DOCTYPE html>' . "\n" . '<html><body>'
-            . '<component></component>'
+            . '<template></template>'
             . '</body></html>';
         $this->assertTrue($expectedSource === $dom->saveHTML());
 
@@ -804,36 +804,36 @@ class Test extends PHPUnit\Framework\TestCase
     public function testSaveHTMLForNodes()
     {
         // A custom html tags makes the default saveHTML function return more whitespaces
-        $html = '<html><head><component><script src="url1"/><script src="url2"/></component></head><body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div>';
+        $html = '<html><head><template><script src="url1"/><script src="url2"/></template></head><body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div>';
 
         $dom = new HTML5DOMDocument();
         $dom->loadHTML($html);
 
-        $expectedOutput = '<div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div>';
+        $expectedOutput = '<div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('div')) === $expectedOutput);
 
-        $expectedOutput = '<body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div></body>';
+        $expectedOutput = '<body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div></body>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('div')->parentNode) === $expectedOutput);
 
-        $expectedOutput = '<html><head><component><script src="url1"></script><script src="url2"></script></component></head><body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div></body></html>';
+        $expectedOutput = '<html><head><template><script src="url1"></script><script src="url2"></script></template></head><body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div></body></html>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('div')->parentNode->parentNode) === $expectedOutput);
 
-        $expectedOutput = '<!DOCTYPE html>' . "\n" . '<html><head><component><script src="url1"></script><script src="url2"></script></component></head><body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div></body></html>';
+        $expectedOutput = '<!DOCTYPE html>' . "\n" . '<html><head><template><script src="url1"></script><script src="url2"></script></template></head><body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div></body></html>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('div')->parentNode->parentNode->parentNode) === $expectedOutput);
 
         $expectedOutput = '<script src="url1"></script>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('script')) === $expectedOutput);
 
-        $expectedOutput = '<component><script src="url1"></script><script src="url2"></script></component>';
+        $expectedOutput = '<template><script src="url1"></script><script src="url2"></script></template>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('script')->parentNode) === $expectedOutput);
 
-        $expectedOutput = '<head><component><script src="url1"></script><script src="url2"></script></component></head>';
+        $expectedOutput = '<head><template><script src="url1"></script><script src="url2"></script></template></head>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('script')->parentNode->parentNode) === $expectedOutput);
 
-        $expectedOutput = '<html><head><component><script src="url1"></script><script src="url2"></script></component></head><body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div></body></html>';
+        $expectedOutput = '<html><head><template><script src="url1"></script><script src="url2"></script></template></head><body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div></body></html>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('script')->parentNode->parentNode->parentNode) === $expectedOutput);
 
-        $expectedOutput = '<!DOCTYPE html>' . "\n" . '<html><head><component><script src="url1"></script><script src="url2"></script></component></head><body><div><component><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></component></div></body></html>';
+        $expectedOutput = '<!DOCTYPE html>' . "\n" . '<html><head><template><script src="url1"></script><script src="url2"></script></template></head><body><div><template><ul><li><a href="#">Link 1</a></li><li><a href="#">Link 2</a></li></ul></template></div></body></html>';
         $this->assertTrue($dom->saveHTML($dom->querySelector('script')->parentNode->parentNode->parentNode->parentNode) === $expectedOutput);
     }
 

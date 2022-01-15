@@ -58,7 +58,7 @@ class Component extends Parser implements Mountable
                         (new Slot($this->document, 0, true))->_mount($slotNode, $this->codebuffer);
                     }
                     // case anonymous component
-                    elseif ($slotNode->nodeName === 'component' && !$slotNode->getAttribute('is')) {
+                    elseif ($slotNode->nodeName === 'template' && !$slotNode->getAttribute('is')) {
                         (new AnonymousComponent($this->document))->_mount($slotNode, $this->codebuffer);
                     }
                     elseif ($slotNode->nodeName === 'block') {

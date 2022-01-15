@@ -1,6 +1,6 @@
 <!-- multi-extends -->
 <?php $data['bind_me'] = 'bound'; ?>
-<component is="extends/c"></component>
+<template is="extends/c"></template>
 =====
 <parent4>
     parent4

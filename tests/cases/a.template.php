@@ -1,6 +1,6 @@
-<component is="comp/a">
+<template is="comp/a">
     <p slot="sn9">9</p>
-</component>
+</template>
 =====
 <div class="comp_slot">
     <span>

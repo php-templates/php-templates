@@ -7,34 +7,34 @@
 </div>
 
 <div class="sdefsdef">
-    <slot name="sn3"><span><slot name="sn4"><component is="comp/simple"></component></slot></span></slot>
+    <slot name="sn3"><span><slot name="sn4"><template is="comp/simple"></template></slot></span></slot>
 </div>
 
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <slot name="sn5">
-        <component is="comp/simple"></component>
+        <template is="comp/simple"></template>
     </slot>
-</component>
+</template>
 
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <slot name="sn6">
         <slot name="sn7"></slot>
     </slot>
-</component>
+</template>
 
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <div class="x">
         <slot name="sn8">
-            <component is="comp/simple"></component>
+            <template is="comp/simple"></template>
         </slot>
     </div>
-</component>
+</template>
 
-<component is="comp/comp_slot">
+<template is="comp/comp_slot">
     <p>xjd</p>
     <slot name="sn9" p-foreach="[1] as $a">
         djdh
-        <component is="comp/simple"></component>
+        <template is="comp/simple"></template>
     </slot>
     <p>hdhd</p>
-</component>
+</template>
