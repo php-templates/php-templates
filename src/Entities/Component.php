@@ -69,7 +69,7 @@ class Component extends Parser implements Mountable
                     }
                 }
             }
-            $this->codebuffer->raw('$comp0->render($data);');
+            $this->codebuffer->raw('$this->comp[0]->render($data);');
         });
     }
     
@@ -100,7 +100,7 @@ class Component extends Parser implements Mountable
                 }
             } else {
                 $next = $i+1; // anticipam urmatoarea variabila pentru 
-                $this->codebuffer->raw("\$comp{$next}->setSlots(\$slots);");
+                $this->codebuffer->raw("\$this->comp[{$next}]->setSlots(\$slots);");
             }
         //});
     }

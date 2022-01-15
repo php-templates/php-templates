@@ -15,6 +15,8 @@ class Parsed
     protected $func;
     protected $rendered = false;
     
+    public $comp = []; // for avoiding polluting scope
+    
     public static function template($name, $data = [])
     {
         return new self($name, self::$templates[$name], $data);

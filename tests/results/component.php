@@ -8,23 +8,23 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
 </div><?php 
 };
 Parsed::$templates['comp/composed'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
-      $comp0 = Parsed::template('comp/simple', []);
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data',])));
+      $this->comp[0] = Parsed::template('comp/simple', []);
 
-    $comp0->render($data); ?><div class="comp/composed">
-    <?php $comp0 = Parsed::template('comp/simple', []);
+    $this->comp[0]->render($data); ?><div class="comp/composed">
+    <?php $this->comp[0] = Parsed::template('comp/simple', []);
 
-    $comp0->render($data); ?>
+    $this->comp[0]->render($data); ?>
     comp/simple
     <span>
-        <?php $comp0 = Parsed::template('comp/simple', []);
+        <?php $this->comp[0] = Parsed::template('comp/simple', []);
 
-    $comp0->render($data); ?>
+    $this->comp[0]->render($data); ?>
     </span>
 </div><?php 
 };
 Parsed::$templates['./cases/component'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data',])));
      ?><!DOCTYPE html>
 <html>
 <body><div class="comp/simple">     comp/simple </div>
@@ -33,9 +33,9 @@ Parsed::$templates['./cases/component'] = function ($data, $slots) {
 
 
 
-<?php $comp0 = Parsed::template('comp/composed', []);
+<?php $this->comp[0] = Parsed::template('comp/composed', []);
 
-    $comp0->render($data); ?>
+    $this->comp[0]->render($data); ?>
 
 -----</body></html><?php 
 };

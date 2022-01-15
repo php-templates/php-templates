@@ -2,24 +2,24 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 Parsed::$templates['extends/parent4'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','this','slot','data',])));
      ?><parent4>
     parent4
     <?php echo htmlspecialchars($bind_me);  
-    if (!empty($slots["default"])) {
-    foreach ($slots['default'] as $slot) {
+    if (!empty($this->slots["default"])) {
+    foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
     } ?>
 </parent4><?php 
 };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','this','slot','data',])));
      ?><parent3>
     parent3
     <?php echo htmlspecialchars($bind_me);  
-    if (!empty($slots["default"])) {
-    foreach ($slots['default'] as $slot) {
+    if (!empty($this->slots["default"])) {
+    foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($data, []));
     }
     } ?>
@@ -30,12 +30,12 @@ Parsed::$templates['extends/c'] = function ($data, $slots) {
      ?><b></b><?php 
 };
 Parsed::$templates['./cases/5'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['data','comp0',])));
+    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['data','this',])));
      ?><!DOCTYPE html>
 <html>
-<body><?php $data['bind_me'] = 'bound';  $comp0 = Parsed::template('extends/c', []);
+<body><?php $data['bind_me'] = 'bound';  $this->comp[0] = Parsed::template('extends/c', []);
 
-    $comp0->render($data); ?>
+    $this->comp[0]->render($data); ?>
 
 -----</body></html><?php 
 };

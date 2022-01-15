@@ -28,27 +28,27 @@ class CodeBuffer
         //nu trb sa fie asa, trb scos la suprafata na
         $data = Helper::arrayToEval($nodeData);
         $this->checkInit();
-        $this->buffer .= "\$comp0 = Parsed::template('$name', $data);".PHP_EOL;
+        $this->buffer .= "\$this->comp[0] = Parsed::template('$name', $data);".PHP_EOL;
     }
      
     public function slot(int $i, string $pos, string $name, $nodeData) {
         $data = Helper::arrayToEval($nodeData);
         $this->checkInit();
         $next = $i+1;
-        $this->buffer .= "\$comp{$next} = \$comp{$i}->addSlot('$pos', Parsed::template('$name', $data));".PHP_EOL;
+        $this->buffer .= "\$this->comp[{$next}] = \$this->comp[{$i}]->addSlot('$pos', Parsed::template('$name', $data));".PHP_EOL;
     }
     
     public function block($name) {
         $this->checkInit();
         $this->buffer .= "\$this->block['$name'] = Parsed::raw('$name', function(\$data, \$slots) {
             extract(\$data);
-            if (isset(\$slots['$name'])) {
-                usort(\$slots['$name'], function(\$a, \$b) {
+            if (isset(\$this->slots['$name'])) {
+                usort(\$this->slots['$name'], function(\$a, \$b) {
                     \$i1 = isset(\$a->data['_index']) ? \$a->data['_index'] : 0;
                     \$i2 = isset(\$b->data['_index']) ? \$b->data['_index'] : 0;
                     return \$i1 - \$i2;
                 });
-                foreach (\$slots['$name'] as \$slot) {
+                foreach (\$this->slots['$name'] as \$slot) {
                     \$slot->render(\$data);
                 }
             }

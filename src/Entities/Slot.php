@@ -49,13 +49,13 @@ class Slot extends Parser implements Mountable
 
         $this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $node) {
             if (!$this->nest) {
-                //$this->codebuffer->raw("DomEvent::event('renderingSlots', '$this->name', \$slots['$this->name'] ?? [], []);");
+                //$this->codebuffer->raw("DomEvent::event('renderingSlots', '$this->name', \$this->slots['$this->name'] ?? [], []);");
             }
-            $this->codebuffer->if('!empty($slots["'.$this->name.'"])', function() use ($nodeData) {
-                $this->codebuffer->foreach("\$slots['$this->name'] as \$slot", function() use ($nodeData) {
+            $this->codebuffer->if('!empty($this->slots["'.$this->name.'"])', function() use ($nodeData) {
+                $this->codebuffer->foreach("\$this->slots['$this->name'] as \$slot", function() use ($nodeData) {
                     $dataString = Helper::arrayToEval($nodeData->attributes);
                     if ($this->nest) {
-                        $this->codebuffer->raw("\$comp{$this->i}->addSlot('{$nodeData->slot}', \$slot);");
+                        $this->codebuffer->raw("\$this->comp[{$this->i}]->addSlot('{$nodeData->slot}', \$slot);");
                     } else {
                         $this->codebuffer->raw('$slot->render(array_merge($data, '.$dataString.'));');
                     }
@@ -80,8 +80,8 @@ class Slot extends Parser implements Mountable
                             (new Parser($this->document, $_name))->parse($_node);
                             $this->codebuffer->nestedExpression($_nodeData->statements, function() use ($_name, $_nodeData) {
                                 $this->codebuffer->component($_name, $_nodeData->attributes);
-                                $this->codebuffer->raw('$comp0->setSlots($slots);');
-                                $this->codebuffer->raw('$comp0->render($data);');
+                                $this->codebuffer->raw('$this->comp[0]->setSlots($slots);');
+                                $this->codebuffer->raw('$this->comp[0]->render($data);');
                             });
                         }
                     }
