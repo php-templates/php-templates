@@ -36,6 +36,7 @@ class Parser
             $dom = new HTML5DOMDocument;
             $dom->substituteEntities = false;
             $dom->formatOutput = true;
+            $dom->xyz = 123;
             $html = file_get_contents($srcFile);
             $html = $this->escapeSpecialCharacters($html);
             $html = $this->removeHtmlComments($html);
@@ -50,7 +51,8 @@ class Parser
             $container = new HTML5DOMDocument;
             $dom = $container->importNode($dom, true);
             $container->appendChild($dom);
-            $dom = $container; unset($container);
+            $dom = $container;
+            $dom->xyz = 123;
         }
 
         $this->parseNode($dom);
@@ -257,6 +259,10 @@ class Parser
     {
         $body = $dom->getElementsByTagName('body')->item(0);
 
+        if (!$body) {
+            return '';
+        }
+        
         $content = '';
         foreach ($body->childNodes as $node)
         {

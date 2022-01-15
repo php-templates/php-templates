@@ -3,7 +3,6 @@
 namespace DomDocument\PhpTemplates;
 
 use DomDocument\PhpTemplates\Facades\Config;
-use DomDocument\PhpTemplates\InvalidNodeException;
 
 class Helper {
     
