@@ -1,7 +1,7 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61e319025952b'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61e31e45f0786'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><div>123</div><?php 
 };
@@ -14,7 +14,7 @@ Parsed::$templates['extends/parent'] = function ($data, $slots) {
     $slot->render(array_merge($data, []));
     }
     }
-    else  {$this->comp[0] = Parsed::template('slot_default?id=61e319025952b', []);
+    else  {$this->comp[0] = Parsed::template('slot_default?id=61e31e45f0786', []);
 
     $this->comp[0]->setSlots($slots);
     $this->comp[0]->render($data);

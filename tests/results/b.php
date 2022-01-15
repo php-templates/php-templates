@@ -1,19 +1,19 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
-Parsed::$templates['block_b1_slot?id=61e318ffd416f'] = function ($data, $slots) {
+Parsed::$templates['block_b1_slot?id=61e31e43b7412'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b11></b11><?php 
 };
-Parsed::$templates['block_b12_slot?id=61e318ffd440b'] = function ($data, $slots) {
+Parsed::$templates['block_b12_slot?id=61e31e43b7661'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b121></b121><?php 
 };
-Parsed::$templates['block_b122_slot?id=61e318ffd46d3'] = function ($data, $slots) {
+Parsed::$templates['block_b122_slot?id=61e31e43b78db'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b1221></b1221><?php 
 };
-Parsed::$templates['b122?id=61e318ffd467a'] = function ($data, $slots) {
+Parsed::$templates['b122?id=61e31e43b7888'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
       $this->block['b122'] = Parsed::raw('b122', function($data, $slots) {
             extract($data);
@@ -28,16 +28,16 @@ Parsed::$templates['b122?id=61e318ffd467a'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b122']->addSlot('b122', Parsed::template('block_b122_slot?id=61e318ffd46d3', ['_index' => '0']))->setSlots($slots);
+$this->block['b122']->addSlot('b122', Parsed::template('block_b122_slot?id=61e31e43b78db', ['_index' => '1']))->setSlots($slots);
 $this->block['b122']->render($data);  
 };
-Parsed::$templates['block_b12_slot?id=61e318ffd45b1'] = function ($data, $slots) {
+Parsed::$templates['block_b12_slot?id=61e31e43b77c3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
      ?><n>
-            <?php Parsed::template('b122?id=61e318ffd467a', [])->setSlots($slots)->render($data); ?>
+            <?php Parsed::template('b122?id=61e31e43b7888', [])->setSlots($slots)->render($data); ?>
             </n><?php 
 };
-Parsed::$templates['b12?id=61e318ffd43b0'] = function ($data, $slots) {
+Parsed::$templates['b12?id=61e31e43b75fd'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
       $this->block['b12'] = Parsed::raw('b12', function($data, $slots) {
             extract($data);
@@ -52,11 +52,11 @@ Parsed::$templates['b12?id=61e318ffd43b0'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b12']->addSlot('b12', Parsed::template('block_b12_slot?id=61e318ffd440b', ['_index' => '0']))->setSlots($slots);
-$this->block['b12']->addSlot('b12', Parsed::template('block_b12_slot?id=61e318ffd45b1', ['_index' => '1']))->setSlots($slots);
+$this->block['b12']->addSlot('b12', Parsed::template('block_b12_slot?id=61e31e43b7661', ['_index' => '1']))->setSlots($slots);
+$this->block['b12']->addSlot('b12', Parsed::template('block_b12_slot?id=61e31e43b77c3', ['_index' => '2']))->setSlots($slots);
 $this->block['b12']->render($data);  
 };
-Parsed::$templates['b1?id=61e318ffd410f'] = function ($data, $slots) {
+Parsed::$templates['b1?id=61e31e43b73b5'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
       $this->block['b1'] = Parsed::raw('b1', function($data, $slots) {
             extract($data);
@@ -71,15 +71,15 @@ Parsed::$templates['b1?id=61e318ffd410f'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61e318ffd416f', ['_index' => '0']))->setSlots($slots);
-$this->block['b1']->addSlot('b1', Parsed::template('b12?id=61e318ffd43b0', ['_index' => '1']))->setSlots($slots);
+$this->block['b1']->addSlot('b1', Parsed::template('block_b1_slot?id=61e31e43b7412', ['_index' => '1']))->setSlots($slots);
+$this->block['b1']->addSlot('b1', Parsed::template('b12?id=61e31e43b75fd', ['_index' => '2']))->setSlots($slots);
 $this->block['b1']->render($data);  
 };
-Parsed::$templates['block_b2_slot?id=61e318ffd4db0'] = function ($data, $slots) {
+Parsed::$templates['block_b2_slot?id=61e31e43b7f21'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b21></b21><?php 
 };
-Parsed::$templates['b2?id=61e318ffd4d51'] = function ($data, $slots) {
+Parsed::$templates['b2?id=61e31e43b7ed1'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['this','data','slots','a','b','i1','i2','slot',])));
       $this->block['b2'] = Parsed::raw('b2', function($data, $slots) {
             extract($data);
@@ -94,24 +94,24 @@ Parsed::$templates['b2?id=61e318ffd4d51'] = function ($data, $slots) {
                 }
             }
         })->setSlots($slots);
-$this->block['b2']->addSlot('b2', Parsed::template('block_b2_slot?id=61e318ffd4db0', ['_index' => '0']))->setSlots($slots);
+$this->block['b2']->addSlot('b2', Parsed::template('block_b2_slot?id=61e31e43b7f21', ['_index' => '1']))->setSlots($slots);
 $this->block['b2']->render($data);  
 };
 Parsed::$templates['block/b'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','data',])));
      ?><b>
-    <?php Parsed::template('b1?id=61e318ffd410f', [])->setSlots($slots)->render($data); ?>
-</b><?php Parsed::template('b2?id=61e318ffd4d51', [])->setSlots($slots)->render($data);  
+    <?php Parsed::template('b1?id=61e31e43b73b5', [])->setSlots($slots)->render($data); ?>
+</b><?php Parsed::template('b2?id=61e31e43b7ed1', [])->setSlots($slots)->render($data);  
 };
-Parsed::$templates['block/b_slot_b1?id=61e318ffd57bd'] = function ($data, $slots) {
+Parsed::$templates['block/b_slot_b1?id=61e31e43b8ba3'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b12></b12><?php 
 };
-Parsed::$templates['block/b_slot_b12?id=61e318ffd5950'] = function ($data, $slots) {
+Parsed::$templates['block/b_slot_b12?id=61e31e43b8d27'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b122></b122><?php 
 };
-Parsed::$templates['block/b_slot_b122?id=61e318ffd5ae6'] = function ($data, $slots) {
+Parsed::$templates['block/b_slot_b122?id=61e31e43b8e86'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b1222></b1222><?php 
 };
@@ -120,11 +120,11 @@ Parsed::$templates['./cases/b'] = function ($data, $slots) {
      ?><!DOCTYPE html>
 <html>
 <body><?php $this->comp[0] = Parsed::template('block/b', []);
-$this->comp[1] = $this->comp[0]->addSlot('b1', Parsed::template('block/b_slot_b1?id=61e318ffd57bd', ['_index' => '1.5']));
+$this->comp[1] = $this->comp[0]->addSlot('b1', Parsed::template('block/b_slot_b1?id=61e31e43b8ba3', ['_index' => '2.5']));
 
-    $this->comp[1]->setSlots($slots);$this->comp[1] = $this->comp[0]->addSlot('b12', Parsed::template('block/b_slot_b12?id=61e318ffd5950', ['_index' => '1.5']));
+    $this->comp[1]->setSlots($slots);$this->comp[1] = $this->comp[0]->addSlot('b12', Parsed::template('block/b_slot_b12?id=61e31e43b8d27', ['_index' => '2.5']));
 
-    $this->comp[1]->setSlots($slots);$this->comp[1] = $this->comp[0]->addSlot('b122', Parsed::template('block/b_slot_b122?id=61e318ffd5ae6', ['_index' => '99']));
+    $this->comp[1]->setSlots($slots);$this->comp[1] = $this->comp[0]->addSlot('b122', Parsed::template('block/b_slot_b122?id=61e31e43b8e86', ['_index' => '99']));
 
     $this->comp[1]->setSlots($slots);
     $this->comp[0]->render($data); ?>
