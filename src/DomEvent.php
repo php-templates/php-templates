@@ -1,6 +1,6 @@
 <?php
 
-namespace DomDocument\PhpTemplates;
+namespace PhpTemplates;
 
 class DomEvent
 {

@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['block_b1_slot?id=61df0d3b4a7ae'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
      ?><b11></b11><?php 

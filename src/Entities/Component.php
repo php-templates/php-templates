@@ -1,11 +1,11 @@
 <?php
 
-namespace DomDocument\PhpTemplates\Entities;
+namespace PhpTemplates\Entities;
 
-use DomDocument\PhpTemplates\CodeBuffer;
-use DomDocument\PhpTemplates\Document;
-use DomDocument\PhpTemplates\Helper;
-use DomDocument\PhpTemplates\Parser;
+use PhpTemplates\CodeBuffer;
+use PhpTemplates\Document;
+use PhpTemplates\Helper;
+use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
 
 class Component extends Parser implements Mountable

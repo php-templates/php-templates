@@ -1,6 +1,6 @@
 <?php
 
-namespace DomDocument\PhpTemplates\Entities;
+namespace PhpTemplates\Entities;
 
 use IvoPetkov\HTML5DOMElement;
 

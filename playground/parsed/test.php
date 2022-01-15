@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['layouts/app'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data',])));
      ?><!DOCTYPE html>

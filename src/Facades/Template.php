@@ -1,11 +1,11 @@
 <?php
 
-namespace DomDocument\PhpTemplates\Facades;
+namespace PhpTemplates\Facades;
 
-use DomDocument\PhpTemplates\Template as PhpTemplate;
-use DomDocument\PhpTemplates\Parser;
+use PhpTemplates\Template as PhpTemplate;
+use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMDocument;
-use DomDocument\PhpTemplates\Parsable;
+use PhpTemplates\Parsable;
 
 class Template
 {

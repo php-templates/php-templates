@@ -1,8 +1,8 @@
 <?php
 
-namespace DomDocument\PhpTemplates;
+namespace PhpTemplates;
 
-use DomDocument\PhpTemplates\Facades\Config;
+use PhpTemplates\Config;
 
 class Helper {
     

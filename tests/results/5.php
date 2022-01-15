@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['extends/parent4'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','slots','slot','data',])));
      ?><parent4>

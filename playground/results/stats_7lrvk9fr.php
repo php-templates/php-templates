@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['slot_default?id=61db1f22df487'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['title',])));
       if (isset($title)) { ?><h5 class="card-title"><?php echo htmlspecialchars($title); ?></h5><?php }  

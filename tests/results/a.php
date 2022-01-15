@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['slots','slot','data',])));
      ?><div class="comp_slot">

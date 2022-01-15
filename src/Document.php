@@ -1,10 +1,10 @@
 <?php
 
-namespace DomDocument\PhpTemplates;
+namespace PhpTemplates;
 
 use IvoPetkov\HTML5DOMDocument;
-use DomDocument\PhpTemplates\Facades\Config;
-use DomDocument\PhpTemplates\DependenciesMap;
+use PhpTemplates\Config;
+use PhpTemplates\DependenciesMap;
 
 class Document
 {
@@ -39,8 +39,8 @@ class Document
     public function render(): string
     {
         $tpl = '<?php ';
-        $tpl .= "\nuse DomDocument\PhpTemplates\Parsed;";
-        $tpl .= "\nuse DomDocument\PhpTemplates\DomEvent;";
+        $tpl .= "\nuse PhpTemplates\Parsed;";
+        $tpl .= "\nuse PhpTemplates\DomEvent;";
         foreach ($this->templates as $name => $fn) {
             $tpl .= "\nParsed::\$templates['$name'] = $fn;";
         }

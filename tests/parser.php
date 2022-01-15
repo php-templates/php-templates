@@ -2,10 +2,10 @@
 
 require('../autoload.php');
 
-use DomDocument\PhpTemplates\Facades\Config;
-use DomDocument\PhpTemplates\Document;
-use DomDocument\PhpTemplates\Parser;
-use DomDocument\PhpTemplates\Parsed;
+use PhpTemplates\Config;
+use PhpTemplates\Document;
+use PhpTemplates\Parser;
+use PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
 
 Config::set('aliased', [

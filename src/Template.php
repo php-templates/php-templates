@@ -1,12 +1,12 @@
 <?php
 
-namespace DomDocument\PhpTemplates;
+namespace PhpTemplates;
 
-use DomDocument\PhpTemplates\Parser;
+use PhpTemplates\Parser;
 use DOMDocument;
 use Component;
 use IvoPetkov\HTML5DOMDocument;
-use DomDocument\PhpTemplates\Facades\DomHolder;
+use PhpTemplates\Facades\DomHolder;
 
 class Template
 {

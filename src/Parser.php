@@ -1,13 +1,13 @@
 <?php
 
-namespace DomDocument\PhpTemplates;
+namespace PhpTemplates;
 
-use DomDocument\PhpTemplates\Entities\AnonymousComponent;
-use DomDocument\PhpTemplates\Entities\Block;
-use DomDocument\PhpTemplates\Entities\Component;
-use DomDocument\PhpTemplates\Entities\Slot;
+use PhpTemplates\Entities\AnonymousComponent;
+use PhpTemplates\Entities\Block;
+use PhpTemplates\Entities\Component;
+use PhpTemplates\Entities\Slot;
 use IvoPetkov\HTML5DOMDocument;
-use DomDocument\PhpTemplates\Facades\Config;
+use PhpTemplates\Config;
 
 class Parser
 {

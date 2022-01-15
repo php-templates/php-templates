@@ -2,9 +2,9 @@
 
 require('./../autoload.php');
 
-use DomDocument\PhpTemplates\Facades\Template;
-use DomDocument\PhpTemplates\DomEvent;
-use DomDocument\PhpTemplates\Facades\Config;
+use PhpTemplates\Facades\Template;
+use PhpTemplates\DomEvent;
+use PhpTemplates\Config;
 
 Config::set('src_path', __DIR__.'/views/');
 Config::set('dest_path', __DIR__.'/results/');

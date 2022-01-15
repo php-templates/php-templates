@@ -1,6 +1,6 @@
 <?php 
-use DomDocument\PhpTemplates\Parsed;
-use DomDocument\PhpTemplates\DomEvent;
+use PhpTemplates\Parsed;
+use PhpTemplates\DomEvent;
 Parsed::$templates['components/tabs'] = function ($data, $slots) {
     extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['value','tabs','i','tab','this','data','slots','slot',])));
       isset($value) ?: $value = array_keys($tabs)[0]; ?><ul class="nav nav-tabs" id="myTab" role="tablist"><?php foreach ($tabs as $i => $tab) { ?><li class="nav-item">

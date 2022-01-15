@@ -1,6 +1,6 @@
 <?php
 
-namespace DomDocument\PhpTemplates\Facades;
+namespace PhpTemplates\Facades;
 
 class Config
 {
