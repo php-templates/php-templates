@@ -10,12 +10,13 @@ class Parsed
     protected $parent = null;
     protected $name;
     public $data;
-    public $block = [];
-    public $slots;
+    public $attrs;
     protected $func;
     protected $rendered = false;
     
+    public $slots = [];
     public $comp = []; // for avoiding polluting scope
+    public $block = [];
     
     public static function template($name, $data = [])
     {
@@ -30,10 +31,10 @@ class Parsed
         return new self($name, $fn, $data);
     }
     
-    private function __construct($name, \Closure $fn, $data = [])
+    private function __construct($name, \Closure $fn, $attrs = [])
     {
         $this->name = $name;
-        $this->data = $data;
+        $this->attrs = $attrs;
         
         $this->func = \Closure::bind($fn, $this);
     }
@@ -60,35 +61,36 @@ class Parsed
 
     public function setIndex($i)
     {
-        $this->data['_index'] = $i;
+        $this->attrs['_index'] = $i;
         return $this;
     }
     
     public function render($parentScope = [])
     {
         //if ($this->name === 'a2') dd($this->slots['a2']);
-        $this->data['_attrs'] = array_keys($this->data);//d($this->data);
+        //$this->data['_attrs'] = array_keys($this->data);//d($this->data);
+        //$data = array_merge($parentScope, $this->data);
+        $this->data = array_merge($parentScope, $this->attrs);
         $this->data['_name'] = $this->name;
-        $data = array_merge($parentScope, $this->data);
-        
+        //d($this->attrs);
         $name = trim($this->name, './\\');
-        if (!isset($data['_cpath'])) {
-            $data['_cpath'] = $event = $name;
+        if (!isset($this->data['_cpath'])) {
+            $this->data['_cpath'] = $event = $name;
         } else {
-            $event = explode('.', $data['_cpath'])[0].'.'.$name;
-            $data['_cpath'] .= '.'.$name;
-            $event = $data['_cpath'];
+            $event = explode('.', $this->data['_cpath'])[0].'.'.$name;
+            $this->data['_cpath'] .= '.'.$name;
+            $event = $this->data['_cpath'];
         }
         //d('evvvvv',$event);
         if (!$this->rendered) {
             $this->rendered = true; // stop infinite loop
-            $continue = DomEvent::event('rendering', $event, $this, $data);
+            $continue = DomEvent::event('rendering', $event, $this, $this->data);
             if (!$continue) {
                 return;
             }
         }
         $func = $this->func;
-        $func($data, $this->slots);
+        $func($this->data, $this->slots);
     }
     
     public function __get($prop)

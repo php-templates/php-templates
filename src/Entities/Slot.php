@@ -57,7 +57,7 @@ class Slot extends Parser implements Mountable
                     if ($this->nest) {
                         $this->codebuffer->raw("\$this->comp[{$this->i}]->addSlot('{$nodeData->slot}', \$slot);");
                     } else {
-                        $this->codebuffer->raw('$slot->render(array_merge($data, '.$dataString.'));');
+                        $this->codebuffer->raw('$slot->render(array_merge($this->data, '.$dataString.'));');
                     }
                 });
             }); 
@@ -81,7 +81,7 @@ class Slot extends Parser implements Mountable
                             $this->codebuffer->nestedExpression($_nodeData->statements, function() use ($_name, $_nodeData) {
                                 $this->codebuffer->component($_name, $_nodeData->attributes);
                                 $this->codebuffer->raw('$this->comp[0]->setSlots($slots);');
-                                $this->codebuffer->raw('$this->comp[0]->render($data);');
+                                $this->codebuffer->raw('$this->comp[0]->render($this->data);');
                             });
                         }
                     }

@@ -34,7 +34,7 @@ class Block extends Parser implements Mountable
         $this->insertBlock($node);
 
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode("<?php Parsed::template('$this->name', [])->setSlots(\$slots)->render(\$data); ?>"),
+            $node->ownerDocument->createTextNode("<?php Parsed::template('$this->name', [])->setSlots(\$slots)->render(\$this->data); ?>"),
             $node
         );
         $this->document->toberemoved[] = $node;

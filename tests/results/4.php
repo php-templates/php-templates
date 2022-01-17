@@ -2,27 +2,25 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 Parsed::$templates['extends/parent2'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['bind_me','this','slot','data',])));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me','this','slot',]));
      ?><parent2>
     <?php echo htmlspecialchars($bind_me);  
     if (!empty($this->slots["default"])) {
     foreach ($this->slots['default'] as $slot) {
-    $slot->render(array_merge($data, []));
+    $slot->render(array_merge($this->data, []));
     }
-    } ?>
-</parent2><?php 
+    } ?></parent2><?php 
 };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?><b></b><?php 
 };
 Parsed::$templates['./cases/4'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['data','this',])));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?><!DOCTYPE html>
-<html>
-<body><?php $data['bind_me'] = 'bound';  $this->comp[0] = Parsed::template('extends/b', []);
+<html><body><?php $this->data['bind_me'] = 'bound';  $this->comp[0] = Parsed::template('extends/b', []);
 
-    $this->comp[0]->render($data); ?>
+    $this->comp[0]->render($this->data); ?>
 
 -----</body></html><?php 
 };

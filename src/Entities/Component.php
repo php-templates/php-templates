@@ -69,7 +69,7 @@ class Component extends Parser implements Mountable
                     }
                 }
             }
-            $this->codebuffer->raw('$this->comp[0]->render($data);');
+            $this->codebuffer->raw('$this->comp[0]->render($this->data);');
         });
     }
     

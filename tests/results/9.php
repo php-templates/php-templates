@@ -2,10 +2,9 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 Parsed::$templates['./cases/9'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?><!DOCTYPE html>
-<html>
-<body><blockk></blockk>
+<html><body><blockk></blockk>
 
 -----</body></html><?php 
 };

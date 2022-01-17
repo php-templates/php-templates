@@ -1,4 +1,4 @@
-<?php $data['val'] = [1,2]; $data['name'] = "myname"; ?>
+<?php $this->data['val'] = [1,2]; $this->data['name'] = "myname"; ?>
 
 <c>
     <slot></slot>

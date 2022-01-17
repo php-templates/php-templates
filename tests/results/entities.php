@@ -2,10 +2,9 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 Parsed::$templates['./cases/entities'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['foo','bar',])));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['foo','bar',]));
      ?><!DOCTYPE html>
-<html>
-<body><div class="{phpt} echo $foo {phpt}"></div>
+<html><body><div class="{phpt} echo $foo {phpt}"></div>
 
 -----
 

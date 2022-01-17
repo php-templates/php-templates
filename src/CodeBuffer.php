@@ -44,8 +44,8 @@ class CodeBuffer
             extract(\$data);
             if (isset(\$this->slots['$name'])) {
                 usort(\$this->slots['$name'], function(\$a, \$b) {
-                    \$i1 = isset(\$a->data['_index']) ? \$a->data['_index'] : 0;
-                    \$i2 = isset(\$b->data['_index']) ? \$b->data['_index'] : 0;
+                    \$i1 = isset(\$a->attrs['_index']) ? \$a->attrs['_index'] : 0;
+                    \$i2 = isset(\$b->attrs['_index']) ? \$b->attrs['_index'] : 0;
                     return \$i1 - \$i2;
                 });
                 foreach (\$this->slots['$name'] as \$slot) {
@@ -97,7 +97,7 @@ class CodeBuffer
         }
         $fnDeclaration = 
         "function (\$data, \$slots) {
-    extract(\$data); \$_attrs = array_intersect_key(\$data, array_flip(array_diff(\$_attrs, $used)));
+    extract(\$this->data); \$_attrs = array_diff_key(\$this->attrs, array_flip($used));
     $templateString
 }";
         return $fnDeclaration;
