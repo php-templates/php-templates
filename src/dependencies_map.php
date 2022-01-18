@@ -124,5 +124,9 @@
       0 => 'products',
       1 => 'components/product_item',
     ),
+    './cases/10' => 
+    array (
+      0 => 'comp/d',
+    ),
   ),
 );

@@ -79,7 +79,7 @@ class Slot extends Parser implements Mountable
                             $_nodeData = Helper::nodeStdClass($_node);
                             (new Parser($this->document, $_name))->parse($_node);
                             $this->codebuffer->nestedExpression($_nodeData->statements, function() use ($_name, $_nodeData) {
-                                $this->codebuffer->component($_name, $_nodeData->attributes);
+                                $this->codebuffer->raw('$this->comp[0] = Parsed::template("'.$_name.'", $_attrs);');
                                 $this->codebuffer->raw('$this->comp[0]->setSlots($slots);');
                                 $this->codebuffer->raw('$this->comp[0]->render($this->data);');
                             });

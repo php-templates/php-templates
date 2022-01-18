@@ -1,6 +1,5 @@
 modificat mesaje erori, afisat sintaxa erori de elseif si else daca el de deasupra nu are if
 
-slot pass aliased value to instance attr pe  slot deci
 data trecute pe sloturi trb sa fie this data... ca le va suprascrie extract
 
 docs:

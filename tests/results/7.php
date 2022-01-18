@@ -1,11 +1,11 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61e51e2566f35'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61e6f99958ebb'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['label',]));
      ?><label class="form-label"><?php echo htmlspecialchars($label); ?></label><?php 
 };
-Parsed::$templates['slot_default?id=61e51e2567618'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61e6f99959353'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['type','options','name','label','val','value',]));
       if ($type === 'text') { ?><input type="text" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'number') { ?><input type="number" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'email') { ?><input type="email" class="form-control" value="<?php echo $value ;?>" placeholder="<?php echo $placeholder ?? $label ;?>"><?php }  elseif ($type === 'checkbox') {  foreach ($options as $name => $label) { ?><label>
             <input type="checkbox" value="1" <?php echo (in_array($name, $values) ? 'checked' : ''); ?>>
@@ -24,7 +24,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($this->data, []));
     }
     }
-    else  {$this->comp[0] = Parsed::template('slot_default?id=61e51e2566f35', []);
+    else  {$this->comp[0] = Parsed::template('slot_default?id=61e6f99958ebb', []);
 
     $this->comp[0]->setSlots($slots);
     $this->comp[0]->render($this->data);
@@ -34,7 +34,7 @@ Parsed::$templates['components/form-group'] = function ($data, $slots) {
     $slot->render(array_merge($this->data, []));
     }
     }
-    else  {$this->comp[0] = Parsed::template('slot_default?id=61e51e2567618', []);
+    else  {$this->comp[0] = Parsed::template('slot_default?id=61e6f99959353', []);
 
     $this->comp[0]->setSlots($slots);
     $this->comp[0]->render($this->data);
