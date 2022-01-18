@@ -18,7 +18,7 @@ Config::set('aliased', [
 $folder_path = Config::get('dest_path').'*';
 $files = glob($folder_path);//dd($folder_path);
 foreach($files as $file) {
-    //if (is_file($file)) unlink($file);
+    if (is_file($file)) unlink($file);
 }
 
 $data['entry_firstname'] = 'Firstname';
