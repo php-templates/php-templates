@@ -54,6 +54,13 @@ class Helper {
         if ($node->nodeName === 'block' && empty($result->name)) {
             throw new InvalidNodeException("Block node should have a 'name=\"value\"' attribute", $node);
         }
+    
+        if (array_intersect(['elseif', 'else'], array_keys($result->statements))) {
+            $e = empty($node->previousSibling) || !method_exists($node->previousSibling, 'getAttribute');
+            if ($e || !$node->previousSibling->getAttribute('p-elseif') || !$node->previousSibling->getAttribute('p-else')) {
+                throw new InvalidNodeException('Unexpected elseif|else on node', $node);
+            }
+        }
         
         return $result;
     }

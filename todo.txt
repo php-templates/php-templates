@@ -1,6 +1,4 @@
-modificat mesaje erori, afisat sintaxa erori de elseif si else daca el de deasupra nu are if
-
-data trecute pe sloturi trb sa fie this data... ca le va suprascrie extract
+testat class multiplu cu :class la spatiu ma refer
 
 docs:
     limitari, totul sa se intample in tag urri, valide attrs

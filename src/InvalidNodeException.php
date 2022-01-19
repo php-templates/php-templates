@@ -5,7 +5,7 @@ namespace PhpTemplates;
 class InvalidNodeException extends \Exception 
 {
     public function __construct($msg, $node)
-    {dd($node->ownerDocument);
+    {
         parent::__construct($msg."\n".$this->dom($node));
     }
     
