@@ -64,6 +64,18 @@ will produce:
 As you can see, control structures can be combined in many ways, even multiple `foreach` on same node. There is no operator precedence, but order of attributes matters, especially when one loop deppends of variables set by the parent loop.
 Allowed control structures are 'if', 'elseif', 'else', 'for', 'foreach'.
 
+## Custom directives
+You may create your own parse rules using `Config::addDirective($name, $fn);`. 
+```markdown
+Config::addDirective('checked', function($expression) {
+    return "$expression ? 'checked' : ''";
+});
+```
+Now we can use our directive like this:
+```markdown
+<input type="checkbox" p-checked="1 < 3">
+```
+
 ## Components
 You can reuse parts of design by making them components. Just put the html code into another file in `src_path` in any folder structure you preffer. For example, you can have src_path + `components/form-group.template.php`:
 ```markdown
