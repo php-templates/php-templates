@@ -1,5 +1,0 @@
-testat class multiplu cu :class la spatiu ma refer
-
-docs:
-    limitari, totul sa se intample in tag urri, valide attrs
-    valid html

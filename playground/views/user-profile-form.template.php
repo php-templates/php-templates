@@ -10,7 +10,7 @@
                 :value="$firstname"
                 />
             <x-form-group type="text" class="col-6"
-                name="firstname"
+                name="lastname"
                 :label="$entry_lastname"
                 :value="$lastname"
                 />

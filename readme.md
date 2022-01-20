@@ -22,7 +22,12 @@ What about:
 ```
 ? Is a vue.js|react.js like syntax, but in PHP.
 
-Php-templates is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax. Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). 
+Php-templates is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.However, because of using DomDocument, there are some limitations:
+- you can't have php tags outside of a node attribute value (`<div <?php ... ?>></div>` is invalid). However, you have directive `p-raw` for this (`p-raw="php_expression"` will echo the php_expression).
+- you can't have a dynamic node name, however, you can combine pure php syntax to echo that entire tag start and end.
+- missing closing tags will lead to unexpected behaviours, however, now you have tools for auto closing tags and highlights.
+- let me know if you found other limitations.
+Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). 
 
 Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to call `PhpTemplates\Template::load({path}, $data)` (path will be relative to `src_path`, without extension `template.php`) to render it. If you only want a template instance to render it later, you can call `Template::get({path}, $attrs)`, then call `render($data)`. `$attrs` will be described later, in Components section.
 
@@ -37,6 +42,7 @@ will produce:
 ```markdown 
 <div class="card <?php echo $myVar; ?> <?php echo $foo === 1 ? 'active' : ''; ?>"></div>
 ```
+- Info: you can't have more than one binding of the same type per node (like multiple ':class').
 
 As you can see, any valid continuing `echo ` php syntax is allowed between "" -> :attr="echo {php_syntax}".
 
@@ -56,6 +62,7 @@ will produce:
 ```
 
 As you can see, control structures can be combined in many ways, even multiple `foreach` on same node. There is no operator precedence, but order of attributes matters, especially when one loop deppends of variables set by the parent loop.
+Allowed control structures are 'if', 'elseif', 'else', 'for', 'foreach'.
 
 ## Components
 You can reuse parts of design by making them components. Just put the html code into another file in `src_path` in any folder structure you preffer. For example, you can have src_path + `components/form-group.template.php`:

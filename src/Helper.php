@@ -55,11 +55,9 @@ class Helper {
             throw new InvalidNodeException("Block node should have a 'name=\"value\"' attribute", $node);
         }
     
-        if (array_intersect(['elseif', 'else'], array_keys($result->statements))) {
-            $e = empty($node->previousSibling) || !method_exists($node->previousSibling, 'getAttribute');
-            if ($e || !$node->previousSibling->getAttribute('p-elseif') || !$node->previousSibling->getAttribute('p-else')) {
-                throw new InvalidNodeException('Unexpected elseif|else on node', $node);
-            }
+        // we can t calculate if prev sibling has conditions attached because it has been already processed and would always trigger the error. Instead, we do the reverse -> check if next node is ok
+        if (array_intersect(['elseif', 'else'], array_keys($result->statements)) && empty($node->previousSibling)) {
+            throw new InvalidNodeException('Unexpected elseif|else on node', $node);
         }
         
         return $result;
