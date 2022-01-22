@@ -300,9 +300,70 @@ In the background, ***Php-Templatess*** will create a `layout/app` template inst
 The extension is valid in any other situation.  All that is required is a default slot on the parent template and its data requirements to be met. Extending feature is related to the next one - ***Events***.
 
 ## Events
-Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. Events are executed before rendering a component, template or a block can be listened and allow the alteration of the context in which they are executed (received data, received slots, order of rendered block items). Events can be general (attached to a template / component) or specific (eliptic or full path to targeted entity, mentioned separated with '.'). The syntax that will be used to attach an event `new PhpTemplates\DomEvent('rendering', '{event_name}', {listener_as_callback_function})`, or `DomEvent::on('rendering', '{event_name}', {listener_as_callback_function})` and must be placed before template calling.
+Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. Events are executed before rendering a component, template or a block can be listened and allow the alteration of the context in which they are executed (received data, received slots, order of rendered block items). Events can be ***general*** (attached to a template / component) or ***specific*** (eliptic or full path to targeted entity, mentioned separated with `.`). Events can be attached on components, slots or blocks. The syntax that will be used to attach an event:
+```
+use PhpTemplates\DomEvent;
 
-On each rendering event, ***php-Templatess*** will keep a record of the current path consisting of the parent templates + the current template joined by '.'.
-When logging an event, a hierarchical selection rule similar to css descendants selector (`body header .my_class1 .myclass_2 {}`) applies, except that the name represents the relative name of the templates. If the `false` value is returned on any event callback, the rendering of the template in question is canceled.
+new DomEvent('rendering', '{event_name}', $callback); 
+// or 
+DomEvent::on('rendering', '{event_name}', $callback);
+```
+Of course, this must be registered before template calling.
 
-The examples found in [playground/form](https://github.com/florin-botea/***php-Templatess***/blob/dev/playground/form.php) will be used as documentation.
+On each rendering event, ***php-Templatess*** will keep a record of the current path consisting of the parent templates + the current template joined by `.`.
+When logging an event, a hierarchical selection rule similar to css ***descendants selector*** (`body header .my_class1 .myclass_2 {}`) applies, except that the name represents the relative name of the templates. If the `false` value is returned on any event callback, the rendering of the template in question is canceled.
+
+Let's take an example. Considering we have the following templates: `user-profile-form` and `form-group`. First one contains a few of the second one. Now, we want to attach events on all `user-profile-form.form-group`:
+```
+$i = 0;
+DomEvent::on('rendering', 'user-profile-form.form-group', function($template, &$data) use (&$i) {
+    $i++;
+
+    // make first element required
+    if ($i === 1) {
+        $data['required'] = true;
+        // or
+        $this->attrs['required'] = true;
+    }
+
+    // stop rendering age field 
+    if ($this->attrs['name'] === 'age') {
+        return false;
+    }
+});
+```
+
+Considering we add our event on a block or slot
+```
+DomEvent::on('rendering', 'user-profile-form.form-fields', function($template, &$data) {
+    // here we have full access to manipulate the rendering context as we want
+    // The rendering entity instance is binded to $this variable
+    // take a look at Parsed::class render() function to see how it works
+
+    $input = Template::get('form-group', [
+        'name' => 'country',
+        'type' => 'select',
+        'options' => ['o1' => 'Ro', 'o2' => 'Gb'],
+        'value' => 'o1',
+        // _index attr here if event target is 
+    ]);
+
+    // if above components accepts slots, we can add them like this:
+    // example of raw template (unparsed, on fly)
+    $label = Template::raw(function() {
+        echo '<label><i class="fa fa-help"></i>My label</label>'
+    });
+    $input->addSlot($position = 'label', $label);
+
+    // finally, hook our input to render list
+    $this->slots['form-fields'][] = $input;
+    // if we have a slot event, we must insert the node at desired index in the above array
+
+    // if form-fields is a block entity we can also change the order of displayed fields
+    foreach ($this->slots['form-fields'] as $node) {
+        // $node->attrs['_index'] = anything you want
+    }
+});
+```
+
+The examples found in [playground/form](https://github.com/florin-botea/***php-Templatess***/blob/dev/playground/form.php) may be used as sample of the power of that feature.
