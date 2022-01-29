@@ -15,7 +15,7 @@ class Template
         $start_time = microtime(true);
         $template = $this->get($rfilepath);
         $template->render($data);
-        d(microtime(true) - $start_time);
+        print_r('<br>'.(microtime(true) - $start_time));
     }
 
     public function get(string $rfilepath, array $data = [])
@@ -26,18 +26,18 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             $doc = new Document($requestName);
             if ($path = $doc->exists()) {
-                
+
             } else {
                 $parser = new Parser($doc, $rfilepath);
                 $parser->parse();
                 $path = $doc->save();
             }
-            
+
             require_once($path);
             return Parsed::template($requestName, $data);
         }
     }
-    
+
     public function raw(\Closure $cb, $data = [])
     {
         return Parsed::raw(null, $cb, $data);
