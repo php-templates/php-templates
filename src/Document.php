@@ -91,7 +91,7 @@ class Document
     protected function getDestFile()
     {
         $dependencies = DependenciesMap::get($this->name);
-        $pf = Config::get('src_path');
+        $pf = trim(Config::get('src_path'), '/').'/';
         asort($dependencies);
         $hash = [$this->name];
         foreach ($dependencies as $f) {
