@@ -1,5 +1,5 @@
-
 <?php
+
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\CodeBuffer;
@@ -14,7 +14,7 @@ class AnonymousComponent extends Parser implements Mountable
     protected $document;
     protected $name;
     protected $codebuffer;
-    
+
     public function __construct(Document $doc)
     {
         $this->document = $doc;
@@ -37,7 +37,7 @@ class AnonymousComponent extends Parser implements Mountable
         $this->document->toberemoved[] = $node;
     }
 
-    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf) 
+    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf)
     {
         $this->codebuffer = $cbf;
         $nodeData = Helper::nodeStdClass($node);
@@ -56,3 +56,4 @@ class AnonymousComponent extends Parser implements Mountable
         (new Parser($this->document, $this->name))->parse($childs);
     }
 }
+
