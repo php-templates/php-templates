@@ -1,0 +1,1 @@
+documentat ca nu recomand deloc folosirea tagurilor pure de php!!!!
