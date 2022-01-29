@@ -1,0 +1,19 @@
+{
+    "name": "florin-botea/php-templates",
+    "license": "MIT",
+    "description": "Php templating engine",
+    "keywords": ["php", "templates"],
+    "homepage": "https://github.com/florin-botea/php-templates",
+    "authors": [
+        {
+            "name": "Florin Botea",
+            "homepage": "https://github.com/florin-botea",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PhpTemplates\\": "src/"
+        }
+    }
+}

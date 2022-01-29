@@ -13,7 +13,7 @@ class Document
     public $templates = [];
     public $eventListeners = [];
     public $tobereplaced = [
-        '="__empty__"' => '', 
+        '="__empty__"' => '',
         '&gt;' => '>',
         '&amp;\gt;' => '&gt;',
         '&lt;' => '<',
@@ -25,17 +25,17 @@ class Document
     ];
     public $toberemoved = [];
     public $templateBlocks = [];
-    
+
     public function __construct(string $name)
     {
         $this->name = $name;
     }
-    
+
     public function addEventListener($ev, $target, $cb)
     {
         $this->eventListeners[$ev][$target][] = $cb;
     }
-    
+
     public function render(): string
     {
         $tpl = '<?php ';
@@ -56,13 +56,13 @@ class Document
                 }
             }
         }
-        
+
         $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
         $tpl = preg_replace('/\?>[ \n\r]*<\?php/', '', $tpl);
-        
+
         return $tpl;
     }
-    
+
     public function save(string $outFile = null)
     {
         if (!$outFile) {
@@ -71,14 +71,14 @@ class Document
         ///dd($outFile);
         file_put_contents($outFile, $this->render());
         DependenciesMap::save();
-        
+
         return $outFile;
     }
 
     public function __get($prop) {
         return $this->$prop;
     }
-    
+
     public function exists()
     {
         $f = $this->getDestFile();
@@ -87,7 +87,7 @@ class Document
         }
         return false;
     }
-    
+
     protected function getDestFile()
     {
         $dependencies = DependenciesMap::get($this->name);
@@ -98,15 +98,15 @@ class Document
             $file = $pf.$f.'.template.php';
             $hash[] = $f.':'.filemtime($file);
         }
-        
-        $pf = Config::get('dest_path');
+
+        $pf = trim(Config::get('dest_path'), '/').'/';
         $name = str_replace('/', '_', $this->name);// todo
         $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
-    
+
         return $outFile.'.php';
     }
-    
-    public function registerDependency($name) 
+
+    public function registerDependency($name)
     {
         DependenciesMap::add($this->name, $name);
     }

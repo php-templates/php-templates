@@ -14,7 +14,7 @@ class Parser
     private $document;
     private $codebuffer;
     private $name;
-    
+
     public function __construct(Document $doc, string $name, CodeBuffer $cbf = null)
     {
         $this->name = $name;
@@ -31,7 +31,7 @@ class Parser
         if (!$dom || Helper::isComponent($dom)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
             $this->document->registerDependency($requestName);
-            $f = Config::get('src_path');
+            $f = trim(Config::get('src_path'), '/').'/';
             $srcFile = $f.$requestName.'.template.php';
             $dom = new HTML5DOMDocument;
             $dom->substituteEntities = false;
@@ -63,7 +63,7 @@ class Parser
                 @$node->parentNode && @$node->parentNode->removeChild($node);
             } catch (\Exception $e) {}
         }
-        
+
         if ($trimHtml) {
             $htmlString = $this->trimHtml($dom);
         }
@@ -84,17 +84,17 @@ class Parser
         $htmlString = CodeBuffer::getTemplateFunction($htmlString);
         $this->document->templates[$this->name] = $htmlString;
     }
-    
+
     private function parseNode($node, $asFunction = null)
     {
         $return = true;
         $nodeData = Helper::nodeStdClass($node);
         if ($node->nodeName === 'slot') {
             (new Slot($this->document))->mount($node);
-        } 
+        }
         elseif ($node->nodeName === 'block') {
             (new Block($this->document, $this->name))->mount($node);// this name, iar mount zice: compx are sloturile y, sunt pe parsed
-        } 
+        }
         elseif ($name = Helper::isComponent($node)) {
             (new Component($this->document, $name))->mount($node);
         }
@@ -109,18 +109,18 @@ class Parser
         if ($return) {
             return;
         }
-        
+
         foreach ($node->childNodes ?? [] as $_node) {//d($_node);
             $this->parseNode($_node);
         }
     }
-    
+
     private function parseSimpleNode($node)
     {
         if (empty($node->attributes)) {
             return;
         }
-        
+
         $toberemoved = ['slot', '_index'];
         $pf = Config::get('prefix');
         $bpf = ':'; // bind prefix
@@ -182,28 +182,28 @@ class Parser
 
         if ($node->nextSibling) {
             $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode("<?php } ?>"), 
+                $node->ownerDocument->createTextNode("<?php } ?>"),
                 $node->nextSibling
             );
         } else {
             $node->parentNode->appendChild($node->ownerDocument->createTextNode("<?php } ?>"));
         }
     }
-    
+
     protected function getNodeSlots($node, $forceDefault = false): array
     {
         $slots = [];
         if (!$node->childNodes) {
             return $slots;
         }
-        
+
         // slots bound together using if else stmt should be keeped together
         $lastPos = null;
         foreach ($node->childNodes as $slotNode) {
             if (Helper::isEmptyNode($slotNode)) {
                 continue;
             }
-            
+
            $slotPosition = null;
            if ($slotNode->nodeName !== '#text') {
                $slotPosition = $slotNode->getAttribute('slot');
@@ -212,7 +212,7 @@ class Parser
             if ($forceDefault || !$slotPosition) {
                 $slotPosition = 'default';
             }
-            
+
             if ($slotNode->nodeName === '#text') {
                 $slots[$slotPosition][] = $slotNode;
             }
@@ -232,19 +232,19 @@ class Parser
                 }
             }
         }
-        
+
         return $slots;
     }
-    
+
     public function removeHtmlComments($content = '') {//d($content);
     	return preg_replace('~<!--.+?-->~ms', '', $content);
     }
-    
+
     protected function extends($extends)
     {
         $extendedTemplate = $extends->getAttribute('template');
         (new Parser($this->document, $extendedTemplate))->parse();
-        
+
         $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
             \$comp = Parsed::template('$extendedTemplate', \$data);
             \$comp->addSlot('default', \$template);
@@ -262,7 +262,7 @@ class Parser
         if (!$body) {
             return '';
         }
-        
+
         $content = '';
         foreach ($body->childNodes as $node)
         {
@@ -275,7 +275,7 @@ class Parser
     {
         return $this->$prop;
     }
-    
+
     public function escapeSpecialCharacters($html) {
         return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
     }
