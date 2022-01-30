@@ -60,7 +60,8 @@ class Document
         }
 
         $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
-        $tpl = preg_replace('/\?>[ \n\r]*<\?php/', '', $tpl);
+
+        $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
 
         return $tpl;
     }
