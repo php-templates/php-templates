@@ -26,9 +26,10 @@ class AnonymousComponent extends Parser implements Mountable
     {
         $this->insertComponent($node);
         $nodeData = Helper::nodeStdClass($node);
-        $this->codebuffer->component($this->name, $nodeData->attributes);
-        $this->codebuffer->raw('$this->comp[0]->render($this->data);');
-
+        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
+            $this->codebuffer->component($this->name, $nodeData->attributes);
+            $this->codebuffer->raw('$this->comp[0]->render($this->data);');
+        });
         $node->parentNode->insertBefore(
             $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
             $node
