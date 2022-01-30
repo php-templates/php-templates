@@ -1,2 +1,6 @@
 documentat ca nu recomand deloc folosirea tagurilor pure de php!!!! am bagat tag-uri <php></php>
-control structure pe anonymous component nu functioneaza... am un if si nu mi-l ia deloc...
+sintaxa <php p-if="foo">
+    string
+</php>
+
+pune directivele custom pan la urma...
