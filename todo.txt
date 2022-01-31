@@ -1,6 +1,22 @@
 documentat ca nu recomand deloc folosirea tagurilor pure de php!!!! am bagat tag-uri <php></php>
-sintaxa <php p-if="foo">
+sintaxa 
+<php p-if="foo">
     string
+</php>
+<php if >
+
+dar si 
+<php>
+php here
 </php>
 
 pune directivele custom pan la urma...
+
+template::config()
+template::srcpath multiplu, de gasit varianta cea mai ok, cel mai ok ar fi daca as suprascrie o functie, un loader care sa imi intoarca path ul
+dar nu as mai avea un default ca fallback... 
+sau si.si iar cand zic src_path, zic default path
+
+se va ocupa un alt tool de pus if-uri, tot el face handle la custom directives si asa am centralizat locul unde se fac astea
+
+<lreplace final de php tags open si close la elseif se poate evita
