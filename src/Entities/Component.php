@@ -8,29 +8,54 @@ use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
 
-class Component extends Parser implements Mountable
+class Component extends AbstractParser
 {
     protected $reservedAttrs = [];
-    protected $attrs = (object) ['slot' => 'default'];
+    protected $attrs = [
+        'slot' => 'default'
+    ];
+
+    public function __construct(Document $doc, $node, AbstractParser $context)
+    {
+        parent::__construct($doc, $node, $context);
+        $this->name = Helper::isComponent($this->node);
+    }
     
+    public function rootContext()
+    {
+
+    }
+
+    public function componentContext()
+    {
+
+    }
+
+    public function slotContext()
+    {
+
+    }
+
+
+
+
+
     public function mount($i = 0): void
     {
-        name pe cstrct
-        $name = Helper::isComponent($this->node);
         // deplete node
         // will fill attrs
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
-        if (!isset($this->document->templates[$name])) {
-            (new Parser($this->document, $name))->parse();
+        if (!isset($this->document->templates[$this->name])) {
+            (new Parser($this->document, $this->name))->parse();
         }
         
         if ($i) {
             // insert as slot
             $next = $i +1;
-            $decl = "\$this->comp[$next] = \$this->comp[$i]->addSlot($this->slotPos, Parsed::template($name, $dataString);";
+            $decl = "\$this->comp[$next] = \$this->comp[$i]->addSlot($this->slotPos, Parsed::template($this->name, $dataString);";
         } else {
-            $decl = "\$this->comp[0] = Parsed::template($name, $dataString);";
+            $decl = "\$this->comp[0] = Parsed::template($this->name, $dataString);";
         }
         $decl = $node->ownerDocument->createTextNode($decl);
         $this->node->parentNode->insertBefore($this->node, $refNode);

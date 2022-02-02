@@ -169,27 +169,6 @@ class Parser
         }
     }
     
-    protected function controlStructure($statement, $args, $node)
-    {
-        if ($args || $args === '0') {
-            $statement .= " ($args)";
-        }
-
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode("<?php $statement { ?>"),
-            $node
-        );
-
-        if ($node->nextSibling) {
-            $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode("<?php } ?>"),
-                $node->nextSibling
-            );
-        } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode("<?php } ?>"));
-        }
-    }
-    
     public function insertAfter($node, string $inserted)
     {dd($a);
         if ($node->nextSibling) {
@@ -210,52 +189,6 @@ class Parser
         );
     }
     
-    protected function getNodeSlots($node, $forceDefault = false): array
-    {
-        $slots = [];
-        if (!$node->childNodes) {
-            return $slots;
-        }
-
-        // slots bound together using if else stmt should be keeped together
-        $lastPos = null;
-        foreach ($node->childNodes as $slotNode) {
-            if (Helper::isEmptyNode($slotNode)) {
-                continue;
-            }
-
-           $slotPosition = null;
-           if ($slotNode->nodeName !== '#text') {
-               $slotPosition = $slotNode->getAttribute('slot');
-               $slotNode->removeAttribute('slot');
-           }
-            if ($forceDefault || !$slotPosition) {
-                $slotPosition = 'default';
-            }
-
-            if ($slotNode->nodeName === '#text') {
-                $slots[$slotPosition][] = $slotNode;
-            }
-            elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
-                // stands its own
-                $container = new HTML5DOMDocument;
-                $slotNode = $container->importNode($slotNode, true);
-                $container->appendChild($slotNode);
-                $slots[$slotPosition][] = $container;
-                $lastPos = $slotPosition;
-            } else {
-                // has dependencies above
-                if (isset($slots[$lastPos])) {
-                    $i = count($slots[$lastPos]) -1;
-                    $slotNode = $slots[$lastPos][$i]->importNode($slotNode, true);
-                    $slots[$lastPos][$i]->appendChild($slotNode);
-                }
-            }
-        }
-
-        return $slots;
-    }
-
     public function removeHtmlComments($content = '') {//d($content);
     	return preg_replace('~<!--.+?-->~ms', '', $content);
     }
