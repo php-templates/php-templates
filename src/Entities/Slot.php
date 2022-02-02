@@ -10,28 +10,58 @@ use IvoPetkov\HTML5DOMElement;
 
 class Slot extends Parser implements Mountable
 {
+    protected $reservedAttrs = [];
     protected $document;
-    protected $name;
-    protected $i;
-    protected $nest;
-    protected $codebuffer;
+    protected $node;
+    protected $context;
+    protected $name = 'default';
+    protected $slotPos = 'default';
     
-    public function __construct(Document $doc, $i = 0, $nest = false)
+    public function __construct(Document $doc, $node, $context)
     {
         $this->document = $doc;
-        $this->i = $i;
-        $this->nest = $nest;
-        $this->codebuffer = new CodeBuffer;
+        $this->node = $node;
+        $this->context = $context;
+        $this->depth = $context->depth +1;
+        if ($node->getAttribute('name')) {
+            $this->name = $node->getAttribute('name');
+        }
+        if ($node->getAttribute('slot')) {
+            $this->slotPos = $node->getAttribute('slot');
+        }
     }
 
-    public function mount(HTML5DOMElement $node): void
+    public function mount($i = 0): void
     {
+        $name = Helper::isComponent($this->node);
+        // deplete node
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+        $slotDefault = $this->getNodeSlots($node, true);
+        
+        $cbf = new CodeBuffer($node);
+        $cbf->raw("<?php foreach (\$this->slots($this->name) as $_slot) {");
+        $cbf->raw("\$_slot->render(array_merge(\$this->data, $dataString))");
+        $cbf->raw('}');
+        
+        if (!empty($slotDefault['default'])) {
+            $this->insertBefore("if (!\$this->slots($this->name)) {", $node);
+            foreach ($slotDefault['default'] as $slot) {
+                NodeParser::parse($slot, $this);
+            }
+        }
+        
+        $cbf->raw('?>');
+        
+        return;
+        $this->insertBefore("} ?>", $node);
+        
+        
+        
+        
         $this->insertSlot($node);
 
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
-            $node
-        );
+    
         $this->document->toberemoved[] = $node;
     }
 

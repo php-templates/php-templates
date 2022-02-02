@@ -10,27 +10,47 @@ use IvoPetkov\HTML5DOMElement;
 
 class Component extends Parser implements Mountable
 {
-    protected $document;
-    protected $name;
-    protected $codebuffer;
+    protected $reservedAttrs = [];
+    protected $attrs = (object) ['slot' => 'default'];
     
-    public function __construct(Document $doc, string $name)
+    public function mount($i = 0): void
     {
-        $this->document = $doc;
-        $this->name = $name;
-        $this->codebuffer = new CodeBuffer;
-    }
-
-    public function mount(HTML5DOMElement $node): void
-    {
-        $this->insertComponent($node);
-
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
-            $node
-        );
-
+        name pe cstrct
+        $name = Helper::isComponent($this->node);
+        // deplete node
+        // will fill attrs
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+        if (!isset($this->document->templates[$name])) {
+            (new Parser($this->document, $name))->parse();
+        }
+        
+        if ($i) {
+            // insert as slot
+            $next = $i +1;
+            $decl = "\$this->comp[$next] = \$this->comp[$i]->addSlot($this->slotPos, Parsed::template($name, $dataString);";
+        } else {
+            $decl = "\$this->comp[0] = Parsed::template($name, $dataString);";
+        }
+        $decl = $node->ownerDocument->createTextNode($decl);
+        $this->node->parentNode->insertBefore($this->node, $refNode);
         $this->document->toberemoved[] = $node;
+        
+        // insert slots
+        foreach ($node->childNodes as $slot) {
+            // move node outside to not be deleted its surroundings when parent node is removed
+            $slot = $slot->cloneNode(true);
+            $node->parentNode->insertBefore($node, $slot);
+            NodeParser::parse($slot, $i +1);
+        }
+        
+        // render only when root
+        if (!$i) {
+            $this->node->parentNode->insertBefore(
+                $this->node, 
+                $node->ownerDocument->createTextNode('$this->comp[0]->render($data)')
+            );
+        }
     }
 
     public function _mount(HTML5DOMElement $node, CodeBuffer $cbf)

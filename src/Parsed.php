@@ -39,6 +39,14 @@ class Parsed
         $this->func = \Closure::bind($fn, $this);
     }
     
+    public function slots($pos)
+    {
+        if (isset($this->slots[$pos])) {
+            return $this->slots[$pos];
+        }
+        return [];
+    }
+    
     public function addSlot($pos, self $renderable)
     {
         $this->slots[$pos][] = $renderable;

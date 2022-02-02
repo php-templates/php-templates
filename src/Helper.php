@@ -35,7 +35,7 @@ class Helper {
             {
                 $k = substr($k, 2);
                 if (in_array($k, Config::allowedControlStructures)) {
-                    $result->statements[$k] = $val;
+                    $result->statements[] = [$k, $val];
                 }
             }
             elseif (in_array(trim($k, ':'), Config::attrCumulative) && !empty($result->attributes[$k])) {

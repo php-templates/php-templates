@@ -85,6 +85,8 @@ class Parser
 
     private function parseNode($node, $asFunction = null)
     {
+        NodeParser::parse($node);
+        return;
         $return = true;
         $nodeData = Helper::nodeStdClass($node);
         if ($node->nodeName === 'slot') {
@@ -166,7 +168,7 @@ class Parser
             }
         }
     }
-
+    
     protected function controlStructure($statement, $args, $node)
     {
         if ($args || $args === '0') {
@@ -187,7 +189,27 @@ class Parser
             $node->parentNode->appendChild($node->ownerDocument->createTextNode("<?php } ?>"));
         }
     }
-
+    
+    public function insertAfter($node, string $inserted)
+    {dd($a);
+        if ($node->nextSibling) {
+            $node->parentNode->insertBefore(
+                $node->ownerDocument->createTextNode($inserted),
+                $node->nextSibling
+            );
+        } else {
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode($inserted));
+        }
+    }
+    
+    public function insertBefore(string $inserted, $node)
+    {
+        $node->parentNode->insertBefore(
+            $node->ownerDocument->createTextNode($inserted),
+            $node
+        );
+    }
+    
     protected function getNodeSlots($node, $forceDefault = false): array
     {
         $slots = [];
