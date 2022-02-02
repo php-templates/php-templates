@@ -27,31 +27,31 @@ class Parser
      */
     public function parse($dom = null)
     {
-        $trimHtml = false;
-        if (!$dom || Helper::isComponent($dom)) {
-            $requestName = preg_replace('(\.template|\.php)', '', $this->name);
-            $this->document->registerDependency($requestName);
-            $f = trim(Config::get('src_path'), '/').'/';
-            $srcFile = $f.$requestName.'.template.php';
-            $dom = new HTML5DOMDocument;
-            $dom->substituteEntities = false;
-            $dom->formatOutput = true;
-            $html = file_get_contents($srcFile);
-            $html = $this->escapeSpecialCharacters($html);
-            $html = $this->removeHtmlComments($html);
-            $trimHtml = strpos($html, '<body') === false;
-            $dom->loadHtml($html);
+        // $trimHtml = false;
+        // if (!$dom || Helper::isComponent($dom)) {
+        //     $requestName = preg_replace('(\.template|\.php)', '', $this->name);
+        //     $this->document->registerDependency($requestName);
+        //     $f = trim(Config::get('src_path'), '/').'/';
+        //     $srcFile = $f.$requestName.'.template.php';
+        //     $dom = new HTML5DOMDocument;
+        //     $dom->substituteEntities = false;
+        //     $dom->formatOutput = true;
+        //     $html = file_get_contents($srcFile);
+        //     $html = $this->escapeSpecialCharacters($html);
+        //     $html = $this->removeHtmlComments($html);
+        //     $trimHtml = strpos($html, '<body') === false;
+        //     $dom->loadHtml($html);
 
-            if ($extends = $dom->querySelector('extends')) {
-                $this->extends($extends);
-            }
-        } elseif ($dom->nodeName !== '#document') {
-            // create extra scope to ensure safe insertbefore and insertafter
-            $container = new HTML5DOMDocument;
-            $dom = $container->importNode($dom, true);
-            $container->appendChild($dom);
-            $dom = $container;
-        }
+        //     if ($extends = $dom->querySelector('extends')) {
+        //         $this->extends($extends);
+        //     }
+        // } elseif ($dom->nodeName !== '#document') {
+        //     // create extra scope to ensure safe insertbefore and insertafter
+        //     $container = new HTML5DOMDocument;
+        //     $dom = $container->importNode($dom, true);
+        //     $container->appendChild($dom);
+        //     $dom = $container;
+        // }
 
         $this->parseNode($dom);
 

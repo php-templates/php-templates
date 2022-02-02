@@ -13,7 +13,7 @@ abstract class AbstractParser
     protected $caret;
     protected $reservedAttrs = [];
     
-    public function __construct(Document $doc, $node, AbstractParser $context)
+    public function __construct(Document $doc, $node, AbstractParser $context = null)
     {
         $this->document = $doc;
         $this->node = $node;
