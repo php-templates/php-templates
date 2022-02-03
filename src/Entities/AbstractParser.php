@@ -11,7 +11,7 @@ abstract class AbstractParser
     protected $context;
     protected $node;
     protected $caret;
-    protected $reservedAttrs = [];
+    protected $attrs = [];
     
     public function __construct(Document $doc, $node, AbstractParser $context = null)
     {
@@ -79,8 +79,10 @@ abstract class AbstractParser
             } else {
                 $val = "'$val'";
             }
-            if (!in_array($k, $this->reservedAttrs)) {
+            if (!array_key_exists($k, $this->attrs)) {
                 $data[$k][] = $val;
+            } else {
+                $this->attrs[$k] = $val;
             }
         }
         

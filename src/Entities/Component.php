@@ -10,7 +10,6 @@ use IvoPetkov\HTML5DOMElement;
 
 class Component extends AbstractParser
 {
-    protected $reservedAttrs = [];
     protected $attrs = [
         'slot' => 'default'
     ];

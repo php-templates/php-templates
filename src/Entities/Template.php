@@ -7,15 +7,16 @@ use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 
-class Component extends AbstractParser
+class Template extends AbstractParser
 {
+    private $trimHtml = false;
+
     public function __construct(Document $doc, $node, string $name)
     {
         $this->document = $doc;
         $this->node = $node;
         $this->name = $name;
 
-        $trimHtml = false;
         if (!$node || Helper::isComponent($node)) {
             $requestName = preg_replace('(\.template|\.php)', '', $this->name);
             $this->document->registerDependency($requestName);
@@ -27,7 +28,7 @@ class Component extends AbstractParser
             $html = file_get_contents($srcFile);
             $html = $this->escapeSpecialCharacters($html);
             $html = $this->removeHtmlComments($html);
-            $trimHtml = strpos($html, '<body') === false;
+            $this->trimHtml = strpos($html, '</body>') === false;
             $node->loadHtml($html);
 
             if ($extends = $node->querySelector('extends')) {
@@ -40,6 +41,40 @@ class Component extends AbstractParser
             $container->appendChild($node);
             $node = $container;
         }
+
+        $this->node = $node;
+    }
+
+    public function register()
+    {
+        // $this->parseNode($dom); ala mare
+
+        while ($this->document->toberemoved) {
+            $node = array_pop($this->document->toberemoved);
+            try {
+                @$node->parentNode && @$node->parentNode->removeChild($node);
+            } catch (\Exception $e) {}
+        }
+
+        if ($trimHtml) {
+            $htmlString = $this->trimHtml($dom);
+        }
+        elseif ($dom->ownerDocument) {
+            $htmlString = $dom->ownerDocument->saveHtml($dom);
+        } else {
+            $htmlString = $dom->saveHtml();
+        }
+        // make replaces
+        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
+        $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php echo htmlspecialchars($eval); ?>";
+            }
+            return '';
+        }, $htmlString);
+
+        $htmlString = CodeBuffer::getTemplateFunction($htmlString);
+        $this->document->templates[$this->name] = $htmlString;
     }
 
     public function rootContext()

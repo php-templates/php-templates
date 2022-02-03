@@ -10,18 +10,31 @@ use IvoPetkov\HTML5DOMElement;
 
 class SimpleNode extends AbstractParser
 {
-    protected $reservedAttrs = [];
+    protected $attrs = [];
 
     public function rootContext()
     {
-
+        $data = $this->depleteNode($this->node);
+        foreach ($data as $k => $val) {
+            $this->node->addAttribute($k, $val);
+        }
     }
 
     public function componentContext()
     {
-        $this->$reservedAttrs
+        parent::makeCaret();
+        $this->attrs['slot'] = 'default';
+
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
+
+        $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+        (new Template($this->document, $this->node, $name))->register();
+
+        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
+        $this->println(
+            sprintf($definition, [$this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString])
+        );
     }
     
     protected function makeCaret() {
