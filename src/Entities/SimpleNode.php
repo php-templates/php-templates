@@ -8,17 +8,17 @@ use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
 
-class SimpleNode extends AbstractParser
+class SimpleNode extends AbstractEntity
 {
     protected $attrs = [];
-/*
-    public function rootContext()
+
+    public function templateContext()
     {
         $data = $this->depleteNode($this->node);
         foreach ($data as $k => $val) {
             $this->node->addAttribute($k, $val);
         }
-    }*/
+    }
 
     public function componentContext()
     {

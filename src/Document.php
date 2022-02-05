@@ -28,9 +28,10 @@ class Document
     public $toberemoved = [];
     public $templateBlocks = [];
 
-    public function __construct(string $name)
+    public function __construct(string $name, array $options = [])
     {
         $this->name = $name;
+        $this->config = array_merge_recursive(Config::all(), $options);
     }
 
     public function addEventListener($ev, $target, $cb)

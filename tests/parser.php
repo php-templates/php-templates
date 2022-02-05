@@ -4,7 +4,7 @@ require('../autoload.php');
 
 use PhpTemplates\Config;
 use PhpTemplates\Document;
-use PhpTemplates\Parser;
+use PhpTemplates\Entities\Template;
 use PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
 
@@ -42,10 +42,11 @@ foreach($files as $f) {
     }
     $rfilepath = str_replace('.template.php', '', $file);
     $doc = new Document($rfilepath);
-    $parser = new Parser($doc, $rfilepath);
     $dom = new HTML5DOMDocument;
+    $parser = new Template($doc, $rfilepath);
     $dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
-    $parser->parse($dom);
+    $parser = new Template($doc, $dom, $rfilepath);
+    $parser->newContext();
     $dest = './results/'.str_replace('.template', '', $f);
     if (!isset($_GET['edit'])) {
         $doc->save($dest);

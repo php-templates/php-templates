@@ -18,7 +18,7 @@ class Template
         print_r('<br>'.(microtime(true) - $start_time));
     }
 
-    public function get(string $rfilepath, array $data = [])
+    public function get(string $rfilepath, array $data = [], $slots = [], $options = [])
     {
         if (isset(Parsed::$templates[$rfilepath])) {
             return Parsed::template($rfilepath, $data);
@@ -26,7 +26,7 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
-            $doc = new Document($requestName, $settings);
+            $doc = new Document($requestName, $options);
             if ($path = $doc->exists()) {
 
             } else {

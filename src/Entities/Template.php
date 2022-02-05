@@ -10,32 +10,29 @@ use PhpTemplates\Helper;
 /**
  * is actually component, but used in different contexts, even on root
 */
-class Template extends AbstractParser
+class Template extends AbstractEntity
 {
-    private $trimHtml = false;
-/*
-    public function __construct(Document $doc, $node, $context)
+    private $name;
+
+    public function __construct(Document $doc, $node, $context = null)
     {
-        
-        $this->document = $doc;
-        $this->node = $node;
-
-        } elseif ($node->nodeName !== '#document') {
-            // create extra scope to ensure safe insertbefore and insertafter
-            $container = new HTML5DOMDocument();
-            $node = $container->importNode($node, true);
-            $container->appendChild($node);
-            $node = $container;
+        parent::__construct($doc, $node, is_string($context) ? null : $context);
+        if (is_string($node)) {
+            $this->name = $node;
+        } 
+        elseif (is_string($context)) {
+            $this->name = $context;
         }
-
-        $this->node = $node;
-    }*/
+    }
+    
+    protected function makeCaret()
+    {
+        //
+    }
     
     public function newContext()
     {
         if (!$this->node) {
-            $this->name = $this->node;
-            $this->node = $this->load($this->name);
             if ($extends = $this->node->querySelector('extends')) {
                 //$this->extends($extends);
             }
@@ -54,12 +51,12 @@ class Template extends AbstractParser
         }
 
         if ($this->trimHtml) {
-            $htmlString = $this->trimHtml($dom);
+            $htmlString = $this->trimHtml($this->node);
         }
         elseif ($this->node->ownerDocument) {
-            $htmlString = $dom->ownerDocument->saveHtml($dom);
+            $htmlString = $this->node->ownerDocument->saveHtml($dom);
         } else {
-            $htmlString = $dom->saveHtml();
+            $htmlString = $this->node->saveHtml();
         }
         // make replaces
         $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);

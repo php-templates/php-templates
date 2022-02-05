@@ -19,7 +19,7 @@ class Parsed
     public $block = [];
     
     public static function template($name, $data = [])
-    {
+    {//dd(self::$templates);
         return new self($name, self::$templates[$name], $data);
     }
     
