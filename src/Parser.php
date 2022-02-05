@@ -12,14 +12,12 @@ use PhpTemplates\Config;
 class Parser
 {
     private $document;
-    private $codebuffer;
     private $name;
 
-    public function __construct(Document $doc, string $name, CodeBuffer $cbf = null)
+    public function __construct(Document $doc, string $name)
     {
         $this->name = $name;
         $this->document = $doc;
-        $this->codebuffer = $cbf ?? new CodeBuffer;
     }
 
     /**
@@ -53,7 +51,7 @@ class Parser
         //     $dom = $container;
         // }
 
-        $this->parseNode($dom);
+        NodeParser::parse($node, null);
 
         while ($this->document->toberemoved) {
             $node = array_pop($this->document->toberemoved);

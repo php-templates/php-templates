@@ -24,12 +24,13 @@ class Template
             return Parsed::template($rfilepath, $data);
         } else {
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-            $doc = new Document($requestName);
+            // init the document with custom settings as src_path, aliases
+            // paths will fallback on default Config in case of file not found or setting not found
+            $doc = new Document($requestName, $settings);
             if ($path = $doc->exists()) {
 
             } else {
-                $parser = new Parser($doc, $rfilepath);
-                $parser->parse();
+                $template = (new Template($doc, null, $rfilepath))->newContext();
                 $path = $doc->save();
             }
 
