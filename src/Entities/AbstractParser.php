@@ -6,7 +6,7 @@ use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 
-abstract class AbstractParser
+abstract class AbstractEntity
 {
     protected $context;
     protected $node;
@@ -117,6 +117,8 @@ abstract class AbstractParser
             $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? '<?php' : ''). " } ?>"));
         }
     }
+    
+    
 
     protected function getNodeSlots($node, $forceDefault = false): array
     {
@@ -162,6 +164,53 @@ abstract class AbstractParser
         }
 
         return $slots;
+    }
+    
+    protected function parseNode($node)
+    {
+        $fn = get_class($this);
+        $fn = lcfirst($fn).'Context';
+        if ($node->nodeName === 'slot') {
+            (new Slot($this->document, $node, $this))->mount($refNode);
+        }
+        elseif ($node->nodeName === 'block') {
+            (new Block($this->document, $node, $this))->mount($refNode);
+        }
+        elseif ($this->isComponent($node)) {
+            (new Component($this->document, $node, $this))->{$fn}();
+        }
+        elseif ($node->nodeName === 'template') {
+            (new AnonymousComponent($this->document))->mount($refNode);
+        }
+        else {
+            (new SimpleNode($this->document, $node))->mount($refNode);
+        }
+    }
+    
+    /**
+     * Load the given route document using this.document settings with fallback on default settings
+     */
+    public function load($rfilepath)
+    {
+        $f = trim(Config::get('src_path'), '/').'/';
+        $srcFile = '%s'.trim($rfilepath, '/');
+        $srcFile = $f.$requestName.'.template.php';
+        $this->document->registerDependency($srcFile);
+        $node = new HTML5DOMDocument;
+        $node->substituteEntities = false;
+        $node->formatOutput = true;
+        $html = file_get_contents($srcFile);
+        $html = $this->escapeSpecialCharacters($html);
+        $html = $this->removeHtmlComments($html);
+        $this->trimHtml = strpos($html, '</body>') === false;
+        $node->loadHtml($html);
+        
+        return $node;
+    }
+    
+    public function isComponent($node)
+    {
+        
     }
 
     public function __get($prop)

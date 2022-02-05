@@ -10,9 +10,7 @@ use IvoPetkov\HTML5DOMElement;
 
 class Component extends AbstractParser
 {
-    protected $attrs = [
-        'slot' => 'default'
-    ];
+    protected $attrs = [];
 
     public function __construct(Document $doc, $node, AbstractParser $context)
     {
@@ -20,16 +18,51 @@ class Component extends AbstractParser
         $this->name = Helper::isComponent($this->node);
     }
     
-    public function rootContext()
+    public function templateContext()
     {
+        $data = $this->deplete($this->node);
+        $dataString = Helper::arrayToEval($data);
+        (new Template($this->document, $this->name))->newContext();
 
+        $definition = '$this->comp[%d] = Parsed::template("%s", %s)';
+        $this->println(
+            sprintf($definition, [$this->depth, $name, $dataString])
+        );
+        
+        foreach ($this->node->childNodes as $slot)
+        {
+            $this->parseNode($slot);
+        }
+        
+        $definition = '$this->comp[%d]->render($this->data)';
+        $this->println(
+            sprintf($definition, [$this->depth])
+        );
     }
 
+    /**
+     * When a component is passed as slot to another component
+     */
     public function componentContext()
     {
+        $this->attrs['slot'] = 'default';
+        $dataString = Helper::arrayToEval($this->depleteNode($this->node));
+        (new Template($this->document, $this->name))->newContext();
 
+        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
+        $this->println(
+            sprintf($definition, [$this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString])
+        );
+        
+        foreach ($this->node->childNodes as $slot)
+        {
+            $this->parseNode($slot);
+        }
     }
 
+    /**
+     * When a component is passed as slot default
+     */
     public function slotContext()
     {
 

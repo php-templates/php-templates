@@ -11,14 +11,14 @@ use IvoPetkov\HTML5DOMElement;
 class SimpleNode extends AbstractParser
 {
     protected $attrs = [];
-
+/*
     public function rootContext()
     {
         $data = $this->depleteNode($this->node);
         foreach ($data as $k => $val) {
             $this->node->addAttribute($k, $val);
         }
-    }
+    }*/
 
     public function componentContext()
     {
@@ -29,7 +29,7 @@ class SimpleNode extends AbstractParser
         $dataString = Helper::arrayToEval($data);
 
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-        (new Template($this->document, $this->node, $name))->register();
+        (new Template($this->document, $this->node))->newContext($name);
 
         $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
         $this->println(

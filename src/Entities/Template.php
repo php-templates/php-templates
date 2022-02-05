@@ -7,33 +7,19 @@ use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 
+/**
+ * is actually component, but used in different contexts, even on root
+*/
 class Template extends AbstractParser
 {
     private $trimHtml = false;
-
-    public function __construct(Document $doc, $node, string $name)
+/*
+    public function __construct(Document $doc, $node, $context)
     {
+        
         $this->document = $doc;
         $this->node = $node;
-        $this->name = $name;
 
-        if (!$node || Helper::isComponent($node)) {
-            $requestName = preg_replace('(\.template|\.php)', '', $this->name);
-            $this->document->registerDependency($requestName);
-            $f = trim(Config::get('src_path'), '/').'/';
-            $srcFile = $f.$requestName.'.template.php';
-            $node = new HTML5DOMDocument;
-            $node->substituteEntities = false;
-            $node->formatOutput = true;
-            $html = file_get_contents($srcFile);
-            $html = $this->escapeSpecialCharacters($html);
-            $html = $this->removeHtmlComments($html);
-            $this->trimHtml = strpos($html, '</body>') === false;
-            $node->loadHtml($html);
-
-            if ($extends = $node->querySelector('extends')) {
-                $this->extends($extends);
-            }
         } elseif ($node->nodeName !== '#document') {
             // create extra scope to ensure safe insertbefore and insertafter
             $container = new HTML5DOMDocument();
@@ -43,12 +29,23 @@ class Template extends AbstractParser
         }
 
         $this->node = $node;
-    }
-
-    public function register()
+    }*/
+    
+    public function newContext()
     {
-        // $this->parseNode($dom); ala mare
-
+        if (!$this->node) {
+            $this->name = $this->node;
+            $this->node = $this->load($this->name);
+            if ($extends = $this->node->querySelector('extends')) {
+                //$this->extends($extends);
+            }
+        }
+        $this->parseNode($this->node);
+        $this->register();
+    }
+    
+    protected function register()
+    {
         while ($this->document->toberemoved) {
             $node = array_pop($this->document->toberemoved);
             try {
@@ -56,10 +53,10 @@ class Template extends AbstractParser
             } catch (\Exception $e) {}
         }
 
-        if ($trimHtml) {
+        if ($this->trimHtml) {
             $htmlString = $this->trimHtml($dom);
         }
-        elseif ($dom->ownerDocument) {
+        elseif ($this->node->ownerDocument) {
             $htmlString = $dom->ownerDocument->saveHtml($dom);
         } else {
             $htmlString = $dom->saveHtml();
@@ -73,13 +70,8 @@ class Template extends AbstractParser
             return '';
         }, $htmlString);
 
-        $htmlString = CodeBuffer::getTemplateFunction($htmlString);
+        $htmlString = $this->getTemplateFunction($htmlString);
         $this->document->templates[$this->name] = $htmlString;
-    }
-
-    public function rootContext()
-    {
-
     }
 
     public function componentContext()
