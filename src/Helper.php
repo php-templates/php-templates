@@ -6,6 +6,14 @@ use PhpTemplates\Config;
 
 class Helper {
     
+    private static $uid = 0;
+
+    public static function uniqid()
+    {
+        self::$uid += 1;
+        return self::$uid;
+    }
+
     public static function nodeStdClass($node, $context = '')
     {
         $specials = ['is', 'slot'];

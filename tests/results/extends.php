@@ -1,20 +1,21 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
-Parsed::$templates['slot_default?id=61e6f9999da40'] = function ($data, $slots) {
+Parsed::$templates['slot_default?id=61fede1b1ba24'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?><div>123</div><?php 
 };
 Parsed::$templates['extends/parent'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','slot','slots',]));
-     ?><parent><?php 
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','slot','_attrs','slots',]));
+     ?><parent>
+    <?php 
     if (!empty($this->slots["d1"])) {
     foreach ($this->slots['d1'] as $slot) {
     $slot->render(array_merge($this->data, []));
     }
     }
-    else  {$this->comp[0] = Parsed::template('slot_default?id=61e6f9999da40', []);
-
+    else  {
+    $this->comp[0] = Parsed::template("slot_default?id=61fede1b1ba24", $_attrs);
     $this->comp[0]->setSlots($slots);
     $this->comp[0]->render($this->data);
     }  
@@ -22,12 +23,14 @@ Parsed::$templates['extends/parent'] = function ($data, $slots) {
     foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($this->data, []));
     }
-    } ?></parent><?php 
+    } ?>
+</parent><?php 
 };
 Parsed::$templates['extends/a'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?><a>
-    <foo></foo></a><?php 
+    <foo></foo>
+</a><?php 
 };
 Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me','this','slot',]));
@@ -37,7 +40,8 @@ Parsed::$templates['extends/parent2'] = function ($data, $slots) {
     foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($this->data, []));
     }
-    } ?></parent2><?php 
+    } ?>
+</parent2><?php 
 };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -52,7 +56,8 @@ Parsed::$templates['extends/parent4'] = function ($data, $slots) {
     foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($this->data, []));
     }
-    } ?></parent4><?php 
+    } ?>
+</parent4><?php 
 };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me','this','slot',]));
@@ -63,7 +68,8 @@ Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     foreach ($this->slots['default'] as $slot) {
     $slot->render(array_merge($this->data, []));
     }
-    } ?></parent3><?php 
+    } ?>
+</parent3><?php 
 };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -72,7 +78,8 @@ Parsed::$templates['extends/c'] = function ($data, $slots) {
 Parsed::$templates['./cases/extends'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?><!DOCTYPE html>
-<html><body><?php $this->comp[0] = Parsed::template('extends/a', []);
+<html>
+<body><?php $this->comp[0] = Parsed::template('extends/a', []);
 
     $this->comp[0]->render($this->data); ?>
 

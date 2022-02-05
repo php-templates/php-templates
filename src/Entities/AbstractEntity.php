@@ -15,9 +15,24 @@ abstract class AbstractEntity
     protected $node;
     protected $caret;
     protected $attrs = [];
+    protected $depth = 0;
+    protected $pf = 'p-';
     
     public function __construct(Document $doc, $node, AbstractEntity $context = null)
     {
+        if ($context) {
+            $ct_type = explode('\\', get_class($context));
+            $ct_type = end($ct_type);
+
+            if (!in_array($ct_type, ['SimpleNode'])) {
+                $this->depth = $context->depth +1;
+            }
+        }
+
+        if (isset($this->document->config['prefix'])) {
+            $this->pf = $this->document->config['prefix'];
+        }
+
         $this->document = $doc;
         if (is_string($node)) {
             $node = $this->load($node);
@@ -38,7 +53,10 @@ abstract class AbstractEntity
      */
     public function getRoot(): AbstractEntity
     {
-        if ($this->context) {
+        if ($this->context && $this->context->depth === 0) {
+            return $this->context;
+        }
+        elseif ($this->context) {
             return $this->context->getRoot();
         }
         return $this;
@@ -52,9 +70,9 @@ abstract class AbstractEntity
     protected function makeCaret()
     {
         $node = $this->getRoot()->node;
-        $caret = $node->ownerDocument->createTextNode('caret');
+        $this->caret = $node->ownerDocument->createTextNode('');
         //$this->document->toberemoved[] = $caret;
-        $node->parentNode->insertBefore($caret, $node);
+        $node->parentNode->insertBefore($this->caret, $node);
     }
 
     protected function println(string $line)
@@ -94,12 +112,12 @@ abstract class AbstractEntity
                 $this->attrs[$k] = $val;
             }
         }
-        
+
         foreach ($data as $k => $val) {
             if (count($val) > 1) {
                 $data[$k] = 'Helper::mergeAttrs('.implode(',',$val).')';
             } else {
-                $data[$k] = $val;
+                $data[$k] = reset($val);
             }
         }
         

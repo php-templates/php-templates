@@ -8,25 +8,30 @@ use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
 
-class Component extends AbstractParser
+class Component extends AbstractEntity
 {
-    protected $attrs = [];
+    protected $attrs = ['is' => null];
 
-    public function __construct(Document $doc, $node, AbstractParser $context)
+    public function __construct(Document $doc, $node, AbstractEntity $context)
     {
         parent::__construct($doc, $node, $context);
         $this->name = Helper::isComponent($this->node);
     }
+
+    public function simpleNodeContext()
+    {
+        $this->templateContext();
+    }
     
     public function templateContext()
     {
-        $data = $this->deplete($this->node);
+        $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
 
-        $definition = '$this->comp[%d] = Parsed::template("%s", %s)';
+        $definition = '<?php $this->comp[%d] = Parsed::template("%s", %s);';
         $this->println(
-            sprintf($definition, [$this->depth, $name, $dataString])
+            sprintf($definition, $this->depth, $this->name, $dataString)
         );
         
         foreach ($this->node->childNodes as $slot)
@@ -34,7 +39,7 @@ class Component extends AbstractParser
             $this->parseNode($slot);
         }
         
-        $definition = '$this->comp[%d]->render($this->data)';
+        $definition = '$this->comp[%d]->render($this->data); ?>';
         $this->println(
             sprintf($definition, [$this->depth])
         );

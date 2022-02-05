@@ -12,11 +12,16 @@ class SimpleNode extends AbstractEntity
 {
     protected $attrs = [];
 
+    public function simpleNodeContext()
+    {
+        $this->templateContext();
+    }
+    
     public function templateContext()
     {
         $data = $this->depleteNode($this->node);
         foreach ($data as $k => $val) {
-            $this->node->addAttribute($k, $val);
+            $this->node->setAttribute($k, $val);
         }
         
         foreach ($this->node->childNodes as $slot)
