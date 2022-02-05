@@ -18,6 +18,11 @@ class SimpleNode extends AbstractEntity
         foreach ($data as $k => $val) {
             $this->node->addAttribute($k, $val);
         }
+        
+        foreach ($this->node->childNodes as $slot)
+        {
+            $this->parseNode($slot);
+        }
     }
 
     public function componentContext()
