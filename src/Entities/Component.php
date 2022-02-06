@@ -41,7 +41,7 @@ class Component extends AbstractEntity
         
         $definition = '$this->comp[%d]->render($this->data); ?>';
         $this->println(
-            sprintf($definition, [$this->depth])
+            sprintf($definition, $this->depth)
         );
     }
 
@@ -56,7 +56,7 @@ class Component extends AbstractEntity
 
         $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
         $this->println(
-            sprintf($definition, [$this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString])
+            sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString)
         );
         
         foreach ($this->node->childNodes as $slot)

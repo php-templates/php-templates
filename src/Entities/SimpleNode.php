@@ -43,7 +43,7 @@ class SimpleNode extends AbstractEntity
 
         $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
         $this->println(
-            sprintf($definition, [$this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString])
+            sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
         );
     }
     

@@ -57,7 +57,7 @@ foreach($files as $f) {
     Parsed::template($rfilepath)->render();
     $results = ob_get_clean();
     $results = explode('<body>', $results);
-    $results = end($results);
+    $results = end($results);dd($results);
     $results = explode('-----',$results);
     foreach ($results as $i => $result) {
         if (empty($expected[$i])) {
