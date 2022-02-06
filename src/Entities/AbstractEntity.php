@@ -200,13 +200,14 @@ abstract class AbstractEntity
             (new Slot($this->document, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'block') {
-            (new Block($this->document, $node, $this))->mount($refNode);
+            (new Block($this->document, $node, $this))->{$fn}();
         }
         elseif ($this->isComponent($node)) {
             (new Component($this->document, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'template') {
-            (new AnonymousComponent($this->document))->mount($refNode);
+            dd('anonim comp');
+            // (new AnonymousComponent($this->document))->mount($refNode);
         }
         else {
             (new SimpleNode($this->document, $node, $this))->{$fn}();

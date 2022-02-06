@@ -77,9 +77,9 @@ class Slot extends AbstractEntity
             $definition = 'if (empty($this->slots("%s"))) {';
             $this->println(sprintf($definition, $this->attrs['name']));
 
-            // foreach ($this->node->childNodes as $slotDefault) {
-            //     $this->parseNode($slotDefault);
-            // }
+            foreach ($this->node->childNodes as $slotDefault) {
+                $this->parseNode($slotDefault);
+            }
 
             $this->println('} ?>');
         }

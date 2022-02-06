@@ -8,16 +8,13 @@ use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
 
-class Block extends Parser implements Mountable
+class Block extends AbstractEntity
 {
-    protected $document;
-    protected $name;
-    protected $codebuffer;
-    
-    public function __construct(Document $doc)
+    protected $attrs = [];
+
+    public function componentContext()
     {
-        $this->document = $doc;
-        $this->codebuffer = new CodeBuffer;
+        //
     }
 
     /**
