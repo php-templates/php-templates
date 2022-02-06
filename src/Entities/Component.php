@@ -25,7 +25,7 @@ class Component extends AbstractEntity
     
     public function templateContext()
     {
-        $data = $this->depleteNode($this->node);
+        $data = $this->depleteNode($this->node);//d($this->attrs['is'], $this->depth);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
 
@@ -43,6 +43,8 @@ class Component extends AbstractEntity
         $this->println(
             sprintf($definition, $this->depth)
         );
+
+        $this->document->toberemoved[] = $this->node;
     }
 
     /**

@@ -53,13 +53,11 @@ abstract class AbstractEntity
      */
     public function getRoot(): AbstractEntity
     {
-        if ($this->context && $this->context->depth === 0) {
-            return $this->context;
+        if ($this->depth === 0) {
+            return $this;
         }
-        elseif ($this->context) {
-            return $this->context->getRoot();
-        }
-        return $this;
+        
+        return $this->context->getRoot();
     }
     
     /**
@@ -103,7 +101,7 @@ abstract class AbstractEntity
             $val = $a->nodeValue;
             if ($k[0] === ':') {
                 $k = substr($k, 1);
-            } else {
+            } elseif (!$html) {
                 $val = "'$val'";
             }
             if (!array_key_exists($k, $this->attrs)) {
@@ -120,7 +118,7 @@ abstract class AbstractEntity
                 $data[$k] = reset($val);
             }
         }
-        
+
         return $data;
     }
 

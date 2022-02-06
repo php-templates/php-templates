@@ -8,6 +8,8 @@ use PhpTemplates\Entities\Template;
 use PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
 
+header("Content-Type: text/plain");
+
 Config::set('aliased', [
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
@@ -55,9 +57,9 @@ foreach($files as $f) {
     $data = [];
     include $dest;
     Parsed::template($rfilepath)->render();
-    $results = ob_get_clean();
+    $results = ob_get_clean();//dd($results);
     $results = explode('<body>', $results);
-    $results = end($results);dd($results);
+    $results = end($results);
     $results = explode('-----',$results);
     foreach ($results as $i => $result) {
         if (empty($expected[$i])) {
