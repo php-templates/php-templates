@@ -15,9 +15,10 @@ class Component extends AbstractEntity
     public function __construct(Document $doc, $node, AbstractEntity $context)
     {
         parent::__construct($doc, $node, $context);
+
         $this->name = Helper::isComponent($this->node);
     }
-
+    
     public function simpleNodeContext()
     {
         $this->templateContext();

@@ -197,7 +197,7 @@ abstract class AbstractEntity
         $fn = end($fn);
         $fn = lcfirst($fn).'Context';
         if ($node->nodeName === 'slot') {
-            (new Slot($this->document, $node, $this))->mount($refNode);
+            (new Slot($this->document, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'block') {
             (new Block($this->document, $node, $this))->mount($refNode);

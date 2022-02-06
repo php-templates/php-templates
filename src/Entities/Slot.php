@@ -7,27 +7,81 @@ use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\InvalidNodeException;
 
-class Slot extends Parser implements Mountable
+class Slot extends AbstractEntity
 {
-    protected $reservedAttrs = [];
-    protected $document;
-    protected $node;
-    protected $context;
-    protected $name = 'default';
-    protected $slotPos = 'default';
-    
-    public function __construct(Document $doc, $node, $context)
+    protected $attrs = ['name' => 'default', 'slot' => 'default'];
+    private $hasSlotDefault;
+
+    public function __construct(Document $doc, $node, AbstractEntity $context)
     {
-        $this->document = $doc;
-        $this->node = $node;
-        $this->context = $context;
-        $this->depth = $context->depth +1;
-        if ($node->getAttribute('name')) {
-            $this->name = $node->getAttribute('name');
+        parent::__construct($doc, $node, $context);
+
+        $this->hasSlotDefault = $this->node->childNodes->length > 0;
+    }
+
+    public function simpleNodeContext()
+    {
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+        $closeTag = $this->hasSlotDefault ? '' : '?>';
+
+        $definition = '<?php foreach ($this->slots("%s") as $_slot) {'
+            .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
+            .PHP_EOL.'} '.$closeTag;
+
+        $this->println(
+            sprintf($definition, $this->attrs['name'], $dataString)
+        );
+
+        if ($this->hasSlotDefault) {
+            $definition = 'if (empty($this->slots("%s"))) {';
+            $this->println(sprintf($definition, $this->attrs['name']));
+
+            foreach ($this->node->childNodes as $slotDefault) {
+                $this->parseNode($slotDefault);
+            }
+
+            $this->println('} ?>');
         }
-        if ($node->getAttribute('slot')) {
-            $this->slotPos = $node->getAttribute('slot');
+
+        $this->document->toberemoved[] = $this->node;
+    }
+
+    public function slotContext()
+    {
+        // throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node->parentNode);
+    }
+
+    /**
+     * <myComp><slot name="mytitle" slot="title"></slot></myComp>
+     *
+     */
+    public function componentContext()
+    {
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+
+        $closeTag = $this->hasSlotDefault ? '' : '?>';
+
+        $definition = '<?php foreach ($this->slots("%s") as $_slot) {'
+            .PHP_EOL.'$this->comp[%d]->addSlot("%s", $_slot);'
+            .PHP_EOL.'} '.$closeTag;
+
+        $this->println(
+            sprintf($definition, $this->attrs['name'], $this->context->depth, $this->attrs['slot'])
+        );
+
+        if ($this->hasSlotDefault) {
+            $definition = 'if (empty($this->slots("%s"))) {';
+            $this->println(sprintf($definition, $this->attrs['name']));
+
+            // foreach ($this->node->childNodes as $slotDefault) {
+            //     $this->parseNode($slotDefault);
+            // }
+
+            $this->println('} ?>');
         }
     }
 

@@ -54,7 +54,7 @@ class Template extends AbstractEntity
             $htmlString = $this->trimHtml($this->node);
         }
         elseif ($this->node->ownerDocument) {
-            $htmlString = $this->node->ownerDocument->saveHtml($dom);
+            $htmlString = $this->node->ownerDocument->saveHtml($this->node);
         } else {
             $htmlString = $this->node->saveHtml();
         }
