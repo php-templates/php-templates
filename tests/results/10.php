@@ -12,7 +12,7 @@ Parsed::$templates['./cases/10'] = function ($data, $slots) {
      ?><!DOCTYPE html>
 <html>
 <body>
-<?php $this->comp[0] = Parsed::template("comp/d", ['rows' => '10']);
+<?php $this->comp[0] = Parsed::template("comp/d", ['rows' => 10]);
 $this->comp[0]->render($this->data); ?>
 
 -----</body></html><?php 

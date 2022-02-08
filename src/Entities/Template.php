@@ -32,9 +32,9 @@ class Template extends AbstractEntity
     
     public function newContext()
     {
-        if (!$this->node) {
+        if (method_exists($this->node, 'querySelector')) {
             if ($extends = $this->node->querySelector('extends')) {
-                //$this->extends($extends);
+                $this->extends($extends);
             }
         }
         $this->parseNode($this->node);
@@ -71,13 +71,28 @@ class Template extends AbstractEntity
         $this->document->templates[$this->name] = $htmlString;
     }
 
-    public function componentContext()
+    // public function componentContext()
+    // {
+
+    // }
+
+    // public function slotContext()
+    // {
+
+    // }
+
+    private function extends($extends)
     {
+        $extendedTemplate = $extends->getAttribute('template');
+        (new Template($this->document, $extendedTemplate))->newContext();
 
-    }
+        $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
+            \$comp = Parsed::template('$extendedTemplate', \$data);
+            \$comp->addSlot('default', \$template);
+            \$comp->render(\$data);
+            return false;
+        }");
 
-    public function slotContext()
-    {
-
+        $extends->parentNode->removeChild($extends);
     }
 }

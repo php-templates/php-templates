@@ -15,11 +15,11 @@ Parsed::$templates['comp/comp_slot?slot=default&id=6'] = function ($data, $slots
       
 };
 Parsed::$templates['comp/comp_slot?slot=default&id=7'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?><div>
-        <block name="b1">
-            <b11>123</b11>
-        </block>
+        
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);
+$this->comp[0]->render($this->data); 
     </div><?php 
 };
 Parsed::$templates['comp/comp_slot?slot=default&id=8'] = function ($data, $slots) {

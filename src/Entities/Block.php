@@ -52,7 +52,8 @@ class Block extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
         $this->println(
-            sprintf('<?php $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
+            sprintf('%s $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
+            Php::start(),
             $this->depth, 
             $dataString,
             $this->name
@@ -66,7 +67,7 @@ class Block extends AbstractEntity
         }
     
         $this->println(
-            sprintf('$this->comp[%d]->render($this->data); ?>', $this->depth)
+            sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, Php::end())
         );
 
         $this->document->toberemoved[] = $this->node;

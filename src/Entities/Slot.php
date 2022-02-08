@@ -27,12 +27,12 @@ class Slot extends AbstractEntity
         $dataString = Helper::arrayToEval($data);
         $closeTag = $this->hasSlotDefault ? '' : '?>';
 
-        $definition = '<?php foreach ($this->slots("%s") as $_slot) {'
+        $definition = '%s foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
             .PHP_EOL.'} '.$closeTag;
 
         $this->println(
-            sprintf($definition, $this->attrs['name'], $dataString)
+            sprintf(Php::start(), $definition, $this->attrs['name'], $dataString)
         );
 
         if ($this->hasSlotDefault) {
@@ -43,7 +43,7 @@ class Slot extends AbstractEntity
                 $this->parseNode($slotDefault);
             }
 
-            $this->println('} ?>');
+            $this->println('} '.Php::end());
         }
 
         $this->document->toberemoved[] = $this->node;
@@ -65,12 +65,12 @@ class Slot extends AbstractEntity
 
         $closeTag = $this->hasSlotDefault ? '' : '?>';
 
-        $definition = '<?php foreach ($this->slots("%s") as $_slot) {'
+        $definition = '%s foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$this->comp[%d]->addSlot("%s", $_slot);'
             .PHP_EOL.'} '.$closeTag;
 
         $this->println(
-            sprintf($definition, $this->attrs['name'], $this->context->depth, $this->attrs['slot'])
+            sprintf(Php::start(), $definition, $this->attrs['name'], $this->context->depth, $this->attrs['slot'])
         );
 
         if ($this->hasSlotDefault) {
@@ -81,7 +81,7 @@ class Slot extends AbstractEntity
                 $this->parseNode($slotDefault);
             }
 
-            $this->println('} ?>');
+            $this->println('} '.Php::end());
         }
     }
 

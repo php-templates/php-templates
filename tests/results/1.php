@@ -2,12 +2,10 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','_slot',]));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?><div class="comp_slot">
     <span>
-<?php foreach ($this->slots("default") as $_slot) {
-$_slot->render(array_merge($this->data, []));
-} ?></span>
+<?php</span>
 </div><?php 
 };
 Parsed::$templates['comp/comp_slot?slot=default&id=1'] = function ($data, $slots) {

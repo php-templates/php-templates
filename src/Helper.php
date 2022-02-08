@@ -83,7 +83,7 @@ class Helper {
         return Config::getComponentByAlias($node->nodeName);
     }
     
-    public static function arrayToEval(array $arr, $simple = false, $unescape = ':')
+    public static function arrayToEval(array $arr, $simple = false)
     {// todo nu va mergw cu array de genul [$foo, $bar]
         if (!$arr) {
             return '[]';
@@ -99,11 +99,6 @@ class Helper {
         
         $stream = [];
         foreach ($arr as $key => $value) {
-            if (strpos($key, $unescape) === 0) {
-                $key = str_replace($unescape, '', $key);
-            } else {
-                $value = "'$value'";
-            }
             $stream[] = "'$key' => $value";
         }
         
