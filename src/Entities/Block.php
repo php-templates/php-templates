@@ -45,15 +45,31 @@ class Block extends AbstractEntity
             $this->itemsIteration++;
             $this->parseNode($slot);
         }
-        /*
-        $this->println(
-            sprintf('$this->comp[%d]->render($this->data); ?>', $this->depth)
-        );*/
     }
     
     public function simpleNodeContext()
     {
-        // todo:
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+        $this->println(
+            sprintf('<?php $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
+            $this->depth, 
+            $dataString,
+            $this->name
+            )
+        );
+        foreach ($this->node->childNodes as $slot) {
+            // register block defaults 
+            //todo: iterate over non empty slots
+            $this->itemsIteration++;
+            $this->parseNode($slot);
+        }
+    
+        $this->println(
+            sprintf('$this->comp[%d]->render($this->data); ?>', $this->depth)
+        );
+
+        $this->document->toberemoved[] = $this->node;
     }
 
     /**
