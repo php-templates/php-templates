@@ -19,15 +19,14 @@ class Php extends AbstractEntity
      */
     public static function start(): string
     {
-        if (self::$debug) debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $started = self::$started;
-        self::$started = true;
-        if ($started) {
-            return '';
+        $r = self::$started ? '' : '<?php';
+        if (self::$debug) {
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            var_dump($r);
         }
-        return '<?php';
+        self::$started = true;
+        return $r;
     }
-
     /**
      * Ends php string cross entities instances
      *
@@ -35,12 +34,12 @@ class Php extends AbstractEntity
      */
     public static function end(): string
     {
-        if (self::$debug) debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $started = self::$started;
-        self::$started = false;
-        if ($started) {
-            return '?>';
+        $r = self::$started ? '?>' : '';
+        if (self::$debug) {
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            var_dump($r);
         }
-        return '';
+        self::$started = false;
+        return $r;
     }
 }
