@@ -23,16 +23,19 @@ class Slot extends AbstractEntity
 
     public function simpleNodeContext()
     {
+        $phpStart = '<?php';
+        $phpEnd = '?>';
+
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
         $closeTag = $this->hasSlotDefault ? '' : '?>';
 
         $definition = '%s foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
-            .PHP_EOL.'} '.$closeTag;
+            .PHP_EOL.'} %s';
 
         $this->println(
-            sprintf($definition, Php::start(), $this->attrs['name'], $dataString)
+            sprintf($definition, $phpStart, $this->attrs['name'], $dataString, $this->hasSlotDefault ? '' : $phpEnd)
         );
 
         if ($this->hasSlotDefault) {
@@ -43,7 +46,7 @@ class Slot extends AbstractEntity
                 $this->parseNode($slotDefault);
             }
 
-            $this->println('} '.Php::end());
+            $this->println('} '.$phpEnd);
         }
 
         $this->document->toberemoved[] = $this->node;
@@ -60,17 +63,18 @@ class Slot extends AbstractEntity
      */
     public function componentContext()
     {
+        $phpStart = '<?php';
+        $phpEnd = '?>';
+
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
 
-        $closeTag = $this->hasSlotDefault ? '' : '?>';
-
         $definition = '%s foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$this->comp[%d]->addSlot("%s", $_slot);'
-            .PHP_EOL.'} '.$closeTag;
+            .PHP_EOL.'} %s';
 
         $this->println(
-            sprintf(Php::start(), $definition, $this->attrs['name'], $this->context->depth, $this->attrs['slot'])
+            sprintf($definition, $phpStart, $this->attrs['name'], $this->context->depth, $this->attrs['slot'], $this->hasSlotDefault ? '' : $phpEnd)
         );
 
         if ($this->hasSlotDefault) {
@@ -81,7 +85,7 @@ class Slot extends AbstractEntity
                 $this->parseNode($slotDefault);
             }
 
-            $this->println('} '.Php::end());
+            $this->println('} '.$phpEnd);
         }
     }
 

@@ -32,7 +32,6 @@ class Template extends AbstractEntity
     
     public function newContext()
     {
-        Php::end(); // reset
         if (method_exists($this->node, 'querySelector')) {
             if ($extends = $this->node->querySelector('extends')) {
                 $this->extends($extends);

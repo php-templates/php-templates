@@ -141,22 +141,24 @@ abstract class AbstractEntity
 
     protected function controlStructure($statement, $args, $node, $html = true)
     {
+        $phpStart = '<?php';
+        $phpEnd = '?>';
         if ($args || $args === '0') {
             $statement .= " ($args)";
         }
 
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode(Php::start()." $statement { ".($html ? '?>' : '')),
+            $node->ownerDocument->createTextNode($phpStart." $statement { ".($html ? $phpEnd : '')),
             $node
         );
 
         if ($node->nextSibling) {
             $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode(Php::start()." } ".Php::end()),
+                $node->ownerDocument->createTextNode($phpStart." } ".$phpEnd),
                 $node->nextSibling
             );
         } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? Php::start() : ''). " } ".Php::end()));
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? $phpStart : ''). " } ".$phpEnd));
         }
     }
     
@@ -315,7 +317,7 @@ abstract class AbstractEntity
         $used = Helper::arrayToEval(array_values(array_unique($m[1])));//var_dump($used);die();
         $used = preg_replace('/\s*[\r\n]*\s*/', '', $used);
         if ($html) {
-            $templateString = " ?>$templateString<?php ";
+            $templateString = " ?> $templateString <?php ";
         }
         $fnDeclaration = 
         "function (\$data, \$slots) {

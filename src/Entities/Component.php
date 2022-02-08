@@ -26,12 +26,15 @@ class Component extends AbstractEntity
     
     public function templateContext()
     {
+        $phpStart = '<?php';
+        $phpEnd = '?>';
+
         $data = $this->depleteNode($this->node);//d($this->attrs['is'], $this->depth);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
 
         $this->println(
-            sprintf('%s $this->comp[%d] = Parsed::template("%s", %s);', Php::start(), $this->depth, $this->name, $dataString)
+            sprintf('%s $this->comp[%d] = Parsed::template("%s", %s);', $phpStart, $this->depth, $this->name, $dataString)
         );
         
         foreach ($this->node->childNodes as $slot)
@@ -40,7 +43,7 @@ class Component extends AbstractEntity
         }
         
         $this->println(
-            sprintf('$this->comp[%d]->render($this->data); ?>', $this->depth, Php::end())
+            sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, $phpEnd)
         );
 
         $this->document->toberemoved[] = $this->node;
