@@ -49,7 +49,7 @@ function dom($d, $name = '', $depth = 0)
         }
     }
     //print_r($x[0]['file'].'->'.$x[0]['line']);
-
+echo $content; return;
 
     echo '<div style="padding-left:'.($depth*0).'px"><div style="background:#f4ff9a; border: 1px solid black; margin-bottom:10px; padding:5px;">';
     echo '<div><b>'. $name .'</b></div>';

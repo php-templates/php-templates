@@ -9,6 +9,7 @@ use PhpTemplates\DependenciesMap;
 class Document
 {
     protected $name;
+    protected $config;
 
     public $templates = [];
     public $eventListeners = [];
@@ -114,6 +115,4 @@ class Document
     {
         DependenciesMap::add($this->name, $name);
     }
-  
-
 }

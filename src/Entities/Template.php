@@ -25,7 +25,7 @@ class Template extends AbstractEntity
         }
     }
     
-    protected function makeCaret()
+    protected function makeCaret($txt = '')
     {
         //
     }

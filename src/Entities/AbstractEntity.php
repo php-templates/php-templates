@@ -65,18 +65,22 @@ abstract class AbstractEntity
      *
      * @return void
      */
-    protected function makeCaret()
+    protected function makeCaret($debugText = '')
     {
+        if ($this->getRoot()->caret) {
+            $this->caret = $this->getRoot()->caret;
+            return;
+        }
         $node = $this->getRoot()->node;
-        $this->caret = $node->ownerDocument->createTextNode('');
+        $this->caret = $node->ownerDocument->createTextNode($debugText);
         //$this->document->toberemoved[] = $caret;
         $node->parentNode->insertBefore($this->caret, $node);
     }
 
     protected function println(string $line)
-    {
+    {//if (!$this->caret) return; //dd(get_class($this), get_class($this->getRoot()));
         $this->caret->parentNode->insertBefore(
-            $this->caret->ownerDocument->createTextNode($line),
+            $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
             $this->caret
         );
     }
@@ -88,13 +92,21 @@ abstract class AbstractEntity
             return $data;
         }
         foreach ($node->attributes as $a) {
-            $node->removeAttribute($a->nodeName);
+            $a = $a->cloneNode();
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) {
                 $k = substr($k, strlen($this->pf));
                 if (in_array($k, Config::allowedControlStructures)) {
                     $this->controlStructure($k, $a->nodeValue, $this->caret, $html);
                     continue;
+                } 
+                //todo validate simple node only
+                elseif ($custom = $this->directive($k, $a->nodeValue)) {
+                    $rid = '__r'.uniqid();
+                    $this->document->tobereplaced[$rid] = $custom;
+                    $data[$rid][] = '__empty__';
+                    continue;
+                    //$node->setAttribute($rid, '__empty__');
                 }
             }
             $k = $a->nodeName;
@@ -109,6 +121,11 @@ abstract class AbstractEntity
             } else {
                 $this->attrs[$k] = $val;
             }
+        }
+        
+        $attributes = $node->attributes;
+        while ($attributes->length) {
+            $node->removeAttribute($attributes->item(0)->name);
         }
 
         foreach ($data as $k => $val) {
@@ -143,7 +160,17 @@ abstract class AbstractEntity
         }
     }
     
-    
+    protected function directive($name, $val)
+    {
+        if (empty($this->document->config['directives'][$name])) {
+            return false;
+        }
+        $directive = $this->document->config['directives'][$name];
+        if (is_callable($directive)) {
+            return $directive($val);
+        }
+        return $directive;
+    }
 
     protected function getNodeSlots($node, $forceDefault = false): array
     {

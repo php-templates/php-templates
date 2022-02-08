@@ -67,18 +67,11 @@ class Config
     
     public static function addDirective($name, $value = null)
     {
+        //todo: validate to not override cstruct
         self::$data['directives'][$name] = $value;
     }
-    
-    public static function directive($name, $val)
-    {
-        if (empty(self::$data['directives'][$name])) {
-            return false;
-        }
-        $directive = self::$data['directives'][$name];
-        if (is_callable($directive)) {
-            return $directive($val);
-        }
-        return $directive;
-    }
 }
+
+Config::addDirective('bind', function($data) {
+    return '<?php foreach('.$data.' as $k=>$v) echo "$k=\"$v\" "; ?>';
+});

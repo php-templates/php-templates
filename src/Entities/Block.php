@@ -10,11 +10,50 @@ use IvoPetkov\HTML5DOMElement;
 
 class Block extends AbstractEntity
 {
-    protected $attrs = [];
+    protected $attrs = ['name' => null];
+    protected $itemsIteration = 0;
+    
+    protected $name;
 
+    public function __construct(Document $doc, $node, AbstractEntity $context = null)
+    {
+        parent::__construct($doc, $node, $context);
+        //todo: set name with throw error
+        $this->name = $node->getAttribute('name');
+    }
+
+    /**
+     * When a block is passed as a component slot
+     */
     public function componentContext()
     {
-        //
+        $this->attrs['slot'] = 'default';
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+        $this->println(
+            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots));', 
+            $this->depth, 
+            $this->context->depth, 
+            $this->attrs['slot'], 
+            $dataString,
+            $this->name
+            )
+        );
+        foreach ($this->node->childNodes as $slot) {
+            // register block defaults 
+            //todo: iterate over non empty slots
+            $this->itemsIteration++;
+            $this->parseNode($slot);
+        }
+        /*
+        $this->println(
+            sprintf('$this->comp[%d]->render($this->data); ?>', $this->depth)
+        );*/
+    }
+    
+    public function simpleNodeContext()
+    {
+        todo:
     }
 
     /**
@@ -25,7 +64,7 @@ class Block extends AbstractEntity
     }
 
     public function mount(HTML5DOMElement $node): void
-    {
+    {dd(334);
         $nodeData = Helper::nodeStdClass($node);
         $this->name = $this->getName($nodeData->name);
         $this->insertBlock($node);

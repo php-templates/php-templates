@@ -21,6 +21,7 @@ class SimpleNode extends AbstractEntity
     {
         $data = $this->depleteNode($this->node);
         foreach ($data as $k => $val) {
+            //if ($this->node->nodeName === 'textarea') dd($data);
             $this->node->setAttribute($k, $val);
         }
         
@@ -47,7 +48,23 @@ class SimpleNode extends AbstractEntity
         );
     }
     
-    protected function makeCaret() {
+    public function blockContext()
+    {
+        parent::makeCaret('foo');
+//dom($this->getRoot()->node);die();
+        $data = $this->depleteNode($this->node);
+        $dataString = Helper::arrayToEval($data);
+
+        $name = $this->context->name .'?slot='.Helper::uniqid();
+        (new Template($this->document, $this->node, $name))->newContext();
+
+        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
+        $this->println(
+            sprintf($definition, $this->depth, $this->context->depth, $this->context->name, $name, $dataString)
+        );
+    }
+    
+    protected function makeCaret($txt = '') {
         $this->caret = $this->node;
     }
 

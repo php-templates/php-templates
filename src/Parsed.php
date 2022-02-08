@@ -19,7 +19,7 @@ class Parsed
     public $block = [];
     
     public static function template($name, $data = [])
-    {//dd(self::$templates);
+    {
         return new self($name, self::$templates[$name], $data);
     }
     
@@ -115,4 +115,24 @@ class Parsed
 
         return $op;
     }
+    
+    public function withName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
 }
+
+Parsed::$templates['***block'] = function() {
+    extract($this->data);
+    if (isset($this->slots[$this->name])) {
+        usort($this->slots[$this->name], function($a, $b) {
+            $i1 = isset($a->attrs['_index']) ? $a->attrs['_index'] : 0;
+            $i2 = isset($b->attrs['_index']) ? $b->attrs['_index'] : 0;
+            return $i1 - $i2;
+        });
+        foreach ($this->slots($this->name) as $_slot) {
+            $_slot->render($this->data);
+        }
+    }
+};
