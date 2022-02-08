@@ -141,8 +141,9 @@ abstract class AbstractEntity
 
     protected function controlStructure($statement, $args, $node, $html = true)
     {
-        $phpStart = '<?php';
-        $phpEnd = '?>';
+        $phpStart = $this->depth ? '' : '<?php';
+        $phpEnd = $this->depth ? '' : '?>';
+        
         if ($args || $args === '0') {
             $statement .= " ($args)";
         }
