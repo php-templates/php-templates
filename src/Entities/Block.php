@@ -48,7 +48,7 @@ class Block extends AbstractEntity
     }
     
     public function simpleNodeContext()
-    {
+    {Php::$debug = 1;
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
         $this->println(
@@ -65,7 +65,7 @@ class Block extends AbstractEntity
             $this->itemsIteration++;
             $this->parseNode($slot);
         }
-    
+    d(123123);
         $this->println(
             sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, Php::end())
         );

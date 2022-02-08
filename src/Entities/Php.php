@@ -10,6 +10,7 @@ use PhpTemplates\Document;
 class Php extends AbstractEntity
 {
     private static $started = false;
+    public static $debug = false;
 
     /**
      * Start php string cross entities instances
@@ -31,6 +32,10 @@ class Php extends AbstractEntity
      */
     public static function end(): string
     {
+        if (self::$debug) {
+            var_dump(self::$started);
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        }
         if (self::$started) {
             return '?>';
         }

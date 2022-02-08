@@ -32,7 +32,7 @@ class Slot extends AbstractEntity
             .PHP_EOL.'} '.$closeTag;
 
         $this->println(
-            sprintf(Php::start(), $definition, $this->attrs['name'], $dataString)
+            sprintf($definition, Php::start(), $this->attrs['name'], $dataString)
         );
 
         if ($this->hasSlotDefault) {

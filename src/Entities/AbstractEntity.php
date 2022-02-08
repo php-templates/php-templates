@@ -146,17 +146,17 @@ abstract class AbstractEntity
         }
 
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode("<?php $statement { ".($html ? '?>' : '')),
+            $node->ownerDocument->createTextNode(Php::start()." $statement { ".($html ? '?>' : '')),
             $node
         );
 
         if ($node->nextSibling) {
             $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode("<?php } ?>"),
+                $node->ownerDocument->createTextNode(Php::start()." } ".Php::end()),
                 $node->nextSibling
             );
         } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? '<?php' : ''). " } ?>"));
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? Php::start() : ''). " } ".Php::end()));
         }
     }
     
