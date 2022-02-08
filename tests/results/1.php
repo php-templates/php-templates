@@ -35,7 +35,7 @@ Parsed::$templates['./cases/1'] = function ($data, $slots) {
      ?><!DOCTYPE html>
 <html>
 <body>
-<?php $this->comp[0] = Parsed::template("comp/comp_slot", []);
+ $this->comp[0] = Parsed::template("comp/comp_slot", []);
 $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=1", []));
 $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("***block", [])->withName("b1")->setSlots($this->slots));
 $this->comp[2] = $this->comp[1]->addSlot("b1", Parsed::template("b1?slot=2", []));
