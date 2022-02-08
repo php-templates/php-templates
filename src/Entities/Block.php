@@ -53,7 +53,7 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
-        todo:
+        // todo:
     }
 
     /**

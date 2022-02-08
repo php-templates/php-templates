@@ -40,9 +40,9 @@ class SimpleNode extends AbstractEntity
         $dataString = Helper::arrayToEval($data);
 
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-        (new Template($this->document, $this->node))->newContext($name);
+        (new Template($this->document, $this->node, $name))->newContext();
 
-        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s))';
+        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
         $this->println(
             sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
         );
@@ -51,7 +51,7 @@ class SimpleNode extends AbstractEntity
     public function blockContext()
     {
         parent::makeCaret('foo');
-//dom($this->getRoot()->node);die();
+
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
 

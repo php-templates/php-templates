@@ -6,6 +6,7 @@ use PhpTemplates\Parser;
 use DOMDocument;
 use Component;
 use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Entities\Template as EntitiesTemplate;
 use PhpTemplates\Facades\DomHolder;
 
 class Template
@@ -30,7 +31,7 @@ class Template
             if ($path = $doc->exists()) {
 
             } else {
-                $template = (new Template($doc, null, $rfilepath))->newContext();
+                (new EntitiesTemplate($doc, null, $rfilepath))->newContext();
                 $path = $doc->save();
             }
 
