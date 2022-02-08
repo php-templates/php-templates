@@ -21,8 +21,8 @@ class Php extends AbstractEntity
     {
         $r = self::$started ? '' : '<?php';
         if (self::$debug) {
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             var_dump($r);
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         }
         self::$started = true;
         return $r;
@@ -36,8 +36,8 @@ class Php extends AbstractEntity
     {
         $r = self::$started ? '?>' : '';
         if (self::$debug) {
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             var_dump($r);
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         }
         self::$started = false;
         return $r;
