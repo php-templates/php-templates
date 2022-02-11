@@ -19,7 +19,7 @@ class SimpleNode extends AbstractEntity
     
     public function templateContext()
     {
-        $data = $this->depleteNode($this->node);
+        $data = $this->depleteNode($this->node, true);
         foreach ($data as $k => $val) {
             //if ($this->node->nodeName === 'textarea') dd($data);
             $this->node->setAttribute($k, $val);
@@ -33,7 +33,7 @@ class SimpleNode extends AbstractEntity
 
     public function componentContext()
     {
-        parent::makeCaret();
+        parent::makeCaret('"caret";');
         $this->attrs['slot'] = 'default';
 
         $data = $this->depleteNode($this->node);
@@ -50,7 +50,7 @@ class SimpleNode extends AbstractEntity
     
     public function blockContext()
     {
-        parent::makeCaret('foo');
+        parent::makeCaret();
 
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
@@ -70,7 +70,7 @@ class SimpleNode extends AbstractEntity
 
     public function slotContext()
     {
-
+        todo
     }
 
 

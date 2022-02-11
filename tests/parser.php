@@ -38,6 +38,9 @@ foreach($files as $f) {
     $test = '';
     $expected = [];
     foreach ($cases as $case) {
+        if (empty(trim($case))) {
+            continue;
+        }
         list($t, $exp) = explode('=====', $case);
         $test .= $t.PHP_EOL.'-----'.PHP_EOL;
         $expected[] = $exp;

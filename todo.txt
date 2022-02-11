@@ -10,6 +10,8 @@ dar si
 php here
 </php>
 
+trebuie rezolvat cu binds from slot to surface... poate fac o alta expresie pt asta... wrap in <template>
+
 pune directivele custom pan la urma...
 
 template::config()

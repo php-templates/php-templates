@@ -49,8 +49,8 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
-        $phpStart = '<?php';
-        $phpEnd = '?>';
+        $phpStart = $this->controlStructures ? '' : '<?php';
+        $phpEnd = $this->controlStructures ? '' : '?>';
 
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
@@ -84,7 +84,7 @@ class Block extends AbstractEntity
     }
 
     public function mount(HTML5DOMElement $node): void
-    {dd(334);
+    {
         $nodeData = Helper::nodeStdClass($node);
         $this->name = $this->getName($nodeData->name);
         $this->insertBlock($node);

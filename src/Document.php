@@ -45,6 +45,7 @@ class Document
         $tpl = '<?php ';
         $tpl .= "\nuse PhpTemplates\Parsed;";
         $tpl .= "\nuse PhpTemplates\DomEvent;";
+        $tpl .= "\nuse PhpTemplates\Helper;";
         foreach ($this->templates as $name => $fn) {
             $tpl .= "\nParsed::\$templates['$name'] = $fn;";
         }
@@ -63,8 +64,8 @@ class Document
 
         $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
 
-        $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
-
+        /*$tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
+*/
         return $tpl;
     }
 

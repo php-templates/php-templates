@@ -108,4 +108,14 @@ class Helper {
     public static function isEmptyNode($node) {
         return $node->nodeName === '#text' && !trim($node->nodeValue);
     }
+    
+    public static function mergeAttrs(...$attrs)// spread
+    {
+        foreach ($attrs as $attr) {
+            if (!is_string($attr)) {
+                return $attrs;
+            }
+        }
+        return implode(' ', $attrs);
+    }
 }

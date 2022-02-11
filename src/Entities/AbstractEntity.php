@@ -15,6 +15,7 @@ abstract class AbstractEntity
     protected $node;
     protected $caret;
     protected $attrs = [];
+    protected $controlStructures = [];
     protected $depth = 0;
     protected $pf = 'p-';
     
@@ -68,10 +69,10 @@ abstract class AbstractEntity
     protected function makeCaret($debugText = '')
     {
         if ($this->getRoot()->caret) {
-            $this->caret = $this->getRoot()->caret;
-            return;
+            $node = $this->getRoot()->caret;
+        } else {
+            $node = $this->getRoot()->node;
         }
-        $node = $this->getRoot()->node;
         $this->caret = $node->ownerDocument->createTextNode($debugText);
         //$this->document->toberemoved[] = $caret;
         $node->parentNode->insertBefore($this->caret, $node);
@@ -85,19 +86,20 @@ abstract class AbstractEntity
         );
     }
     
-    protected function depleteNode($node, $html = true)
+    protected function depleteNode($node, $html = false)
     {
         $data = [];
+        $binds = [];
         if (!$node->attributes) {
             return $data;
         }
         foreach ($node->attributes as $a) {
-            $a = $a->cloneNode();
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) {
                 $k = substr($k, strlen($this->pf));
                 if (in_array($k, Config::allowedControlStructures)) {
-                    $this->controlStructure($k, $a->nodeValue, $this->caret, $html);
+                    $this->controlStructure($k, $a->nodeValue, $this->caret);
+                    $this->controlStructures[] = [$k, $a->nodeValue];
                     continue;
                 } 
                 //todo validate simple node only
@@ -110,36 +112,67 @@ abstract class AbstractEntity
                 }
             }
             $k = $a->nodeName;
-            $val = $a->nodeValue;
-            if ($k[0] === ':') {
-                $k = substr($k, 1);
-            } elseif (!$html) {
-                $val = "'$val'";
+       
+            if (array_key_exists($k, $this->attrs)) {
+                $this->attrs[$k] = $a->nodeValue;
+            } 
+            elseif ($k[0] === ':') {
+                $binds[$k][] = $a->nodeValue;
             }
-            if (!array_key_exists($k, $this->attrs)) {
-                $data[$k][] = $val;
-            } else {
-                $this->attrs[$k] = $val;
+            else {
+                $data[$k][] = $a->nodeValue;
             }
         }
-        
+
         $attributes = $node->attributes;
         while ($attributes->length) {
             $node->removeAttribute($attributes->item(0)->name);
         }
-
-        foreach ($data as $k => $val) {
-            if (count($val) > 1) {
-                $data[$k] = 'Helper::mergeAttrs('.implode(',',$val).')';
+        
+        foreach ($data as $k => &$val) {
+            $bk = ':'.$k;
+            $bind = isset($binds[$bk]) ? $binds[$bk] : null;
+            
+            if ($bind || !$html) {
+                $val = array_map(function($attr) {
+                    return "'$attr'";
+                }, $val);
+            }
+            if ($bind) {
+                $val = array_merge($val, $bind);
+                $val = 'Helper::mergeAttrs('.implode(',',$val).')';
+                unset($binds[$bk]);
             } else {
-                $data[$k] = reset($val);
+                $val = implode(' ', $val);
+            }
+            
+            if ($html && $bind) {
+                $rkey = uniqid();
+                $this->document->tobereplaced[$rkey] = "<?php echo $val; ?>";
+                $val = $rkey;
+            }
+        }
+        
+        foreach ($binds as $k => $bval) {
+            $k = substr($k, 1);
+            if (count($bval) > 1) {
+                $bval = 'Helper::mergeAttrs('.implode(',',$bval).')';
+            } else {
+                $bval = $bval[0];
+            }
+            if ($html) {
+                $rkey = uniqid();
+                $this->document->tobereplaced[$rkey] = "<?php echo $bval; ?>";
+                $data[$k] = $rkey;
+            } else {
+                $data[$k] = $bval;
             }
         }
 
         return $data;
     }
 
-    protected function controlStructure($statement, $args, $node, $html = true)
+    protected function controlStructure($statement, $args, $node)
     {
         $phpStart = $this->depth ? '' : '<?php';
         $phpEnd = $this->depth ? '' : '?>';
@@ -149,7 +182,7 @@ abstract class AbstractEntity
         }
 
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($phpStart." $statement { ".($html ? $phpEnd : '')),
+            $node->ownerDocument->createTextNode($phpStart." $statement { ".$phpEnd),
             $node
         );
 

@@ -29,7 +29,7 @@ class Component extends AbstractEntity
         $phpStart = '<?php';
         $phpEnd = '?>';
 
-        $data = $this->depleteNode($this->node);//d($this->attrs['is'], $this->depth);
+        $data = $this->depleteNode($this->node, false);//d($this->attrs['is'], $this->depth);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
 
@@ -55,7 +55,7 @@ class Component extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $dataString = Helper::arrayToEval($this->depleteNode($this->node));
+        $dataString = Helper::arrayToEval($this->depleteNode($this->node, false));
         (new Template($this->document, $this->name))->newContext();
 
         $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
