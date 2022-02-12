@@ -46,7 +46,7 @@ class Component extends AbstractEntity
             sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, $phpEnd)
         );
 
-        $this->document->toberemoved[] = $this->node;
+        //$this->document->toberemoved[] = $this->node;
     }
 
     /**

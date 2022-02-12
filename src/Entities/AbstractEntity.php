@@ -39,6 +39,9 @@ abstract class AbstractEntity
             $node = $this->load($node);
         }
         $this->node = $node;
+        if (method_exists($this->node, 'setAttribute')) {
+        $this->node->setAttribute('i', $this->depth);
+        }
         $this->context = $context;
         $this->makeCaret();
     }
@@ -74,7 +77,7 @@ abstract class AbstractEntity
             $debugText = end($debugText);
         }if ($node)dd($node);
         if (!$node) {
-            d($this->depth);
+            //d($this->depth);
         if (!$this->depth) {
             $this->caret = $this->node;
             return;

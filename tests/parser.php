@@ -76,7 +76,13 @@ foreach($files as $f) {
             echo $f."[$i] failed \n";
             echo "\nexpected\n{$expected[$i]}\ngained\n";
             echo $result;
-            echo "\n$_expected\n$_result";
+            echo "\n$_expected\n$_result\n";
+            
+            $input = $cases[$i];
+            $output = file_get_contents($dest);
+            $output = explode('-----', $output);
+            $output = $output[$i];
+            echo "\ninput\n$input\n\noutput\n$output";
             die();
         }
     }
