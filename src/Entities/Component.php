@@ -70,6 +70,15 @@ class Component extends AbstractEntity
     }
 
     /**
+     * When component is passed as block default
+     */
+    public function blockContext()
+    {
+        $this->node->setAttribute('slot', $this->context->name);
+        $this->componentContext();
+    }
+
+    /**
      * When a component is passed as slot default
      */
     public function slotContext()
