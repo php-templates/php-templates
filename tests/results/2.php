@@ -20,7 +20,7 @@ Parsed::$templates['comp/comp_slot?slot=default&id=2'] = function ($data, $slots
      ?> <div>
         
 <?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);
-$this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=3", ['_index' => '1']));
+$this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=3", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[0]->render($this->data); ?>
     </div> <?php 
 };

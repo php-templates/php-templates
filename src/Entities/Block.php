@@ -85,6 +85,7 @@ class Block extends AbstractEntity
 
     public function blockContext()
     {
+        $this->node->setAttribute('slot', $this->context->name);$this->x = 1;
         $this->componentContext();
     }
 

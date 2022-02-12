@@ -59,7 +59,7 @@ class SimpleNode extends AbstractEntity
         (new Template($this->document, $this->node, $name))->newContext();
 
         $this->println(
-            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
+            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 
             $this->depth, $this->context->depth, $this->context->name, $name, $dataString)
         );
     }
