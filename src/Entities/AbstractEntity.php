@@ -40,7 +40,7 @@ abstract class AbstractEntity
         }
         $this->node = $node;
         if (method_exists($this->node, 'setAttribute')) {
-        $this->node->setAttribute('i', $this->depth);
+        // $this->node->setAttribute('i', $this->depth);
         }
         $this->context = $context;
         $this->makeCaret();
@@ -72,7 +72,7 @@ abstract class AbstractEntity
     protected function makeCaret($node = null)
     {
         $debugText = '';
-        if (1) {
+        if (0) {
             $debugText = explode('\\', get_class($this));
             $debugText = end($debugText);
         }if ($node)dd($node);
@@ -82,9 +82,9 @@ abstract class AbstractEntity
             $this->caret = $this->node;
             return;
         } 
-        elseif($this->depth === 1) {
-            $node = $this->node;
-        } else {
+        /* elseif($this->depth === 1) {
+            $node = $this->context->caret;
+        }  */else {
             $node = $this->context->caret;
         }
         }

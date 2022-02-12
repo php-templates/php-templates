@@ -46,7 +46,7 @@ class Component extends AbstractEntity
             sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, $phpEnd)
         );
 
-        //$this->document->toberemoved[] = $this->node;
+        $this->document->toberemoved[] = $this->node;
     }
 
     /**
@@ -58,9 +58,9 @@ class Component extends AbstractEntity
         $dataString = Helper::arrayToEval($this->depleteNode($this->node, false));
         (new Template($this->document, $this->name))->newContext();
 
-        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
         $this->println(
-            sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString)
+            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
+            $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString)
         );
         
         foreach ($this->node->childNodes as $slot)

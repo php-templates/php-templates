@@ -11,8 +11,7 @@ use IvoPetkov\HTML5DOMElement;
 class Block extends AbstractEntity
 {
     protected $attrs = ['name' => null];
-    protected $itemsIteration = 0;
-    
+
     protected $name;
 
     public function __construct(Document $doc, $node, AbstractEntity $context = null)
@@ -39,10 +38,14 @@ class Block extends AbstractEntity
             $this->name
             )
         );
-        foreach ($this->node->childNodes as $slot) {
+        foreach ($this->childNodes() as $i => $slot) {
             // register block defaults 
-            //todo: iterate over non empty slots
-            $this->itemsIteration++;
+            if (!method_exists($slot, 'setAttribute')) {
+                $_slot = $slot->ownerDocument->createElement('template');
+                $_slot->appendChild($slot);
+                $slot = $_slot;
+            }
+            $slot->setAttribute('_index', $i+1);
             $this->parseNode($slot);
         }
     }
@@ -62,10 +65,14 @@ class Block extends AbstractEntity
             $this->name
             )
         );
-        foreach ($this->node->childNodes as $slot) {
+        foreach ($this->childNodes() as $i => $slot) {
             // register block defaults 
-            //todo: iterate over non empty slots
-            $this->itemsIteration++;
+            if (!method_exists($slot, 'setAttribute')) {
+                $_slot = $slot->ownerDocument->createElement('template');
+                $_slot->appendChild($slot);
+                $slot = $_slot;
+            }
+            $slot->setAttribute('_index', $i+1);
             $this->parseNode($slot);
         }
 
@@ -74,6 +81,11 @@ class Block extends AbstractEntity
         );
 
         $this->document->toberemoved[] = $this->node;
+    }
+
+    public function blockContext()
+    {
+        $this->componentContext();
     }
 
     /**

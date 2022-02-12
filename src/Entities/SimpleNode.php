@@ -41,10 +41,10 @@ class SimpleNode extends AbstractEntity
 
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
         (new Template($this->document, $this->node, $name))->newContext();
-//aici
-        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
+
         $this->println(
-            sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
+            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
+            $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
         );
     }
     
@@ -58,9 +58,9 @@ class SimpleNode extends AbstractEntity
         $name = $this->context->name .'?slot='.Helper::uniqid();
         (new Template($this->document, $this->node, $name))->newContext();
 
-        $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
         $this->println(
-            sprintf($definition, $this->depth, $this->context->depth, $this->context->name, $name, $dataString)
+            sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
+            $this->depth, $this->context->depth, $this->context->name, $name, $dataString)
         );
     }
     

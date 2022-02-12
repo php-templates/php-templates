@@ -39,8 +39,7 @@ class Slot extends AbstractEntity
         );
 
         if ($this->hasSlotDefault) {
-            $definition = 'if (empty($this->slots("%s"))) {';
-            $this->println(sprintf($definition, $this->attrs['name']));
+            $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
 
             foreach ($this->childNodes($this->node) as $slotDefault) {
                 $this->parseNode($slotDefault);
@@ -78,8 +77,7 @@ class Slot extends AbstractEntity
         );
 
         if ($this->hasSlotDefault) {
-            $definition = 'if (empty($this->slots("%s"))) {';
-            $this->println(sprintf($definition, $this->attrs['name']));
+            $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
 
             foreach ($this->node->childNodes as $slotDefault) {
                 $this->parseNode($slotDefault);
