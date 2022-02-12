@@ -25,7 +25,7 @@ class SimpleNode extends AbstractEntity
             $this->node->setAttribute($k, $val);
         }
         
-        foreach ($this->node->childNodes as $slot)
+        foreach ($this->childNodes($this->node) as $slot)
         {
             $this->parseNode($slot);
         }
@@ -33,7 +33,7 @@ class SimpleNode extends AbstractEntity
 
     public function componentContext()
     {
-        parent::makeCaret('"caret";');
+        parent::makeCaret();
         $this->attrs['slot'] = 'default';
 
         $data = $this->depleteNode($this->node);
@@ -41,7 +41,7 @@ class SimpleNode extends AbstractEntity
 
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
         (new Template($this->document, $this->node, $name))->newContext();
-
+//aici
         $definition = '$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));';
         $this->println(
             sprintf($definition, $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
@@ -70,7 +70,14 @@ class SimpleNode extends AbstractEntity
 
     public function slotContext()
     {
-        todo
+        //$this->caret = $this->context->caret.insert before
+        $this->node = $this->node->cloneNode(true);
+        parent::makeCaret();
+        //$this->depth = 0; // move to html root
+        $this->templateContext();
+        $this->println(' ?>'); // break php
+        $this->caret->parentNode->insertBefore($this->node, $this->caret);
+        $this->println('<?php ;'); // unbreak php
     }
 
 

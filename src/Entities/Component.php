@@ -37,7 +37,7 @@ class Component extends AbstractEntity
             sprintf('%s $this->comp[%d] = Parsed::template("%s", %s);', $phpStart, $this->depth, $this->name, $dataString)
         );
         
-        foreach ($this->node->childNodes as $slot)
+        foreach ($this->childNodes() as $slot)
         {
             $this->parseNode($slot);
         }

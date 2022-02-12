@@ -42,7 +42,7 @@ class Slot extends AbstractEntity
             $definition = 'if (empty($this->slots("%s"))) {';
             $this->println(sprintf($definition, $this->attrs['name']));
 
-            foreach ($this->node->childNodes as $slotDefault) {
+            foreach ($this->childNodes($this->node) as $slotDefault) {
                 $this->parseNode($slotDefault);
             }
 
@@ -62,9 +62,9 @@ class Slot extends AbstractEntity
      *
      */
     public function componentContext()
-    {
-        $phpStart = '<?php';
-        $phpEnd = '?>';
+    {//aici
+        $phpStart = '';//'?php';
+        $phpEnd = '';//'?';
 
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);

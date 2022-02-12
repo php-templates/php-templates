@@ -66,19 +66,31 @@ abstract class AbstractEntity
      *
      * @return void
      */
-    protected function makeCaret($debugText = '')
+    protected function makeCaret($node = null)
     {
-        if ($this->getRoot()->caret) {
-            $node = $this->getRoot()->caret;
+        $debugText = '';
+        if (1) {
+            $debugText = explode('\\', get_class($this));
+            $debugText = end($debugText);
+        }if ($node)dd($node);
+        if (!$node) {
+            d($this->depth);
+        if (!$this->depth) {
+            $this->caret = $this->node;
+            return;
+        } 
+        elseif($this->depth === 1) {
+            $node = $this->node;
         } else {
-            $node = $this->getRoot()->node;
+            $node = $this->context->caret;
+        }
         }
         $this->caret = $node->ownerDocument->createTextNode($debugText);
         //$this->document->toberemoved[] = $caret;
         $node->parentNode->insertBefore($this->caret, $node);
     }
 
-    protected function println(string $line)
+    public function println(string $line)
     {//if (!$this->caret) return; //dd(get_class($this), get_class($this->getRoot()));
         $this->caret->parentNode->insertBefore(
             $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
@@ -101,11 +113,11 @@ abstract class AbstractEntity
                     $this->controlStructure($k, $a->nodeValue, $this->caret);
                     $this->controlStructures[] = [$k, $a->nodeValue];
                     continue;
-                } 
+                }
                 //todo validate simple node only
                 elseif ($custom = $this->directive($k, $a->nodeValue)) {
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$rid] = $custom;
+                    $this->document->tobereplaced[$rid] = $custom;//d($custom);
                     $data[$rid][] = '__empty__';
                     continue;
                     //$node->setAttribute($rid, '__empty__');
@@ -176,7 +188,7 @@ abstract class AbstractEntity
     {
         $phpStart = $this->depth ? '' : '<?php';
         $phpEnd = $this->depth ? '' : '?>';
-        
+    
         if ($args || $args === '0') {
             $statement .= " ($args)";
         }
@@ -192,12 +204,12 @@ abstract class AbstractEntity
                 $node->nextSibling
             );
         } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode(($html ? $phpStart : ''). " } ".$phpEnd));
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode($phpStart. " } ".$phpEnd));
         }
     }
     
     protected function directive($name, $val)
-    {
+    {//d($name, $this->document->config['directives']);
         if (empty($this->document->config['directives'][$name])) {
             return false;
         }
@@ -206,6 +218,25 @@ abstract class AbstractEntity
             return $directive($val);
         }
         return $directive;
+    }
+    
+    protected function childNodes($node = null)
+    {
+        if (!$node) {
+            $node = $this->node;
+        }
+        $cnodes = [];
+        if (!$node->childNodes) {
+            return $cnodes;
+        }
+        foreach ($node->childNodes as $cn) {
+            if (Helper::isEmptyNode($cn)) 
+            continue;
+            
+            $cnodes[] = $cn;
+        }
+        
+        return $cnodes;
     }
 
     protected function getNodeSlots($node, $forceDefault = false): array

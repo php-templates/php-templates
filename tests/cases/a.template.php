@@ -1,3 +1,4 @@
+<!-- slot in slot -->
 <template is="comp/a">
     <p slot="sn9">9</p>
 </template>

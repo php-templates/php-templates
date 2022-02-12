@@ -15,7 +15,7 @@ class Config
     ];
     
     const allowedControlStructures = [
-        'if', 'elseif', 'else', 'for', 'foreach', 'raw'
+        'if', 'elseif', 'else', 'for', 'foreach'
     ];
     
     const attrCumulative = [
@@ -74,4 +74,7 @@ class Config
 
 Config::addDirective('bind', function($data) {
     return '<?php foreach('.$data.' as $k=>$v) echo "$k=\"$v\" "; ?>';
+});
+Config::addDirective('raw', function($data) {
+    return '<?php echo ('.$data.') ?>';
 });

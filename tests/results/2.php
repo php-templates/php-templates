@@ -23,17 +23,12 @@ Parsed::$templates['comp/comp_slot?slot=default&id=2'] = function ($data, $slots
 $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=3", []));
 $this->comp[0]->render($this->data); ?></div> <?php 
 };
-Parsed::$templates['comp/comp_slot?slot=default&id=4'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-     ?>  <?php 
-};
 Parsed::$templates['./cases/2'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
 <html><body>
 <?php $this->comp[0] = Parsed::template("comp/comp_slot", []);
-$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=2", []));"caret";
-$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=4", []));"caret";
+$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=2", []));
 $this->comp[0]->render($this->data); ?>
 
 -----</body></html> <?php 
