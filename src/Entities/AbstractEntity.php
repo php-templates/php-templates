@@ -189,6 +189,10 @@ abstract class AbstractEntity
 
     protected function controlStructure($statement, $args, $node)
     {
+        // check if next node has or not a control structure like elseif or else to not close the tag
+        // check if above node has or not a control structure like if or elseif to not open php tag
+        // prev node already depleted by attributes, so can't help... find a solution
+
         $phpStart = $this->depth ? '' : '<?php';
         $phpEnd = $this->depth ? '' : '?>';
     
@@ -212,7 +216,7 @@ abstract class AbstractEntity
     }
     
     protected function directive($name, $val)
-    {//d($name, $this->document->config['directives']);
+    {
         if (empty($this->document->config['directives'][$name])) {
             return false;
         }
