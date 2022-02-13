@@ -93,16 +93,28 @@ abstract class AbstractEntity
         $node->parentNode->insertBefore($this->caret, $node);
     }
 
-    public function println(string $line)
-    {//if (!$this->caret) return; //dd(get_class($this), get_class($this->getRoot()));
-        $this->caret->parentNode->insertBefore(
-            $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
-            $this->caret
-        );
+    public function println(string $line, $end = false)
+    {
+        if ($end) {
+            if ($this->caret->nextSibling) {
+                $this->caret->parentNode->insertBefore(
+                    $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
+                    $this->caret->nextSibling
+                );
+            } else {
+                $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode(PHP_EOL.$line));
+            }
+        } else {
+            $this->caret->parentNode->insertBefore(
+                $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
+                $this->caret
+            );
+        }
     }
     
-    protected function depleteNode($node, $html = false)
+    protected function depleteNode($node, $htmlContext = false, $echoData = false)
     {
+        $phpTagsInserted = false;
         $data = [];
         $binds = [];
         if (!$node->attributes) {
@@ -113,8 +125,9 @@ abstract class AbstractEntity
             if (strpos($k, $this->pf) === 0) {
                 $k = substr($k, strlen($this->pf));
                 if (in_array($k, Config::allowedControlStructures)) {
-                    $this->controlStructure($k, $a->nodeValue, $this->caret);
+                    $this->controlStructure($k, $a->nodeValue, $this->caret, $htmlContext && !$phpTagsInserted);
                     $this->controlStructures[] = [$k, $a->nodeValue];
+                    $phpTagsInserted = true;
                     continue;
                 }
                 //todo validate simple node only
@@ -139,6 +152,23 @@ abstract class AbstractEntity
             }
         }
 
+        // enclose html with ?\><\?php
+        if ($htmlContext && $phpTagsInserted && $node->parentNode) {
+            $node->parentNode->insertBefore(
+                $node->ownerDocument->createTextNode(' ?>'),
+                $node
+            );
+    
+            if ($node->nextSibling) {
+                $node->parentNode->insertBefore(
+                    $node->ownerDocument->createTextNode('<?php '),
+                    $node->nextSibling
+                );
+            } else {
+                $node->parentNode->appendChild($node->ownerDocument->createTextNode('<?php '));
+            }
+        }
+
         $attributes = $node->attributes;
         while ($attributes->length) {
             $node->removeAttribute($attributes->item(0)->name);
@@ -148,7 +178,7 @@ abstract class AbstractEntity
             $bk = ':'.$k;
             $bind = isset($binds[$bk]) ? $binds[$bk] : null;
             
-            if ($bind || !$html) {
+            if ($bind || !$echoData) {
                 $val = array_map(function($attr) {
                     return "'$attr'";
                 }, $val);
@@ -161,7 +191,7 @@ abstract class AbstractEntity
                 $val = implode(' ', $val);
             }
             
-            if ($html && $bind) {
+            if ($echoData && $bind) {
                 $rkey = uniqid();
                 $this->document->tobereplaced[$rkey] = "<?php echo $val; ?>";
                 $val = $rkey;
@@ -175,7 +205,7 @@ abstract class AbstractEntity
             } else {
                 $bval = $bval[0];
             }
-            if ($html) {
+            if ($echoData) {
                 $rkey = uniqid();
                 $this->document->tobereplaced[$rkey] = "<?php echo $bval; ?>";
                 $data[$k] = $rkey;
@@ -187,38 +217,27 @@ abstract class AbstractEntity
         return $data;
     }
 
-    protected function controlStructure($statement, $args, $node)
+    protected function controlStructure($statement, $args, $node, $phpTags = false)
     {
-        // check if next node has or not a control structure like elseif or else to not close the tag
-        // check if above node has or not a control structure like if or elseif to not open php tag
-        // prev node already depleted by attributes, so can't help... find a solution
-        $phpStart = $this->depth ? '' : '';
-        $phpEnd = $this->depth ? '' : '';
-        if (in_array($statement, ['elseif', 'else'])) {
-            $phpStart = ';';
-        }
-        if ($next = $this->node->nextSibling) {
-            if (method_exists($next, 'hasAttribute') && ($next->hasAttribute($this->pf.'elseif') || $next->hasAttribute($this->pf.'else'))) {
-                $phpEnd = '';
-            }
-        }
-    
+        $phpStart = $phpTags ? '<?php ;' : '';
+        $phpEnd = $phpTags ? '; ?>' : '';
+
         if ($args || $args === '0') {
             $statement .= " ($args)";
         }
 
         $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($phpStart." $statement { ".$phpEnd),
+            $node->ownerDocument->createTextNode($phpStart." $statement { "),
             $node
         );
 
         if ($node->nextSibling) {
             $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode($phpStart." } ".$phpEnd),
+                $node->ownerDocument->createTextNode(" } ".$phpEnd),
                 $node->nextSibling
             );
         } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode($phpStart. " } ".$phpEnd));
+            $node->parentNode->appendChild($node->ownerDocument->createTextNode(" } ".$phpEnd));
         }
     }
     

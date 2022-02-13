@@ -22,13 +22,12 @@ class Slot extends AbstractEntity
     }
 
     public function simpleNodeContext()
-    {
-        $phpStart = '';
-        $phpEnd = '';
-
+    {    
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
-        $closeTag = $this->hasSlotDefault ? '' : '?>';
+
+        $phpStart = $this->controlStructures ? '' : '<?php ';
+        $phpEnd = $this->controlStructures ? '' : ' ?>';
 
         $definition = '%s foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
@@ -79,7 +78,7 @@ class Slot extends AbstractEntity
         if ($this->hasSlotDefault) {
             $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
 
-            foreach ($this->node->childNodes as $slotDefault) {
+            foreach ($this->childNodes() as $slotDefault) {
                 $this->parseNode($slotDefault);
             }
 

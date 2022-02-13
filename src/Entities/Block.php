@@ -52,14 +52,13 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
-        $phpStart = $this->controlStructures ? '' : '';
-        $phpEnd = $this->controlStructures ? '' : '';
-
+        $this->println('<?php ;');
+        $this->println(' ?>', 'after');
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
+
         $this->println(
-            sprintf('%s $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
-            $phpStart,
+            sprintf('$this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
             $this->depth, 
             $dataString,
             $this->name
@@ -77,7 +76,7 @@ class Block extends AbstractEntity
         }
 
         $this->println(
-            sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, $phpEnd)
+            sprintf('$this->comp[%d]->render($this->data);', $this->depth)
         );
 
         $this->document->toberemoved[] = $this->node;

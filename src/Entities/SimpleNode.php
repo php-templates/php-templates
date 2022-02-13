@@ -19,7 +19,7 @@ class SimpleNode extends AbstractEntity
     
     public function templateContext()
     {
-        $data = $this->depleteNode($this->node, true);
+        $data = $this->depleteNode($this->node, true, true);
         foreach ($data as $k => $val) {
             //if ($this->node->nodeName === 'textarea') dd($data);
             $this->node->setAttribute($k, $val);
@@ -70,13 +70,22 @@ class SimpleNode extends AbstractEntity
 
     public function slotContext()
     {
-        //$this->caret = $this->context->caret.insert before
         $this->node = $this->node->cloneNode(true);
         parent::makeCaret();
-        //$this->depth = 0; // move to html root
-        $this->templateContext();
-        //$this->println(' ?'); // break php
+
+        $data = $this->depleteNode($this->node, false, true);
+        foreach ($data as $k => $val) {
+            //if ($this->node->nodeName === 'textarea') dd($data);
+            $this->node->setAttribute($k, $val);
+        }
+        
+        foreach ($this->childNodes($this->node) as $slot)
+        {
+            $this->parseNode($slot);
+        }
+
+        $this->println('; ?>');
+        $this->println('<?php ;', 'after');
         $this->caret->parentNode->insertBefore($this->node, $this->caret);
-        //$this->println('?php ;'); // unbreak php
     }
 }

@@ -26,15 +26,15 @@ class Component extends AbstractEntity
     
     public function templateContext()
     {
-        $data = $this->depleteNode($this->node, false);//d($this->attrs['is'], $this->depth);
+        $this->println('<?php ;');
+        $this->println(' ?>', 'after');
+
+        $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
-        
-        $phpStart = $this->controlStructures ? '' : '';
-        $phpEnd = $this->controlStructures ? '' : '';
 
         $this->println(
-            sprintf('%s $this->comp[%d] = Parsed::template("%s", %s);', $phpStart, $this->depth, $this->name, $dataString)
+            sprintf('$this->comp[%d] = Parsed::template("%s", %s);', $this->depth, $this->name, $dataString)
         );
         
         foreach ($this->childNodes() as $slot)
@@ -43,7 +43,7 @@ class Component extends AbstractEntity
         }
         
         $this->println(
-            sprintf('$this->comp[%d]->render($this->data); %s', $this->depth, $phpEnd)
+            sprintf('$this->comp[%d]->render($this->data);', $this->depth)
         );
 
         $this->document->toberemoved[] = $this->node;
@@ -63,7 +63,7 @@ class Component extends AbstractEntity
             $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString)
         );
         
-        foreach ($this->node->childNodes as $slot)
+        foreach ($this->childNodes() as $slot)
         {
             $this->parseNode($slot);
         }
