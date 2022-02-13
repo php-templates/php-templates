@@ -192,9 +192,16 @@ abstract class AbstractEntity
         // check if next node has or not a control structure like elseif or else to not close the tag
         // check if above node has or not a control structure like if or elseif to not open php tag
         // prev node already depleted by attributes, so can't help... find a solution
-
         $phpStart = $this->depth ? '' : '<?php';
         $phpEnd = $this->depth ? '' : '?>';
+        if (in_array($statement, ['elseif', 'else'])) {
+            $phpStart = ';';
+        }
+        if ($next = $this->node->nextSibling) {
+            if (method_exists($next, 'hasAttribute') && ($next->hasAttribute($this->pf.'elseif') || $next->hasAttribute($this->pf.'else'))) {
+                $phpEnd = '';
+            }
+        }
     
         if ($args || $args === '0') {
             $statement .= " ($args)";

@@ -26,12 +26,12 @@ class Component extends AbstractEntity
     
     public function templateContext()
     {
-        $phpStart = '<?php';
-        $phpEnd = '?>';
-
         $data = $this->depleteNode($this->node, false);//d($this->attrs['is'], $this->depth);
         $dataString = Helper::arrayToEval($data);
         (new Template($this->document, $this->name))->newContext();
+        
+        $phpStart = $this->controlStructures ? '' : '<?php';
+        $phpEnd = $this->controlStructures ? '' : '?>';
 
         $this->println(
             sprintf('%s $this->comp[%d] = Parsed::template("%s", %s);', $phpStart, $this->depth, $this->name, $dataString)

@@ -214,15 +214,6 @@ $false = false;
 
 -----
 
-<template is="comp/simple" p-if="$true"></template>
-<elseif p-elseif="$true"></elseif>
-=====
-<div class="comp/simple">
-    comp/simple
-</div>
-
------
-
 <template is="comp/simple" p-if="$false"></template>
 <elseif p-elseif="$true"></elseif>
 =====
