@@ -11,9 +11,9 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
 Parsed::$templates['./cases/12'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['true','this',]));
      ?> <!DOCTYPE html>
-<html><body><?php if ($true) { 
+<html><body> if ($true) { 
  $this->comp[0] = Parsed::template("comp/simple", []);
-$this->comp[0]->render($this->data); <?php } ; elseif ($true) { ?><elseif></elseif>; } ?>
+$this->comp[0]->render($this->data);  } ; elseif ($true) { <elseif></elseif>; } 
 
 -----</body></html> <?php 
 };
