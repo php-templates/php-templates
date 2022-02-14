@@ -8,7 +8,7 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
     comp/simple
 </div> <?php 
 };
-Parsed::$templates['comp/simple?slot=default&id=34'] = function ($data, $slots) {
+Parsed::$templates['comp/simple?slot=default&id=1'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> comp/simple <?php 
 };
@@ -26,9 +26,8 @@ $this->comp[0]->render($this->data);
 <?php ; foreach ([1,2] as $a) { 
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data); } 
- ?>
-    </span>
-</div><?php} ; ?> <?php 
+ ?></span>
+</div><?php ;} ; ?> <?php 
 };
 Parsed::$templates['comp/csf'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['i','this','_slot',]));
@@ -36,14 +35,13 @@ Parsed::$templates['comp/csf'] = function ($data, $slots) {
      for ($i=0;$i<2;$i++) { 
  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
-}  } 
-</div> <?php 
+}  } </div> <?php 
 };
-Parsed::$templates['comp/csf?slot=default&id=35'] = function ($data, $slots) {
+Parsed::$templates['comp/csf?slot=default&id=2'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> x2 <?php 
 };
-Parsed::$templates['comp/csf?slot=default&id=36'] = function ($data, $slots) {
+Parsed::$templates['comp/csf?slot=default&id=3'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <p>1</p> <?php 
 };
@@ -55,7 +53,7 @@ Parsed::$templates['comp/csdf'] = function ($data, $slots) {
 $_slot->render(array_merge($this->data, []));
 } 
 if (empty($this->slots("default"))) {
-; ?><p>compslotdefault</p>
+; ?><p>compslotdefault</p>SimpleNode
 <?php ;
 }  } </span>
     <div class=""> foreach ([1,2] as $a) { 
@@ -63,28 +61,27 @@ if (empty($this->slots("default"))) {
 $_slot->render(array_merge($this->data, []));
 } 
 if (empty($this->slots("slot1"))) {
-; ?>slot1
+; ?>slot1SimpleNode
 <?php ;
 }  } </div>
     <div>
 <?php  foreach ($this->slots("slot2") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 } 
-if (empty($this->slots("slot2"))) {
+if (empty($this->slots("slot2"))) {Component
 }  ?></div>
     <div>
 <?php  foreach ($this->slots("slot2") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 } 
-if (empty($this->slots("slot2"))) {
+if (empty($this->slots("slot2"))) {Component
 }  ?></div>
     
 <?php  foreach ($this->slots("slot3") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 } 
-if (empty($this->slots("slot3"))) {
-}  ?>
-</div><?php} ; ?> <?php 
+if (empty($this->slots("slot3"))) {Component
+}  ?></div><?php ;} ; ?> <?php 
 };
 Parsed::$templates['comp/comp_slot'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','_slot',]));
@@ -95,22 +92,21 @@ $_slot->render(array_merge($this->data, []));
 }  ?></span>
 </div> <?php 
 };
-Parsed::$templates['comp/comp_slot?slot=default&id=37'] = function ($data, $slots) {
+Parsed::$templates['comp/comp_slot?slot=default&id=4'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','_slot',]));
      ?> <div>
         
 <?php  foreach ($this->slots("sn8") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 } 
-if (empty($this->slots("sn8"))) {
-}  ?>
-    </div> <?php 
+if (empty($this->slots("sn8"))) {Component
+}  ?></div> <?php 
 };
-Parsed::$templates['comp/comp_slot?slot=default&id=38'] = function ($data, $slots) {
+Parsed::$templates['comp/comp_slot?slot=default&id=5'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <p>xjd</p> <?php 
 };
-Parsed::$templates['comp/comp_slot?slot=default&id=39'] = function ($data, $slots) {
+Parsed::$templates['comp/comp_slot?slot=default&id=6'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <p>hdhd</p> <?php 
 };
@@ -125,10 +121,9 @@ if (empty($this->slots("default"))) {
 ; ?><span>
 <?php  foreach ($this->slots("sn") as $_slot) {
 $_slot->render(array_merge($this->data, []));
-}  ?></span>
+}  ?></span>SimpleNode
 <?php ;
-}  ?>
-</div><div class="sdefsdef">
+}  ?></div><div class="sdefsdef">
     
 <?php  foreach ($this->slots("sn1") as $_slot) {
 $_slot->render(array_merge($this->data, []));
@@ -139,12 +134,11 @@ if (empty($this->slots("sn1"))) {
 $_slot->render(array_merge($this->data, []));
 } 
 if (empty($this->slots("sn2"))) {
-; ?>foo
+; ?>fooSimpleNode
 <?php ;
-}  ?></span>
+}  ?></span>SimpleNode
 <?php ;
-}  ?>
-</div><div class="sdefsdef">
+}  ?></div><div class="sdefsdef">
     
 <?php  foreach ($this->slots("sn3") as $_slot) {
 $_slot->render(array_merge($this->data, []));
@@ -154,43 +148,41 @@ if (empty($this->slots("sn3"))) {
 <?php  foreach ($this->slots("sn4") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 } 
-if (empty($this->slots("sn4"))) {
-}  ?></span>
+if (empty($this->slots("sn4"))) {Component
+}  ?></span>SimpleNode
 <?php ;
-}  ?>
-</div><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);foreach ($this->slots("sn5") as $_slot) {
+}  ?></div><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);foreach ($this->slots("sn5") as $_slot) {
 $this->comp[0]->addSlot("default", $_slot);
-}if (empty($this->slots("sn5"))) {}$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);foreach ($this->slots("sn6") as $_slot) {
+}if (empty($this->slots("sn5"))) {Component}Slot$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);foreach ($this->slots("sn6") as $_slot) {
 $this->comp[0]->addSlot("default", $_slot);
-}if (empty($this->slots("sn6"))) {}$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=37", ['class' => 'x']));$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=38", []));foreach ([1] as $a) {foreach ($this->slots("sn9") as $_slot) {
+}if (empty($this->slots("sn6"))) {Slot}Slot$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=4", ['class' => 'x']));SimpleNode$this->comp[0]->render($this->data);?><?php ;$this->comp[0] = Parsed::template("comp/comp_slot", []);$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=5", []));SimpleNodeforeach ([1] as $a) {foreach ($this->slots("sn9") as $_slot) {
 $this->comp[0]->addSlot("default", $_slot);
-}if (empty($this->slots("sn9"))) {; ?>djdh<?php ;}}$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=39", []));$this->comp[0]->render($this->data);?> <?php 
+}if (empty($this->slots("sn9"))) {; ?>djdhSimpleNode<?php ;Component}Slot}$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=6", []));SimpleNode$this->comp[0]->render($this->data);?> <?php 
 };
-Parsed::$templates['comp/cns?slot=sn&id=40'] = function ($data, $slots) {
+Parsed::$templates['comp/cns?slot=sn&id=7'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <span></span> <?php 
 };
-Parsed::$templates['comp/cns?slot=sn1&id=41'] = function ($data, $slots) {
+Parsed::$templates['comp/cns?slot=sn1&id=8'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <span></span> <?php 
 };
-Parsed::$templates['comp/cns?slot=sn3&id=42'] = function ($data, $slots) {
+Parsed::$templates['comp/cns?slot=sn3&id=9'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <p>3</p> <?php 
 };
-Parsed::$templates['comp/cns?slot=sn8&id=43'] = function ($data, $slots) {
+Parsed::$templates['comp/cns?slot=sn8&id=10'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <span>8</span> <?php 
 };
-Parsed::$templates['comp/cns?slot=sn9&id=44'] = function ($data, $slots) {
+Parsed::$templates['comp/cns?slot=sn9&id=11'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <p>9</p> <?php 
 };
 Parsed::$templates['./cases/control_structure'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['array','array_map','true','false','a','this','i',]));
      ?> <!DOCTYPE html>
-<html>
-<body><?php $array = [1, 2];
+<html><body><?php $array = [1, 2];
 $array_map = ['foo' => 'f1', 'bar' => 'f2'];
 $true = true;
 $false = false;
@@ -198,7 +190,7 @@ $false = false;
 
 <?php ; foreach ($array as $a) {  ?><div class="x">
     <span></span>
-</div><?php  } ; ?>
+</div><?php ; } ; ?>
 
 -----
 
@@ -208,8 +200,7 @@ $false = false;
 <?php ;
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
- ?>
-</div><?php  } ; ?>
+ ?></div><?php ; } ; ?>
 
 -----
 
@@ -219,8 +210,7 @@ $this->comp[0]->render($this->data);
 <?php ; foreach ($array as $a) { 
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data); } 
- ?>
-</div>
+ ?></div>
 
 -----
 
@@ -228,7 +218,7 @@ $this->comp[0]->render($this->data); }
 
 <?php ; foreach ($array as $a) { 
 $this->comp[0] = Parsed::template("comp/simple", []);
-$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/simple?slot=default&id=34", []));
+$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/simple?slot=default&id=1", []));SimpleNode
 $this->comp[0]->render($this->data); } 
  ?>
 
@@ -248,7 +238,7 @@ $this->comp[0]->render($this->data);
 
 <?php ;
 $this->comp[0] = Parsed::template("comp/csf", []);
-$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/csf?slot=default&id=35", []));
+$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/csf?slot=default&id=2", []));SimpleNode
 $this->comp[0]->render($this->data);
  ?>
 
@@ -258,7 +248,7 @@ $this->comp[0]->render($this->data);
 
 <?php ;
 $this->comp[0] = Parsed::template("comp/csf", []);
-$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/csf?slot=default&id=36", []));
+$this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/csf?slot=default&id=3", []));SimpleNode
 $this->comp[0]->render($this->data);
  ?>
 
@@ -278,19 +268,19 @@ $this->comp[0]->render($this->data);
 
 <?php ;
 $this->comp[0] = Parsed::template("comp/cns", []); for ($i=0;$i<2;$i++) { 
-$this->comp[1] = $this->comp[0]->addSlot("sn", Parsed::template("comp/cns?slot=sn&id=40", ['class' => 'x'])); } 
-$this->comp[1] = $this->comp[0]->addSlot("sn1", Parsed::template("comp/cns?slot=sn1&id=41", ['class' => 'y']));
-$this->comp[1] = $this->comp[0]->addSlot("sn3", Parsed::template("comp/cns?slot=sn3&id=42", []));
-$this->comp[1] = $this->comp[0]->addSlot("sn5", Parsed::template("comp/simple", []));
-$this->comp[1] = $this->comp[0]->addSlot("sn8", Parsed::template("comp/cns?slot=sn8&id=43", []));
-$this->comp[1] = $this->comp[0]->addSlot("sn9", Parsed::template("comp/cns?slot=sn9&id=44", []));
+$this->comp[1] = $this->comp[0]->addSlot("sn", Parsed::template("comp/cns?slot=sn&id=7", ['class' => 'x']));SimpleNode } 
+$this->comp[1] = $this->comp[0]->addSlot("sn1", Parsed::template("comp/cns?slot=sn1&id=8", ['class' => 'y']));SimpleNode
+$this->comp[1] = $this->comp[0]->addSlot("sn3", Parsed::template("comp/cns?slot=sn3&id=9", []));SimpleNode
+$this->comp[1] = $this->comp[0]->addSlot("sn5", Parsed::template("comp/simple", []));Component
+$this->comp[1] = $this->comp[0]->addSlot("sn8", Parsed::template("comp/cns?slot=sn8&id=10", []));SimpleNode
+$this->comp[1] = $this->comp[0]->addSlot("sn9", Parsed::template("comp/cns?slot=sn9&id=11", []));SimpleNode
 $this->comp[0]->render($this->data);
  ?>
 
 -----
 
 
-<?php ; if ($false) {  ?><div></div><?php  } ; elseif ($false) {  ?><div></div><?php  } ; else {  ?><else></else><?php  } ; ?>
+<?php ; if ($false) {  ?><div></div><?php ; } ; elseif ($false) {  ?><div></div><?php ; } ; else {  ?><else></else><?php ; } ; ?>
 
 -----
 
@@ -299,17 +289,17 @@ $this->comp[0]->render($this->data);
 <?php ; if ($false) { 
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data); } 
- elseif ($true) {  ?><elseif></elseif><?php  } ; ?>
+ elseif ($true) {  ?><elseif></elseif><?php ; } ; ?>
 
 -----
 
 
-<?php ; foreach ([1, 2] as $a) {  if ($a == 2) {  ?><div><?php echo htmlspecialchars($a); ?></div><?php  }  } ; ?>
+<?php ; foreach ([1, 2] as $a) {  if ($a == 2) {  ?><div><?php echo htmlspecialchars($a); ?></div><?php ; }  } ; ?>
 
 -----
 
 
-2<?php ; if ($false) {  foreach ([1, 2] as $a) {  ?><div><?php echo htmlspecialchars($a); ?></div><?php  }  } ; ?>
+2<?php ; if ($false) {  foreach ([1, 2] as $a) {  ?><div><?php echo htmlspecialchars($a); ?></div><?php ; }  } ; ?>
 
 -----</body></html> <?php 
 };

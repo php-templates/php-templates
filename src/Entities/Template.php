@@ -32,6 +32,8 @@ class Template extends AbstractEntity
     
     public function newContext()
     {
+        $this->thread = uniqid();
+        Php::setThread($this->thread);
         if (method_exists($this->node, 'querySelector')) {
             if ($extends = $this->node->querySelector('extends')) {
                 $this->extends($extends);

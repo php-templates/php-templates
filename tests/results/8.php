@@ -5,8 +5,7 @@ use PhpTemplates\Helper;
 Parsed::$templates['./cases/8'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <!DOCTYPE html>
-<html>
-<body><div class="<?php echo htmlspecialchars(123); ?>"></div>
+<html><body><div class="<?php echo htmlspecialchars(123); ?>"></div>
 
 -----
 

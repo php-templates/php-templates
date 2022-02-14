@@ -22,15 +22,13 @@ $this->comp[0]->render($this->data);
 <?php ;
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
- ?>
-    </span>
+ ?></span>
 </div> <?php 
 };
 Parsed::$templates['./cases/component'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html>
-<body>
+<html><body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);

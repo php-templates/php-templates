@@ -19,13 +19,11 @@ $this->comp[0] = Parsed::template("***block", [])->withName("a1")->setSlots($thi
 $this->comp[1] = $this->comp[0]->addSlot("a1", Parsed::template("a1?slot=19", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[0]->render($this->data);
  ?>
-    
 <?php ;
 $this->comp[0] = Parsed::template("***block", [])->withName("a2")->setSlots($this->slots);
 $this->comp[1] = $this->comp[0]->addSlot("a2", Parsed::template("a2?slot=20", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[0]->render($this->data);
- ?>
-</a> <?php 
+ ?></a> <?php 
 };
 Parsed::$templates['block/a?slot=a2&id=18'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -58,13 +56,11 @@ Parsed::$templates['b122?slot=25'] = function ($data, $slots) {
 Parsed::$templates['b12?slot=24'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <n>
-            
 <?php ;
 $this->comp[0] = Parsed::template("***block", [])->withName("b122")->setSlots($this->slots);
 $this->comp[1] = $this->comp[0]->addSlot("b122", Parsed::template("b122?slot=25", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[0]->render($this->data);
- ?>
-            </n> <?php 
+ ?></n> <?php 
 };
 Parsed::$templates['b2?slot=26'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -81,8 +77,7 @@ $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("***block", ['_i
 $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=23", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=24", ['_index' => '2'])->setSlots($this->slots));
 $this->comp[0]->render($this->data);
- ?>
-</b><?php ;$this->comp[0] = Parsed::template("***block", [])->withName("b2")->setSlots($this->slots);$this->comp[1] = $this->comp[0]->addSlot("b2", Parsed::template("b2?slot=26", ['_index' => '1'])->setSlots($this->slots));$this->comp[0]->render($this->data);?> <?php 
+ ?></b><?php ;$this->comp[0] = Parsed::template("***block", [])->withName("b2")->setSlots($this->slots);$this->comp[1] = $this->comp[0]->addSlot("b2", Parsed::template("b2?slot=26", ['_index' => '1'])->setSlots($this->slots));$this->comp[0]->render($this->data);?> <?php 
 };
 Parsed::$templates['block/b?slot=b1&id=27'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -121,8 +116,7 @@ Parsed::$templates['comp/comp_slot?slot=default&id=31'] = function ($data, $slot
 $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);
 $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=32", ['_index' => '1'])->setSlots($this->slots));
 $this->comp[0]->render($this->data);
- ?>
-    </div> <?php 
+ ?></div> <?php 
 };
 Parsed::$templates['b1?slot=33'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['k',]));
@@ -137,8 +131,7 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
 Parsed::$templates['./cases/block'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','a','k',]));
      ?> <!DOCTYPE html>
-<html>
-<body>
+<html><body>
 <?php ;
 $this->comp[0] = Parsed::template("block/a", []);
 $this->comp[1] = $this->comp[0]->addSlot("a2", Parsed::template("block/a?slot=a2&id=18", ['_index' => '99']));

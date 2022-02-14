@@ -32,8 +32,7 @@ Parsed::$templates['comp/a?slot=sn9&id=7'] = function ($data, $slots) {
 Parsed::$templates['./cases/a'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html>
-<body>
+<html><body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/a", []);
 $this->comp[1] = $this->comp[0]->addSlot("sn9", Parsed::template("comp/a?slot=sn9&id=7", []));

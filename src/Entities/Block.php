@@ -52,8 +52,8 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
-        $this->println('<?php ;');
-        $this->println(' ?>', 'after');
+        //$this->println($this->phpOpen());
+        //$this->println($this->phpClose(), 'after');
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
 

@@ -26,8 +26,8 @@ class Component extends AbstractEntity
     
     public function templateContext()
     {
-        $this->println('<?php ;');
-        $this->println(' ?>', 'after');
+        $this->println($this->phpOpen());
+        //$this->println(' ?', 'after');
 
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);

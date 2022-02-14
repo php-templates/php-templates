@@ -17,10 +17,13 @@ abstract class AbstractEntity
     protected $attrs = [];
     protected $controlStructures = [];
     protected $depth = 0;
+    protected $thread;
     protected $pf = 'p-';
     
     public function __construct(Document $doc, $node, AbstractEntity $context = null)
     {
+        $this->thread = Php::getThread();
+        
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
@@ -72,7 +75,7 @@ abstract class AbstractEntity
     protected function makeCaret($node = null)
     {
         $debugText = '';
-        if (0) {
+        if (1) {
             $debugText = explode('\\', get_class($this));
             $debugText = end($debugText);
         }if ($node)dd($node);
@@ -155,17 +158,17 @@ abstract class AbstractEntity
         // enclose html with ?\><\?php
         if ($htmlContext && $phpTagsInserted && $node->parentNode) {
             $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode(' ?>'),
+                $node->ownerDocument->createTextNode($this->phpClose()),
                 $node
             );
     
             if ($node->nextSibling) {
                 $node->parentNode->insertBefore(
-                    $node->ownerDocument->createTextNode('<?php '),
+                    $node->ownerDocument->createTextNode($this->phpOpen()),
                     $node->nextSibling
                 );
             } else {
-                $node->parentNode->appendChild($node->ownerDocument->createTextNode('<?php '));
+                $node->parentNode->appendChild($node->ownerDocument->createTextNode($this->phpOpen()));
             }
         }
 
@@ -219,8 +222,8 @@ abstract class AbstractEntity
 
     protected function controlStructure($statement, $args, $node, $phpTags = false)
     {
-        $phpStart = $phpTags ? '<?php ;' : '';
-        $phpEnd = $phpTags ? '; ?>' : '';
+        $phpStart = $phpTags ? $this->phpOpen() : '';
+        $phpEnd = $phpTags ? '' : '';
 
         if ($args || $args === '0') {
             $statement .= " ($args)";
@@ -427,6 +430,14 @@ abstract class AbstractEntity
  
     public function removeHtmlComments($content = '') {//d($content);
     	return preg_replace('~<!--.+?-->~ms', '', $content);
+    }
+    
+    protected function phpOpen() {
+        return Php::open($this->thread);
+    }
+    
+    protected function phpClose() {
+        return Php::close($this->thread);
     }
 
     public function __get($prop)
