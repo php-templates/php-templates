@@ -25,63 +25,20 @@ class SimpleNode extends AbstractEntity
             }
             return;
         }
-        /*
-        $this->caret = $this->node;
-        
-        if ($this->shouldClosePhp) {
-            $this->println('?>');
+
+        if ($node = $this->node->cloneNode(true)) {
+            $this->document->toberemoved[] = $this->node;
+            $this->node = $node;
         }
-        // don t close if received opened php
-        //$shouldClosePhp = ;
-        //ramane php deschid de la elseif, ca ala de jos nu il inchide... si asta mai jos face echo open php pt ca e deschis...
-        $this->depleteNode($this->node, function($data, $node) use (&$phpOpen) {
-            $this->fillNode($this->node, $data);   
-            if ($phpOpen = $this->phpIsOpen()) {
-                
-            }
-            foreach ($this->childNodes($this->node) as $slot) {
-                $this->parseNode($slot);
-            }
-        });
-        if ($this->phpIsOpen()) {d(1);
-            $this->println('?>');
-            $this->println('<?php -;', 'after');
-        }
-        d('x', $this->node->nodeName.'.'.$this->node->nodeValue);
-        if ($this->shouldClosePhp) {d(11);
-            //$this->phpClose('');
-            //nu se inchide...
-        } else {d(0);}
-       // d($this->node->nodeName);
-       */
-       //d($this->node);
-       $node = $this->node;
-       $this->document->toberemoved[] = $node;
-        $this->node = $this->node->cloneNode(true) ? $this->node->cloneNode(true) : $this->node;
-    //d(1, $this->node);
-        // close php
-        
+
         $this->depleteNode($this->node, function($data, $c_structs) {
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
             }
             $this->fillNode($this->node, $data);
-            //$this->phpClose();
-            //nu am caret
-            //if (!$this->caret->parentNode) dd($this->caret);
-            $opened = $this->phpIsOpen();
-            
-            /*if ($opened) {
-                $this->println('?>');
-                $this->phpClose('');
-            }*/
-            $c_structs && $this->phpClose();
+            $c_structs && $this->println('?>');
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
-            $c_structs && $this->phpOpen();
-            /*if ($opened) {
-                $this->println('<?php ;');
-                $this->phpOpen('');
-            }*/
+            $c_structs && $this->println('<?php ;');
         });
         
         $this->shouldClosePhp && $this->phpClose();
@@ -135,21 +92,5 @@ class SimpleNode extends AbstractEntity
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
             $this->phpOpen();
         });
-    }
-    
-    private function enclosePhp()
-    {
-        $this->node->parentNode->insertBefore(
-            $this->node->ownerDocument->createTextNode('?>'),
-            $this->node
-        );
-        if ($this->node->nextSibling) {
-            $this->node->parentNode->insertBefore(
-                $this->node->ownerDocument->createTextNode('<?php ;'),
-                $this->node->nextSibling
-            );
-        } else {
-            $this->node->parentNode->appendChild($this->node->ownerDocument->createTextNode('<?php ;'));
-        }
     }
 }

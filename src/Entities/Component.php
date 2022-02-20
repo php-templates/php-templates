@@ -34,8 +34,7 @@ class Component extends AbstractEntity
     
             $this->println(
                 sprintf('$this->comp[%d] = Parsed::template("%s", %s);', $this->depth, $this->name, $dataString)
-            );
-//dom($this->node->parentNode);d($this->depth, 2333);//d($this->document);           
+            );       
             foreach ($this->childNodes() as $slot) {
                 $this->parseNode($slot);
             }

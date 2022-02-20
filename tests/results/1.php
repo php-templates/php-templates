@@ -19,7 +19,8 @@ Parsed::$templates['b1?slot=1'] = function ($data, $slots) {
 };
 Parsed::$templates['./cases/1'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
-     ?> <html><body>
+     ?> <html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/comp_slot", []);
 $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("***block", [])->withName("b1")->setSlots($this->slots));

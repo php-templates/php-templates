@@ -15,7 +15,7 @@ abstract class AbstractEntity
     protected $node;
     protected $caret;
     protected $attrs = [];
-    protected $controlStructures = [];
+    // protected $controlStructures = [];
     protected $depth = 0;
     protected $thread;
     protected $pf = 'p-';
@@ -244,29 +244,29 @@ abstract class AbstractEntity
         }
     }
 
-    protected function controlStructure($statement, $args, $node, $phpTags = false)
-    {
-        $phpStart = $phpTags ? $this->phpOpen() : '';
-        $phpEnd = $phpTags ? '' : '';
+    // protected function controlStructure($statement, $args, $node, $phpTags = false)
+    // {
+    //     $phpStart = $phpTags ? $this->phpOpen() : '';
+    //     $phpEnd = $phpTags ? '' : '';
 
-        if ($args || $args === '0') {
-            $statement .= " ($args)";
-        }
+    //     if ($args || $args === '0') {
+    //         $statement .= " ($args)";
+    //     }
 
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($phpStart." $statement { "),
-            $node
-        );
+    //     $node->parentNode->insertBefore(
+    //         $node->ownerDocument->createTextNode($phpStart." $statement { "),
+    //         $node
+    //     );
 
-        if ($node->nextSibling) {
-            $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode(" } ".$phpEnd),
-                $node->nextSibling
-            );
-        } else {
-            $node->parentNode->appendChild($node->ownerDocument->createTextNode(" } ".$phpEnd));
-        }
-    }
+    //     if ($node->nextSibling) {
+    //         $node->parentNode->insertBefore(
+    //             $node->ownerDocument->createTextNode(" } ".$phpEnd),
+    //             $node->nextSibling
+    //         );
+    //     } else {
+    //         $node->parentNode->appendChild($node->ownerDocument->createTextNode(" } ".$phpEnd));
+    //     }
+    // }
     
     protected function directive($name, $val)
     {
@@ -480,18 +480,11 @@ abstract class AbstractEntity
     
     protected function shouldClosePhp()
     {
-        /*
-        if (!$this->phpIsOpen()) {
-            d(1);
-            return false;
-        }
-        else*/
         if ($this->depth) {
             return false;
         }
-        elseif ($this->node->nextSibling && $this->node->nextSibling->attributes) {
-            foreach ($this->node->nextSibling->attributes as $a) {
-                //d($a->nodeName);
+        elseif (($next = $this->nextSibling($this->node)) && $next->attributes) {
+            foreach ($next->attributes as $a) {
                 if (strpos($a->nodeName, $this->pf) === 0 && in_array(substr($a->nodeName, strlen($this->pf)), Config::allowedControlStructures)) {
                     return false;
                 }
@@ -499,6 +492,15 @@ abstract class AbstractEntity
         }
         
         return true;
+    }
+
+    protected function nextSibling($node)
+    {
+        $node = $node->nextSibling;
+        while ($node && Helper::isEmptyNode($node)) {
+            $node = $node->nextSibling;
+        }
+        return $node;
     }
 
     public function __get($prop)

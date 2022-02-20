@@ -168,7 +168,7 @@ class Parser
     }
     
     public function insertAfter($node, string $inserted)
-    {dd($a);
+    {
         if ($node->nextSibling) {
             $node->parentNode->insertBefore(
                 $node->ownerDocument->createTextNode($inserted),
