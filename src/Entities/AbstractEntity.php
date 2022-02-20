@@ -47,6 +47,8 @@ abstract class AbstractEntity
         }
         $this->context = $context;
         $this->makeCaret();
+        
+        $this->shouldClosePhp = $this->shouldClosePhp();
     }
     
     //abstract public function rootContext();
@@ -72,28 +74,35 @@ abstract class AbstractEntity
      *
      * @return void
      */
-    protected function makeCaret($node = null)
+    protected function makeCaret()
     {
         $debugText = '';
-        if (1) {
+        if (0) {
             $debugText = explode('\\', get_class($this));
-            $debugText = end($debugText);
-        }if ($node)dd($node);
-        if (!$node) {
-            //d($this->depth);
-        if (!$this->depth) {
-            $this->caret = $this->node;
+            $debugText = end($debugText).'.'.$this->depth;
+        }
+    
+        if (!$this->node->parentNode) {
+            //d($this->node->nodeName);
+            // is hierarchical top
             return;
-        } 
-        /* elseif($this->depth === 1) {
-            $node = $this->context->caret;
-        }  */else {
-            $node = $this->context->caret;
         }
+        elseif ($this->depth < 1) {
+            $node = $this->node;
         }
+        else {
+            $context = $this->context;
+            while ($context->depth > 0) {
+                $context = $context->context;
+            }
+            //dd($this->context->node, $this->context->depth);
+            $node = $context->caret;
+        }
+        
         $this->caret = $node->ownerDocument->createTextNode($debugText);
-        //$this->document->toberemoved[] = $caret;
         $node->parentNode->insertBefore($this->caret, $node);
+        //d($node, $debugText);
+        //$this->document->toberemoved[] = $caret;
     }
 
     public function println(string $line, $end = false)
@@ -107,7 +116,8 @@ abstract class AbstractEntity
             } else {
                 $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode(PHP_EOL.$line));
             }
-        } else {
+        } else {//debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);dd($this->context);
+        //d($line, $this->caret->nextSibling);
             $this->caret->parentNode->insertBefore(
                 $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
                 $this->caret
@@ -115,25 +125,23 @@ abstract class AbstractEntity
         }
     }
     
-    protected function depleteNode($node, $htmlContext = false, $echoData = false)
+    protected function depleteNode($node, callable $cb)
     {
-        $phpTagsInserted = false;
+        $c_structs = [];
         $data = [];
         $binds = [];
-        if (!$node->attributes) {
-            return $data;
-        }
-        foreach ($node->attributes as $a) {
+        $attrs = $node->attributes ? $node->attributes : [];
+        foreach ($attrs as $a) {
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) {
                 $k = substr($k, strlen($this->pf));
                 if (in_array($k, Config::allowedControlStructures)) {
-                    $this->controlStructure($k, $a->nodeValue, $this->caret, $htmlContext && !$phpTagsInserted);
-                    $this->controlStructures[] = [$k, $a->nodeValue];
-                    $phpTagsInserted = true;
+                    //$this->controlStructure($k, $a->nodeValue, $this->caret, $htmlContext && !$phpTagsInserted);
+                    $c_structs[] = [$k, $a->nodeValue];
+                    //$phpTagsInserted = true;
                     continue;
                 }
-                //todo validate simple node only
+                //todo validate simple node only, component not alowed
                 elseif ($custom = $this->directive($k, $a->nodeValue)) {
                     $rid = '__r'.uniqid();
                     $this->document->tobereplaced[$rid] = $custom;//d($custom);
@@ -155,25 +163,8 @@ abstract class AbstractEntity
             }
         }
 
-        // enclose html with ?\><\?php
-        if ($htmlContext && $phpTagsInserted && $node->parentNode) {
-            $node->parentNode->insertBefore(
-                $node->ownerDocument->createTextNode($this->phpClose()),
-                $node
-            );
-    
-            if ($node->nextSibling) {
-                $node->parentNode->insertBefore(
-                    $node->ownerDocument->createTextNode($this->phpOpen()),
-                    $node->nextSibling
-                );
-            } else {
-                $node->parentNode->appendChild($node->ownerDocument->createTextNode($this->phpOpen()));
-            }
-        }
-
         $attributes = $node->attributes;
-        while ($attributes->length) {
+        while ($attributes && $attributes->length) {
             $node->removeAttribute($attributes->item(0)->name);
         }
         
@@ -181,23 +172,15 @@ abstract class AbstractEntity
             $bk = ':'.$k;
             $bind = isset($binds[$bk]) ? $binds[$bk] : null;
             
-            if ($bind || !$echoData) {
+            if ($bind) {
                 $val = array_map(function($attr) {
                     return "'$attr'";
                 }, $val);
-            }
-            if ($bind) {
                 $val = array_merge($val, $bind);
                 $val = 'Helper::mergeAttrs('.implode(',',$val).')';
                 unset($binds[$bk]);
             } else {
                 $val = implode(' ', $val);
-            }
-            
-            if ($echoData && $bind) {
-                $rkey = uniqid();
-                $this->document->tobereplaced[$rkey] = "<?php echo $val; ?>";
-                $val = $rkey;
             }
         }
         
@@ -208,16 +191,57 @@ abstract class AbstractEntity
             } else {
                 $bval = $bval[0];
             }
-            if ($echoData) {
-                $rkey = uniqid();
-                $this->document->tobereplaced[$rkey] = "<?php echo $bval; ?>";
-                $data[$k] = $rkey;
-            } else {
-                $data[$k] = $bval;
-            }
+            $data[$k] = $bval;
         }
 
-        return $data;
+        // imsert $c_structs
+        foreach ($c_structs as $struct) {
+            list($statement, $args) = $struct;
+            if ($args || $args === '0') {
+                $statement .= " ($args)";
+            }
+
+            $this->println("$statement { ");
+        }
+        
+        $cb($data, $c_structs, $node);
+
+        // close all control structures
+        $close = implode(PHP_EOL, array_fill(0, count($c_structs), '} '));
+        /*
+        if (count($c_structs) && $this->caret === $this->node) {
+            if ($this->caret->nextSibling) {
+                $this->caret->parentNode->insertBefore(
+                    $this->caret->ownerDocument->createTextNode($close),
+                    $this->caret->nextSibling
+                );
+            } else {
+                $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode($close));
+            }
+        } */
+        if (count($c_structs)) {
+            $this->println($close);
+        }
+    }
+
+    protected function fillNode($node, array $data) 
+    {
+        if (is_null($node)) {
+            $_data = [];
+            foreach ($data as $k => $val) {
+                if ($k[0] === ':') {
+                    $k = substr($k, 1);
+                }
+                $_data[$k] = $val;
+            }
+            return $_data;
+        }
+        foreach ($data as $k => $val) {
+            if ($k[0] === ':') {
+                $val = "<?php echo $val; ?>";
+            }
+            $node->setAttribute($k, $val);
+        }
     }
 
     protected function controlStructure($statement, $args, $node, $phpTags = false)
@@ -258,6 +282,7 @@ abstract class AbstractEntity
     
     protected function childNodes($node = null)
     {
+        Php::setThread($this->thread);
         if (!$node) {
             $node = $this->node;
         }
@@ -432,12 +457,48 @@ abstract class AbstractEntity
     	return preg_replace('~<!--.+?-->~ms', '', $content);
     }
     
-    protected function phpOpen() {
-        return Php::open($this->thread);
+    protected function phpOpen($println = true) {
+        $tag = Php::open($this->thread);
+        if ($println && $tag) {
+            $this->println($tag);
+        }
+        return $tag;
     }
     
-    protected function phpClose() {
-        return Php::close($this->thread);
+    protected function phpClose($println = true) {
+        $tag = Php::close($this->thread);
+        if ($println && $tag) {
+            $this->println($tag);
+        }
+        return $tag;
+    }
+    
+    protected function phpIsOpen()
+    {
+        return Php::isOpen($this->thread);
+    }
+    
+    protected function shouldClosePhp()
+    {
+        /*
+        if (!$this->phpIsOpen()) {
+            d(1);
+            return false;
+        }
+        else*/
+        if ($this->depth) {
+            return false;
+        }
+        elseif ($this->node->nextSibling && $this->node->nextSibling->attributes) {
+            foreach ($this->node->nextSibling->attributes as $a) {
+                //d($a->nodeName);
+                if (strpos($a->nodeName, $this->pf) === 0 && in_array(substr($a->nodeName, strlen($this->pf)), Config::allowedControlStructures)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
 
     public function __get($prop)

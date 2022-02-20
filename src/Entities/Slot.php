@@ -22,29 +22,32 @@ class Slot extends AbstractEntity
     }
 
     public function simpleNodeContext()
-    {    
-        $data = $this->depleteNode($this->node);
-        $dataString = Helper::arrayToEval($data);
-
-        $phpStart = $this->controlStructures ? '' : '<?php ';
-        $phpEnd = $this->controlStructures ? '' : ' ?>';
-
-        $definition = '%s foreach ($this->slots("%s") as $_slot) {'
+    {
+        if ($shouldClosePhp = !$this->phpIsOpen()) {
+            $this->phpOpen();
+        }
+        $data = $this->depleteNode($this->node, function($data) {
+            $data = $this->fillNode(null, $data);
+            $dataString = Helper::arrayToEval($data);
+    
+            $definition = 'foreach ($this->slots("%s") as $_slot) {'
             .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
-            .PHP_EOL.'} %s';
-
-        $this->println(
-            sprintf($definition, $phpStart, $this->attrs['name'], $dataString, $this->hasSlotDefault ? '' : $phpEnd)
-        );
-
-        if ($this->hasSlotDefault) {
-            $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
-
-            foreach ($this->childNodes($this->node) as $slotDefault) {
-                $this->parseNode($slotDefault);
+            .PHP_EOL.'}';
+    
+            $this->println(
+                sprintf($definition, $this->attrs['name'], $dataString)
+            );
+    
+            if ($this->hasSlotDefault) {
+                $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
+                foreach ($this->childNodes($this->node) as $slotDefault) {
+                    $this->parseNode($slotDefault);
+                }
+                $this->println('}');
             }
-
-            $this->println('} '.$phpEnd);
+        });
+        if ($shouldClosePhp) {
+            $this->phpClose();
         }
 
         $this->document->toberemoved[] = $this->node;

@@ -27,7 +27,7 @@ class Php
         $php = '';
         if (empty(self::$threads[$threadName])) {
             self::$threads[$threadName] = true;
-            $php = '<?php ';
+            $php = '<?php ;';
         }
         return $php;
     }
@@ -42,5 +42,8 @@ class Php
         return $php;
     }
     
-    
+    public static function isOpen(string $threadName): string
+    {
+        return !empty(self::$threads[$threadName]);
+    }
 }

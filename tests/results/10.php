@@ -9,10 +9,9 @@ Parsed::$templates['comp/d'] = function ($data, $slots) {
 };
 Parsed::$templates['./cases/10'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
-     ?> <!DOCTYPE html>
-<html><body>
+     ?> <html><body>
 <?php ;
-$this->comp[0] = Parsed::template("comp/d", ['rows' => '10']);
+$this->comp[0] = Parsed::template("comp/d", ['rows' => 10]);
 $this->comp[0]->render($this->data);
  ?>
 

@@ -25,11 +25,6 @@ class Template extends AbstractEntity
         }
     }
     
-    protected function makeCaret($txt = '')
-    {
-        //
-    }
-    
     public function newContext()
     {
         $this->thread = uniqid();
@@ -39,7 +34,7 @@ class Template extends AbstractEntity
                 $this->extends($extends);
             }
         }
-        $this->parseNode($this->node);
+        $this->parseNode($this->node);//dom($this->node);d(123);
         $this->register();
     }
     
