@@ -26,12 +26,21 @@ class SimpleNode extends AbstractEntity
             return;
         }
 
-        if ($node = $this->node->cloneNode(true)) {
-            $this->document->toberemoved[] = $this->node;
+        $node = null;
+        if (method_exists($this->caret->parentNode, 'inseerBefore')) {
+            $node = $this->node->cloneNode(true);
+            $this->removeNode($this->node);
             $this->node = $node;
+            $this->caret->parentNode->inseerBefore($this->node, $this->caret);
         }
 
-        $this->depleteNode($this->node, function($data, $c_structs) {
+        $this->depleteNode($this->node, function($data, $c_structs) use ($node) {
+            if ($node/* || $this->caret->parentNode->ownerDocument*/) {
+                    $this->caret->parentNode->inseerBefore($this->node, $this->caret);
+                
+            } else {
+                //d(1);
+            }
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
             }
@@ -46,8 +55,13 @@ class SimpleNode extends AbstractEntity
 
     public function componentContext()
     {
+        //dom($this->node);
+
         $this->attrs['slot'] = 'default';
-        
+        //if ($this->node->parentNode) {
+        //nu merge... nu se face register ce naiba...
+        //pt ca comp register e chemat cred inainte de asta si ii zboara nodurile inainte sa faca si el register
+        //cam asta se intampla? nu cred, pt ca register comp se face pe definitie comp
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
@@ -59,6 +73,7 @@ class SimpleNode extends AbstractEntity
                 $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
             );
         });
+        //dom($this->node);die();
     }
     
     public function blockContext()

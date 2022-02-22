@@ -50,7 +50,7 @@ class Slot extends AbstractEntity
             $this->phpClose();
         }
 
-        $this->document->toberemoved[] = $this->node;
+        $this->removeNode($this->node);
     }
 
     public function slotContext()

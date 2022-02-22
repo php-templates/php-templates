@@ -77,7 +77,8 @@ abstract class AbstractEntity
     protected function makeCaret()
     {
         $debugText = '';
-        if (0) {
+        if (0
+        ) {
             $debugText = explode('\\', get_class($this));
             $debugText = end($debugText).'.'.$this->depth;
         }
@@ -102,7 +103,7 @@ abstract class AbstractEntity
         $this->caret = $node->ownerDocument->createTextNode($debugText);
         $node->parentNode->insertBefore($this->caret, $node);
         //d($node, $debugText);
-        //$this->document->toberemoved[] = $caret;
+        //$this->document->toberemoved[$this->thread][] = $caret;
     }
 
     public function println(string $line, $end = false)
@@ -455,6 +456,10 @@ abstract class AbstractEntity
  
     public function removeHtmlComments($content = '') {//d($content);
     	return preg_replace('~<!--.+?-->~ms', '', $content);
+    }
+    
+    protected function removeNode($node) {//d($node->nodeName);
+        $node->parentNode->removeChild($node);
     }
     
     protected function phpOpen($println = true) {

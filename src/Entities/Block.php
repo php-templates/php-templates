@@ -58,6 +58,8 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
+        //$this->node->setAttribute('x', 'y');
+        //dom($GLOBALS['x']);die();
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
@@ -88,8 +90,8 @@ class Block extends AbstractEntity
         if ($this->shouldClosePhp) {
             $this->phpClose();
         }
-
-        $this->document->toberemoved[] = $this->node;
+        // remove now...
+        $this->removeNode($this->node);
     }
 
     public function blockContext()

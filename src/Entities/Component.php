@@ -25,7 +25,7 @@ class Component extends AbstractEntity
     }
     
     public function templateContext()
-    {
+    {$x = $GLOBALS['x'];
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);   
@@ -46,8 +46,12 @@ class Component extends AbstractEntity
         if ($this->shouldClosePhp) {
             $this->phpClose();
         }
-
-        $this->document->toberemoved[] = $this->node;
+        $p = $this->node->parentNode;
+//dom($p);d('--->');
+        $this->removeNode($this->node);
+        //dd($x);
+        //dom($x); die();
+//dom($p);
     }
 
     /**

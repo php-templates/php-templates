@@ -26,7 +26,8 @@ class Template extends AbstractEntity
     }
     
     public function newContext()
-    {
+    {$GLOBALS['x'] = $this->node;
+        //d($this->name, '--->');dom($this->node);d('<---');
         $this->thread = uniqid();
         Php::setThread($this->thread);
         if (method_exists($this->node, 'querySelector')) {
@@ -34,19 +35,13 @@ class Template extends AbstractEntity
                 $this->extends($extends);
             }
         }
-        $this->parseNode($this->node);//dom($this->node);d(123);
+        $this->parseNode($this->node);
+        //d($this->name, '--->');dom($this->node);d('<---');
         $this->register();
     }
     
     protected function register()
     {
-        while ($this->document->toberemoved) {
-            $node = array_pop($this->document->toberemoved);
-            try {
-                @$node->parentNode && @$node->parentNode->removeChild($node);
-            } catch (\Exception $e) {}
-        }
-
         if ($this->trimHtml) {
             $htmlString = $this->trimHtml($this->node);
         }
@@ -65,7 +60,7 @@ class Template extends AbstractEntity
             return '';
         }, $htmlString);
 
-        $htmlString = $this->getTemplateFunction($htmlString);
+        $htmlString = $this->getTemplateFunction($htmlString);//d($htmlString);
         $this->document->templates[$this->name] = $htmlString;
     }
 
