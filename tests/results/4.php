@@ -19,7 +19,8 @@ Parsed::$templates['extends/b'] = function ($data, $slots) {
 };
 Parsed::$templates['./cases/4'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
-     ?> <html><body><?php $this->data['bind_me'] = 'bound'; ?>
+     ?> <!DOCTYPE html>
+<html><body><?php $this->data['bind_me'] = 'bound'; ?>
 
 <?php ;
 $this->comp[0] = Parsed::template("extends/b", []);

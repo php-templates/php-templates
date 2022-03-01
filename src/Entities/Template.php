@@ -16,6 +16,7 @@ class Template extends AbstractEntity
 
     public function __construct(Document $doc, $node, $context = null)
     {
+        //d(is_string($context) ? 'ss' : '');
         parent::__construct($doc, $node, is_string($context) ? null : $context);
         if (is_string($node)) {
             $this->name = $node;
@@ -26,7 +27,9 @@ class Template extends AbstractEntity
     }
     
     public function newContext()
-    {$GLOBALS['x'] = $this->node;
+    {
+        //$GLOBALS['x'] = $this->node;d(1);
+    //d('ct',$this->context);
         //d($this->name, '--->');dom($this->node);d('<---');
         $this->thread = uniqid();
         Php::setThread($this->thread);

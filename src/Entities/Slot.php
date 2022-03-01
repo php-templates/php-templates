@@ -46,8 +46,10 @@ class Slot extends AbstractEntity
                 $this->println('}');
             }
         });
-        if ($shouldClosePhp) {
+        if ($shouldClosePhp) {//d($this->attrs, 'todo');
+            //$this->println('?');
             $this->phpClose();
+            //nu merg if uri ratacite intre tag uri fiecare trbinchissi deschis pe iter
         }
 
         $this->removeNode($this->node);
@@ -66,7 +68,7 @@ class Slot extends AbstractEntity
     {
         $phpStart = '';//'?php';
         $phpEnd = '';//'?';
-
+cu atentie ca pot exista foreach uri pe slot
         $data = $this->depleteNode($this->node);
         $dataString = Helper::arrayToEval($data);
 

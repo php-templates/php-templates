@@ -25,10 +25,11 @@ class Component extends AbstractEntity
     }
     
     public function templateContext()
-    {$x = $GLOBALS['x'];
+    {
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);   
+            $data = $this->fillNode(null, $data);
+
             $dataString = Helper::arrayToEval($data);
             (new Template($this->document, $this->name))->newContext();
     

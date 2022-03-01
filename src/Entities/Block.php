@@ -26,6 +26,7 @@ class Block extends AbstractEntity
      */
     public function componentContext()
     {
+//d(1);dom($this->node->parentNode);dd('ww');    
         $this->attrs['slot'] = 'default';
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
@@ -58,10 +59,13 @@ class Block extends AbstractEntity
     
     public function simpleNodeContext()
     {
+        //d('-');dom($this->caret->parentNode, $this->depth);die();
         //$this->node->setAttribute('x', 'y');
         //dom($GLOBALS['x']);die();
+//$this->makeCaret($this->node);
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
+            //$this->node->setAttribute('x',33);
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
     

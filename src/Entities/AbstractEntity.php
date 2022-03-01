@@ -27,7 +27,7 @@ abstract class AbstractEntity
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
-
+//d($ct_type);
             if (!in_array($ct_type, ['SimpleNode'])) {
                 $this->depth = $context->depth +1;
             }
@@ -74,7 +74,7 @@ abstract class AbstractEntity
      *
      * @return void
      */
-    protected function makeCaret()
+    protected function makeCaret($refNode = null)
     {
         $debugText = '';
         if (0
@@ -89,15 +89,20 @@ abstract class AbstractEntity
             return;
         }
         elseif ($this->depth < 1) {
+//d($this->node->nodeName);
             $node = $this->node;
         }
         else {
+            //d($this->context->depth, $this->depth);dom($this->node);
             $context = $this->context;
             while ($context->depth > 0) {
                 $context = $context->context;
             }
             //dd($this->context->node, $this->context->depth);
             $node = $context->caret;
+        }
+        if ($refNode) {
+            $node = $refNode;
         }
         
         $this->caret = $node->ownerDocument->createTextNode($debugText);
@@ -169,7 +174,7 @@ abstract class AbstractEntity
             $node->removeAttribute($attributes->item(0)->name);
         }
         
-        foreach ($data as $k => &$val) {
+        foreach ($data as $k => $val) {
             $bk = ':'.$k;
             $bind = isset($binds[$bk]) ? $binds[$bk] : null;
             
@@ -180,22 +185,27 @@ abstract class AbstractEntity
                 $val = array_merge($val, $bind);
                 $val = 'Helper::mergeAttrs('.implode(',',$val).')';
                 unset($binds[$bk]);
+                unset($data[$k]);
+                $data[$bk] = $val;
             } else {
-                $val = implode(' ', $val);
+                $data[$k] = implode(' ', $val);
             }
         }
         
-        foreach ($binds as $k => $bval) {
-            $k = substr($k, 1);
+        foreach ($binds as $bk => $bval) {
+            $k = substr($bk, 1);
             if (count($bval) > 1) {
                 $bval = 'Helper::mergeAttrs('.implode(',',$bval).')';
             } else {
                 $bval = $bval[0];
             }
-            $data[$k] = $bval;
+            $data[$bk] = $bval;
         }
 
         // imsert $c_structs
+        if ($c_structs) {
+            $this->phpOpen();
+        }
         foreach ($c_structs as $struct) {
             list($statement, $args) = $struct;
             if ($args || $args === '0') {
@@ -229,16 +239,23 @@ abstract class AbstractEntity
     {
         if (is_null($node)) {
             $_data = [];
-            foreach ($data as $k => $val) {
+            foreach ($data as $k => &$val) {
                 if ($k[0] === ':') {
                     $k = substr($k, 1);
+                } else {
+                    $val = "'$val'";
                 }
                 $_data[$k] = $val;
             }
             return $_data;
         }
+        
+        if (!method_exists($node, 'setAttribute')) {
+            return;
+        }
         foreach ($data as $k => $val) {
             if ($k[0] === ':') {
+                $k = substr($k, 1);
                 $val = "<?php echo $val; ?>";
             }
             $node->setAttribute($k, $val);
@@ -459,6 +476,7 @@ abstract class AbstractEntity
     }
     
     protected function removeNode($node) {//d($node->nodeName);
+        //$this->fillNode($node, ['removed' => 1]);
         $node->parentNode->removeChild($node);
     }
     

@@ -7,6 +7,7 @@ use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
+use IvoPetkov\HTML5DOMDocument;
 
 class SimpleNode extends AbstractEntity
 {
@@ -26,28 +27,32 @@ class SimpleNode extends AbstractEntity
             return;
         }
 
-        $node = null;
-        if (method_exists($this->caret->parentNode, 'inseerBefore')) {
-            $node = $this->node->cloneNode(true);
+        $node = @$this->node->cloneNode(true);
+        if ($node && method_exists($this->caret->parentNode, 'insertBefore')) {
             $this->removeNode($this->node);
             $this->node = $node;
-            $this->caret->parentNode->inseerBefore($this->node, $this->caret);
+            $this->caret->parentNode->insertBefore($this->node, $this->caret);
         }
+
 
         $this->depleteNode($this->node, function($data, $c_structs) use ($node) {
             if ($node/* || $this->caret->parentNode->ownerDocument*/) {
-                    $this->caret->parentNode->inseerBefore($this->node, $this->caret);
+                    //$this->caret->parentNode->inseerBefore($this->node, $this->caret);
+                $c_structs && $this->phpClose();
+                $this->caret->parentNode->insertBefore($this->node, $this->caret);
                 
-            } else {
-                //d(1);
             }
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
             }
+            if ($node && $c_structs) {
+                $this->phpOpen();         
+            }
+//$data['x'] = 123;
             $this->fillNode($this->node, $data);
-            $c_structs && $this->println('?>');
-            $this->caret->parentNode->insertBefore($this->node, $this->caret);
-            $c_structs && $this->println('<?php ;');
+            if ($node) {// if ($this->node->nodeName === 'option') dd(44);
+
+            }
         });
         
         $this->shouldClosePhp && $this->phpClose();
@@ -56,21 +61,24 @@ class SimpleNode extends AbstractEntity
     public function componentContext()
     {
         //dom($this->node);
-
+//setattr de proba
         $this->attrs['slot'] = 'default';
         //if ($this->node->parentNode) {
         //nu merge... nu se face register ce naiba...
         //pt ca comp register e chemat cred inainte de asta si ii zboara nodurile inainte sa faca si el register
         //cam asta se intampla? nu cred, pt ca register comp se face pe definitie comp
         $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);
-            $dataString = Helper::arrayToEval($data);
+            $this->fillNode($this->node, $data);
+            //$this->fillNode($this->node, ['x'=>13]);
+            //$dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-            (new Template($this->document, $this->node, $name))->newContext();
+            $node = new HTML5DOMDocument;
+            $node->appendChild($node->importNode($this->node, true));
+            (new Template($this->document, $node, $name))->newContext();
     
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
-                $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
+                $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]')
             );
         });
         //dom($this->node);die();
@@ -99,13 +107,20 @@ class SimpleNode extends AbstractEntity
         $this->node = $this->node->cloneNode(true);
         // close php
         $this->depleteNode($this->node, function($data) {
+            $this->phpClose();
+            if ($this->node->nodeName === 'select') {
+                //dd($data);
+            }
+            
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
             }
             $this->fillNode($this->node, $data);
-            $this->phpClose();
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
             $this->phpOpen();
         });
+        //if ($this->shouldClosePhp) {
+            //$this->phpClose();
+        //}
     }
 }
