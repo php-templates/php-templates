@@ -63,6 +63,7 @@ class SimpleNode extends AbstractEntity
         //dom($this->node);
 //setattr de proba
         $this->attrs['slot'] = 'default';
+        $this->attrs['_index'] = 0;
         //if ($this->node->parentNode) {
         //nu merge... nu se face register ce naiba...
         //pt ca comp register e chemat cred inainte de asta si ii zboara nodurile inainte sa faca si el register
@@ -73,12 +74,16 @@ class SimpleNode extends AbstractEntity
             //$dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
             $node = new HTML5DOMDocument;
+  //      $node->preserveWhitespace = false;
+   //     $node->formatOutput = true;
+    
             $node->appendChild($node->importNode($this->node, true));
             (new Template($this->document, $node, $name))->newContext();
     
+            pass attrs toeval
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
-                $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]')
+                $this->depth, $this->context->depth, $this->attrs['slot'], $name, Helper::arrayToEval())
             );
         });
         //dom($this->node);die();
@@ -90,6 +95,7 @@ class SimpleNode extends AbstractEntity
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.Helper::uniqid();
+            //TODO: scope
             (new Template($this->document, $this->node, $name))->newContext();
     
             $this->println(

@@ -53,9 +53,10 @@ class Template extends AbstractEntity
         } else {
             $htmlString = $this->node->saveHtml();
         }
+        //d('>>>', $htmlString, '<<<');
         // make replaces
-        $htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
-        $htmlString = preg_replace('/\?\&gt;[\s\r\n\t]*\&lt;\?php[\s\r\n\t;]*else/', 'else', $htmlString);
+        //$htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
+        //$htmlString = preg_replace('/\?\&gt;[\s\r\n\t]*\&lt;\?php[\s\r\n\t;]*else/', 'else', $htmlString);
         $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 return "<?php echo htmlspecialchars($eval); ?>";

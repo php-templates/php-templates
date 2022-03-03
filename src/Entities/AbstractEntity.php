@@ -347,6 +347,8 @@ abstract class AbstractEntity
             elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
                 // stands its own
                 $container = new HTML5DOMDocument;
+//        $container->preserveWhitespace = false;
+     //   $container->formatOutput = true;
                 $slotNode = $container->importNode($slotNode, true);
                 $container->appendChild($slotNode);
                 $slots[$slotPosition][] = $container;
@@ -406,14 +408,15 @@ abstract class AbstractEntity
         
         $this->document->registerDependency($srcFile);
         $node = new HTML5DOMDocument;
-        $node->substituteEntities = false;
-        $node->formatOutput = true;
+        //$node->substituteEntities = false;
+        //dd($node->preserveWhiteSpace ? 1 : 0);
+        //$node->formatOutput = true;
         $html = file_get_contents($srcFile);
         $html = $this->escapeSpecialCharacters($html);
         $html = $this->removeHtmlComments($html);
         $this->trimHtml = strpos($html, '</body>') === false;
         $node->loadHtml($html);
-        
+        //d($html)
         return $node;
     }
     
@@ -450,7 +453,7 @@ abstract class AbstractEntity
         $content = '';
         foreach ($body->childNodes as $node)
         {
-            $content.= $dom->saveHtml($node);
+            $content.= $dom->saveHtml($node).PHP_EOL;
         }
         return $content;
     }

@@ -7,6 +7,7 @@ use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use PhpTemplates\Parser;
 use IvoPetkov\HTML5DOMElement;
+use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\InvalidNodeException;
 
 class Slot extends AbstractEntity
@@ -66,6 +67,49 @@ class Slot extends AbstractEntity
      */
     public function componentContext()
     {
+        $this->attrs['slot'] = 'default';
+        $this->attrs['name'] = 'default';
+        //$this->phpOpen();
+        $this->depleteNode($this->node, function($data) {
+            $data = $this->fillNode(null, $data);
+            $dataString = Helper::arrayToEval($data);
+    
+            $definition = 'foreach ($this->slots("%s") as $_slot) {'
+            .PHP_EOL.'$this->comp[%d]->addSlot("%s", $_slot);'
+            .PHP_EOL.'}';
+            $this->println(
+                sprintf($definition,
+                $this->attrs['name'], 
+                $this->context->depth, 
+                $this->attrs['slot'], 
+                //$dataString,
+                //$this->name
+                )
+            );
+            
+            if ($childNodes = $this->childNodes()) {
+                $this->println(
+                    sprintf('if (empty($this->slots("%s"))) { ;', 
+                    $this->attrs['name'])
+                );
+                foreach ($childNodes as $cn) {
+                    $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+                    $node = new HTML5DOMDocument;
+                   // $node->preserveWhiteSpace = false;
+                 //   $node->formatOutput = true;
+                    $node->appendChild($node->importNode($cn, true));
+                    (new Template($this->document, $node, $name))->newContext();
+            
+                    $this->println(
+                        sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
+                        $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]')
+                    );
+                }
+                $this->println('}');
+            }
+        });
+        //dom($this->caret->parentNode);die();
+        /*
         $phpStart = '';//'?php';
         $phpEnd = '';//'?';
 cu atentie ca pot exista foreach uri pe slot
@@ -88,6 +132,6 @@ cu atentie ca pot exista foreach uri pe slot
             }
 
             $this->println('} '.$phpEnd);
-        }
+        }*/
     }
 }
