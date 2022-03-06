@@ -97,18 +97,19 @@ class Document
     protected function getDestFile()
     {
         $dependencies = DependenciesMap::get($this->name);
-        $pf = trim(Config::get('src_path'), '/').'/';
+        //$pf = trim(Config::get('src_path'), '/').'/';
         asort($dependencies);
         $hash = [$this->name];//dd($dependencies);
         foreach ($dependencies as $f) {
-            $file = $pf.$f;
+            $file = $f;//dd($file);
             $hash[] = $f.':'.filemtime($file);
         }
 
-        $pf = trim(Config::get('dest_path'), '/').'/';
+        $pf = rtrim(Config::get('dest_path'), '/').'/';
         $name = str_replace('/', '_', $this->name);// todo
+        //dd($pf, file_exists('/'.$pf) ? 1 : 0);
         $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
-
+//dd($outFile);
         return $outFile.'.php';
     }
 

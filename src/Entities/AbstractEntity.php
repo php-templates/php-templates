@@ -256,10 +256,16 @@ abstract class AbstractEntity
         foreach ($data as $k => $val) {
             if ($k[0] === ':') {
                 $k = substr($k, 1);
-                $val = "<?php echo $val; ?>";
+                $rid = '__r'.uniqid();
+                $this->document->tobereplaced[$rid] = "<?php echo $val; ?>";
+                $val = $rid;
             }
             $node->setAttribute($k, $val);
         }
+        if ($node->nodeName === 'a') {
+           // dom($node); die();
+        }
+        
     }
 
     // protected function controlStructure($statement, $args, $node, $phpTags = false)
