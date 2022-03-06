@@ -1,18 +1,22 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
+use PhpTemplates\Helper;
 Parsed::$templates['components/dropdown'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['text','slots','slot','data',])));
-     ?><div class="dropdown">
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['text','this','_slot',]));
+     ?> <div class="dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <?php echo htmlspecialchars($text); ?>
     </a>
     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-      <?php 
-    if (!empty($slots["default"])) {
-    foreach ($slots['default'] as $slot) {
-    $slot->render(array_merge($data, []));
-    }
-    } ?></div>
-</div><?php 
+      
+<?php ;
+foreach ($this->slots("default") as $_slot) {
+$_slot->render(array_merge($this->data, []));
+}
+ ?>
+    </div>
+</div>
+
+ <?php 
 };
