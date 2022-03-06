@@ -52,7 +52,8 @@ if (empty($this->slots("sn8"))) {
 $this->comp[1] = Parsed::template("comp/simple", []);
 $this->comp[1]->render($this->data);
 }
- ?></div> <?php 
+ ?>
+    </div> <?php 
 };
 Parsed::$templates['comp/comp_slot?slot=default&id=5'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
@@ -93,7 +94,8 @@ $_slot->render(array_merge($this->data, []));
  ?></span>
 <?php ;
 }
- ?></div>
+ ?>
+</div>
 
 
 <div class="sdefsdef">
@@ -115,7 +117,8 @@ if (empty($this->slots("sn2"))) {
  ?></span>
 <?php ;
 }
- ?></div>
+ ?>
+</div>
 
 
 <div class="sdefsdef">
@@ -137,7 +140,8 @@ $this->comp[1]->render($this->data);
  ?></span>
 <?php ;
 }
- ?></div>
+ ?>
+</div>
 
 
 <?php ;
@@ -152,6 +156,7 @@ $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("sn5?slot=d
 $this->comp[0]->render($this->data);
 ?>
 
+
 <?php ;
 $this->comp[0] = Parsed::template("comp/comp_slot", []);
 foreach ($this->slots("sn6") as $_slot) {
@@ -164,12 +169,14 @@ $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("sn6?slot=d
 $this->comp[0]->render($this->data);
 ?>
 
+
 <?php ;
 $this->comp[0] = Parsed::template("comp/comp_slot", []);
 $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=4", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));
 
 $this->comp[0]->render($this->data);
 ?>
+
 
 <?php ;
 $this->comp[0] = Parsed::template("comp/comp_slot", []);
@@ -215,7 +222,8 @@ Parsed::$templates['comp/cns?slot=sn9&id=13'] = function ($data, $slots) {
 Parsed::$templates['./cases/13'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this','i',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/cns", []);
 for ($i=0;$i<2;$i++) { 

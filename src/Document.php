@@ -13,19 +13,7 @@ class Document
 
     public $templates = [];
     public $eventListeners = [];
-    public $tobereplaced = [
-        '="__empty__"' => '',
-        '&gt;' => '>',
-        '&amp;\gt;' => '&gt;',
-        '&lt;' => '<',
-        '&amp;\lt;' => '&lt;',
-        '&amp;' => '&',
-        '&amp;\amp;' => '&amp;',
-        '<php>' => '<?php',
-        '</php>' => '?>'
-        /*'?&gt;' => '?>',
-        '-&gt;' => '->',*/
-    ];
+    public $tobereplaced = [];
     public $toberemoved = [];
     public $templateBlocks = [];
 
@@ -61,8 +49,6 @@ class Document
                 }
             }
         }
-
-        $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
 
         /*$tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
 */

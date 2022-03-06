@@ -12,13 +12,15 @@ Parsed::$templates['extends/parent4'] = function ($data, $slots) {
 foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
- ?></parent4>
+ ?>
+</parent4>
 
  <?php 
 };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me','this','_slot',]));
-     ?> <parent3>
+     ?> 
+<parent3>
     parent3
     <?php echo htmlspecialchars($bind_me); ?>
     
@@ -26,20 +28,23 @@ Parsed::$templates['extends/parent3'] = function ($data, $slots) {
 foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
- ?></parent3>
+ ?>
+</parent3>
 
  <?php 
 };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-     ?> <b></b>
+     ?> 
+<b></b>
 
  <?php 
 };
 Parsed::$templates['./cases/5'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html><body><?php $this->data['bind_me'] = 'bound'; ?>
+<html>
+<body><?php $this->data['bind_me'] = 'bound'; ?>
 
 <?php ;
 $this->comp[0] = Parsed::template("extends/c", []);

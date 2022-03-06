@@ -24,6 +24,7 @@ $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
 }
 
+
 foreach ([1,2] as $a) {
 ?>
 <div class="comp/composed">
@@ -40,7 +41,8 @@ foreach ([1,2] as $a) {
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
 } 
- ?></span>
+ ?>
+    </span>
 </div>
 <?php ;
 }
@@ -58,7 +60,8 @@ foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
 } 
- ?></div>
+ ?>
+</div>
 
  <?php 
 };
@@ -73,7 +76,8 @@ Parsed::$templates['comp/csf?slot=default&id=53'] = function ($data, $slots) {
 Parsed::$templates['./cases/control_structure'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['array','array_map','true','false','a','this',]));
      ?> <!DOCTYPE html>
-<html><body><?php $array = [1, 2];
+<html>
+<body><?php $array = [1, 2];
 $array_map = ['foo' => 'f1', 'bar' => 'f2'];
 $true = true;
 $false = false;
@@ -100,7 +104,8 @@ foreach ($array as $a) {
 <?php ;
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
- ?></div>
+ ?>
+</div>
 <?php ;
 } 
  ?>
@@ -115,7 +120,8 @@ foreach ($array as $a) {
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
 } 
- ?></div>
+ ?>
+</div>
 
 -----
 
@@ -189,6 +195,7 @@ if ($false) {
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);
 } 
+
 elseif ($true) { 
  ?><elseif></elseif>
 <?php ;

@@ -3,7 +3,7 @@ use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
 Parsed::$templates['components/form-group'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['class','this','_slot','label','type','value','placeholder','options','name','val','error',]));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['class','this','_slot','label','type','value','placeholder','options','name','values','val','_attrs','k','v','error',]));
      ?> <div class="<?php echo Helper::mergeAttrs('form-group',!empty($class) ? $class : ''); ?>">
     
 <?php ;
@@ -15,6 +15,7 @@ if (empty($this->slots("label"))) {
 <?php ;
 }
  ?>
+    
 <?php ;
 foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
@@ -52,12 +53,14 @@ foreach ($options as $val => $label) {
 } 
 elseif ($type === 'select') { 
  ?><select class="form-control">
+            
 <?php ;
 foreach ($options as $val => $label) { 
  ?><option <?php echo ($val == $value ? 'checked' : '') ?> value="<?php echo $val; ?>"><?php echo htmlspecialchars($label); ?></option>
 <?php ;
 } 
- ?></select>
+ ?>
+        </select>
 <?php ;
 } 
 elseif ($type === 'textarea') { 
@@ -66,6 +69,7 @@ elseif ($type === 'textarea') {
 } 
 }
  ?>
+    
 <?php ;
 if (!empty($error)) { 
  ?><span class="error"><?php echo htmlspecialchars($error); ?></span>
@@ -79,7 +83,8 @@ if (!empty($error)) {
 Parsed::$templates['./cases/7'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("components/form-group", ['type' => 'checkbox', 'name' => 'options', 'label' => 'Options', 'options' => ['o1' => 'A', 'o2' => 'B'], 'values' => ['o1']]);
 $this->comp[0]->render($this->data);

@@ -129,12 +129,12 @@ class Parser
                 $expr = substr($k, strlen($pf));
                 if ($expr === 'raw') {
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$rid] = "<?php echo ({$attr->nodeValue}); ?>";
+                    $this->document->tobereplaced[$this->thread][$rid] = "<?php echo ({$attr->nodeValue}); ?>";
                     $node->setAttribute($rid, '__empty__');
                 }
                 elseif ($expr === 'bind') {
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$rid] = "<?php foreach({$attr->nodeValue} as ".'$k=>$v) echo "$k=\"$v\" "; ?>';
+                    $this->document->tobereplaced[$this->thread][$rid] = "<?php foreach({$attr->nodeValue} as ".'$k=>$v) echo "$k=\"$v\" "; ?>';
                     $node->setAttribute($rid, '__empty__');
                 }
                 elseif (in_array($expr, Config::allowedControlStructures)) {
@@ -142,7 +142,7 @@ class Parser
                 }
                 elseif ($custom = Config::directive($expr, $attr->nodeValue)) {
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$rid] = "<?php echo $custom; ?>";
+                    $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $custom; ?>";
                     $node->setAttribute($rid, '__empty__');
                 }
 
@@ -156,7 +156,7 @@ class Parser
                 } else {
                     $node->setAttribute($a, $rid);
                 }
-                $this->document->tobereplaced[$rid] = "<?php echo {$attr->nodeValue} ;?>";
+                $this->document->tobereplaced[$this->thread][$rid] = "<?php echo {$attr->nodeValue} ;?>";
                 $toberemoved[] = $k;
             }
         }

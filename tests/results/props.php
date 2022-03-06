@@ -11,9 +11,10 @@ Parsed::$templates['props/a'] = function ($data, $slots) {
  <?php 
 };
 Parsed::$templates['props/b'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['true',]));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['true','_attrs','k','v',]));
      ?> <b true="<?php echo $true; ?>">
-    <bind <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>></bind></b>
+    <bind <?php foreach($_attrs as $k=>$v) echo "$k=\"$v\" "; ?>></bind>    
+</b>
 
  <?php 
 };
@@ -24,17 +25,20 @@ Parsed::$templates['props/c'] = function ($data, $slots) {
 data['val'] = [1,2]; $this->data['name'] = "myname"; ?>
 
 <c>
+    
 <?php ;
 foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
- ?></c>
+ ?>
+</c>
 
  <?php 
 };
 Parsed::$templates['props/c?slot=default&id=54'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['val','v','name',]));
      ?> 
+        
 <?php ;
 foreach ($val as $v) { 
  ?><div><?php echo htmlspecialchars($name.$v); ?></div>
@@ -63,12 +67,15 @@ Parsed::$templates['comp/comp_slot?slot=default&id=55'] = function ($data, $slot
 Parsed::$templates['./cases/props'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['foo','bar','arr','true','false','this',]));
      ?> <!DOCTYPE html>
-<html><body><?php $foo = 'foo';
+<html>
+<body><?php $foo = 'foo';
 $bar = 'bar';
 $arr = ['arr1', 'arr2'];
 $true = 1;
 $false = 0;
-?><simple bar="$bar" foo="<?php echo $foo; ?>"></simple>
+?>
+
+<simple bar="$bar" foo="<?php echo $foo; ?>"></simple>
 
 -----
 

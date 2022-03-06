@@ -150,7 +150,7 @@ abstract class AbstractEntity
                 //todo validate simple node only, component not alowed
                 elseif ($custom = $this->directive($k, $a->nodeValue)) {
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$rid] = $custom;//d($custom);
+                    $this->document->tobereplaced[$this->thread][$rid] = $custom;//d($custom);
                     $data[$rid][] = '__empty__';
                     continue;
                     //$node->setAttribute($rid, '__empty__');
@@ -257,7 +257,7 @@ abstract class AbstractEntity
             if ($k[0] === ':') {
                 $k = substr($k, 1);
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced[$rid] = "<?php echo $val; ?>";
+                $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $val; ?>";
                 $val = $rid;
             }
             $node->setAttribute($k, $val);

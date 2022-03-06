@@ -13,7 +13,8 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
 Parsed::$templates['./cases/simple_component'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/simple", []);
 $this->comp[0]->render($this->data);

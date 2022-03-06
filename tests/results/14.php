@@ -91,7 +91,8 @@ $this->comp[3] = $this->comp[2]->addSlot("default", Parsed::template("comp/comp_
 $this->comp[1]->render($this->data);
 } 
 }
- ?></div>
+ ?>
+</div>
 <?php ;
 }
 ?>
@@ -101,7 +102,8 @@ $this->comp[1]->render($this->data);
 Parsed::$templates['./cases/14'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("comp/csdf", []);
 $this->comp[0]->render($this->data);

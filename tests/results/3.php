@@ -9,7 +9,8 @@ Parsed::$templates['b1?slot=18'] = function ($data, $slots) {
 Parsed::$templates['./cases/3'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['k','this',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 foreach ([1,2] as $k) { 
 $this->comp[0] = Parsed::template("***block", ['k' => $k])->withName("b1")->setSlots($this->slots);

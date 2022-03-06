@@ -13,10 +13,20 @@ use PhpTemplates\Helper;
 class Template extends AbstractEntity
 {
     private $name;
+    private $tobereplaced = [
+        '="__empty__"' => '',
+        '&gt;' => '>',
+        '&amp;\gt;' => '&gt;',
+        '&lt;' => '<',
+        '&amp;\lt;' => '&lt;',
+        '&amp;' => '&',
+        '&amp;\amp;' => '&amp;',
+        '<php>' => '<?php',
+        '</php>' => '?>'
+    ];
 
     public function __construct(Document $doc, $node, $context = null)
     {
-        //d(is_string($context) ? 'ss' : '');
         parent::__construct($doc, $node, is_string($context) ? null : $context);
         if (is_string($node)) {
             $this->name = $node;
@@ -28,18 +38,16 @@ class Template extends AbstractEntity
     
     public function newContext()
     {
-        //$GLOBALS['x'] = $this->node;d(1);
-    //d('ct',$this->context);
-        //d($this->name, '--->');dom($this->node);d('<---');
         $this->thread = uniqid();
         Php::setThread($this->thread);
+        $this->document->tobereplaced[$this->thread] = $this->tobereplaced;
         if (method_exists($this->node, 'querySelector')) {
             if ($extends = $this->node->querySelector('extends')) {
                 $this->extends($extends);
             }
         }
         $this->parseNode($this->node);
-        //d($this->name, '--->');dom($this->node);d('<---');
+
         $this->register();
     }
     
@@ -53,10 +61,7 @@ class Template extends AbstractEntity
         } else {
             $htmlString = $this->node->saveHtml();
         }
-        //d('>>>', $htmlString, '<<<');
-        // make replaces
-        //$htmlString = preg_replace('/<html>[\s\n\r]*<\/html>/', '', $htmlString);
-        //$htmlString = preg_replace('/\?\&gt;[\s\r\n\t]*\&lt;\?php[\s\r\n\t;]*else/', 'else', $htmlString);
+
         $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 return "<?php echo htmlspecialchars($eval); ?>";
@@ -64,19 +69,11 @@ class Template extends AbstractEntity
             return '';
         }, $htmlString);
 
-        $htmlString = $this->getTemplateFunction($htmlString);//d($htmlString);
+        $htmlString = str_replace(array_keys($this->document->tobereplaced[$this->thread]), array_values($this->document->tobereplaced[$this->thread]), $htmlString);
+
+        $htmlString = $this->getTemplateFunction($htmlString);
         $this->document->templates[$this->name] = $htmlString;
     }
-
-    // public function componentContext()
-    // {
-
-    // }
-
-    // public function slotContext()
-    // {
-
-    // }
 
     private function extends($extends)
     {

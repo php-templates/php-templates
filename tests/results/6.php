@@ -9,17 +9,20 @@ Parsed::$templates['props/c'] = function ($data, $slots) {
 data['val'] = [1,2]; $this->data['name'] = "myname"; ?>
 
 <c>
+    
 <?php ;
 foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
- ?></c>
+ ?>
+</c>
 
  <?php 
 };
 Parsed::$templates['props/c?slot=default&id=19'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['val','v','name',]));
      ?> 
+        
 <?php ;
 foreach ($val as $v) { 
  ?><div><?php echo htmlspecialchars($name.$v); ?></div>
@@ -31,7 +34,8 @@ foreach ($val as $v) {
 Parsed::$templates['./cases/6'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
      ?> <!DOCTYPE html>
-<html><body>
+<html>
+<body>
 <?php ;
 $this->comp[0] = Parsed::template("props/c", []);
 $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("props/c?slot=default&id=19", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));
