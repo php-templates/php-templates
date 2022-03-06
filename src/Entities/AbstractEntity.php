@@ -387,7 +387,6 @@ abstract class AbstractEntity
             (new Component($this->document, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'template') {
-            d('anonim comp');
             (new AnonymousComponent($this->document, $node, $this))->{$fn}();
         }
         else {
