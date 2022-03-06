@@ -60,6 +60,10 @@ class SimpleNode extends AbstractEntity
 
     public function componentContext()
     {
+        if ($this->node->nodeValue == 'foo') {
+            //$this->println('line');
+            //dom($this->caret->parentNode);d('....');
+        }
         //dom($this->node);
 //setattr de proba
         $this->attrs['slot'] = 'default';
@@ -74,18 +78,21 @@ class SimpleNode extends AbstractEntity
             //$dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
             $node = new HTML5DOMDocument;
-  //      $node->preserveWhitespace = false;
-   //     $node->formatOutput = true;
-    
+  
             $node->appendChild($node->importNode($this->node, true));
             (new Template($this->document, $node, $name))->newContext();
     
-            pass attrs toeval
+            $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
+            //dd($dataString);
             $this->println(
-                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
-                $this->depth, $this->context->depth, $this->attrs['slot'], $name, Helper::arrayToEval())
+                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 
+                $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
             );
         });
+if ($this->node->nodeValue == 'foo') {
+    //dom($this->caret->parentNode);
+    //dd(444);
+}
         //dom($this->node);die();
     }
     
@@ -95,8 +102,9 @@ class SimpleNode extends AbstractEntity
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.Helper::uniqid();
-            //TODO: scope
-            (new Template($this->document, $this->node, $name))->newContext();
+            $node = new HTML5DOMDocument;
+            $node->appendChild($node->importNode($this->node, true));
+            (new Template($this->document, $node, $name))->newContext();
     
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 

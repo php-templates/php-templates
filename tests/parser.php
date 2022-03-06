@@ -21,7 +21,7 @@ Config::set('src_path', './');
 Config::set('dest_path', './results/');
 
 Config::addDirective('checked', function($eval) {
-    return $eval.' ? "checked" : ""';
+    return '<?php echo '.$eval.' ? "checked" : ""; ?>';
 });
 
 $files = scandir('./cases');
@@ -48,8 +48,10 @@ foreach($files as $f) {
     $rfilepath = str_replace('.template.php', '', $file);
     $doc = new Document($rfilepath);
     $dom = new HTML5DOMDocument;
+    //$dom->preserveWhiteSpace = 
     $parser = new Template($doc, $rfilepath);
     $dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
+    //d($dom);
     $parser = new Template($doc, $dom, $rfilepath);
     $parser->newContext();
     $dest = './results/'.str_replace('.template', '', $f);

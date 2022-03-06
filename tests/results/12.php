@@ -6,7 +6,9 @@ Parsed::$templates['comp/simple'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
      ?> <div class="comp/simple">
     comp/simple
-</div> <?php 
+</div>
+
+ <?php 
 };
 Parsed::$templates['./cases/12'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['array','array_map','true','false','this',]));

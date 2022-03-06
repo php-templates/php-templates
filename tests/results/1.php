@@ -11,7 +11,9 @@ foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->data, []));
 }
  ?></span>
-</div> <?php 
+</div>
+
+ <?php 
 };
 Parsed::$templates['b1?slot=1'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));

@@ -6,55 +6,35 @@ use PhpTemplates\CodeBuffer;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use PhpTemplates\Parser;
-use IvoPetkov\HTML5DOMDocument;
 use IvoPetkov\HTML5DOMElement;
+use IvoPetkov\HTML5DOMDocument;
 
-class AnonymousComponent extends Parser implements Mountable
+class AnonymousComponent extends AbstractEntity
 {
-    protected $document;
-    protected $name;
-    protected $codebuffer;
+    protected $attrs = [];
 
-    public function __construct(Document $doc)
+    public function componentContext()
     {
-        $this->document = $doc;
-        $this->name = uniqid();
-        $this->codebuffer = new CodeBuffer;
-    }
-
-    public function mount(HTML5DOMElement $node): void
-    {
-        $this->insertComponent($node);
-        $nodeData = Helper::nodeStdClass($node);
-        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
-            $this->codebuffer->component($this->name, $nodeData->attributes);
-            $this->codebuffer->raw('$this->comp[0]->render($this->data);');
+        $this->attrs['slot'] = 'default';
+        $this->attrs['_index'] = 0;
+        
+        $this->depleteNode($this->node, function($data) {
+            $this->fillNode($this->node, $data);
+            //$this->fillNode($this->node, ['x'=>13]);
+            //$dataString = Helper::arrayToEval($data);
+            $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+            $node = new HTML5DOMDocument;
+            foreach ($this->node->childNodes as $cn) {
+                $node->appendChild($node->importNode($cn, true));
+            }
+            (new Template($this->document, $node, $name))->newContext();
+            $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
+            //dd($dataString);
+            $this->println(
+                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 
+                $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
+            );
         });
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
-            $node
-        );
-
-        $this->document->toberemoved[] = $node;
-    }
-
-    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf)
-    {
-        $this->codebuffer = $cbf;
-        $nodeData = Helper::nodeStdClass($node);
-        $this->insertComponent($node);
-        $this->codebuffer->slot(0, $nodeData->slot, $this->name, $nodeData->attributes);
-    }
-
-    protected function insertComponent($node)
-    {
-        $nodeData = Helper::nodeStdClass($node);
-        // childnodes
-        $childs = new HTML5DOMDocument();
-        foreach ($node->childNodes as $cn) {
-            $childs->appendChild($childs->importNode($cn, true));
-        }
-        (new Parser($this->document, $this->name))->parse($childs);
     }
 }
 

@@ -99,9 +99,9 @@ class Document
         $dependencies = DependenciesMap::get($this->name);
         $pf = trim(Config::get('src_path'), '/').'/';
         asort($dependencies);
-        $hash = [$this->name];
+        $hash = [$this->name];//dd($dependencies);
         foreach ($dependencies as $f) {
-            $file = $pf.$f.'.template.php';
+            $file = $pf.$f;
             $hash[] = $f.':'.filemtime($file);
         }
 

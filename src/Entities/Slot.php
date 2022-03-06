@@ -69,7 +69,11 @@ class Slot extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['name'] = 'default';
-        //$this->phpOpen();
+if ($this->node->getAttribute('name') == 'sn9') {
+   // dom($this->caret->parentNode);
+    //d(55555);
+}
+        $this->phpOpen('');
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
@@ -108,30 +112,9 @@ class Slot extends AbstractEntity
                 $this->println('}');
             }
         });
-        //dom($this->caret->parentNode);die();
-        /*
-        $phpStart = '';//'?php';
-        $phpEnd = '';//'?';
-cu atentie ca pot exista foreach uri pe slot
-        $data = $this->depleteNode($this->node);
-        $dataString = Helper::arrayToEval($data);
-
-        $definition = '%s foreach ($this->slots("%s") as $_slot) {'
-            .PHP_EOL.'$this->comp[%d]->addSlot("%s", $_slot);'
-            .PHP_EOL.'} %s';
-
-        $this->println(
-            sprintf($definition, $phpStart, $this->attrs['name'], $this->context->depth, $this->attrs['slot'], $this->hasSlotDefault ? '' : $phpEnd)
-        );
-
-        if ($this->hasSlotDefault) {
-            $this->println(sprintf('if (empty($this->slots("%s"))) {', $this->attrs['name']));
-
-            foreach ($this->childNodes() as $slotDefault) {
-                $this->parseNode($slotDefault);
-            }
-
-            $this->println('} '.$phpEnd);
-        }*/
+if ($this->attrs['name'] == 'sn9') {
+   // dom($this->caret->parentNode);
+   // dd(7777);
+}
     }
 }

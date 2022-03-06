@@ -92,6 +92,11 @@ class Component extends AbstractEntity
      */
     public function slotContext()
     {
-dd('component.slotcontext');
+//dd('component.slotcontext');
+//nu e comp context, e template context cu if
+//cel mai probabil trb sa fac set slot de sus in jos
+//div class="x"> se rupe aic
+        $this->templateContext();
+        //if ($this->shouldClosePhp)
     }
 }

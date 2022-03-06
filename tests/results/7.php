@@ -72,7 +72,9 @@ if (!empty($error)) {
 <?php ;
 } 
  ?>
-</div> <?php 
+</div>
+
+ <?php 
 };
 Parsed::$templates['./cases/7'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));

@@ -95,7 +95,7 @@ abstract class AbstractEntity
         else {
             //d($this->context->depth, $this->depth);dom($this->node);
             $context = $this->context;
-            while ($context->depth > 0) {
+            while ($context->depth > 1) {
                 $context = $context->context;
             }
             //dd($this->context->node, $this->context->depth);
@@ -381,8 +381,8 @@ abstract class AbstractEntity
             (new Component($this->document, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'template') {
-            dd('anonim comp');
-            // (new AnonymousComponent($this->document))->mount($refNode);
+            d('anonim comp');
+            (new AnonymousComponent($this->document, $node, $this))->{$fn}();
         }
         else {
             (new SimpleNode($this->document, $node, $this))->{$fn}();

@@ -1,19 +1,23 @@
 <?php 
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
+use PhpTemplates\Helper;
 Parsed::$templates['comp/simple'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, [])));
-     ?><div class="comp/simple">
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
+     ?> <div class="comp/simple">
     comp/simple
-</div><?php 
+</div>
+
+ <?php 
 };
 Parsed::$templates['./cases/simple_component'] = function ($data, $slots) {
-    extract($data); $_attrs = array_intersect_key($data, array_flip(array_diff($_attrs, ['comp0','data',])));
-     ?><!DOCTYPE html>
-<html>
-<body><?php $comp0 = Parsed::template('comp/simple', []);
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['this',]));
+     ?> <!DOCTYPE html>
+<html><body>
+<?php ;
+$this->comp[0] = Parsed::template("comp/simple", []);
+$this->comp[0]->render($this->data);
+ ?>
 
-    $comp0->render($data); ?>
-
------</body></html><?php 
+-----</body></html> <?php 
 };

@@ -63,6 +63,9 @@ class Block extends AbstractEntity
         //$this->node->setAttribute('x', 'y');
         //dom($GLOBALS['x']);die();
 //$this->makeCaret($this->node);
+if ($this->node->getAttribute('name') == 'b122') {
+    ///dom($this->caret->parentNode->parentNode);dd();
+}
         $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
             //$this->node->setAttribute('x',33);

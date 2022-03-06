@@ -28,6 +28,7 @@ function d(...$data) {
 
 function dom($d, $name = '', $depth = 0)
 {
+    //dd(111);
     //if (empty($_GET['debug'])) return;
     
     if (is_string($d)) {

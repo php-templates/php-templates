@@ -31,7 +31,7 @@ class Template
             if ($path = $doc->exists()) {
 
             } else {
-                (new EntitiesTemplate($doc, null, $rfilepath))->newContext();
+                (new EntitiesTemplate($doc, $rfilepath))->newContext();
                 $path = $doc->save();
             }
 
