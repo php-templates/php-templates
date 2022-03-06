@@ -13,6 +13,18 @@ class AnonymousComponent extends AbstractEntity
 {
     protected $attrs = [];
 
+    public function simpleNodeContext()
+    {
+        $this->depleteNode($this->node, function($data) {
+            foreach ($this->childNodes($this->node) as $slot) {
+                $this->parseNode($slot);
+            }
+            $this->fillNode($this->node, $data);
+            $this->caret->parentNode->insertBefore($this->node, $this->caret);
+        });
+        $this->removeNode($this->node);
+    }
+
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
@@ -29,7 +41,7 @@ class AnonymousComponent extends AbstractEntity
             }
             (new Template($this->document, $node, $name))->newContext();
             $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
-            //dd($dataString);
+
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 
                 $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)

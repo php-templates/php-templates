@@ -137,4 +137,9 @@ if ($this->node->nodeValue == 'foo') {
             //$this->phpClose();
         //}
     }
+
+    public function anonymousComponentContext()
+    {
+        $this->slotContext();
+    }
 }
