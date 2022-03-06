@@ -3,15 +3,17 @@
 
  error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 
-function dd(...$data) {
-    //print_r(debug_backtrace());
-    foreach ($data as $d) {
-        //var_dump($d);
-        //echo '<pre>';
-        print_r($d);
-        //echo '</pre>';
+if (!function_exists('dd')) {
+    function dd(...$data) {
+        //print_r(debug_backtrace());
+        foreach ($data as $d) {
+            //var_dump($d);
+            //echo '<pre>';
+            print_r($d);
+            //echo '</pre>';
+        }
+        die();
     }
-    die();
 }
 
 function d(...$data) {
