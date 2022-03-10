@@ -5,11 +5,9 @@ use PhpTemplates\Helper;
 Parsed::$templates['./cases/16'] = function ($data, $slots) {
     extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['true',]));
      ?> <!DOCTYPE html>
-<html>
-<body><?php
+<html><body><?php
     $true = 1;
-?>
-<div role="map-route" class="flex w-full sm:w-auto">
+?><div role="map-route" class="flex w-full sm:w-auto">
     
 <?php ;
 if ($true) { 
@@ -24,8 +22,7 @@ else {
 <?php ;
 } 
 } 
-</div>
- ?>
+ ?></div>
 
 -----</body></html> <?php 
 };

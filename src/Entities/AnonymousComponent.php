@@ -22,6 +22,7 @@ class AnonymousComponent extends AbstractEntity
             $this->fillNode($this->node, $data);
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
         });
+        $this->shouldClosePhp && $this->phpClose();
         $this->removeNode($this->node);
     }
 
