@@ -6,6 +6,7 @@ use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Directive;
 
 abstract class AbstractEntity
 {
@@ -148,9 +149,14 @@ abstract class AbstractEntity
                     continue;
                 }
                 //todo validate simple node only, component not alowed
-                elseif ($custom = $this->directive($k, $a->nodeValue)) {
+                elseif (Directive::exists($k)) {
+                    $custom = Directive::run($k, $a->nodeValue);
+                    if (!$custom) {
+                        continue;
+                    }
+                    
                     $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$this->thread][$rid] = $custom;//d($custom);
+                    $this->document->tobereplaced[$this->thread][$rid] = $custom; // trb....
                     $data[$rid][] = '__empty__';
                     continue;
                     //$node->setAttribute($rid, '__empty__');
@@ -260,12 +266,17 @@ abstract class AbstractEntity
                 $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $val; ?>";
                 $val = $rid;
             }
+            elseif ($k === 'p-bind') {
+                $rid = '__r'.uniqid();
+                $this->document->tobereplaced[$this->thread][$rid] = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>"';
+                $k = $rid;
+                $val = '__empty__';
+            }
             $node->setAttribute($k, $val);
         }
         if ($node->nodeName === 'a') {
            // dom($node); die();
         }
-        
     }
 
     // protected function controlStructure($statement, $args, $node, $phpTags = false)

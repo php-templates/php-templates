@@ -22,3 +22,5 @@ sau si.si iar cand zic src_path, zic default path
 se va ocupa un alt tool de pus if-uri, tot el face handle la custom directives si asa am centralizat locul unde se fac astea
 
 <lreplace final de php tags open si close la elseif se poate evita
+
+de gasit o varianta in care directives se seteaza mai clar, totodata de acoperit in directiva custom si cazul html, if, php

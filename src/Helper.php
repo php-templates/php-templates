@@ -84,19 +84,26 @@ class Helper {
     }
     
     public static function arrayToEval(array $arr, $simple = false)
-    {// todo nu va mergw cu array de genul [$foo, $bar]
+    {
+        // todo nu va mergw cu array de genul [$foo, $bar]
         if (!$arr) {
             return '[]';
         }
         $isAssoc = array_keys($arr) !== range(0, count($arr) - 1);
         if (!$isAssoc || $simple) {
+            $binds = isset($arr['p-bind']) ? $arr['p-bind'] : null;
+            unset($arr['p-bind']);
             $arr = var_export($arr, true);
             $arr = str_replace(['array (', ')', '\n', '\r', PHP_EOL], ['[', ']', '', '', ''], $arr);
             $arr = preg_replace('/\d+[ ]*\\=>[ ]*/', '', $arr);
             //var_dump(utf8_encode ($arr));dd();
-            return trim($arr, ',');
+            $arr = trim($arr, ',');
+            if ($binds) {
+                return "array_merge($binds, $arr)";
+            }
+            return $arr;
         }
-        
+
         $stream = [];
         foreach ($arr as $key => $value) {
             $stream[] = "'$key' => $value";
