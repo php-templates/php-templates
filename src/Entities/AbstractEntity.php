@@ -268,7 +268,7 @@ abstract class AbstractEntity
             }
             elseif ($k === 'p-bind') {
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced[$this->thread][$rid] = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\"; ?>"';
+                $this->document->tobereplaced[$this->thread][$rid] = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>';
                 $k = $rid;
                 $val = '__empty__';
             }
