@@ -12,6 +12,7 @@ class Config
         'dest_path' => 'parsed/',
         'track_changes' => true,// track dependencies changes
         'trim_html' => false,
+        'aliased' => [],
     ];
     
     const allowedControlStructures = [
