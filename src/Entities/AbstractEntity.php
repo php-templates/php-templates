@@ -2,11 +2,13 @@
 
 namespace PhpTemplates\Entities;
 
+use DOMAttr;
 use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Directive;
+use PhpTemplates\InvalidNodeException;
 
 abstract class AbstractEntity
 {
@@ -90,7 +92,6 @@ abstract class AbstractEntity
             return;
         }
         elseif ($this->depth < 1) {
-//d($this->node->nodeName);
             $node = $this->node;
         }
         else {
@@ -134,32 +135,40 @@ abstract class AbstractEntity
     
     protected function depleteNode($node, callable $cb)
     {
+        $attrs = $node->attributes ? $node->attributes : [];
+        $extracted_attributes = [];
+
+        foreach ($attrs as $a) {
+            $k = $a->nodeName;
+
+            if (strpos($k, $this->pf) === 0) {
+                // unpack directive result attributes
+                $directiveName = substr($k, strlen($this->pf));
+                if (Directive::exists($directiveName)) {
+                    $result = Directive::run($directiveName, $a->nodeValue);
+                    if (empty($result)) {
+                        throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
+                    }
+                    foreach ($result as $k => $val) {
+                        $extracted_attributes[] = new DOMAttr($k, $val);
+                    }
+                    // directive unpacked his data
+                    continue;
+                }
+            }
+            $extracted_attributes[] = $a->cloneNode(true);
+        }
+
         $c_structs = [];
         $data = [];
         $binds = [];
-        $attrs = $node->attributes ? $node->attributes : [];
-        foreach ($attrs as $a) {
+        foreach ($extracted_attributes as $a) {
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) {
                 $k = substr($k, strlen($this->pf));
                 if (in_array($k, Config::allowedControlStructures)) {
-                    //$this->controlStructure($k, $a->nodeValue, $this->caret, $htmlContext && !$phpTagsInserted);
                     $c_structs[] = [$k, $a->nodeValue];
-                    //$phpTagsInserted = true;
                     continue;
-                }
-                //todo validate simple node only, component not alowed
-                elseif (Directive::exists($k)) {
-                    $custom = Directive::run($k, $a->nodeValue);
-                    if (!$custom) {
-                        continue;
-                    }
-                    
-                    $rid = '__r'.uniqid();
-                    $this->document->tobereplaced[$this->thread][$rid] = $custom; // trb....
-                    $data[$rid][] = '__empty__';
-                    continue;
-                    //$node->setAttribute($rid, '__empty__');
                 }
             }
             $k = $a->nodeName;
@@ -225,17 +234,7 @@ abstract class AbstractEntity
 
         // close all control structures
         $close = implode(PHP_EOL, array_fill(0, count($c_structs), '} '));
-        /*
-        if (count($c_structs) && $this->caret === $this->node) {
-            if ($this->caret->nextSibling) {
-                $this->caret->parentNode->insertBefore(
-                    $this->caret->ownerDocument->createTextNode($close),
-                    $this->caret->nextSibling
-                );
-            } else {
-                $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode($close));
-            }
-        } */
+
         if (count($c_structs)) {
             $this->println($close);
         }
@@ -255,7 +254,7 @@ abstract class AbstractEntity
             }
             return $_data;
         }
-        
+
         if (!method_exists($node, 'setAttribute')) {
             return;
         }
@@ -272,47 +271,14 @@ abstract class AbstractEntity
                 $k = $rid;
                 $val = '__empty__';
             }
+            elseif ($k === 'p-raw') {
+                $rid = '__r'.uniqid();
+                $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $val; ?>";
+                $k = $rid;
+                $val = '__empty__';
+            }
             $node->setAttribute($k, $val);
         }
-        if ($node->nodeName === 'a') {
-           // dom($node); die();
-        }
-    }
-
-    // protected function controlStructure($statement, $args, $node, $phpTags = false)
-    // {
-    //     $phpStart = $phpTags ? $this->phpOpen() : '';
-    //     $phpEnd = $phpTags ? '' : '';
-
-    //     if ($args || $args === '0') {
-    //         $statement .= " ($args)";
-    //     }
-
-    //     $node->parentNode->insertBefore(
-    //         $node->ownerDocument->createTextNode($phpStart." $statement { "),
-    //         $node
-    //     );
-
-    //     if ($node->nextSibling) {
-    //         $node->parentNode->insertBefore(
-    //             $node->ownerDocument->createTextNode(" } ".$phpEnd),
-    //             $node->nextSibling
-    //         );
-    //     } else {
-    //         $node->parentNode->appendChild($node->ownerDocument->createTextNode(" } ".$phpEnd));
-    //     }
-    // }
-    
-    protected function directive($name, $val)
-    {
-        if (empty($this->document->config['directives'][$name])) {
-            return false;
-        }
-        $directive = $this->document->config['directives'][$name];
-        if (is_callable($directive)) {
-            return $directive($val);
-        }
-        return $directive;
     }
     
     protected function childNodes($node = null)

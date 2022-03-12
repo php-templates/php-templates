@@ -7,6 +7,7 @@ use PhpTemplates\Document;
 use PhpTemplates\Entities\Template;
 use PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Directive;
 
 header("Content-Type: text/plain");
 
@@ -20,8 +21,10 @@ Config::set('aliased', [
 Config::set('src_path', './');
 Config::set('dest_path', './results/');
 
-Config::addDirective('checked', function($eval) {
-    return '<?php echo '.$eval.' ? "checked" : ""; ?>';
+Directive::add('checked', function($eval) {
+    return [
+        'p-raw' => $eval.' ? "checked" : ""'
+    ];
 });
 
 $files = scandir('./cases');

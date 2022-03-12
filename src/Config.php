@@ -65,17 +65,4 @@ class Config
 
         return self::$data['aliased'][$name];
     }
-    
-    public static function addDirective($name, $value = null)
-    {
-        //todo: validate to not override cstruct
-        self::$data['directives'][$name] = $value;
-    }
 }
-
-Config::addDirective('bind', function($data) {
-    return '<?php foreach('.$data.' as $k=>$v) echo "$k=\"$v\" "; ?>';
-});
-Config::addDirective('raw', function($data) {
-    return '<?php echo ('.$data.') ?>';
-});

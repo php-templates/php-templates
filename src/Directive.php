@@ -18,7 +18,7 @@ class Directive
         return isset(self::$all[$key]);
     }
 
-    public static function run(string $key, string $value)
+    public static function run(string $key, string $value): array
     {
         if (!self::exists($key)) {
             return null;
@@ -26,13 +26,6 @@ class Directive
 
         $callable = self::$all[$key];
 
-        $callable($value);
+        return $callable($value);
     }
 }
-
-// Directive::add('bind', function($data) {
-//     return 'foreach('.$data.' as $k=>$v) echo "$k=\"$v\" ";';
-// });
-Directive::add('raw', function($data) {
-    return 'echo ('.$data.');';
-});

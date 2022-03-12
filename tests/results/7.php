@@ -3,7 +3,7 @@ use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
 Parsed::$templates['components/form-group'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['class','this','_slot','label','type','value','placeholder','options','name','val','_attrs','k','v','error',]));
+    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['class','this','_slot','label','type','value','placeholder','options','name','values','val','_attrs','k','v','error',]));
      ?> <div class="<?php echo Helper::mergeAttrs('form-group',!empty($class) ? $class : ''); ?>">
     
 <?php ;
@@ -36,7 +36,7 @@ elseif ($type === 'email') {
 elseif ($type === 'checkbox') { 
 foreach ($options as $name => $label) { 
  ?><label>
-            <input type="checkbox" value="1">
+            <input type="checkbox" <?php echo in_array($name, $values) ? 'checked' : ''; ?> value="1">
             <?php echo htmlspecialchars($label); ?>
         </label>
 <?php ;
@@ -45,7 +45,7 @@ foreach ($options as $name => $label) {
 elseif ($type === 'radio') { 
 foreach ($options as $val => $label) { 
  ?><label>
-            <input type="radio" name="<?php echo $name; ?>" value="<?php echo $val; ?>">
+            <input type="radio" <?php echo $val == $value ? 'checked' : ''; ?> name="<?php echo $name; ?>" value="<?php echo $val; ?>">
             <?php echo htmlspecialchars($label); ?>
         </label>
 <?php ;
@@ -56,7 +56,7 @@ elseif ($type === 'select') {
             
 <?php ;
 foreach ($options as $val => $label) { 
- ?><option value="<?php echo $val; ?>"><?php echo htmlspecialchars($label); ?></option>
+ ?><option <?php echo $val == $value ? 'checked' : ''; ?> value="<?php echo $val; ?>"><?php echo htmlspecialchars($label); ?></option>
 <?php ;
 } 
  ?>
