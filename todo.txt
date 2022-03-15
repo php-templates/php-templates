@@ -23,4 +23,14 @@ se va ocupa un alt tool de pus if-uri, tot el face handle la custom directives s
 
 <lreplace final de php tags open si close la elseif se poate evita
 
-de gasit o varianta in care directives se seteaza mai clar, totodata de acoperit in directiva custom si cazul html, if, php
+teste noua implementare directives
+parseNode va fi pe un trait folosit de toti
+func lui entities/templ vor fi cele ale lui AbstractEntity
+func lui entities/Tenplate vor fi preluate de new Context()->parse()
+func din abstract entites ce tin de pregatire fisier pt parsare vor fi in new Context
+scos taguri <php> si inlocuit cu blade syntax
+pregatire templ implica: replcallback pentru @php, php blocks to store in to be replaced late
+replace urile nu trb sa fie per thread, ci globale, altfel nested comp nu vor avea acces la ele. Vor fi procesate o singura data pe doc render
+niciun tag <> in html pan la final
+
+in final, suport blade syntax if
