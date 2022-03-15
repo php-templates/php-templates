@@ -1,13 +1,11 @@
 <?php
 
-namespace PhpTemplates\Entities;
-
-use PhpTemplates\Document;
+namespace PhpTemplates;
 
 /**
  * is actually component, but used in different contexts, even on root
 */
-class Php
+class PhpTag
 {
     protected static $thread = '';
     protected static $threads = [];

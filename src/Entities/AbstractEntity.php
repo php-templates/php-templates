@@ -9,28 +9,31 @@ use PhpTemplates\Helper;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Directive;
 use PhpTemplates\InvalidNodeException;
+use PhpTemplates\PhpTag;
+use PhpTemplates\Traits\CanParseNodes;
 
 abstract class AbstractEntity
 {
+    use CanParseNodes;
+
     protected $trimHtml = false;
     protected $document;
     protected $context;
     protected $node;
     protected $caret;
     protected $attrs = [];
-    // protected $controlStructures = [];
     protected $depth = 0;
     protected $thread;
     protected $pf = 'p-';
     
     public function __construct(Document $doc, $node, AbstractEntity $context = null)
     {
-        $this->thread = Php::getThread();
+        $this->thread = PhpTag::getThread();
         
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
-//d($ct_type);
+
             if (!in_array($ct_type, ['SimpleNode'])) {
                 $this->depth = $context->depth +1;
             }
@@ -283,7 +286,7 @@ abstract class AbstractEntity
     
     protected function childNodes($node = null)
     {
-        Php::setThread($this->thread);
+        PhpTag::setThread($this->thread);
         if (!$node) {
             $node = $this->node;
         }
@@ -330,8 +333,6 @@ abstract class AbstractEntity
             elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
                 // stands its own
                 $container = new HTML5DOMDocument;
-//        $container->preserveWhitespace = false;
-     //   $container->formatOutput = true;
                 $slotNode = $container->importNode($slotNode, true);
                 $container->appendChild($slotNode);
                 $slots[$slotPosition][] = $container;
@@ -347,59 +348,6 @@ abstract class AbstractEntity
         }
 
         return $slots;
-    }
-    
-    protected function parseNode($node)
-    {
-        $fn = explode('\\', get_class($this));
-        $fn = end($fn);
-        $fn = lcfirst($fn).'Context';
-        if ($node->nodeName === 'slot') {
-            (new Slot($this->document, $node, $this))->{$fn}();
-        }
-        elseif ($node->nodeName === 'block') {
-            (new Block($this->document, $node, $this))->{$fn}();
-        }
-        elseif ($this->isComponent($node)) {
-            (new Component($this->document, $node, $this))->{$fn}();
-        }
-        elseif ($node->nodeName === 'template') {
-            (new AnonymousComponent($this->document, $node, $this))->{$fn}();
-        }
-        else {
-            (new SimpleNode($this->document, $node, $this))->{$fn}();
-        }
-    }
-    
-    /**
-     * Load the given route document using this.document settings with fallback on default settings
-     */
-    public function load($rfilepath)
-    {
-        $srcpath1 = rtrim($this->document->config['src_path'], '/').'/'.$rfilepath.'.template.php';
-        $srcpath2 = rtrim(Config::get('src_path'), '/').'/'.$rfilepath.'.template.php';
-        if (file_exists($srcpath1)) {
-            $srcFile = $srcpath1;
-        }
-        elseif ($srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
-            $srcFile = $srcpath2;
-        } else {
-            $message = implode(' or ', array_unique([$srcpath1, $srcpath2]));
-            throw new \Exception("Template file $message not found");
-        }
-        
-        $this->document->registerDependency($srcFile);
-        $node = new HTML5DOMDocument;
-        //$node->substituteEntities = false;
-        //dd($node->preserveWhiteSpace ? 1 : 0);
-        //$node->formatOutput = true;
-        $html = file_get_contents($srcFile);
-        $html = $this->escapeSpecialCharacters($html);
-        $html = $this->removeHtmlComments($html);
-        $this->trimHtml = strpos($html, '</body>') === false;
-        $node->loadHtml($html);
-        //d($html)
-        return $node;
     }
     
     public function isComponent($node)
@@ -420,53 +368,12 @@ abstract class AbstractEntity
         return null;
     }
     
-    public function escapeSpecialCharacters($html) {
-        return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
-    }
-
-    public function trimHtml($dom)
-    {
-        $body = $dom->getElementsByTagName('body')->item(0);
-
-        if (!$body) {
-            return '';
-        }
-
-        $content = '';
-        foreach ($body->childNodes as $node)
-        {
-            $content.= $dom->saveHtml($node).PHP_EOL;
-        }
-        return $content;
-    }
-    
-    
-    protected function getTemplateFunction(string $templateString, $html = true) {
-        preg_match_all('/\$([a-zA-Z0-9_]+)/', $templateString, $m);
-        $used = Helper::arrayToEval(array_values(array_unique($m[1])));//var_dump($used);die();
-        $used = preg_replace('/\s*[\r\n]*\s*/', '', $used);
-        if ($html) {
-            $templateString = " ?> $templateString <?php ";
-        }
-        $fnDeclaration = 
-        "function (\$data, \$slots) {
-    extract(\$this->data); \$_attrs = array_diff_key(\$this->attrs, array_flip($used));
-    $templateString
-}";
-        return $fnDeclaration;
-    }
- 
-    public function removeHtmlComments($content = '') {//d($content);
-    	return preg_replace('~<!--.+?-->~ms', '', $content);
-    }
-    
-    protected function removeNode($node) {//d($node->nodeName);
-        //$this->fillNode($node, ['removed' => 1]);
+    protected function removeNode($node) {
         $node->parentNode->removeChild($node);
     }
     
     protected function phpOpen($println = true) {
-        $tag = Php::open($this->thread);
+        $tag = PhpTag::open($this->thread);
         if ($println && $tag) {
             $this->println($tag);
         }
@@ -474,7 +381,7 @@ abstract class AbstractEntity
     }
     
     protected function phpClose($println = true) {
-        $tag = Php::close($this->thread);
+        $tag = PhpTag::close($this->thread);
         if ($println && $tag) {
             $this->println($tag);
         }
@@ -483,7 +390,7 @@ abstract class AbstractEntity
     
     protected function phpIsOpen()
     {
-        return Php::isOpen($this->thread);
+        return PhpTag::isOpen($this->thread);
     }
     
     protected function shouldClosePhp()

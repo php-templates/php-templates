@@ -3,8 +3,7 @@
 namespace PhpTemplates\Entities;
 
 use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\Config;
-use PhpTemplates\Document;
+use PhpTemplates\Context;
 use PhpTemplates\Helper;
 
 /**
@@ -12,81 +11,42 @@ use PhpTemplates\Helper;
 */
 class Template extends AbstractEntity
 {
-    private $name;
-    private $tobereplaced = [
-        '="__empty__"' => '',
-        '&gt;' => '>',
-        '&amp;\gt;' => '&gt;',
-        '&lt;' => '<',
-        '&amp;\lt;' => '&lt;',
-        '&amp;' => '&',
-        '&amp;\amp;' => '&amp;',
-        '<php>' => '<?php',
-        '</php>' => '?>'
-    ];
+    protected $attrs = [];
 
-    public function __construct(Document $doc, $node, $context = null)
+    public function simpleNodeContext()
     {
-        parent::__construct($doc, $node, is_string($context) ? null : $context);
-        if (is_string($node)) {
-            $this->name = $node;
-        } 
-        elseif (is_string($context)) {
-            $this->name = $context;
-        }
-    }
-    
-    public function newContext()
-    {
-        $this->thread = uniqid();
-        Php::setThread($this->thread);
-        $this->document->tobereplaced[$this->thread] = $this->tobereplaced;
-        if (method_exists($this->node, 'querySelector')) {
-            if ($extends = $this->node->querySelector('extends')) {
-                $this->extends($extends);
+        $this->depleteNode($this->node, function($data) {
+            foreach ($this->childNodes($this->node) as $slot) {
+                $this->parseNode($slot);
             }
-        }
-        $this->parseNode($this->node);
-
-        $this->register();
+            $this->fillNode($this->node, $data);
+            $this->caret->parentNode->insertBefore($this->node, $this->caret);
+        });
+        $this->shouldClosePhp && $this->phpClose();
+        $this->removeNode($this->node);
     }
-    
-    protected function register()
-    {
-        if ($this->trimHtml) {
-            $htmlString = $this->trimHtml($this->node);
-        }
-        elseif ($this->node->ownerDocument) {
-            $htmlString = $this->node->ownerDocument->saveHtml($this->node);
-        } else {
-            $htmlString = $this->node->saveHtml();
-        }
 
-        $htmlString = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
-            if ($eval = trim($m[1])) {
-                return "<?php echo htmlspecialchars($eval); ?>";
+    public function componentContext()
+    {
+        $this->attrs['slot'] = 'default';
+        $this->attrs['_index'] = 0;
+        
+        $this->depleteNode($this->node, function($data) {
+            $this->fillNode($this->node, $data);
+            //$this->fillNode($this->node, ['x'=>13]);
+            //$dataString = Helper::arrayToEval($data);
+            $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+            $node = new HTML5DOMDocument;
+            foreach ($this->node->childNodes as $cn) {
+                $node->appendChild($node->importNode($cn, true));
             }
-            return '';
-        }, $htmlString);
+            (new Context($this->document, $node, $name))->parse();
+            $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
 
-        $htmlString = str_replace(array_keys($this->document->tobereplaced[$this->thread]), array_values($this->document->tobereplaced[$this->thread]), $htmlString);
-
-        $htmlString = $this->getTemplateFunction($htmlString);
-        $this->document->templates[$this->name] = $htmlString;
-    }
-
-    private function extends($extends)
-    {
-        $extendedTemplate = $extends->getAttribute('template');
-        (new Template($this->document, $extendedTemplate))->newContext();
-
-        $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
-            \$comp = Parsed::template('$extendedTemplate', \$data);
-            \$comp->addSlot('default', \$template);
-            \$comp->render(\$data);
-            return false;
-        }");
-
-        $extends->parentNode->removeChild($extends);
+            $this->println(
+                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 
+                $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString)
+            );
+        });
     }
 }

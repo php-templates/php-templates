@@ -7,6 +7,7 @@ use PhpTemplates\Document;
 use PhpTemplates\Entities\Template;
 use PhpTemplates\Parsed;
 use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Context;
 use PhpTemplates\Directive;
 
 header("Content-Type: text/plain");
@@ -52,11 +53,11 @@ foreach($files as $f) {
     $doc = new Document($rfilepath);
     $dom = new HTML5DOMDocument;
     //$dom->preserveWhiteSpace = 
-    $parser = new Template($doc, $rfilepath);
+    $parser = new Context($doc, $rfilepath);
     $dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
     //d($dom);
-    $parser = new Template($doc, $dom, $rfilepath);
-    $parser->newContext();
+    $parser = new Context($doc, $dom, $rfilepath);
+    $parser->parse();
     $dest = './results/'.str_replace('.template', '', $f);
     if (!isset($_GET['edit'])) {
         $doc->save($dest);
