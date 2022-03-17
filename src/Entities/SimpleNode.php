@@ -5,7 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\CodeBuffer;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
+use PhpTemplates\Context;
 use IvoPetkov\HTML5DOMElement;
 use IvoPetkov\HTML5DOMDocument;
 
@@ -80,7 +80,7 @@ class SimpleNode extends AbstractEntity
             $node = new HTML5DOMDocument;
   
             $node->appendChild($node->importNode($this->node, true));
-            (new Template($this->document, $node, $name))->newContext();
+            (new Context($this->document, $node, $name))->parse();
     
             $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
             //dd($dataString);
@@ -104,7 +104,7 @@ if ($this->node->nodeValue == 'foo') {
             $name = $this->context->name .'?slot='.Helper::uniqid();
             $node = new HTML5DOMDocument;
             $node->appendChild($node->importNode($this->node, true));
-            (new Template($this->document, $node, $name))->newContext();
+            (new Context($this->document, $node, $name))->parse();
     
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots));', 

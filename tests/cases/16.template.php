@@ -1,6 +1,6 @@
-<php>
+@php
     $true = 1;
-</php>
+@endphp
 <div role="map-route" class="flex w-full sm:w-auto">
     <template p-if="$true">
         <a class="text-2xl font-serif font-semibold text-purple-900" href=""><i class="fas fa-book"></i><span class="text-lg text-blue-700"></span></a>

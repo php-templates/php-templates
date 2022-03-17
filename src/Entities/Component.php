@@ -5,7 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\CodeBuffer;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
+use PhpTemplates\Context;
 use IvoPetkov\HTML5DOMElement;
 
 class Component extends AbstractEntity
@@ -31,7 +31,7 @@ class Component extends AbstractEntity
             $data = $this->fillNode(null, $data);
 
             $dataString = Helper::arrayToEval($data);
-            (new Template($this->document, $this->name))->newContext();
+            (new Context($this->document, $this->name))->parse();
     
             $this->println(
                 sprintf('$this->comp[%d] = Parsed::template("%s", %s);', $this->depth, $this->name, $dataString)
@@ -64,7 +64,7 @@ class Component extends AbstractEntity
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);   
             $dataString = Helper::arrayToEval($data);
-            (new Template($this->document, $this->name))->newContext();
+            (new Context($this->document, $this->name))->parse();
     
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 

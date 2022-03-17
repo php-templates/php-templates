@@ -49,14 +49,16 @@ foreach($files as $f) {
         $test .= $t.PHP_EOL.'-----'.PHP_EOL;
         $expected[] = $exp;
     }
+    $file = str_replace('cases/', 'temp/', $file);
+    file_put_contents($file, $test);
     $rfilepath = str_replace('.template.php', '', $file);
     $doc = new Document($rfilepath);
-    $dom = new HTML5DOMDocument;
-    //$dom->preserveWhiteSpace = 
+    // $dom = new HTML5DOMDocument;
+    // cream un context nou pentru a preprocesa continutul
+    //$dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
     $parser = new Context($doc, $rfilepath);
-    $dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
-    //d($dom);
-    $parser = new Context($doc, $dom, $rfilepath);
+    
+    //$parser = new Context($doc, $dom, $rfilepath);
     $parser->parse();
     $dest = './results/'.str_replace('.template', '', $f);
     if (!isset($_GET['edit'])) {
@@ -92,4 +94,5 @@ foreach($files as $f) {
             die();
         }
     }
+    unlink($file);
 }

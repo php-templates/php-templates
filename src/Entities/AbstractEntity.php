@@ -26,10 +26,15 @@ abstract class AbstractEntity
     protected $thread;
     protected $pf = 'p-';
     
-    public function __construct(Document $doc, $node, AbstractEntity $context = null)
+    public function __construct(Document $doc, $node, $context = null) //todo interfata ca param 3
     {
         $this->thread = PhpTag::getThread();
         
+        if (is_string($context)) {
+            $this->name = $context;
+            $context = null;
+        }
+        //if (is_string($node)) debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
@@ -44,9 +49,6 @@ abstract class AbstractEntity
         }
 
         $this->document = $doc;
-        if (is_string($node)) {
-            $node = $this->load($node);
-        }
         $this->node = $node;
         if (method_exists($this->node, 'setAttribute')) {
         // $this->node->setAttribute('i', $this->depth);
@@ -81,14 +83,14 @@ abstract class AbstractEntity
      * @return void
      */
     protected function makeCaret($refNode = null)
-    {
+    {//d($this->node);
         $debugText = '';
         if (0
         ) {
             $debugText = explode('\\', get_class($this));
             $debugText = end($debugText).'.'.$this->depth;
         }
-    
+
         if (!$this->node->parentNode) {
             //d($this->node->nodeName);
             // is hierarchical top
@@ -118,6 +120,9 @@ abstract class AbstractEntity
 
     public function println(string $line, $end = false)
     {
+        $rid = '__r'.uniqid();
+        $this->document->tobereplaced['_'][$rid] = '<?php ' . $line . ' ?>';
+        $line = $rid;
         if ($end) {
             if ($this->caret->nextSibling) {
                 $this->caret->parentNode->insertBefore(
@@ -136,7 +141,7 @@ abstract class AbstractEntity
         }
     }
     
-    protected function depleteNode($node, callable $cb)
+    protected function depleteNode($node, callable $cb, $isHtml = false)
     {
         $attrs = $node->attributes ? $node->attributes : [];
         $extracted_attributes = [];
@@ -221,24 +226,25 @@ abstract class AbstractEntity
         }
 
         // imsert $c_structs
-        if ($c_structs) {
-            $this->phpOpen();
-        }
+        $open = [];
         foreach ($c_structs as $struct) {
             list($statement, $args) = $struct;
             if ($args || $args === '0') {
                 $statement .= " ($args)";
             }
 
-            $this->println("$statement { ");
+            $open[] = "$statement { ";
+        }
+        if (count($c_structs)) {
+            $open = implode(PHP_EOL, $open);
+            $this->println($open);
         }
         
         $cb($data, $c_structs, $node);
 
-        // close all control structures
-        $close = implode(PHP_EOL, array_fill(0, count($c_structs), '} '));
-
         if (count($c_structs)) {
+            // close all control structures
+            $close = implode(PHP_EOL, array_fill(0, count($c_structs), '} '));
             $this->println($close);
         }
     }
@@ -350,29 +356,12 @@ abstract class AbstractEntity
         return $slots;
     }
     
-    public function isComponent($node)
-    {
-        if (!@$node->nodeName) {
-            return null;
-        }
-        if ($node->nodeName === 'template') {
-            return $node->getAttribute('is');
-        }
-        
-        // merged with default aliased
-        $aliased = $this->document->config['aliased'];
-        if (isset($aliased[$node->nodeName])) {
-            return $aliased[$node->nodeName];
-        }
-
-        return null;
-    }
-    
     protected function removeNode($node) {
         $node->parentNode->removeChild($node);
     }
     
     protected function phpOpen($println = true) {
+        return;
         $tag = PhpTag::open($this->thread);
         if ($println && $tag) {
             $this->println($tag);
@@ -381,6 +370,7 @@ abstract class AbstractEntity
     }
     
     protected function phpClose($println = true) {
+        return;
         $tag = PhpTag::close($this->thread);
         if ($println && $tag) {
             $this->println($tag);

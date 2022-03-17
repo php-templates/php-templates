@@ -49,9 +49,13 @@ class Document
                 }
             }
         }
+        
+        foreach ($this->tobereplaced as $t => $r) {
+            $tpl = str_replace(array_keys($r), array_values($r), $tpl);
+        }
 
-        /*$tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
-*/
+        $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
+
         return $tpl;
     }
 

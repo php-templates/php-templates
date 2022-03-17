@@ -5,32 +5,40 @@ namespace PhpTemplates;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\PhpTag;
 use PhpTemplates\Traits\CanParseNodes;
-
+// rename into TemplateParser
 class Context {
     use CanParseNodes;
 
     private $name;
+    private $node;
+    private $trimHtml = false;
+    public $depth = 0; // todo _get
+  // todo: muta pe document  
     private $tobereplaced = [
         '="__empty__"' => '',
-        '&gt;' => '>',
+        /*'&gt;' => '>',
         '&amp;\gt;' => '&gt;',
         '&lt;' => '<',
         '&amp;\lt;' => '&lt;',
         '&amp;' => '&',
         '&amp;\amp;' => '&amp;',
         '<php>' => '<?php',
-        '</php>' => '?>'
+        '</php>' => '?>'*/
     ];
 
     public function __construct(Document $doc, $node, $context = null)
     {
         // parent::__construct($doc, $node, is_string($context) ? null : $context);
+        $this->document = $doc;
         if (is_string($node)) {
             $this->name = $node;
+            $node = $this->load($node);
         } 
         elseif (is_string($context)) {
             $this->name = $context;
         }
+        
+        $this->node = $node;
     }
     
     public function parse()
@@ -108,16 +116,35 @@ class Context {
         $node = new HTML5DOMDocument();
 
         $html = file_get_contents($srcFile);
-        $html = $this->escapeSpecialCharacters($html);
+        $html = $this->collectBrokingBlocks($html);
         $html = $this->removeHtmlComments($html);
-        $this->trimHtml = strpos($html, '</body>') === false;
+        $this->trimHtml = strpos($html, '<body') === false;
         $node->loadHtml($html);
-
+//if(!$node) dd();
         return $node;
     }
 
+//chemat din afara, sau cu flag uri
     public function escapeSpecialCharacters($html) {
         return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
+    }
+    
+    private function collectBrokingBlocks($html)
+    {
+        
+        $html = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
+            $rid = '__r'.uniqid();
+            $this->document->tobereplaced['_'][$rid] = $m[0];
+            return $rid;
+        }, $html);
+        
+        $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
+            $rid = '__r'.uniqid();
+            $this->document->tobereplaced['_'][$rid] = '<?php ' . $m[1] . ' ?>';
+            return $rid;
+        }, $html);
+        
+        return $html;
     }
 
     public function trimHtml($dom)

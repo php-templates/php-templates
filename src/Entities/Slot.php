@@ -5,7 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\CodeBuffer;
 use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
+use PhpTemplates\Context;
 use IvoPetkov\HTML5DOMElement;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\InvalidNodeException;
@@ -102,7 +102,7 @@ if ($this->node->getAttribute('name') == 'sn9') {
                    // $node->preserveWhiteSpace = false;
                  //   $node->formatOutput = true;
                     $node->appendChild($node->importNode($cn, true));
-                    (new Template($this->document, $node, $name))->newContext();
+                    (new Context($this->document, $node, $name))->parse();
             
                     $this->println(
                         sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 

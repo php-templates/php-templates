@@ -13,6 +13,7 @@ trait CanParseNodes {
     {
         $fn = explode('\\', get_class($this));
         $fn = end($fn);
+        if ($fn == 'Context') $fn = 'Template'; //todo other way
         $fn = lcfirst($fn).'Context';
         if ($node->nodeName === 'slot') {
             (new Slot($this->document, $node, $this))->{$fn}();
@@ -29,5 +30,23 @@ trait CanParseNodes {
         else {
             (new SimpleNode($this->document, $node, $this))->{$fn}();
         }
+    }
+    
+    protected function isComponent($node)
+    {
+        if (!@$node->nodeName) {
+            return null;
+        }
+        if ($node->nodeName === 'template') {
+            return $node->getAttribute('is');
+        }
+        
+        // merged with default aliased
+        $aliased = $this->document->config['aliased'];
+        if (isset($aliased[$node->nodeName])) {
+            return $aliased[$node->nodeName];
+        }
+
+        return null;
     }
 }

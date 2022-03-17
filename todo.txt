@@ -34,3 +34,5 @@ replace urile nu trb sa fie per thread, ci globale, altfel nested comp nu vor av
 niciun tag <> in html pan la final
 
 in final, suport blade syntax if
+
+desfiintat php si phpopen si {phpt}
