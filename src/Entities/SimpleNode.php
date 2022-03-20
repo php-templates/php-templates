@@ -11,6 +11,7 @@ use IvoPetkov\HTML5DOMDocument;
 
 class SimpleNode extends AbstractEntity
 {
+    //protected $isHtml = true;
     protected $attrs = [];
 
     public function simpleNodeContext()
@@ -20,6 +21,7 @@ class SimpleNode extends AbstractEntity
     
     public function templateContext()
     {
+        //$this->isHtml = true;
         if (!$this->node->parentNode) {
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
@@ -118,6 +120,7 @@ if ($this->node->nodeValue == 'foo') {
      */
     public function slotContext()
     {
+        $this->isHtml = true;
         $this->node = $this->node->cloneNode(true);
         // close php
         $this->depleteNode($this->node, function($data) {

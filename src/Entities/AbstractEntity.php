@@ -16,6 +16,7 @@ abstract class AbstractEntity
 {
     use CanParseNodes;
 
+    protected $isHtml = false;
     protected $trimHtml = false;
     protected $document;
     protected $context;
@@ -221,6 +222,11 @@ abstract class AbstractEntity
                 $bval = 'Helper::mergeAttrs('.implode(',',$bval).')';
             } else {
                 $bval = $bval[0];
+            }
+            if ($this->isHtml) {
+                $rid = '__r'.uniqid();
+                $this->document->tobereplaced['_'][$rid] = $bval;
+                $bval = $rid;
             }
             $data[$bk] = $bval;
         }

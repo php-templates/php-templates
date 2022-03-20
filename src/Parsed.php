@@ -78,9 +78,12 @@ class Parsed
         //if ($this->name === 'a2') dd($this->slots['a2']);
         //$this->data['_attrs'] = array_keys($this->data);//d($this->data);
         //$data = array_merge($parentScope, $this->data);
+        nu e nevoie de this data aici, poate ramane data, iar render fn foloseste data param
+        this->attrs se pun pe render, raportat la this data (actual attrs) si props de atunci
+    
         $this->data = array_merge($parentScope, $this->attrs);
         $this->data['_name'] = $this->name;
-        //d($this->attrs);
+         
         $name = trim($this->name, './\\');
         if (!isset($this->data['_cpath'])) {
             $this->data['_cpath'] = $event = $name;

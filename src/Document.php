@@ -92,7 +92,7 @@ class Document
         $hash = [$this->name];//dd($dependencies);
         foreach ($dependencies as $f) {
             $file = $f;//dd($file);
-            $hash[] = $f.':'.filemtime($file);
+            $hash[] = $f.':'.@filemtime($file);
         }
 
         $pf = rtrim(Config::get('dest_path'), '/').'/';

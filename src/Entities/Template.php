@@ -15,6 +15,7 @@ class Template extends AbstractEntity
 
     public function simpleNodeContext()
     {
+        $this->isHtml = true;
         $this->depleteNode($this->node, function($data) {
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
