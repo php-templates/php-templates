@@ -2,19 +2,18 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
+
 Parsed::$templates['comp/simple'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-     ?> <div class="comp/simple">
+$this->attrs = $this->data;
+extract($data); ?> <div class="comp/simple">
     comp/simple
 </div>
 
- <?php 
-};
+ <?php };
 Parsed::$templates['./temp/simple_component'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-      $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->data); ?>
+$this->attrs = $this->data;
+extract($data);  $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?>
 
 -----
 
- <?php 
-};
+ <?php };

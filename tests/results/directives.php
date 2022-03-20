@@ -2,9 +2,10 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
+
 Parsed::$templates['./temp/directives'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['var',]));
-      
+$this->attrs = $this->data;
+extract($data);  
     $var = 0;
 ?>
 
@@ -16,5 +17,4 @@ Parsed::$templates['./temp/directives'] = function ($data, $slots) {
 
 -----
 
- <?php 
-};
+ <?php };

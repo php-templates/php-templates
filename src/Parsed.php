@@ -133,7 +133,7 @@ class Parsed
     
     public function render($parentScope = [])
     {
-        $this->scopeData = array_merge($parentScope, $this->attrs);
+        $this->scopeData = array_merge($parentScope, $this->data);
         $this->scopeData['_name'] = $this->name;
          
         $name = trim($this->name, './\\');
@@ -182,8 +182,8 @@ Parsed::$templates['***block'] = function() {
     extract($this->data);
     if (isset($this->slots[$this->name])) {
         usort($this->slots[$this->name], function($a, $b) {
-            $i1 = isset($a->attrs['_index']) ? $a->attrs['_index'] : 0;
-            $i2 = isset($b->attrs['_index']) ? $b->attrs['_index'] : 0;
+            $i1 = isset($a->data['_index']) ? $a->data['_index'] : 0;
+            $i2 = isset($b->data['_index']) ? $b->data['_index'] : 0;
             return $i1 - $i2;
         });
         foreach ($this->slots($this->name) as $_slot) {

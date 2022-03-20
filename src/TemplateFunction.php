@@ -105,6 +105,17 @@ class TemplateFunction
         $extends->parentNode->removeChild($extends);
     }
 
+    private function getProps($propsNode)
+    {
+        $props = [];
+        foreach ($propsNode->attributes as $attr) {
+            $props[$attr->nodeName] = $attr->nodeValue;
+        }
+        $propsNode->parentNode->removeChild($propsNode);
+        
+        return $props;
+    }
+
     /**
      * Load the given route document using this.document settings with fallback on default settings
      */

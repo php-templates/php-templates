@@ -15,11 +15,10 @@ class SimpleNode extends AbstractEntity
     {
         $this->templateFunctionContext();
     }
-    
+
     public function templateContext()
     {
-        dom($this->caret->parentNode);die();
-        return $this->slotContext();
+        return $this->templateFunctionContext();
     }
 
     public function templateFunctionContext()
@@ -37,7 +36,6 @@ class SimpleNode extends AbstractEntity
             $this->node = $node;
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
         }
-
 
         $this->depleteNode($this->node, function($data, $c_structs) use ($node) {
             if ($node/* || $this->caret->parentNode->ownerDocument*/) {

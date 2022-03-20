@@ -31,7 +31,7 @@ $data['email'] = 'florin@email.com';
 $data['gender'] = 'male';
 $data['entry_male'] = 'Male';
 $data['entry_female'] = 'Femele';
-
+/*
 // DomEvents to manipulate the original
 // add an event on rendering user-profile-form.form-fields block
 DomEvent::on('rendering', 'user-profile-form.form-fields', function($t, $data) {
@@ -135,7 +135,7 @@ DomEvent::on('rendering', 'user-profile-form.components/tabs', function($t, &$da
             <?php Template::get('products', $data)->render($data); ?>
         </div> <?php
     }));
-});
+});*/
 // dom events end
 
 // the original

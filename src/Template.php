@@ -27,11 +27,12 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
-            $doc = new Document($requestName, $options);
-            if ($path = $doc->exists()) {
-
-            } else {
-                (new Context($doc, $rfilepath))->parse();
+            $doc = new Document($requestName, '');
+            if ($path = $doc->exists()) {} 
+            else {
+                $process = new Process($requestName, $options);
+                (new TemplateFunction($process, $rfilepath))->parse();
+                $doc->setContent($process->getResult());
                 $path = $doc->save();
             }
 

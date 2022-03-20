@@ -31,7 +31,7 @@ class Template extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['_index'] = 0;
-        
+
         $this->depleteNode($this->node, function($data) {
             $this->fillNode($this->node, $data);
             //$this->fillNode($this->node, ['x'=>13]);
