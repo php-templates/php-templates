@@ -3,7 +3,7 @@
 namespace PhpTemplates\Entities;
 
 use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\Context;
+use PhpTemplates\TemplateFunction;
 use PhpTemplates\Helper;
 
 /**
@@ -23,7 +23,7 @@ class Template extends AbstractEntity
             $this->fillNode($this->node, $data);
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
         });
-        $this->shouldClosePhp && $this->phpClose();
+
         $this->removeNode($this->node);
     }
 
@@ -41,7 +41,7 @@ class Template extends AbstractEntity
             foreach ($this->node->childNodes as $cn) {
                 $node->appendChild($node->importNode($cn, true));
             }
-            (new Context($this->document, $node, $name))->parse();
+            (new TemplateFunction($this->process, $node, $name))->parse();
             $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
 
             $this->println(

@@ -2,9 +2,10 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
+
 Parsed::$templates['./temp/16'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-      
+$this->attrs = $this->data;
+extract($data);  
     $true = 1;
  ?>
 
@@ -13,9 +14,9 @@ Parsed::$templates['./temp/16'] = function ($data, $slots) {
 <?php if ($true) {  ?><a class="text-2xl font-serif font-semibold text-purple-900" href=""><i class="fas fa-book"></i><span class="text-lg text-blue-700"></span></a>
 <?php if ($true) {  ?><span class="self-end text-sm font-semibold text-purple-800">, capitolul</span>
 <?php }   else {  ?><a href="/" class="inline text-lg font-serif font-semibold text-purple-900"><i class="fas fa-home"></i> Home</a>
-<?php }   }  ?></div>
+<?php }   }  ?>
+</div>
 
 -----
 
- <?php 
-};
+ <?php };

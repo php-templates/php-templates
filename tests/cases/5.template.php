@@ -1,5 +1,5 @@
 <!-- multi-extends -->
-<?php $this->data['bind_me'] = 'bound'; ?>
+<?php $this->scopeData['bind_me'] = 'bound'; ?>
 <template is="extends/c"></template>
 =====
 <parent4>

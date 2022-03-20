@@ -3,50 +3,55 @@
 namespace PhpTemplates;
 
 use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\PhpTag;
 use PhpTemplates\Traits\CanParseNodes;
-// rename into TemplateParser
-class Context {
-    rename in template function ca asta eibi
-    nu poate inloxui doc din cauza ca replaces colectate pe fiest load trb sa fie globale
-    sau poate-> pt ca la final as face replace la tot cumulat
-    poate ar fi ok ca asta sa inloc doc ca si liant per parsari-> nu e idee buna pt ca nu am acces la doc sa inreg fn-> ba da ca pot face ca in mom in care se face start parsing doc sa fie tinut global static sau sa fie trecut ca arg 
-    asta va contine un prop care e parent
-    pe root zic new context parse
-    apoi zic register(document ca arg)
-    care face pregatirile
-    itereaza peste -> memory consuming
-    
+
+class TemplateFunction 
+{
     use CanParseNodes;
     
-    private $data; // data passed to component using  node attributes
+    /**
+     * Current processing thread contextual data holder (like config, parsed index, other cross entities shared data)
+     * @var Process
+     */
+    protected $process;
+
+    /**
+     * If the current template is parsed from a file, or from an existing DomNode (like slot nodes)
+     * @var boolean
+     */
+    private $wasRecentlyLoaded = false;
+
+    /**
+     * Data passed to component using node attributes
+     *
+     * @var array
+     */
+    private $data = [];
+
+    /**
+     * When a template file has <props/> node, if called as component tag, 
+     * make an array_diff_keys between them and passed attributes to obdain the p-bind="$this->attrs" variables
+     * @var array
+     */
+    private $props = [];
+
+
+// refactor end
+    
     private $attrs; // computed at calling render function moment
 
     private $name;
     private $node;
     private $trimHtml = false;
-    public $depth = 0; // todo _get
-  // todo: muta pe document  
-    private $tobereplaced = [
-        '="__empty__"' => '',
-        /*'&gt;' => '>',
-        '&amp;\gt;' => '&gt;',
-        '&lt;' => '<',
-        '&amp;\lt;' => '&lt;',
-        '&amp;' => '&',
-        '&amp;\amp;' => '&amp;',
-        '<php>' => '<?php',
-        '</php>' => '?>'*/
-    ];
+    private $depth = 0;
 
-    public function __construct(Document $doc, $node, $context = null)
+    public function __construct(Process $process, $node, $context = null)
     {
-        // parent::__construct($doc, $node, is_string($context) ? null : $context);
-        $this->document = $doc;
+        $this->process = $process;
         if (is_string($node)) {
             $this->name = $node;
             $node = $this->load($node);
-            // aici ar trebui extends ul
+            $this->wasRecentlyLoaded = true;
         }    
         elseif (is_string($context)) {
             $this->name = $context;
@@ -57,13 +62,7 @@ class Context {
     
     public function parse()
     {
-        $this->thread = uniqid();
-        PhpTag::setThread($this->thread);
-        $this->document->tobereplaced[$this->thread] = $this->tobereplaced;
-        if (method_exists($this->node, 'querySelector')) {
-            muta mai sus, pe construct, nu ar trb sa fie aici
-            ca poate pune vreunul extendz undenu trb
-            asta la pachet cu cautarea de atribute
+        if ($this->wasRecentlyLoaded && method_exists($this->node, 'querySelector')) {
             if ($extends = $this->node->querySelector('extends')) {
                 $this->extends($extends);
             }
@@ -87,18 +86,16 @@ class Context {
             $htmlString = $this->node->saveHtml();
         }
 
-        //$htmlString = str_replace(array_keys($this->document->tobereplaced[$this->thread]), array_values($this->document->tobereplaced[$this->thread]), $htmlString);
-
         $htmlString = $this->getTemplateFunction($htmlString);
-        $this->document->templates[$this->name] = $htmlString;
+        $this->process->addTemplateFunction($this->name, $htmlString);
     }
 
     private function extends($extends)
     {
         $extendedTemplate = $extends->getAttribute('template');
-        (new Context($this->document, $extendedTemplate))->parse();
+        (new TemplateFunction($this->process, $extendedTemplate))->parse();
 
-        $this->document->addEventListener('rendering', $this->name, "function(\$template, \$data) {
+        $this->process->addEventListener('rendering', $this->name, "function(\$template, \$data) {
             \$comp = Parsed::template('$extendedTemplate', \$data);
             \$comp->addSlot('default', \$template);
             \$comp->render(\$data);
@@ -113,7 +110,7 @@ class Context {
      */
     public function load($rfilepath)
     {
-        $srcpath1 = rtrim($this->document->config['src_path'], '/').'/'.$rfilepath.'.template.php';
+        $srcpath1 = rtrim($this->process->config('src_path'), '/').'/'.$rfilepath.'.template.php';
         $srcpath2 = rtrim(Config::get('src_path'), '/').'/'.$rfilepath.'.template.php';
         if (file_exists($srcpath1)) {
             $srcFile = $srcpath1;
@@ -125,7 +122,7 @@ class Context {
             throw new \Exception("Template file $message not found");
         }
         
-        $this->document->registerDependency($srcFile);
+        $this->process->addDependencyFile($srcFile);
         $node = new HTML5DOMDocument();
 
         $html = file_get_contents($srcFile);
@@ -147,20 +144,20 @@ class Context {
         
         $html = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
             $rid = '__r'.uniqid();
-            $this->document->tobereplaced['_'][$rid] = $m[0];
+            $this->process->toBeReplaced($rid, $m[0]);
             return $rid;
         }, $html);
         
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
             $rid = '__r'.uniqid();
-            $this->document->tobereplaced['_'][$rid] = '<?php ' . $m[1] . ' ?>';
+            $this->process->toBeReplaced($rid, '<?php ' . $m[1] . ' ?>');
             return $rid;
         }, $html);
         
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced['_'][$rid] = "<?php echo htmlspecialchars($eval); ?>";
+                $this->process->toBeReplaced($rid, "<?php echo htmlspecialchars($eval); ?>");
                 return $rid;
             }
             return '';
@@ -185,44 +182,32 @@ class Context {
         return $content;
     }
     
-    protected function getTemplateFunction(string $templateString, $html = true) {
-        //preg_match_all('/\$([a-zA-Z0-9_]+)/', $templateString, $m);
-        //$used = Helper::arrayToEval(array_values(array_unique($m[1])));//var_dump($used);die();
-        //$used = preg_replace('/\s*[\r\n]*\s*/', '', $used);
-        //if ($html) {
-            $templateString = " ?> $templateString <?php ";
-        //}
-        
-        nuuu in momentul parsarii, voi avea parsed t [x => 1, @y => 2], iar pe template pun si un fill de props. pe construct, filtrez oile si pun props si attrs
-        nu merge pe event uri
-        
-        nunu
-        data, scopedata, attrs, props <-- cel mai semantic
-        nunu  
-        declare props... are nevoie de extract data
-        this attrs calculation are nevoie de props
-        extract data
-        apooi extract props daca este
-        aici fac un array assoc sau ceva obj builder, iar a doua e o 
-        $fnheader = ' extract($_data);';
+    protected function getTemplateFunction(string $templateString) 
+    {
+        $templateString = " ?> $templateString <?php ";
         if ($this->props) {
             $props = Helper::arrayToEval($this->props);
-            $prepend = "\$_props = $props; ";
-            $prepend .= ' $_attrs = array_diff_key($this->data, $props);';
-            $prepend .= ' $_data = array_merge($_props, $data);';
-            $header = $data = array merge props, this data si apoi linia de mai sus si apoi extract
+            $fnheader = PHP_EOL."\$props = $props; ";
+            $fnheader .= ' $this->attrs = array_diff_key($this->data, $props);';
+            $fnheader .= ' $data = array_merge($props, $data);';
         } else {
-            $header
+            $fnheader = PHP_EOL.'$this->attrs = $this->data;';
         }
-        $fnDeclaration = 
-        "function (\$data, \$slots) {
-     \$_attrs = array_diff_key(\$this->data, array_flip($used));
-    $templateString
-}";
+        $fnheader .= PHP_EOL.'extract($data);';
+        $fnDeclaration = 'function ($data, $slots) {';
+        $fnDeclaration .= $fnheader;
+        $fnDeclaration .= $templateString;
+        $fnDeclaration .= '}';
+
         return $fnDeclaration;
     }
  
-    public function removeHtmlComments($content = '') {//d($content);
+    public function removeHtmlComments($content = '') {
     	return preg_replace('~<!--.+?-->~ms', '', $content);
+    }
+
+    public function __get($prop)
+    {
+        return $this->$prop;
     }
 }

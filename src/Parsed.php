@@ -2,20 +2,78 @@
 
 namespace PhpTemplates;
 
+use Closure;
+
 class Parsed
 {
+    /**
+     * Array of templateFunctions keyed by relative template file path
+     *
+     * @var array
+     */
     public static $templates = [];
-    public static $templateBlocks = [];
 
+    /**
+     * Parent / context
+     * @var self
+     */
     protected $parent = null;
+
+    /**
+     * called template function name
+     * @var string
+     */
     protected $name;
-    public $data;
-    public $attrs;
+
+    /**
+     * Filled at render time, keeped here to allow further modifications on events callbacks
+     *
+     * @var array
+     */
+    public $scopeData = [];
+
+    /**
+     * Data passed to component using node attributes
+     *
+     * @var array
+     */
+    public $data = [];
+
+    /**
+     * gained at render time, make an array_diff_keys between them and passed attributes to obdain the p-bind="$this->attrs" variables
+     * @var array
+     */
+    public $attrs = [];
+
+    /**
+     * render function to be called
+     * @var Closure
+     */
     protected $func;
+
+    /**
+     * if the render function has been triggered
+     *
+     * @var boolean
+     */
     protected $rendered = false;
     
+    /**
+     * Array of Parsed entities keyed by slot position
+     * @var array
+     */
     public $slots = [];
-    public $comp = []; // for avoiding polluting scope
+
+    /**
+     * recyclable for avoiding polluting function variables scope
+     * @var array numeric indexes representing depth level
+     */
+    public $comp = [];
+
+    /**
+     * recyclable for avoiding polluting function variables scope
+     * @var array numeric indexes representing depth level
+     */
     public $block = [];
     
     public static function template($name, $data = [])
@@ -34,7 +92,7 @@ class Parsed
     private function __construct($name, \Closure $fn, $attrs = [])
     {
         $this->name = $name;
-        $this->attrs = $attrs;
+        $this->data = $attrs;
         
         $this->func = \Closure::bind($fn, $this);
     }
@@ -75,33 +133,27 @@ class Parsed
     
     public function render($parentScope = [])
     {
-        //if ($this->name === 'a2') dd($this->slots['a2']);
-        //$this->data['_attrs'] = array_keys($this->data);//d($this->data);
-        //$data = array_merge($parentScope, $this->data);
-        nu e nevoie de this data aici, poate ramane data, iar render fn foloseste data param
-        this->attrs se pun pe render, raportat la this data (actual attrs) si props de atunci
-    
-        $this->data = array_merge($parentScope, $this->attrs);
-        $this->data['_name'] = $this->name;
+        $this->scopeData = array_merge($parentScope, $this->attrs);
+        $this->scopeData['_name'] = $this->name;
          
         $name = trim($this->name, './\\');
-        if (!isset($this->data['_cpath'])) {
-            $this->data['_cpath'] = $event = $name;
+        if (!isset($this->scopeData['_cpath'])) {
+            $this->scopeData['_cpath'] = $event = $name;
         } else {
-            $event = explode('.', $this->data['_cpath'])[0].'.'.$name;
-            $this->data['_cpath'] .= '.'.$name;
-            $event = $this->data['_cpath'];
+            $event = explode('.', $this->scopeData['_cpath'])[0].'.'.$name;
+            $this->scopeData['_cpath'] .= '.'.$name;
+            $event = $this->scopeData['_cpath'];
         }
-        //d('evvvvv',$event);
+
         if (!$this->rendered) {
             $this->rendered = true; // stop infinite loop
-            $continue = DomEvent::event('rendering', $event, $this, $this->data);
+            $continue = DomEvent::event('rendering', $event, $this, $this->scopeData);
             if (!$continue) {
                 return;
             }
         }
         $func = $this->func;
-        $func($this->data, $this->slots);
+        $func($this->scopeData, $this->slots);
     }
     
     public function __get($prop)

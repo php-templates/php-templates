@@ -2,40 +2,41 @@
 use PhpTemplates\Parsed;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Helper;
+
 Parsed::$templates['extends/parent4'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me',]));
-     ?> <parent4>
+$this->attrs = $this->data;
+extract($data); ?> <parent4>
     parent4
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
-$_slot->render(array_merge($this->data, []));
-} ?></parent4>
+$_slot->render(array_merge($this->scopeData, []));
+} ?>
+</parent4>
 
- <?php 
-};
+ <?php };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip(['bind_me',]));
-     ?> <parent3>
+$this->attrs = $this->data;
+extract($data); ?> 
+<parent3>
     parent3
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
-$_slot->render(array_merge($this->data, []));
-} ?></parent3>
+$_slot->render(array_merge($this->scopeData, []));
+} ?>
+</parent3>
 
- <?php 
-};
+ <?php };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-     ?> <b></b>
+$this->attrs = $this->data;
+extract($data); ?> 
+<b></b>
 
- <?php 
-};
+ <?php };
 Parsed::$templates['./temp/5'] = function ($data, $slots) {
-    extract($this->data); $_attrs = array_diff_key($this->attrs, array_flip([]));
-      $this->data['bind_me'] = 'bound';  $this->comp[0] = Parsed::template("extends/c", []);  $this->comp[0]->render($this->data); ?>
+$this->attrs = $this->data;
+extract($data);  $this->scopeData['bind_me'] = 'bound';  $this->comp[0] = Parsed::template("extends/c", []);  $this->comp[0]->render($this->scopeData); ?>
 
 -----
 
- <?php 
-};
+ <?php };
 new DomEvent('rendering', 'extends/parent3', function($template, $data) {
             $comp = Parsed::template('extends/parent4', $data);
             $comp->addSlot('default', $template);

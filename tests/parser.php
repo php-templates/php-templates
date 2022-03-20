@@ -3,12 +3,11 @@
 require('../autoload.php');
 
 use PhpTemplates\Config;
-use PhpTemplates\Document;
-use PhpTemplates\Entities\Template;
 use PhpTemplates\Parsed;
-use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\Context;
 use PhpTemplates\Directive;
+use PhpTemplates\Document;
+use PhpTemplates\Process;
+use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
@@ -52,14 +51,14 @@ foreach($files as $f) {
     $file = str_replace('cases/', 'temp/', $file);
     file_put_contents($file, $test);
     $rfilepath = str_replace('.template.php', '', $file);
-    $doc = new Document($rfilepath);
+    $process = new Process($rfilepath);
     // $dom = new HTML5DOMDocument;
     // cream un context nou pentru a preprocesa continutul
     //$dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
-    $parser = new Context($doc, $rfilepath);
-    
-    //$parser = new Context($doc, $dom, $rfilepath);
+    $parser = new TemplateFunction($process, $rfilepath);
     $parser->parse();
+    $doc = new Document($rfilepath, $process->getResult());
+
     $dest = './results/'.str_replace('.template', '', $f);
     if (!isset($_GET['edit'])) {
         $doc->save($dest);

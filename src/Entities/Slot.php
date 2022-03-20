@@ -2,37 +2,31 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Context;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\TemplateFunction;
 use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Process;
 
 class Slot extends AbstractEntity
 {
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
 
-    public function __construct(Document $doc, $node, AbstractEntity $context)
+    public function __construct(Process $process, $node, AbstractEntity $context)
     {
-        parent::__construct($doc, $node, $context);
+        parent::__construct($process, $node, $context);
 
         $this->hasSlotDefault = $this->node->childNodes->length > 0;
     }
 
     public function simpleNodeContext()
     {
-        if ($shouldClosePhp = !$this->phpIsOpen()) {
-            $this->phpOpen();
-        }
-        $data = $this->depleteNode($this->node, function($data) {
+        $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
     
             $definition = 'foreach ($this->slots("%s") as $_slot) {'
-            .PHP_EOL.'$_slot->render(array_merge($this->data, %s));'
+            .PHP_EOL.'$_slot->render(array_merge($this->scopeData, %s));'
             .PHP_EOL.'}';
     
             $this->println(
@@ -47,11 +41,6 @@ class Slot extends AbstractEntity
                 $this->println('}');
             }
         });
-        if ($shouldClosePhp) {//d($this->attrs, 'todo');
-            //$this->println('?');
-            $this->phpClose();
-            //nu merg if uri ratacite intre tag uri fiecare trbinchissi deschis pe iter
-        }
 
         $this->removeNode($this->node);
     }
@@ -69,11 +58,7 @@ class Slot extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['name'] = 'default';
-if ($this->node->getAttribute('name') == 'sn9') {
-   // dom($this->caret->parentNode);
-    //d(55555);
-}
-        $this->phpOpen('');
+
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
@@ -99,10 +84,9 @@ if ($this->node->getAttribute('name') == 'sn9') {
                 foreach ($childNodes as $cn) {
                     $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
                     $node = new HTML5DOMDocument;
-                   // $node->preserveWhiteSpace = false;
-                 //   $node->formatOutput = true;
+
                     $node->appendChild($node->importNode($cn, true));
-                    (new Context($this->document, $node, $name))->parse();
+                    (new TemplateFunction($this->process, $node, $name))->parse();
             
                     $this->println(
                         sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
@@ -112,9 +96,5 @@ if ($this->node->getAttribute('name') == 'sn9') {
                 $this->println('}');
             }
         });
-if ($this->attrs['name'] == 'sn9') {
-   // dom($this->caret->parentNode);
-   // dd(7777);
-}
     }
 }

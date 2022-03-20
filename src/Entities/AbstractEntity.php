@@ -4,21 +4,25 @@ namespace PhpTemplates\Entities;
 
 use DOMAttr;
 use PhpTemplates\Config;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Directive;
 use PhpTemplates\InvalidNodeException;
-use PhpTemplates\PhpTag;
+use PhpTemplates\Process;
 use PhpTemplates\Traits\CanParseNodes;
 
 abstract class AbstractEntity
 {
     use CanParseNodes;
+    
+    /**
+     * Current processing thread contextual data holder (like config, parsed index, other cross entities shared data)
+     * @var Process
+     */
+    protected $process;
 
     protected $isHtml = false;
     protected $trimHtml = false;
-    protected $document;
     protected $context;
     protected $node;
     protected $caret;
@@ -27,10 +31,8 @@ abstract class AbstractEntity
     protected $thread;
     protected $pf = 'p-';
     
-    public function __construct(Document $doc, $node, $context = null) //todo interfata ca param 3
+    public function __construct(Process $process, $node, $context = null) //todo interfata ca param 3
     {
-        $this->thread = PhpTag::getThread();
-        
         if (is_string($context)) {
             $this->name = $context;
             $context = null;
@@ -45,19 +47,17 @@ abstract class AbstractEntity
             }
         }
 
-        if (isset($this->document->config['prefix'])) {
-            $this->pf = $this->document->config['prefix'];
+        if (isset($this->process->config['prefix'])) {
+            $this->pf = $this->process->config['prefix'];
         }
 
-        $this->document = $doc;
+        $this->process = $process;
         $this->node = $node;
         if (method_exists($this->node, 'setAttribute')) {
         // $this->node->setAttribute('i', $this->depth);
         }
         $this->context = $context;
         $this->makeCaret();
-        
-        $this->shouldClosePhp = $this->shouldClosePhp();
     }
     
     //abstract public function rootContext();
@@ -84,7 +84,7 @@ abstract class AbstractEntity
      * @return void
      */
     protected function makeCaret($refNode = null)
-    {//d($this->node);
+    {
         $debugText = '';
         if (0
         ) {
@@ -93,7 +93,6 @@ abstract class AbstractEntity
         }
 
         if (!$this->node->parentNode) {
-            //d($this->node->nodeName);
             // is hierarchical top
             return;
         }
@@ -101,12 +100,10 @@ abstract class AbstractEntity
             $node = $this->node;
         }
         else {
-            //d($this->context->depth, $this->depth);dom($this->node);
             $context = $this->context;
             while ($context->depth > 1) {
                 $context = $context->context;
             }
-            //dd($this->context->node, $this->context->depth);
             $node = $context->caret;
         }
         if ($refNode) {
@@ -115,26 +112,26 @@ abstract class AbstractEntity
         
         $this->caret = $node->ownerDocument->createTextNode($debugText);
         $node->parentNode->insertBefore($this->caret, $node);
-        //d($node, $debugText);
-        //$this->document->toberemoved[$this->thread][] = $caret;
     }
 
     public function println(string $line, $end = false)
     {
         $rid = '__r'.uniqid();
-        $this->document->tobereplaced['_'][$rid] = '<?php ' . $line . ' ?>';
+        $this->process->toBeReplaced($rid, '<?php ' . $line . ' ?>');
         $line = $rid;
+
         if ($end) {
             if ($this->caret->nextSibling) {
                 $this->caret->parentNode->insertBefore(
                     $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
                     $this->caret->nextSibling
                 );
-            } else {
+            }
+            else {
                 $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode(PHP_EOL.$line));
             }
-        } else {//debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);dd($this->context);
-        //d($line, $this->caret->nextSibling);
+        }
+        else {
             $this->caret->parentNode->insertBefore(
                 $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
                 $this->caret
@@ -225,7 +222,7 @@ abstract class AbstractEntity
             }
             if ($this->isHtml) {
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced['_'][$rid] = $bval;
+                $this->process->toBeReplaced($rid, $bval);
                 $bval = $rid;
             }
             $data[$bk] = $bval;
@@ -277,18 +274,18 @@ abstract class AbstractEntity
             if ($k[0] === ':') {
                 $k = substr($k, 1);
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $val; ?>";
+                $this->process->toBeReplaced($rid, "<?php echo $val; ?>");
                 $val = $rid;
             }
             elseif ($k === 'p-bind') {
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced[$this->thread][$rid] = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>';
+                $this->process->toBeReplaced($rid, '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>');
                 $k = $rid;
                 $val = '__empty__';
             }
             elseif ($k === 'p-raw') {
                 $rid = '__r'.uniqid();
-                $this->document->tobereplaced[$this->thread][$rid] = "<?php echo $val; ?>";
+                $this->process->toBeReplaced($rid, "<?php echo $val; ?>");
                 $k = $rid;
                 $val = '__empty__';
             }
@@ -298,7 +295,6 @@ abstract class AbstractEntity
     
     protected function childNodes($node = null)
     {
-        PhpTag::setThread($this->thread);
         if (!$node) {
             $node = $this->node;
         }
@@ -366,45 +362,6 @@ abstract class AbstractEntity
         $node->parentNode->removeChild($node);
     }
     
-    protected function phpOpen($println = true) {
-        return;
-        $tag = PhpTag::open($this->thread);
-        if ($println && $tag) {
-            $this->println($tag);
-        }
-        return $tag;
-    }
-    
-    protected function phpClose($println = true) {
-        return;
-        $tag = PhpTag::close($this->thread);
-        if ($println && $tag) {
-            $this->println($tag);
-        }
-        return $tag;
-    }
-    
-    protected function phpIsOpen()
-    {
-        return PhpTag::isOpen($this->thread);
-    }
-    
-    protected function shouldClosePhp()
-    {
-        if ($this->depth) {
-            return false;
-        }
-        elseif (($next = $this->nextSibling($this->node)) && $next->attributes) {
-            foreach ($next->attributes as $a) {
-                if (strpos($a->nodeName, $this->pf) === 0 && in_array(substr($a->nodeName, strlen($this->pf)), Config::allowedControlStructures)) {
-                    return false;
-                }
-            }
-        }
-        
-        return true;
-    }
-
     protected function nextSibling($node)
     {
         $node = $node->nextSibling;

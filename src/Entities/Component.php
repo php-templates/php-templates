@@ -2,36 +2,33 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Context;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\TemplateFunction;
+use PhpTemplates\Process;
 
 class Component extends AbstractEntity
 {
     protected $attrs = ['is' => null];
 
-    public function __construct(Document $doc, $node, AbstractEntity $context)
+    public function __construct(Process $process, $node, AbstractEntity $context)
     {
-        parent::__construct($doc, $node, $context);
+        parent::__construct($process, $node, $context);
 
         $this->name = Helper::isComponent($this->node);
     }
     
     public function simpleNodeContext()
     {
-        $this->templateContext();
+        $this->templateFunctionContext();
     }
     
-    public function templateContext()
+    public function templateFunctionContext()
     {
-        $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
 
             $dataString = Helper::arrayToEval($data);
-            (new Context($this->document, $this->name))->parse();
+            (new TemplateFunction($this->process, $this->name))->parse();
     
             $this->println(
                 sprintf('$this->comp[%d] = Parsed::template("%s", %s);', $this->depth, $this->name, $dataString)
@@ -41,18 +38,11 @@ class Component extends AbstractEntity
             }
             //d($this->caret);
             $this->println(
-                sprintf('$this->comp[%d]->render($this->data);', $this->depth)
+                sprintf('$this->comp[%d]->render($this->scopeData);', $this->depth)
             );
         });
-        if ($this->shouldClosePhp) {
-            $this->phpClose();
-        }
-        $p = $this->node->parentNode;
-//dom($p);d('--->');
+
         $this->removeNode($this->node);
-        //dd($x);
-        //dom($x); die();
-//dom($p);
     }
 
     /**
@@ -64,7 +54,7 @@ class Component extends AbstractEntity
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);   
             $dataString = Helper::arrayToEval($data);
-            (new Context($this->document, $this->name))->parse();
+            (new TemplateFunction($this->process, $this->name))->parse();
     
             $this->println(
                 sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
@@ -92,11 +82,6 @@ class Component extends AbstractEntity
      */
     public function slotContext()
     {
-//dd('component.slotcontext');
-//nu e comp context, e template context cu if
-//cel mai probabil trb sa fac set slot de sus in jos
-//div class="x"> se rupe aic
-        $this->templateContext();
-        //if ($this->shouldClosePhp)
+        $this->templateFunctionContext();
     }
 }

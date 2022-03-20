@@ -2,11 +2,8 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\Process;
 
 class Block extends AbstractEntity
 {
@@ -14,9 +11,9 @@ class Block extends AbstractEntity
 
     protected $name;
 
-    public function __construct(Document $doc, $node, AbstractEntity $context = null)
+    public function __construct(Process $process, $node, AbstractEntity $context = null)
     {
-        parent::__construct($doc, $node, $context);
+        parent::__construct($process, $node, $context);
         //todo: set name with throw error
         $this->name = $node->getAttribute('name');
     }
@@ -25,10 +22,9 @@ class Block extends AbstractEntity
      * When a block is passed as a component slot
      */
     public function componentContext()
-    {
-//d(1);dom($this->node->parentNode);dd('ww');    
+    {  
         $this->attrs['slot'] = 'default';
-        //$this->phpOpen();
+
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
@@ -52,21 +48,10 @@ class Block extends AbstractEntity
                 $this->parseNode($slot);
             }
         });
-        if ($this->shouldClosePhp) {
-            $this->phpClose();
-        }
     }
     
     public function simpleNodeContext()
     {
-        //d('-');dom($this->caret->parentNode, $this->depth);die();
-        //$this->node->setAttribute('x', 'y');
-        //dom($GLOBALS['x']);die();
-//$this->makeCaret($this->node);
-if ($this->node->getAttribute('name') == 'b122') {
-    ///dom($this->caret->parentNode->parentNode);dd();
-}
-        $this->phpOpen();
         $this->depleteNode($this->node, function($data) {
             //$this->node->setAttribute('x',33);
             $data = $this->fillNode(null, $data);
@@ -91,12 +76,10 @@ if ($this->node->getAttribute('name') == 'b122') {
             }
     
             $this->println(
-                sprintf('$this->comp[%d]->render($this->data);', $this->depth)
+                sprintf('$this->comp[%d]->render($this->scopeData);', $this->depth)
             );
         });
-        if ($this->shouldClosePhp) {
-            $this->phpClose();
-        }
+
         // remove now...
         $this->removeNode($this->node);
     }
