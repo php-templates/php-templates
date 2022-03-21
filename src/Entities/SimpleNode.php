@@ -23,6 +23,7 @@ class SimpleNode extends AbstractEntity
 
     public function templateFunctionContext()
     {
+        $this->isHtml = true;
         if (!$this->node->parentNode) {
             foreach ($this->childNodes($this->node) as $slot) {
                 $this->parseNode($slot);
@@ -75,11 +76,14 @@ class SimpleNode extends AbstractEntity
     
     public function blockContext()
     {
+        $this->attrs['_index'] = 0;
+        $GLOBALS['x'] = $this->node->getAttribute('class') == 'row';
         $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);
-            $dataString = Helper::arrayToEval($data);
+            $this->fillNode($this->node, $data);
+            //if ($GLOBALS['x']) dd($this->attrs, $data);
+            $dataString = Helper::arrayToEval($this->attrs);
             $name = $this->context->name .'?slot='.Helper::uniqid();
-            $node = new HTML5DOMDocument;
+            $node = new HTML5DOMDocument; //pierde atributele daca e simple node... trebuie fill de aici
             $node->appendChild($node->importNode($this->node, true));
             (new TemplateFunction($this->process, $node, $name))->parse();
     
@@ -105,10 +109,5 @@ class SimpleNode extends AbstractEntity
             $this->fillNode($this->node, $data);
             $this->caret->parentNode->insertBefore($this->node, $this->caret);
         });
-    }
-
-    public function anonymousComponentContext()
-    {
-        $this->slotContext();
     }
 }

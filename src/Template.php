@@ -28,7 +28,7 @@ class Template
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
             $doc = new Document($requestName, '');
-            if ($path = $doc->exists()) {} 
+            if ($path = $doc->exists() && 0) {} 
             else {
                 $process = new Process($requestName, $options);
                 (new TemplateFunction($process, $rfilepath))->parse();

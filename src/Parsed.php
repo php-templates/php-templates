@@ -178,8 +178,8 @@ class Parsed
     }
 }
 
-Parsed::$templates['***block'] = function() {
-    extract($this->data);
+Parsed::$templates['***block'] = function($data) {
+    extract($data);
     if (isset($this->slots[$this->name])) {
         usort($this->slots[$this->name], function($a, $b) {
             $i1 = isset($a->data['_index']) ? $a->data['_index'] : 0;
@@ -187,7 +187,7 @@ Parsed::$templates['***block'] = function() {
             return $i1 - $i2;
         });
         foreach ($this->slots($this->name) as $_slot) {
-            $_slot->render($this->data);
+            $_slot->render($this->scopeData);
         }
     }
 };

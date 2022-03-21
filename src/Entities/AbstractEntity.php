@@ -220,7 +220,7 @@ abstract class AbstractEntity
             } else {
                 $bval = $bval[0];
             }
-            if ($this->isHtml) {
+            if ($this->isHtml && 0) { // todo: findout
                 $rid = '__r'.uniqid();
                 $this->process->toBeReplaced($rid, $bval);
                 $bval = $rid;
