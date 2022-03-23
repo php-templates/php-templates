@@ -4,3 +4,5 @@ dar nu as mai avea un default ca fallback...
 sau si.si iar cand zic src_path, zic default path
 
 teste noua implementare directives
+la final de render trb resetate staticele ca va face conflict modular
+doc head fiix
