@@ -13,8 +13,7 @@ Parsed::$templates['block/a'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <a>
     
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("a1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("a1", Parsed::template("a1?slot=36", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  $this->comp[0] = Parsed::template("***block", [])->withName("a2")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("a2", Parsed::template("a2?slot=37", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
-</a>
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("a1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("a1", Parsed::template("a1?slot=36", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  $this->comp[0] = Parsed::template("***block", [])->withName("a2")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("a2", Parsed::template("a2?slot=37", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?></a>
 
  <?php };
 Parsed::$templates['block/a?slot=a2&id=35'] = function ($data, $slots) {
@@ -41,9 +40,7 @@ extract($data); ?> <b1221></b1221> <?php };
 Parsed::$templates['b12?slot=41'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <n>
-            
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("b122")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b122", Parsed::template("b122?slot=42", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
-            </n> <?php };
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b122")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b122", Parsed::template("b122?slot=42", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?></n> <?php };
 Parsed::$templates['b2?slot=43'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <b21></b21> <?php };
@@ -51,11 +48,10 @@ Parsed::$templates['block/b'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <b>
     
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=39", ['_index' => '1'])->setSlots($this->slots));  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("***block", ['_index' => '2'])->withName("b12")->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=40", ['_index' => '1'])->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=41", ['_index' => '2'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
-</b>
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=39", ['_index' => 1])->setSlots($this->slots));  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("***block", ['_index' => '2'])->withName("b12")->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=40", ['_index' => 1])->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b12", Parsed::template("b12?slot=41", ['_index' => 2])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?></b>
 
 
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("b2")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b2", Parsed::template("b2?slot=43", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  };
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b2")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b2", Parsed::template("b2?slot=43", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  };
 Parsed::$templates['block/b?slot=b1&id=44'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <b12></b12> <?php };
@@ -85,8 +81,7 @@ Parsed::$templates['comp/comp_slot?slot=default&id=48'] = function ($data, $slot
 $this->attrs = $this->data;
 extract($data); ?> <div>
         
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=49", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
-    </div> <?php };
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=49", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?></div> <?php };
 Parsed::$templates['b1?slot=50'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <b11><?php echo htmlspecialchars($k); ?></b11> <?php };
@@ -111,7 +106,7 @@ extract($data);  $this->comp[0] = Parsed::template("block/a", []);  $this->comp[
 
 -----
 
-<?php $this->comp[0] = Parsed::template("comp/comp_slot", []);  $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("***block", [])->withName("b1")->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b1", Parsed::template("b1?slot=47", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
+<?php $this->comp[0] = Parsed::template("comp/comp_slot", []);  $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("***block", [])->withName("b1")->setSlots($this->slots));  $this->comp[2] = $this->comp[1]->addSlot("b1", Parsed::template("b1?slot=47", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
 
 -----
 
@@ -119,7 +114,7 @@ extract($data);  $this->comp[0] = Parsed::template("block/a", []);  $this->comp[
 
 -----
 
-<?php foreach ([1,2] as $k) {   $this->comp[0] = Parsed::template("***block", ['k' => $k])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=50", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  }  ?>
+<?php foreach ([1,2] as $k) {   $this->comp[0] = Parsed::template("***block", ['k' => $k])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=50", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData);  }  ?>
 
 -----
 

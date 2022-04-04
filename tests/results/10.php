@@ -6,8 +6,7 @@ use PhpTemplates\Helper;
 Parsed::$templates['comp/d'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <div class="form-group">
-    <textarea class="form-control" <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?>></textarea>
-</div>
+    <textarea class="form-control" <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?>></textarea></div>
 
  <?php };
 Parsed::$templates['./temp/10'] = function ($data, $slots) {

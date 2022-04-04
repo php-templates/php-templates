@@ -12,9 +12,9 @@ $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("label"))) { ?><label class="form-label"><?php echo htmlspecialchars($label); ?></label>
 <?php }  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("default"))) {  if ($type === 'text') {  ?><input type="text" class="form-control" value="<?php echo __r6237615a10535; ?>" placeholder="<?php echo __r6237615a10537; ?>">
-<?php }   elseif ($type === 'number') {  ?><input type="number" class="form-control" value="<?php echo __r6237615a10557; ?>" placeholder="<?php echo __r6237615a10558; ?>">
-<?php }   elseif ($type === 'email') {  ?><input type="email" class="form-control" value="<?php echo __r6237615a10573; ?>" placeholder="<?php echo __r6237615a10574; ?>">
+}  if (empty($this->slots("default"))) {  if ($type === 'text') {  ?><input type="text" class="form-control" value="<?php echo $value; ?>" placeholder="<?php echo $placeholder ?? $label; ?>">
+<?php }   elseif ($type === 'number') {  ?><input type="number" class="form-control" value="<?php echo $value; ?>" placeholder="<?php echo $placeholder ?? $label; ?>">
+<?php }   elseif ($type === 'email') {  ?><input type="email" class="form-control" value="<?php echo $value; ?>" placeholder="<?php echo $placeholder ?? $label; ?>">
 <?php }   elseif ($type === 'checkbox') { 
 foreach ($options as $name => $label) {  ?><label>
             <input type="checkbox" <?php echo in_array($name, $values) ? 'checked' : ''; ?> value="1">
@@ -28,11 +28,9 @@ foreach ($options as $val => $label) {  ?><label>
         </label>
 <?php } 
 }   elseif ($type === 'select') {  ?><select class="form-control">
-            
 <?php foreach ($options as $val => $label) {  ?><option <?php echo $val == $value ? 'checked' : ''; ?> value="<?php echo $val; ?>"><?php echo htmlspecialchars($label); ?></option>
-<?php }  ?>
-        </select>
-<?php }   elseif ($type === 'textarea') {  ?><textarea class="form-control" <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?> placeholder="<?php echo __r6237615a10628; ?>"><?php echo htmlspecialchars($value); ?></textarea>
+<?php }  ?></select>
+<?php }   elseif ($type === 'textarea') {  ?><textarea class="form-control" <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?> placeholder="<?php echo $placeholder ?? $label; ?>"><?php echo htmlspecialchars($value); ?></textarea>
 <?php }   }  if (!empty($error)) {  ?><span class="error"><?php echo htmlspecialchars($error); ?></span>
 <?php }  ?>
 </div>

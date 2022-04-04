@@ -9,7 +9,8 @@ use PhpTemplates\DependenciesMap;
 
 class Process
 {
-    private $config = [];
+    private $parent;
+    private $config;
 
     private $templateFunctions = [];
     private $tobereplaced = [
@@ -17,43 +18,52 @@ class Process
     ];
     private $eventListeners = [];
 
-    public function __construct(string $name, array $options = [])
+    public function __construct(string $name, Config $config, $parent = null)
     {
         $this->name = $name;
-        $this->config = array_merge_recursive(Config::all(), $options);
+        $this->config = $config;
+        $this->parent = $parent;
+    }
+    
+    public function root()
+    {
+        $p = $this;
+        while ($p->parent) {
+            $p = $p->parent;
+        }
+        return $p;
     }
 
     public function hasTemplateFunction(string $key): bool
     {
-        return isset($this->templateFunctions[$key]);
+        return isset($this->root()->templateFunctions[$key]);
     }
 
     public function addTemplateFunction(string $key, string $fnBody)
     {
-        $this->templateFunctions[$key] = $fnBody;
+        $this->root()->templateFunctions[$key] = $fnBody;
     }
 
     public function addEventListener(string $eventType, string $targetTplFn, $callbackFnBody)
     {
-        $this->eventListeners[$eventType][$targetTplFn][] = $callbackFnBody;
+        $this->root()->eventListeners[$eventType][$targetTplFn][] = $callbackFnBody;
     }
 
     public function addDependencyFile($path)
     {
-        DependenciesMap::add($this->name, $path);
+        DependenciesMap::add($this->root()->name, $path);
     }
 
     public function toBeReplaced($key, $val)
     {
-        $this->tobereplaced[$key] = $val;
+        $this->root()->tobereplaced[$key] = $val;
     }
 
     public function config(string $key) 
     {
-        if (isset($this->config[$key])) {
-            return $this->config[$key];
+        if (isset($this->config->{$key})) {
+            return $this->config->{$key};
         }
-
         return null;
     }
 
@@ -79,5 +89,10 @@ class Process
         $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
 
         return $tpl;
+    }
+    
+    public function __get($prop)
+    {
+        return $this->{$prop};
     }
 }

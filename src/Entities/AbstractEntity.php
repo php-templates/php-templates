@@ -150,8 +150,9 @@ abstract class AbstractEntity
             if (strpos($k, $this->pf) === 0) {
                 // unpack directive result attributes
                 $directiveName = substr($k, strlen($this->pf));
-                if (Directive::exists($directiveName)) {
-                    $result = Directive::run($directiveName, $a->nodeValue);
+                if (isset($this->process->config->directives[$directiveName])) {
+                    $directive = $this->process->config->directives[$directiveName];
+                    $result = $directive($a->nodeValue);
                     if (empty($result)) {
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
                     }

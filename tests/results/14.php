@@ -44,8 +44,7 @@ $_slot->render(array_merge($this->scopeData, []));
     
 <?php foreach ($this->slots("slot3") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("slot3"))) {  foreach ([3,4] as $a) {   $this->comp[1] = Parsed::template("comp/comp_slot", []);  $this->comp[2] = $this->comp[1]->addSlot("default", Parsed::template("comp/comp_slot", []));  $this->comp[3] = $this->comp[2]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=15", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));  $this->comp[1]->render($this->scopeData);  }   } ?>
-</div>
+}  if (empty($this->slots("slot3"))) {  foreach ([3,4] as $a) {   $this->comp[1] = Parsed::template("comp/comp_slot", []);  $this->comp[2] = $this->comp[1]->addSlot("default", Parsed::template("comp/comp_slot", []));  $this->comp[3] = $this->comp[2]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=15", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));  $this->comp[1]->render($this->scopeData);  }   } ?></div>
 <?php }   };
 Parsed::$templates['./temp/14'] = function ($data, $slots) {
 $this->attrs = $this->data;

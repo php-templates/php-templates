@@ -8,14 +8,12 @@ $this->attrs = $this->data;
 extract($data); ?> <parent2>
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent2>
+} ?></parent2>
 
  <?php };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<b></b>
+extract($data); ?> <b></b>
 
  <?php };
 Parsed::$templates['./temp/4'] = function ($data, $slots) {

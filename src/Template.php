@@ -11,10 +11,25 @@ use PhpTemplates\Facades\DomHolder;
 
 class Template
 {
-    public function load(string $rfilepath, array $data = [])
+    /**
+     * Default config
+     */
+    protected static $config = [];
+    
+    public function setConfig(string $key, Config $config)
+    {
+        self::$config[$key] = $config;
+    }
+    
+    public function getConfig(string $key = 'default')
+    {
+        return isset(self::$config[$key]) ? self::$config[$key] : null;
+    }
+    
+    public function load(string $rfilepath, array $data = [], $slots = [], $options = [])
     {
         $start_time = microtime(true);
-        $template = $this->get($rfilepath);
+        $template = $this->get($rfilepath, $data, $slots, $options);
         $template->render($data);
         print_r('<br>'.(microtime(true) - $start_time));
     }
@@ -37,7 +52,7 @@ class Template
             }
 
             require_once($path);
-            return Parsed::template($requestName, $data);
+            return Parsed::template($requestName, $data)->setSlots($slots);
         }
     }
 
@@ -46,3 +61,5 @@ class Template
         return Parsed::raw(null, $cb, $data);
     }
 }
+
+Template::setConfig('default', new Config('src', 'dest'));

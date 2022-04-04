@@ -6,22 +6,18 @@ use PhpTemplates\Helper;
 Parsed::$templates['extends/parent'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <parent>
-    
 <?php foreach ($this->slots("d1") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("d1"))) { ?><div>123</div>
 <?php }  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent>
+} ?></parent>
 
  <?php };
 Parsed::$templates['extends/a'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<a>
-    <foo></foo>
-</a>
+extract($data); ?> <a>
+    <foo></foo></a>
 
  <?php };
 Parsed::$templates['extends/parent2'] = function ($data, $slots) {
@@ -29,14 +25,12 @@ $this->attrs = $this->data;
 extract($data); ?> <parent2>
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent2>
+} ?></parent2>
 
  <?php };
 Parsed::$templates['extends/b'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<b></b>
+extract($data); ?> <b></b>
 
  <?php };
 Parsed::$templates['extends/parent4'] = function ($data, $slots) {
@@ -45,25 +39,21 @@ extract($data); ?> <parent4>
     parent4
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent4>
+} ?></parent4>
 
  <?php };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<parent3>
+extract($data); ?> <parent3>
     parent3
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent3>
+} ?></parent3>
 
  <?php };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<b></b>
+extract($data); ?> <b></b>
 
  <?php };
 Parsed::$templates['./temp/extends'] = function ($data, $slots) {

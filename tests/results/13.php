@@ -34,8 +34,7 @@ extract($data); ?> <div class="x">
         
 <?php foreach ($this->slots("sn8") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("sn8"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?>
-    </div> <?php };
+}  if (empty($this->slots("sn8"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?></div> <?php };
 Parsed::$templates['comp/comp_slot?slot=default&id=5'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <p>xjd</p> <?php };
@@ -60,8 +59,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -73,8 +71,7 @@ $_slot->render(array_merge($this->scopeData, []));
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn2"))) { ?>foo
 <?php } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -85,8 +82,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn4") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn4"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <?php $this->comp[0] = Parsed::template("comp/comp_slot", []);  foreach ($this->slots("sn5") as $_slot) {

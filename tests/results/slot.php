@@ -43,8 +43,7 @@ $_slot->render(array_merge($this->scopeData, []));
     
 <?php foreach ($this->slots("slot3") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("slot3"))) {  $this->comp[1] = Parsed::template("comp/comp_slot", []);  $this->comp[2] = $this->comp[1]->addSlot("default", Parsed::template("comp/comp_slot", []));  $this->comp[3] = $this->comp[2]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=57", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));  $this->comp[1]->render($this->scopeData);  } ?>
-</div>
+}  if (empty($this->slots("slot3"))) {  $this->comp[1] = Parsed::template("comp/comp_slot", []);  $this->comp[2] = $this->comp[1]->addSlot("default", Parsed::template("comp/comp_slot", []));  $this->comp[3] = $this->comp[2]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=57", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));  $this->comp[1]->render($this->scopeData);  } ?></div>
 
  <?php };
 Parsed::$templates['comp/comp_illegat_slot_in_slot'] = function ($data, $slots) {
@@ -53,8 +52,7 @@ extract($data); ?> <div>
     
 <?php foreach ($this->slots("bar") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("bar"))) {  } ?>
-</div>
+}  if (empty($this->slots("bar"))) {  } ?></div>
 
  <?php };
 Parsed::$templates['comp/simple'] = function ($data, $slots) {
@@ -74,8 +72,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -87,8 +84,7 @@ $_slot->render(array_merge($this->scopeData, []));
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn2"))) { ?>foo
 <?php } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -99,8 +95,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn4") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn4"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
  <?php };
 Parsed::$templates['sn5?slot=default&id=58'] = function ($data, $slots) {
@@ -117,8 +112,7 @@ extract($data); ?> <div class="x">
         
 <?php foreach ($this->slots("sn8") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  if (empty($this->slots("sn8"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?>
-    </div> <?php };
+}  if (empty($this->slots("sn8"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?></div> <?php };
 Parsed::$templates['comp/comp_slot?slot=default&id=61'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data); ?> <p>xjd</p> <?php };
@@ -143,8 +137,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -156,8 +149,7 @@ $_slot->render(array_merge($this->scopeData, []));
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn2"))) { ?>foo
 <?php } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <div class="sdefsdef">
@@ -168,8 +160,7 @@ $_slot->render(array_merge($this->scopeData, []));
 <?php foreach ($this->slots("sn4") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
 }  if (empty($this->slots("sn4"))) {  $this->comp[1] = Parsed::template("comp/simple", []);  $this->comp[1]->render($this->scopeData);  } ?></span>
-<?php } ?>
-</div>
+<?php } ?></div>
 
 
 <?php $this->comp[0] = Parsed::template("comp/comp_slot", []);  foreach ($this->slots("sn5") as $_slot) {

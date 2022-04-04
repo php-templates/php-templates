@@ -52,7 +52,7 @@ class Document
             $hash[] = $f.':'.@filemtime($file);
         }
 
-        $pf = rtrim(Config::get('dest_path'), '/').'/';
+        $pf = rtrim(Template::getConfig()->destPath, '/').'/';
         $name = str_replace('/', '_', $this->name);// todo
 
         $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);

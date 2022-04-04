@@ -9,25 +9,21 @@ extract($data); ?> <parent4>
     parent4
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent4>
+} ?></parent4>
 
  <?php };
 Parsed::$templates['extends/parent3'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<parent3>
+extract($data); ?> <parent3>
     parent3
     <?php echo htmlspecialchars($bind_me);  foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</parent3>
+} ?></parent3>
 
  <?php };
 Parsed::$templates['extends/c'] = function ($data, $slots) {
 $this->attrs = $this->data;
-extract($data); ?> 
-<b></b>
+extract($data); ?> <b></b>
 
  <?php };
 Parsed::$templates['./temp/5'] = function ($data, $slots) {

@@ -14,15 +14,13 @@ Parsed::$templates['comp/composed'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data);  $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?>
 
-
 <div class="comp/composed">
     
 <?php $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?>
     comp/simple
     <span>
         
-<?php $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?>
-    </span>
+<?php $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?></span>
 </div>
 
  <?php };

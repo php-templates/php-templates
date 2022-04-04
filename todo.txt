@@ -6,3 +6,10 @@ sau si.si iar cand zic src_path, zic default path
 teste noua implementare directives
 la final de render trb resetate staticele ca va face conflict modular
 doc head fiix
+
+path access using . notation, implica event cu > 
+first chunk e prefix setare
+setarile vor fi salvate pe chei, cu una default
+la fel si salvarea lor in parsed, asta implica extra logica la optiunile de pe proces, nested oplon variation cu reset la final
+
+repara playground

@@ -14,7 +14,7 @@ class Component extends AbstractEntity
     {
         parent::__construct($process, $node, $context);
 
-        $this->name = Helper::isComponent($this->node);
+        $this->name = $this->isComponent($this->node);
     }
     
     public function simpleNodeContext()

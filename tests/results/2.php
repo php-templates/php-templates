@@ -20,8 +20,7 @@ Parsed::$templates['comp/comp_slot?slot=default&id=16'] = function ($data, $slot
 $this->attrs = $this->data;
 extract($data); ?> <div>
         
-<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=17", ['_index' => '1'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>
-    </div> <?php };
+<?php $this->comp[0] = Parsed::template("***block", [])->withName("b1")->setSlots($this->slots);  $this->comp[1] = $this->comp[0]->addSlot("b1", Parsed::template("b1?slot=17", ['_index' => 1])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?></div> <?php };
 Parsed::$templates['./temp/2'] = function ($data, $slots) {
 $this->attrs = $this->data;
 extract($data);  $this->comp[0] = Parsed::template("comp/comp_slot", []);  $this->comp[1] = $this->comp[0]->addSlot("default", Parsed::template("comp/comp_slot?slot=default&id=16", ['slot' => 'default', '_index' => '0'])->setSlots($this->slots));  $this->comp[0]->render($this->scopeData); ?>

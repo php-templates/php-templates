@@ -8,11 +8,9 @@ $this->attrs = $this->data;
 extract($data);  $this->scopeData['val'] = [1,2]; $this->scopeData['name'] = "myname"; ?>
 
 <c>
-    
 <?php foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</c>
+} ?></c>
 
  <?php };
 Parsed::$templates['props/c?slot=default&id=19'] = function ($data, $slots) {

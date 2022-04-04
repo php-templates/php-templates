@@ -4,28 +4,26 @@ require('../autoload.php');
 
 use PhpTemplates\Config;
 use PhpTemplates\Parsed;
-use PhpTemplates\Directive;
+use PhpTemplates\Template;
 use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-Config::set('aliased', [
-    'x-form-group' => 'components/form-group',
-    'x-input-group' => 'components/input-group',
-    'x-card' => 'components/card',
-    'x-helper' => 'components/helper',
-]);
+$cfg = new Config('./', './results/');
+$cfg->addAlias('x-form-group', 'components/form-group');
+$cfg->addAlias('x-input-group', 'components/input-group');
+$cfg->addAlias('x-card', 'components/card');
+$cfg->addAlias('x-helper', 'components/helper');
 
-Config::set('src_path', './');
-Config::set('dest_path', './results/');
-
-Directive::add('checked', function($eval) {
+$cfg->addDirective('checked', function($eval) {
     return [
         'p-raw' => $eval.' ? "checked" : ""'
     ];
 });
+
+Template::setConfig('default', $cfg);
 
 $files = scandir('./cases');
 $files = array_diff($files, ['.', '..', './']);
@@ -51,7 +49,7 @@ foreach($files as $f) {
     $file = str_replace('cases/', 'temp/', $file);
     file_put_contents($file, $test);
     $rfilepath = str_replace('.template.php', '', $file);
-    $process = new Process($rfilepath);
+    $process = new Process($rfilepath, $cfg);
     // $dom = new HTML5DOMDocument;
     // cream un context nou pentru a preprocesa continutul
     //$dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));

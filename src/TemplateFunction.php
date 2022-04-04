@@ -49,8 +49,20 @@ class TemplateFunction
     {
         $this->process = $process;
         if (is_string($node)) {
+            $path = array_filter(explode('/', $node));
+            $cfgKey = reset($path);
+            if (Template::getConfig($cfgKey)) {
+                $cfg = Template::getConfig($cfgKey);
+                $cfg->merge(Template::getConfig());
+                array_shift($path);
+                $path = implode($path);
+            } else {
+                $cfg = Template::getConfig('default');
+                $path = $node;
+            }
             $this->name = $node;
-            $node = $this->load($node);
+            $this->process = new Process($this->name, $cfg, $this->process);
+            $node = $this->load($path);
             $this->wasRecentlyLoaded = true;
         }    
         elseif (is_string($context)) {
@@ -121,8 +133,8 @@ class TemplateFunction
      */
     public function load($rfilepath)
     {
-        $srcpath1 = rtrim($this->process->config('src_path'), '/').'/'.$rfilepath.'.template.php';
-        $srcpath2 = rtrim(Config::get('src_path'), '/').'/'.$rfilepath.'.template.php';
+        $srcpath1 = rtrim($this->process->config->srcPath, '/').'/'.$rfilepath.'.template.php';
+        $srcpath2 = rtrim(Template::getConfig()->srcPath, '/').'/'.$rfilepath.'.template.php';
         if (file_exists($srcpath1)) {
             $srcFile = $srcpath1;
         }

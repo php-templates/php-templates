@@ -12,10 +12,8 @@ extract($data); ?> <a true="<?php echo $true; ?>">
  <?php };
 Parsed::$templates['props/b'] = function ($data, $slots) {
 $props = ['true' => 1];  $this->attrs = array_diff_key($this->data, $props); $data = array_merge($props, $data);
-extract($data); ?> 
-<b true="<?php echo $true; ?>">
-    <bind <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?>></bind>    
-</b>
+extract($data); ?> <b true="<?php echo $true; ?>">
+    <bind <?php foreach($this->attrs as $k=>$v) echo "$k=\"$v\" "; ?>></bind></b>
 
  <?php };
 Parsed::$templates['props/c'] = function ($data, $slots) {
@@ -23,11 +21,9 @@ $this->attrs = $this->data;
 extract($data);  $this->scopeData['val'] = [1,2]; $this->scopeData['name'] = "myname"; ?>
 
 <c>
-    
 <?php foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-} ?>
-</c>
+} ?></c>
 
  <?php };
 Parsed::$templates['props/c?slot=default&id=54'] = function ($data, $slots) {

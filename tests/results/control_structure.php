@@ -24,8 +24,7 @@ extract($data);  foreach ([1,2] as $a) {   $this->comp[0] = Parsed::template("co
     comp/simple
     <span>
         
-<?php foreach ([1,2] as $a) {   $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData);  }  ?>
-    </span>
+<?php foreach ([1,2] as $a) {   $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData);  }  ?></span>
 </div>
 <?php }   };
 Parsed::$templates['comp/csf'] = function ($data, $slots) {
@@ -34,8 +33,7 @@ extract($data); ?> <div class="comp_slot">
     
 <?php for ($i=0;$i<2;$i++) {   foreach ($this->slots("default") as $_slot) {
 $_slot->render(array_merge($this->scopeData, []));
-}  }  ?>
-</div>
+}  }  ?></div>
 
  <?php };
 Parsed::$templates['comp/csf?slot=default&id=52'] = function ($data, $slots) {
@@ -62,16 +60,14 @@ $false = false;
 <?php foreach ($array as $a) {  ?>
 <div class="x">
     
-<?php $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?>
-</div>
+<?php $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData); ?></div>
 <?php }  ?>
 
 -----
 
 <div class="x">
     
-<?php foreach ($array as $a) {   $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData);  }  ?>
-</div>
+<?php foreach ($array as $a) {   $this->comp[0] = Parsed::template("comp/simple", []);  $this->comp[0]->render($this->scopeData);  }  ?></div>
 
 -----
 
