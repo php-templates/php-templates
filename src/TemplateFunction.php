@@ -49,16 +49,17 @@ class TemplateFunction
     {
         $this->process = $process;
         if (is_string($node)) {
-            $path = array_filter(explode('/', $node));
-            $cfgKey = reset($path);
-            if (Template::getConfig($cfgKey)) {
+            $path = array_filter(explode(':', $node));
+            $cfgKey = 'default';
+            if (count($path) > 1) {
+                $cfgKey = $path[0];
+            }
+            $path = end($path);
+            if ($cfgKey != 'default') {
                 $cfg = Template::getConfig($cfgKey);
                 $cfg->merge(Template::getConfig());
-                array_shift($path);
-                $path = implode($path);
             } else {
                 $cfg = Template::getConfig('default');
-                $path = $node;
             }
             $this->name = $node;
             $this->process = new Process($this->name, $cfg, $this->process);
@@ -138,10 +139,12 @@ class TemplateFunction
         if (file_exists($srcpath1)) {
             $srcFile = $srcpath1;
         }
-        elseif ($srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
+        elseif (0 && $srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
             $srcFile = $srcpath2;
-        } else {
+        } 
+        else {
             $message = implode(' or ', array_unique([$srcpath1, $srcpath2]));
+            $message =$srcpath1;
             throw new \Exception("Template file $message not found");
         }
         

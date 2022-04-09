@@ -23,7 +23,7 @@ class Template
     
     public function getConfig(string $key = 'default')
     {
-        return isset(self::$config[$key]) ? self::$config[$key] : null;
+        return isset(self::$config[$key]) ? self::$config[$key] : null;//TODO: THROW ERROR
     }
     
     public function load(string $rfilepath, array $data = [], $slots = [], $options = [])
@@ -45,7 +45,17 @@ class Template
             $doc = new Document($requestName, '');
             if ($path = $doc->exists() && 0) {} 
             else {
-                $process = new Process($requestName, $options);
+                /*
+                if (Template::getConfig($cfgKey)) {
+                    $cfg = Template::getConfig($cfgKey);
+                    $cfg->merge(Template::getConfig());
+                    array_shift($path);
+                    $path = implode($path);
+                } else {
+                    $cfg = Template::getConfig('default');
+                    $path = $node;
+                }*/
+                $process = new Process($requestName, Template::getConfig());
                 (new TemplateFunction($process, $rfilepath))->parse();
                 $doc->setContent($process->getResult());
                 $path = $doc->save();

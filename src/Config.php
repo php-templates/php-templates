@@ -37,6 +37,16 @@ class Config
         $this->aliased[$key] = $component;
     }
     
+    public function setSrcPath(string $val)
+    {
+        $this->srcPath = $val;
+    }
+    
+    public function setDestPath(string $val)
+    {
+        $this->destPath = $val;
+    }
+    
     public function merge(Config $cfg)
     {
         $this->aliased = array_merge($cfg->aliased, $this->aliased);
