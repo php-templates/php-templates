@@ -71,6 +71,7 @@ function buf($self, $name = '', $depth = 0)
 
 require_once(__DIR__.'/html5-dom-document-php/autoload.php');
 
+require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');
     $path = 'PhpTemplates\\';

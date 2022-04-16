@@ -11,7 +11,7 @@ class Document
     protected $name;
     protected $content = '';
 
-    public function __construct(string $name, $content) {
+    public function __construct(string $name, $content = '') {
         $this->name = $name;
         $this->content = $content;
     }

@@ -12,29 +12,27 @@ use PhpTemplates\Facades\DomHolder;
 class Template
 {
     /**
-     * Default config
+     * configs keyed by namespace
      */
-    protected static $config = [];
+    protected $configs = [];
+    protected $destPath;
     
-    public function setConfig(string $key, Config $config)
-    {
-        self::$config[$key] = $config;
+    public function __construct(string $srcPath, string $destPath) {
+        $this->destPath = $destPath;
+        $this->configs['default'] = [
+            'src_path' => $srcPath
+        ];
     }
     
-    public function getConfig(string $key = 'default')
-    {
-        return isset(self::$config[$key]) ? self::$config[$key] : null;//TODO: THROW ERROR
-    }
-    
-    public function load(string $rfilepath, array $data = [], $slots = [], $options = [])
+    public function load(string $rfilepath, array $data = [], $slots = [])
     {
         $start_time = microtime(true);
-        $template = $this->get($rfilepath, $data, $slots, $options);
+        $template = $this->get($rfilepath, $data, $slots);
         $template->render($data);
         print_r('<br>'.(microtime(true) - $start_time));
     }
 
-    public function get(string $rfilepath, array $data = [], $slots = [], $options = [])
+    public function get(string $rfilepath, array $data = [], $slots = [])
     {
         if (isset(Parsed::$templates[$rfilepath])) {
             return Parsed::template($rfilepath, $data);
@@ -42,20 +40,10 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
-            $doc = new Document($requestName, '');
+            $doc = new Document($requestName);
             if ($path = $doc->exists() && 0) {} 
             else {
-                /*
-                if (Template::getConfig($cfgKey)) {
-                    $cfg = Template::getConfig($cfgKey);
-                    $cfg->merge(Template::getConfig());
-                    array_shift($path);
-                    $path = implode($path);
-                } else {
-                    $cfg = Template::getConfig('default');
-                    $path = $node;
-                }*/
-                $process = new Process($requestName, Template::getConfig());
+                $process = new Process($requestName, $this->config);
                 (new TemplateFunction($process, $rfilepath))->parse();
                 $doc->setContent($process->getResult());
                 $path = $doc->save();
@@ -69,6 +57,16 @@ class Template
     public function raw(\Closure $cb, $data = [])
     {
         return Parsed::raw(null, $cb, $data);
+    }
+    
+    public function addNamespace($name, $src)
+    {
+        $this->config[$name] = new Config($src, '');
+    }
+    
+    public function setDestPath($dest)
+    {
+        $this->config['default']->setDestPath($dest);
     }
 }
 
