@@ -22,6 +22,23 @@ class Parser
         // init entities with prefix
     }
     
+    public function withConfig(string $key)
+    {
+        $this->config = $this->configs[$key];
+        return $this;
+    }
+    
+    public function parse($rfilepath)
+    {
+        $comp = new TemplateFunction($this, $rfilepath);
+        $comp->parse();
+    }
+    
+    public function parseNode()
+    {
+        
+    }
+    
     public function getResult()
     {
         

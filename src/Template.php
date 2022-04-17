@@ -43,8 +43,9 @@ class Template
             $doc = new Document($requestName);
             if ($path = $doc->exists() && 0) {} 
             else {
-                $process = new Process($requestName, $this->config);
-                (new TemplateFunction($process, $rfilepath))->parse();
+                $parser = new Parser($this->configs);
+                $parser->parse($rfilepath);
+                //(new TemplateFunction($process, $rfilepath))->parse();
                 $doc->setContent($process->getResult());
                 $path = $doc->save();
             }
@@ -59,14 +60,31 @@ class Template
         return Parsed::raw(null, $cb, $data);
     }
     
-    public function addNamespace($name, $src)
+    /**
+     * Add additional parse src path
+     */
+    public function addPath($name, $src)
     {
-        $this->config[$name] = new Config($src, '');
+        if (isset($this->configs[$name])) {
+            throw new \Exception("Config '$name' already exists");
+        }
+        $this->configs[$name] = new Config($src);
+    }
+    
+    public function addDirective(string $key, Closure $callable, $path = 'default'): void
+    {
+        if (!isset($this->configs[$key])) {
+            throw new \Exception('Config path not found');
+        } 
+        elseif ($this->configs[$key]->hasDirective($key)) {
+            throw new \Exception('Directive already exists');
+        }
+        $this->configs[$key]->addDirective($callable);
     }
     
     public function setDestPath($dest)
     {
-        $this->config['default']->setDestPath($dest);
+        $this->$destPath = $dest;
     }
 }
 

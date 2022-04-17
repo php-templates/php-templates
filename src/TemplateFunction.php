@@ -50,19 +50,15 @@ class TemplateFunction
         $this->process = $process;
         if (is_string($node)) {
             $path = array_filter(explode(':', $node));
-            $cfgKey = 'default';
             if (count($path) > 1) {
                 $cfgKey = $path[0];
-            }
-            $path = end($path);
-            if ($cfgKey != 'default') {
-                $cfg = Template::getConfig($cfgKey);
-                $cfg->merge(Template::getConfig());
             } else {
-                $cfg = Template::getConfig('default');
+                $cfgKey = 'default';
             }
+            $this->process->withConfig($cfgKey);
+            $path = end($path);
             $this->name = $node;
-            $this->process = new Process($this->name, $cfg, $this->process);
+            //$this->process = new Process($this->name, $cfg, $this->process);
             $node = $this->load($path);
             $this->wasRecentlyLoaded = true;
         }    
@@ -135,11 +131,11 @@ class TemplateFunction
     public function load($rfilepath)
     {
         $srcpath1 = rtrim($this->process->config->srcPath, '/').'/'.$rfilepath.'.template.php';
-        $srcpath2 = rtrim(Template::getConfig()->srcPath, '/').'/'.$rfilepath.'.template.php';
+        $srcpath2 = rtrim($this->process->configs['default']->srcPath, '/').'/'.$rfilepath.'.template.php';
         if (file_exists($srcpath1)) {
             $srcFile = $srcpath1;
         }
-        elseif (0 && $srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
+        elseif ($srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
             $srcFile = $srcpath2;
         } 
         else {
