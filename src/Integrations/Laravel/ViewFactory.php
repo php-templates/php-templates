@@ -2,6 +2,8 @@
 
 namespace PhpTemplates\Integrations\Laravel;
 
+use PhpTemplates\Template;
+
 class ViewFactory implements \Illuminate\Contracts\View\Factory
 {
     private $sharedData = [];
@@ -9,7 +11,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     
     public function __construct($laravel)
     {
-        $this->template = new \PhpTemplates\Template(config('view.paths.0'), config('view.compiled'));
+        $this->template = new Template(config('view.paths.0'), config('view.compiled'));
     }
     
     /**
@@ -102,7 +104,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
         if (is_array($hints)) {
             throw new \Exception('Only one hint per namespace allowed');
         }
-        $this->template->addNamespace($namespace, $hints);
+        $this->template->addPath($namespace, $hints);
     }
 
     /**
@@ -114,6 +116,6 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function replaceNamespace($namespace, $hints)
     {
-        dd(12);
+        $this->template->replacePath($namespace, $hints);
     }
 }

@@ -41,12 +41,6 @@ trait CanParseNodes {
             return $node->getAttribute('is');
         }
         
-        // merged with default aliased
-        $aliased = $this->process->config->aliased;
-        if (isset($aliased[$node->nodeName])) {
-            return $aliased[$node->nodeName];
-        }
-
-        return null;
+        return $this->process->getAliased($node->nodeName);
     }
 }

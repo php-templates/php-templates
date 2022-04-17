@@ -130,17 +130,17 @@ class TemplateFunction
      */
     public function load($rfilepath)
     {
-        $srcpath1 = rtrim($this->process->config->srcPath, '/').'/'.$rfilepath.'.template.php';
-        $srcpath2 = rtrim($this->process->configs['default']->srcPath, '/').'/'.$rfilepath.'.template.php';
-        if (file_exists($srcpath1)) {
-            $srcFile = $srcpath1;
+        $srcFile = null;
+        foreach ($this->process->getSrcPaths() as $srcPath) {
+            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
+            if (file_exists($filepath)) {
+                $srcFile = $filepath;
+                break;
+            }
         }
-        elseif ($srcpath2 !== $srcpath1 && file_exists($srcpath2)) {
-            $srcFile = $srcpath2;
-        } 
-        else {
-            $message = implode(' or ', array_unique([$srcpath1, $srcpath2]));
-            $message =$srcpath1;
+
+        if (!$srcFile) {
+            $message = implode(' or ', $this->process->getSrcPaths());
             throw new \Exception("Template file $message not found");
         }
         
@@ -156,7 +156,6 @@ class TemplateFunction
         return $node;
     }
 
-//chemat din afara, sau cu flag uri
     public function escapeSpecialCharacters($html) {
         return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
     }

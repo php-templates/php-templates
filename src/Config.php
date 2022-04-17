@@ -4,6 +4,13 @@ namespace PhpTemplates;
 
 class Config
 {
+    private $name;
+
+    private $srcPath;
+    private $trackChanges = true; // TODO:
+    private $aliased = [];
+    private $directives = [];
+
     const allowedControlStructures = [
         'if', 'elseif', 'else', 'for', 'foreach'
     ];
@@ -13,19 +20,11 @@ class Config
     ];
     
     private $prefix = 'p-';
-    private $srcPath;
-    private $destPath;
-    private $trackChanges = true; // TODO:
-    private $aliased = [];
-    private $directives = [];
    
-    public function __construct($srcPath, $destPath) {
+    public function __construct($name, $srcPath) {
+        $this->name = $name;
         $this->srcPath = $srcPath;
-        $this->destPath = $destPath;
     }
-    
-    //const attrDataBindEager = 'data';
-    //const attrIsComponent = 'is';
 
     public function addDirective(string $key, \Closure $callable): void
     {
@@ -36,21 +35,20 @@ class Config
     {
         $this->aliased[$key] = $component;
     }
+
+    public function hasDirective(string $key): bool
+    {
+        return isset($this->directives[$key]);
+    }
+    
+    public function hasAlias(string $key): bool
+    {
+        return isset($this->aliased[$key]);
+    }
     
     public function setSrcPath(string $val)
     {
         $this->srcPath = $val;
-    }
-    
-    public function setDestPath(string $val)
-    {
-        $this->destPath = $val;
-    }
-    
-    public function merge(Config $cfg)
-    {
-        $this->aliased = array_merge($cfg->aliased, $this->aliased);
-        $this->directives = array_merge($cfg->directives, $this->directives);
     }
     
     public function __get($prop)

@@ -8,10 +8,12 @@ use PhpTemplates\DependenciesMap;
 
 class Document
 {
+    protected $destPath;
     protected $name;
     protected $content = '';
 
-    public function __construct(string $name, $content = '') {
+    public function __construct(string $destPath, string $name, $content = '') {
+        $this->destPath = $destPath;
         $this->name = $name;
         $this->content = $content;
     }
@@ -32,7 +34,7 @@ class Document
         return $outFile;
     }
 
-    public function exists()
+    public function exists($basePath)
     {
         $f = $this->getDestFile();
         if (file_exists($f)) {
@@ -52,7 +54,7 @@ class Document
             $hash[] = $f.':'.@filemtime($file);
         }
 
-        $pf = rtrim(Template::getConfig()->destPath, '/').'/';
+        $pf = rtrim($this->destPath, '/').'/';
         $name = str_replace(['/', ':'], '_', $this->name);// todo
 
         $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);

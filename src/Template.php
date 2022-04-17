@@ -2,13 +2,6 @@
 
 namespace PhpTemplates;
 
-use PhpTemplates\Parser;
-use DOMDocument;
-use Component;
-use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\Context;
-use PhpTemplates\Facades\DomHolder;
-
 class Template
 {
     /**
@@ -19,9 +12,7 @@ class Template
     
     public function __construct(string $srcPath, string $destPath) {
         $this->destPath = $destPath;
-        $this->configs['default'] = [
-            'src_path' => $srcPath
-        ];
+        $this->configs['default'] = new Config('default', $srcPath);
     }
     
     public function load(string $rfilepath, array $data = [], $slots = [])
@@ -40,12 +31,11 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
-            $doc = new Document($requestName);
-            if ($path = $doc->exists() && 0) {} 
+            $doc = new Document($this->destPath, $requestName);
+            if ($path = $doc->exists($this->destPath) && 0) {} 
             else {
-                $parser = new Parser($this->configs);
-                $parser->parse($rfilepath);
-                //(new TemplateFunction($process, $rfilepath))->parse();
+                $process = new Process($rfilepath, $this->configs);
+                (new TemplateFunction($process, $rfilepath))->parse();
                 $doc->setContent($process->getResult());
                 $path = $doc->save();
             }
@@ -63,29 +53,47 @@ class Template
     /**
      * Add additional parse src path
      */
-    public function addPath($name, $src)
+    public function addPath($name, $srcPath)
     {
         if (isset($this->configs[$name])) {
             throw new \Exception("Config '$name' already exists");
         }
-        $this->configs[$name] = new Config($src);
+        $this->configs[$name] = new Config($name, $srcPath);
+    }
+
+    public function replacePath($name, $srcPath)
+    {
+        if (!isset($this->configs[$name])) {
+            $this->addPath($name, $srcPath);
+        } else {
+            $this->configs[$name]->setSrcPath($srcPath);
+        }
     }
     
-    public function addDirective(string $key, Closure $callable, $path = 'default'): void
+    public function addDirective(string $key, \Closure $callable, $path = 'default'): void
     {
-        if (!isset($this->configs[$key])) {
+        if (!isset($this->configs[$path])) {
             throw new \Exception('Config path not found');
         } 
-        elseif ($this->configs[$key]->hasDirective($key)) {
+        elseif ($this->configs[$path]->hasDirective($key)) {
             throw new \Exception('Directive already exists');
         }
-        $this->configs[$key]->addDirective($callable);
+        $this->configs[$path]->addDirective($key, $callable);
+    }
+
+    public function addAlias(string $key, string $value, $path = 'default'): void
+    {
+        if (!isset($this->configs[$path])) {
+            throw new \Exception('Config path not found');
+        } 
+        elseif ($this->configs[$path]->hasAlias($key)) {
+            throw new \Exception('Alias already exists');
+        }
+        $this->configs[$path]->addAlias($key, $value);
     }
     
     public function setDestPath($dest)
     {
-        $this->$destPath = $dest;
+        $this->destPath = $dest;
     }
 }
-
-Template::setConfig('default', new Config('src', 'dest'));

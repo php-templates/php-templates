@@ -9,62 +9,108 @@ use PhpTemplates\DependenciesMap;
 
 class Process
 {
-    private $parent;
+    /**
+     * Name of the initiator file
+     */
+    private $name;
+    /**
+     * All configs keyed by namespace
+     */
+    private $configs;
+
+    /**
+     * current selected config
+     */
     private $config;
 
     private $templateFunctions = [];
+    private $eventListeners = [];
     private $tobereplaced = [
         '="__empty__"' => '',
     ];
-    private $eventListeners = [];
 
-    public function __construct(string $name, Config $config, $parent = null)
+    public function __construct(string $rfilepath, array $configs)
     {
-        $this->name = $name;
-        $this->config = $config;
-        $this->parent = $parent;
+        $this->name = $rfilepath;
+        $this->configs = $configs;
+    }
+
+    public function withConfig(string $key): self
+    {
+        $this->config = $this->configs[$key];
+
+        return $this;
     }
     
-    public function root()
+    /**
+     * return merged paths [current config, default]
+     *
+     * @return array
+     */
+    public function getSrcPaths(): array
     {
-        $p = $this;
-        while ($p->parent) {
-            $p = $p->parent;
+        $paths = [];
+
+        if ($this->config->name != 'default') {
+            $paths[] = $this->config->srcPath;
         }
-        return $p;
+
+        $paths[] = $this->configs['default']->srcPath;
+
+        return $paths;
+    }
+
+    /**
+     * Get component path from current config with fallback on default , or null
+     *
+     * @param string $alias
+     * @return void
+     */
+    public function getAliased(string $alias)
+    {
+        if (isset($this->config->aliased[$alias])) {
+            return $this->config->aliased[$alias];
+        }
+        elseif (isset($this->configs['default']->aliased[$alias])) {
+            return $this->configs['default']->aliased[$alias];
+        }
+        return null;
+    }
+
+    public function getDirective(string $name)
+    {
+        if (isset($this->config->directives[$name])) {
+            return $this->config->directives[$name];
+        }
+        elseif (isset($this->configs['default']->directives[$name])) {
+            return $this->configs['default']->directives[$name];
+        }
+        return null;
     }
 
     public function hasTemplateFunction(string $key): bool
     {
-        return isset($this->root()->templateFunctions[$key]);
+        return isset($this->templateFunctions[$key]);
     }
 
     public function addTemplateFunction(string $key, string $fnBody)
     {
-        $this->root()->templateFunctions[$key] = $fnBody;
+        $this->templateFunctions[$key] = $fnBody;
     }
 
     public function addEventListener(string $eventType, string $targetTplFn, $callbackFnBody)
     {
-        $this->root()->eventListeners[$eventType][$targetTplFn][] = $callbackFnBody;
+        $this->eventListeners[$eventType][$targetTplFn][] = $callbackFnBody;
     }
 
     public function addDependencyFile($path)
     {
-        DependenciesMap::add($this->root()->name, $path);
+        DependenciesMap::add($this->name, $path);
     }
 
     public function toBeReplaced($key, $val)
     {
-        $this->root()->tobereplaced[$key] = $val;
-    }
-
-    public function config(string $key) 
-    {
-        if (isset($this->config->{$key})) {
-            return $this->config->{$key};
-        }
-        return null;
+        $this->tobereplaced[$key] = $val;
     }
 
     public function getResult()
@@ -92,7 +138,7 @@ class Process
     }
     
     public function __get($prop)
-    {
+    {debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         return $this->{$prop};
     }
 }

@@ -11,23 +11,30 @@ use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-$cfg = new Config('./', './results/');
-$cfg->addAlias('x-form-group', 'components/form-group');
-$cfg->addAlias('x-input-group', 'components/input-group');
-$cfg->addAlias('x-card', 'components/card');
-$cfg->addAlias('x-helper', 'components/helper');
+$parser = new Template('./', './results/');
+$parser->addAlias('x-form-group', 'components/form-group');
+$parser->addAlias('x-input-group', 'components/input-group');
+$parser->addAlias('x-card', 'components/card');
+$parser->addAlias('x-helper', 'components/helper');
 
-$cfg->addDirective('checked', function($eval) {
+$parser->addDirective('checked', function($eval) {
     return [
         'p-raw' => $eval.' ? "checked" : ""'
     ];
 });
 
-Template::setConfig('default', $cfg);
+
+$files = array_diff(scandir('./results'), array('.', '..'));
+foreach($files as $file){ // iterate files
+    $file = './results/' . $file;
+    if(is_file($file)) {
+        unlink($file); // delete file
+    }
+}
 
 $files = scandir('./cases');
 $files = array_diff($files, ['.', '..', './']);
-//dd(Config::all());
+
 foreach($files as $f) {
     if (isset($_GET['t']) && explode('.', $f)[0] !== $_GET['t']) {
         continue;
@@ -49,23 +56,11 @@ foreach($files as $f) {
     $file = str_replace('cases/', 'temp/', $file);
     file_put_contents($file, $test);
     $rfilepath = str_replace('.template.php', '', $file);
-    $process = new Process($rfilepath, $cfg);
-    // $dom = new HTML5DOMDocument;
-    // cream un context nou pentru a preprocesa continutul
-    //$dom->loadHtml($parser->escapeSpecialCharacters($parser->removeHtmlComments($test)));
-    $parser = new TemplateFunction($process, $rfilepath);
-    $parser->parse();
-    $doc = new Document($rfilepath, $process->getResult());
-
-    $dest = './results/'.str_replace('.template', '', $f);
-    if (!isset($_GET['edit'])) {
-        $doc->save($dest);
-    }
+    
     ob_start();
     $data = [];
-    include $dest;
-    Parsed::template($rfilepath)->render();
-    $results = ob_get_clean();//dd($results);
+    $parser->load($rfilepath);
+    $results = ob_get_clean();
     $results = explode('<body>', $results);
     $results = end($results);
     $results = explode('-----',$results);
