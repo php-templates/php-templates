@@ -52,10 +52,10 @@ class Process
         $paths = [];
 
         if ($this->config->name != 'default') {
-            $paths[] = $this->config->srcPath;
+            $paths = (array)$this->config->srcPath;
         }
 
-        $paths[] = $this->configs['default']->srcPath;
+        $paths = array_merge($paths, (array)$this->configs['default']->srcPath);
 
         return $paths;
     }

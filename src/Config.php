@@ -46,7 +46,7 @@ class Config
         return isset($this->aliased[$key]);
     }
     
-    public function setSrcPath(string $val)
+    public function setSrcPath($val)
     {
         $this->srcPath = $val;
     }

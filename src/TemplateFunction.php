@@ -131,16 +131,18 @@ class TemplateFunction
     public function load($rfilepath)
     {
         $srcFile = null;
+        $tried = [];
         foreach ($this->process->getSrcPaths() as $srcPath) {
             $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
             if (file_exists($filepath)) {
                 $srcFile = $filepath;
                 break;
             }
+            $tried[] = $filepath;
         }
 
         if (!$srcFile) {
-            $message = implode(' or ', $this->process->getSrcPaths());
+            $message = implode(' or ', $tried);
             throw new \Exception("Template file $message not found");
         }
         

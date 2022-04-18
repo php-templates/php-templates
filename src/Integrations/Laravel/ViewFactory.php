@@ -12,6 +12,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     public function __construct($laravel)
     {
         $this->template = new Template(config('view.paths.0'), config('view.compiled'));
+        $this->template->replacePath('errors', 'eee');
     }
     
     /**
@@ -101,9 +102,10 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function addNamespace($namespace, $hints)
     {
-        if (is_array($hints)) {
-            throw new \Exception('Only one hint per namespace allowed');
+        if (in_array($namespace, ['errors'])) {
+            $hints[1] = __DIR__ . '/views';
         }
+ 
         $this->template->addPath($namespace, $hints);
     }
 
@@ -116,6 +118,14 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function replaceNamespace($namespace, $hints)
     {
+        if (in_array($namespace, ['errors'])) {
+            $hints[1] = __DIR__ . '/views';
+        }
         $this->template->replacePath($namespace, $hints);
+    }
+    
+    public function __call($m, $args)
+    {
+        return call_user_func_array([$this->template, $m], $args);
     }
 }
