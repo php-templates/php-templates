@@ -1,3 +1,6 @@
+nodurile child de extends sunt sloturi 
+deci nu e nevoie de extends(
+
 trait care face parse trb sa fie un factory initiat de la bun inceput si el va delega tot cu config cu orice, va tine loc si la process si muta templ fn
 
 pune facadele la punct
