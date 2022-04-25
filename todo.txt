@@ -1,3 +1,8 @@
+cp empty ca attr trb sa ramana empty nu hiidden=""
+throw error daca o directiva nu exista-> ba nu, scoate attr
+
+renunta la replace braking blocks, se pot face asa: phpt-gt; phpt-lt; phpt-amp;
+
 nodurile child de extends sunt sloturi 
 deci nu e nevoie de extends(
 

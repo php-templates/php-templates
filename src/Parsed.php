@@ -135,7 +135,7 @@ class Parsed
     {
         $this->scopeData = array_merge($parentScope, $this->data);
         $this->scopeData['_name'] = $this->name;
-         
+        
         $name = trim($this->name, './\\');
         if (!isset($this->scopeData['_cpath'])) {
             $this->scopeData['_cpath'] = $event = $name;
@@ -152,6 +152,7 @@ class Parsed
                 return;
             }
         }
+ 
         $func = $this->func;
         $func($this->scopeData, $this->slots);
     }

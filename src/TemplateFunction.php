@@ -168,20 +168,20 @@ class TemplateFunction
         $html = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
             $rid = '__r'.uniqid();
             $this->process->toBeReplaced($rid, $m[0]);
-            return $rid;
+            return $rid.'="__empty__"';
         }, $html);
         
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
             $rid = '__r'.uniqid();
             $this->process->toBeReplaced($rid, '<?php ' . $m[1] . ' ?>');
-            return $rid;
+            return $rid.'="__empty__"';
         }, $html);
         
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 $rid = '__r'.uniqid();
                 $this->process->toBeReplaced($rid, "<?php echo htmlspecialchars($eval); ?>");
-                return $rid;
+                return $rid.'="__empty__"';
             }
             return '';
         }, $html);

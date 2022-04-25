@@ -18,9 +18,9 @@ class Template
     public function load(string $rfilepath, array $data = [], $slots = [])
     {
         $start_time = microtime(true);
-        $template = $this->get($rfilepath, $data, $slots);
+        $template = $this->get($rfilepath, [], $slots);
         $template->render($data);
-        print_r('<br>'.(microtime(true) - $start_time));
+       // print_r('<br>'.(microtime(true) - $start_time));
     }
 
     public function get(string $rfilepath, array $data = [], $slots = [])

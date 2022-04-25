@@ -126,6 +126,8 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     
     public function __call($m, $args)
     {
-        return call_user_func_array([$this->template, $m], $args);
+        if (method_exists($this->template, $m)) {
+            return call_user_func_array([$this->template, $m], $args);
+        }//flushFinderCache
     }
 }
