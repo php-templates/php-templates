@@ -116,9 +116,9 @@ class Process
     public function getResult()
     {
         $tpl = '<?php ';
+        $tpl .= PHP_EOL."namespace PhpTemplates;";
         $tpl .= PHP_EOL."use PhpTemplates\Parsed;";
         $tpl .= PHP_EOL."use PhpTemplates\DomEvent;";
-        $tpl .= PHP_EOL."use PhpTemplates\Helper;";
         $tpl .= PHP_EOL;
         foreach ($this->templateFunctions as $name => $fn) {
             $tpl .= PHP_EOL."Parsed::\$templates['$name'] = $fn;";

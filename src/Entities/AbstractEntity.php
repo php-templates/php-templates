@@ -204,7 +204,7 @@ abstract class AbstractEntity
                     return "'$attr'";
                 }, $val);
                 $val = array_merge($val, $bind);
-                $val = 'Helper::mergeAttrs('.implode(',',$val).')';
+                $val = 'attr('.implode(',',$val).')';
                 unset($binds[$bk]);
                 unset($data[$k]);
                 $data[$bk] = $val;
@@ -216,7 +216,7 @@ abstract class AbstractEntity
         foreach ($binds as $bk => $bval) {
             $k = substr($bk, 1);
             if (count($bval) > 1) {
-                $bval = 'Helper::mergeAttrs('.implode(',',$bval).')';
+                $bval = 'attr('.implode(',',$bval).')';
             } else {
                 $bval = $bval[0];
             }

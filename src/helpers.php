@@ -2,13 +2,33 @@
 
 namespace PhpTemplates;
 
-function view(string $view, array $data = [])
+/**
+ * Echo escaped string
+ *
+ * @param string $string
+ * @return void
+ */
+function e(string $string) 
 {
-   
-    ob_start();
-    Template::load($view, $data);
-    $output = ob_get_contents();
-    ob_end_clean();
- 
-    return $output;
+    echo htmlspecialchars($string);
+}
+
+/**
+ * Gain array or string as param and echo it as class string
+ *
+ * @param mixed $data
+ * @return void
+ */
+function attr(...$data)
+{
+    $class = [];
+    foreach ($data as $data) {
+        if (is_array($data)) {
+            $class[] = implode(' ', array_keys(array_filter($data)));
+        } 
+        elseif(is_string($data)) {
+            $class[] = $data;
+        }
+    }
+    echo implode(' ', $class);
 }

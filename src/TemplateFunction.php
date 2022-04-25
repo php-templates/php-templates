@@ -180,7 +180,7 @@ class TemplateFunction
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, "<?php echo htmlspecialchars($eval); ?>");
+                $this->process->toBeReplaced($rid, "<?php e($eval); ?>");
                 return $rid.'="__empty__"';
             }
             return '';
