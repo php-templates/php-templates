@@ -10,6 +10,7 @@ use PhpTemplates\Directive;
 use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Process;
 use PhpTemplates\Traits\CanParseNodes;
+use voku\helper\DomDocument;
 
 abstract class AbstractEntity
 {
@@ -340,14 +341,14 @@ abstract class AbstractEntity
             }
             elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
                 // stands its own
-                $container = new HTML5DOMDocument;
+                $container = new DomDocument();dd(66);
                 $slotNode = $container->importNode($slotNode, true);
                 $container->appendChild($slotNode);
                 $slots[$slotPosition][] = $container;
                 $lastPos = $slotPosition;
             } else {
                 // has dependencies above
-                if (isset($slots[$lastPos])) {
+                if (isset($slots[$lastPos])) {dd(1);
                     $i = count($slots[$lastPos]) -1;
                     $slotNode = $slots[$lastPos][$i]->importNode($slotNode, true);
                     $slots[$lastPos][$i]->appendChild($slotNode);

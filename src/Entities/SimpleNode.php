@@ -61,7 +61,7 @@ class SimpleNode extends AbstractEntity
             $this->fillNode($this->node, $data);
             $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
             $node = new HTML5DOMDocument;
-  
+  dd(1);
             $node->appendChild($node->importNode($this->node, true));
             (new TemplateFunction($this->process, $node, $name))->parse();
     
@@ -78,7 +78,7 @@ class SimpleNode extends AbstractEntity
     {
         $this->attrs['_index'] = 0;
         $GLOBALS['x'] = $this->node->getAttribute('class') == 'row';
-        $this->depleteNode($this->node, function($data) {
+        $this->depleteNode($this->node, function($data) {dd(2);
             $this->fillNode($this->node, $data);
             //if ($GLOBALS['x']) dd($this->attrs, $data);
             $dataString = Helper::arrayToEval($this->attrs);

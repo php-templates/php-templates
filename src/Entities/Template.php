@@ -37,7 +37,7 @@ class Template extends AbstractEntity
             //$this->fillNode($this->node, ['x'=>13]);
             //$dataString = Helper::arrayToEval($data);
             $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-            $node = new HTML5DOMDocument;
+            $node = new HTML5DOMDocument;dd(9);
             foreach ($this->node->childNodes as $cn) {
                 $node->appendChild($node->importNode($cn, true));
             }

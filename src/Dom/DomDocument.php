@@ -10,12 +10,16 @@ class DomDocument
 {
     private $dom;
     
+    private $buffer;
+    
     private $nodeName = '#document';
     private $parentNode = null;
     
     public function loadHtml(string $str)
     {
-        $this->dom = HtmlDomParser::str_get_html($str);
+        (new Parser())->parse($str);
+        die(); 
+        // $this->dom = HtmlDomParser::str_get_html($str);
     }
     
     /* GETTERS */

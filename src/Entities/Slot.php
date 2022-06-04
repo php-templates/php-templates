@@ -84,7 +84,7 @@ class Slot extends AbstractEntity
                 foreach ($childNodes as $cn) {
                     $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
                     $node = new HTML5DOMDocument;
-
+dd(8);
                     $node->appendChild($node->importNode($cn, true));
                     (new TemplateFunction($this->process, $node, $name))->parse();
             

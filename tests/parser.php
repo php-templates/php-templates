@@ -2,6 +2,12 @@
 
 require('../autoload.php');
 
+use PhpTemplates\Dom\Parser;
+
+(new Parser)->parse(file_get_contents('./html.html'));
+
+die();
+
 use PhpTemplates\Config;
 use PhpTemplates\Parsed;
 use PhpTemplates\Template;
