@@ -34,10 +34,14 @@ class Template
             $doc = new Document($this->destPath, $requestName);
             if ($path = $doc->exists($this->destPath) && 0) {} 
             else {
+                try {
                 $process = new Process($rfilepath, $this->configs);
                 (new TemplateFunction($process, $rfilepath))->parse();
                 $doc->setContent($process->getResult());
                 $path = $doc->save();
+                } catch(Exception $e) {
+                    throw new Exception($e->getMessage());
+                }
             }
 
             require_once($path);

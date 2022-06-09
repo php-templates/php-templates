@@ -132,7 +132,11 @@ class Process
         }
         
         $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
-        $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
+        $tpl = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function($m) {
+            return $m[1];
+        }, $tpl);
+        
+        //$tpl = preg_replace('/[\n ]+ *\n+/', "\n", $tpl);
 
         return $tpl;
     }

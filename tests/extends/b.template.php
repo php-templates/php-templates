@@ -1,3 +1,3 @@
-<extends template="extends/parent2"></extends>
-
-<b></b>
+<template is="extends/parent2">
+    <b></b>
+</template>

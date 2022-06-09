@@ -10,7 +10,8 @@ use PhpTemplates\Directive;
 use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Process;
 use PhpTemplates\Traits\CanParseNodes;
-use voku\helper\DomDocument;
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\PhpNode;
 
 abstract class AbstractEntity
 {
@@ -85,14 +86,7 @@ abstract class AbstractEntity
      * @return void
      */
     protected function makeCaret($refNode = null)
-    {
-        $debugText = '';
-        if (0
-        ) {
-            $debugText = explode('\\', get_class($this));
-            $debugText = end($debugText).'.'.$this->depth;
-        }
-
+    {return;
         if (!$this->node->parentNode) {
             // is hierarchical top
             return;
@@ -111,30 +105,29 @@ abstract class AbstractEntity
             $node = $refNode;
         }
         
-        $this->caret = $node->ownerDocument->createTextNode($debugText);
+        $this->caret = new DomNode('#text');
         $node->parentNode->insertBefore($this->caret, $node);
+        
     }
 
     public function println(string $line, $end = false)
-    {
-        $rid = '__r'.uniqid();
-        $this->process->toBeReplaced($rid, '<?php ' . $line . ' ?>');
-        $line = $rid;
+    {return;
+        $line = '<?php ' . $line . ' ?>';
 
         if ($end) {
             if ($this->caret->nextSibling) {
                 $this->caret->parentNode->insertBefore(
-                    $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
+                    new DomNode('#text', PHP_EOL.$line),
                     $this->caret->nextSibling
                 );
             }
             else {
-                $this->caret->parentNode->appendChild($this->caret->ownerDocument->createTextNode(PHP_EOL.$line));
+                $this->caret->parentNode->appendChild(new DomNode('#text', PHP_EOL.$line));
             }
         }
         else {
             $this->caret->parentNode->insertBefore(
-                $this->caret->ownerDocument->createTextNode(PHP_EOL.$line),
+                new DomNode('#text', PHP_EOL.$line),
                 $this->caret
             );
         }
@@ -163,7 +156,7 @@ abstract class AbstractEntity
                     continue;
                 }
             }
-            $extracted_attributes[] = $a->cloneNode(true);
+            $extracted_attributes[] = clone $a;
         }
 
         $c_structs = [];
@@ -191,10 +184,7 @@ abstract class AbstractEntity
             }
         }
 
-        $attributes = $node->attributes;
-        while ($attributes && $attributes->length) {
-            $node->removeAttribute($attributes->item(0)->name);
-        }
+        $node->removeAttributes();
         
         foreach ($data as $k => $val) {
             $bk = ':'.$k;
@@ -228,29 +218,28 @@ abstract class AbstractEntity
             }
             $data[$bk] = $bval;
         }
-
         // imsert $c_structs
-        $open = [];
+        $cstruct = null;
+        $condNode = null;
         foreach ($c_structs as $struct) {
             list($statement, $args) = $struct;
-            if ($args || $args === '0') {
-                $statement .= " ($args)";
+            $phpnode = new PhpNode($statement, $args);
+            if ($cstruct) {
+                $cstruct->appendChild($phpnode);
+            } else {
+                $condNode = $phpnode;
             }
-
-            $open[] = "$statement { ";
+            $cstruct = $phpnode;
+        }//d(''.$node);
+        if ($condNode) {
+            $node->parentNode->insertBefore($condNode, $node);
+            $cstruct->appendChild($node->detach());
+            $node = $condNode;
+            //=dd(''.$node);
         }
-        if (count($c_structs)) {
-            $open = implode(PHP_EOL, $open);
-            $this->println($open);
-        }
+        //dd(''.$node, $node);
         
-        $cb($data, $c_structs, $node);
-
-        if (count($c_structs)) {
-            // close all control structures
-            $close = implode(PHP_EOL, array_fill(0, count($c_structs), '} '));
-            $this->println($close);
-        }
+        $cb($data, $c_structs);
     }
 
     protected function fillNode($node, array $data) 
@@ -275,20 +264,17 @@ abstract class AbstractEntity
             if ($k[0] === ':') {
                 $k = substr($k, 1);
                 $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, "<?php echo $val; ?>");
-                $val = $rid;
+                $val = "<?php echo $val; ?>";
             }
             elseif ($k === 'p-bind') {
                 $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>');
-                $k = $rid;
-                $val = '__empty__';
+                $k = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>';
+                $val = '';
             }
             elseif ($k === 'p-raw') {
                 $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, "<?php echo $val; ?>");
-                $k = $rid;
-                $val = '__empty__';
+                $k = "<?php echo $val; ?>";
+                $val = '';
             }
             $node->setAttribute($k, $val);
         }
@@ -312,7 +298,7 @@ abstract class AbstractEntity
         
         return $cnodes;
     }
-
+//remove it
     protected function getNodeSlots($node, $forceDefault = false): array
     {
         $slots = [];

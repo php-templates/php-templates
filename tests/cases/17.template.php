@@ -10,6 +10,6 @@
 
 -----
 
-<div :class="['x' => 1]"></div>
+<!-- div :class="['x' => 1]"></div>
 =====
-<div class="x"></div>
+<div class="x"></div -->

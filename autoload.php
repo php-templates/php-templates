@@ -29,36 +29,10 @@ function d(...$data) {
     } 
 }
 
-function dom($d, $name = '', $depth = 0)
+function dom($dom)
 {
-    //dd(111);
-    //if (empty($_GET['debug'])) return;
-    
-    if (is_string($d)) {
-        $content = $d;
-    } else {
-        if (!is_iterable($d)) {
-            $d = [$d];
-        } 
-        $content = '';
-        foreach ($d as $node)
-        {
-            if (@$node->ownerDocument) {
-            //$node = $dom->importNode($node, true);
-                $content.= $node->ownerDocument->saveHtml($node);
-            }
-            else {
-                $content.= $node->saveHtml();
-            }
-        }
-    }
-    //print_r($x[0]['file'].'->'.$x[0]['line']);
-echo $content; return;
-
-    echo '<div style="padding-left:'.($depth*0).'px"><div style="background:#f4ff9a; border: 1px solid black; margin-bottom:10px; padding:5px;">';
-    echo '<div><b>'. $name .'</b></div>';
-    echo htmlspecialchars($content);
-    echo '</div></div>';
+    echo PHP_EOL.'-------------'.PHP_EOL.$dom.PHP_EOL.'-------------'.PHP_EOL;
+    die();
 }   
 
 function buf($self, $name = '', $depth = 0)
@@ -70,8 +44,7 @@ function buf($self, $name = '', $depth = 0)
     echo '</div></div>';
 }
 
-require_once(__DIR__.'/html5-dom-document-php/autoload.php');
-
+require_once('vendor/autoload.php');
 require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');

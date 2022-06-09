@@ -2,15 +2,263 @@
 
 namespace PhpTemplates\Dom;
 
-use voku\helper\HtmlDomParser;
-
 class DomNode
 {
-    private $node;
+    private static $last_id = 0;
     
-    public function __construct($node)
+     private $selfClosingTags = [
+        'area',
+        'base',
+        'br',
+        'col',
+        'embed',
+        'hr',
+        'img',
+        'input',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'wbr',
+        'command',
+        'keygen',
+        'menuitem',    
+    ];
+    
+    protected $nodeId;
+    protected $nodeName;
+    protected $nodeValue;
+    protected $attrs = [];
+    protected $parentNode;
+    protected $childNodes = [];
+    
+    public function __construct(string $nodeName, string $nodeValue = '')
     {
-        $this->node = $node;
+        self::$last_id++;
+        $this->nodeId = self::$last_id;
+        $this->nodeName = trim($nodeName);
+        $this->nodeValue = $nodeValue;
+        $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
+    }
+    
+    public static function fromString(string $str, $options = []): self
+    {
+        $parser = new Parser;
+        if (isset($options['preservePatterns'])) {
+            foreach ($options['preservePatterns'] as $p) {
+                $parser->addPreservePattern($p);
+            }
+        }
+        
+        return $parser->parse($str);
+    }
+    
+    public static function fromArray($arr)
+    {
+        $node = new DomNode($arr['nodeName'], $arr['nodeValue']);
+        foreach ($arr['attrs'] as $attr) {
+            $node->addAttribute($attr['nodeName'], $attr['nodeValue']);
+        }
+        foreach ($arr['childNodes'] as $cn) {
+            $node->appendChild(self::fromArray($cn));
+        }
+        return $node;
+    }
+    
+    public function addAttribute(string $nodeName, string $nodeValue)
+    {
+        $attr = (object) [
+            'nodeName' => $nodeName,
+            'nodeValue' => $nodeValue
+        ];
+        $this->attrs[] = $attr;
+    }
+    
+    public function setAttribute(string $nodeName, string $nodeValue)
+    {
+        foreach ($this->attrs as $attr) {
+            if ($attr->nodeName == $nodeName) {
+                $attr->nodeValue = $nodeValue;
+                return;
+            }
+        }
+        
+        $attr = (object) [
+            'nodeName' => $nodeName,
+            'nodeValue' => $nodeValue
+        ];
+        $this->attrs[] = $attr;
+    }
+    
+    public function getAttribute(string $name)
+    {
+        foreach ($this->attrs as $attr) {
+            if ($attr->nodeName == $name) {
+                return $attr->nodeValue;
+            }
+        }
+        return null;
+    }
+    
+    public function hasAttribute(string $name)
+    {
+        foreach ($this->attrs as $attr) {
+            if ($attr->nodeName == $name) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public function removeAttributes()
+    {
+        $this->attrs = [];
+    }
+    
+    public function appendChild(self $node) 
+    {
+        // set parent node first
+        $node->parent($this);
+        $this->childNodes[] = $node;
+    }
+    
+    public function insertBefore($node, self $refNode)
+    {
+        $node->parent($this);
+        $i = null;//TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        foreach ($this->childNodes as $j => $cn) {
+            if ($cn === $refNode) {
+                $i = $j;
+                break;
+            }
+        }
+        
+        if (!is_null($i)) {
+            array_splice($this->childNodes, $i, 0, [$node]);
+        } else {
+            $this->appendChild($node);
+        }
+    }
+    
+    public function removeChild(self $node)
+    {
+        $i = array_search($node, $this->childNodes, true);
+        if ($i >= 0) {
+            $this->childNodes[$i]->parentNode && $this->childNodes[$i]->detach();
+            unset($this->childNodes[$i]);
+            reset($this->childNodes);
+        }
+    }
+    
+    public function empty()
+    {
+        $this->childNodes = [];
+    }
+    
+    public function detach()
+    {
+        if ($this->parentNode) {
+            $parent = $this->parentNode;
+            $this->parentNode = null;
+            $parent->removeChild($this);
+        }
+        return $this;
+    }
+    
+    public function cloneNode()
+    {
+        $arr = $this->__toArray();
+        return self::fromArray($arr);
+    }
+    
+    public function debug()
+    {
+        $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId];
+        if ($this->nodeName == '#text') {
+            $x['text'] = $this->nodeValue;
+        }
+        foreach($this->childNodes as $cn) {
+            $x['childs'][] = $cn->debug();
+        }
+        return $x;
+    }
+    
+    public function __toArray()
+    {
+        $arr = [
+            'nodeName' => $this->nodeName,
+            'nodeValue' => $this->nodeValue,
+            'attrs' => json_decode(json_encode($this->attrs), true),
+            'childNodes' => [],
+        ];
+        foreach ($this->childNodes as $cn) {
+            $arr['childNodes'][] = $cn->__toArray();
+        }
+        
+        return $arr;
+    }
+    
+    public function __toString()
+    {
+        // NODE START
+        $indentNL = $this->getIndent();
+        $return = $indentNL;
+        if ($this->nodeName[0] != '#' && $this->nodeName) {
+            $attrs = [];
+            foreach ($this->attrs as $attr) {
+                $attrs[] = ($attr->nodeValue === '') ? $attr->nodeName : $attr->nodeName . '="' . $attr->nodeValue . '"';
+            }
+            $attrs = implode(' ', $attrs);
+            $return .= "<{$this->nodeName} $attrs>";
+        }
+        
+        if ($this->nodeName == '#text' || !$this->nodeName) {
+            $return .= $this->nodeValue;
+            return $return;
+        }
+        elseif ($this->nodeName[0] == '#') {
+            $return .= $this->nodeValue;
+        }
+        
+        // NODE CONTENT
+        foreach ($this->childNodes as $cn) {
+            $return .= $cn;
+        }
+        
+        // NODE END
+        if ($this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
+            if (!$this->childNodes) {
+                $indentNL = '';
+            }
+            $return .= $indentNL . "</{$this->nodeName}>";
+        }
+        
+        return $return;
+    }
+    
+    public function parent($parentNode)
+    {
+        if ($this->parentNode) {
+            debug_print_backtrace(2);
+            throw new \Exception("Node already has a parent, detach it first");
+        }
+        $this->parentNode = $parentNode;
+    }
+    
+    public function getIndent()
+    {
+        $level = 0;
+        $c = $this;
+        while ($c->parentNode) {
+            $c = $c->parentNode;
+            $level++;
+        }
+        $level--;
+        if ($level <= 0) {
+            return PHP_EOL;
+        }
+        return PHP_EOL.str_repeat('  ', $level);
     }
     
     /* GETTERS */
@@ -24,19 +272,51 @@ class DomNode
     
     public function getNodeName()
     {
-        return $this->node->getNode()->nodeName;
+        return $this->nodeName;
     }
     
     public function getParentNode()
     {
-        return new DomNode($this->node->parentNode());
+        return $this->parentNode;
     }
     
-    public function getOwnerDocument()
-    {dd($this->node->parentNode());
-        if ($this->node->getNode()->ownerDocument) {
-            return new DomDocument(new HtmlDomParser($this->node->getNode()->ownerDocument));
+    public function getAttributes()
+    {
+        return new DomNamedNodeMap($this->attrs);
+    }
+    
+    public function getRoot()
+    {
+        if (!$this->parentNode) {
+            return null;
         }
-        return null;
+        
+        $node = $this;
+        while ($node->parentNode) {
+            $node = $node->parentNode;
+        }
+        
+        return $node;
+    }
+    
+    public function removeAttribute($name)
+    {
+        foreach ($this->attrs as $i => $attr) {
+            if ($attr->nodeName == $name) {
+                unset($this->attrs[$i]);
+                return;
+            }
+        }
+    }
+    
+    public function isSelfClosingTag()
+    {
+        return in_array($this->nodeName, $this->selfClosingTags);
+    }
+    
+    public function changeNode($nodeName, $nodeValue = '')
+    {
+        $this->nodeName = $nodeName;
+        $this->nodeValue = $nodeValue;
     }
 }

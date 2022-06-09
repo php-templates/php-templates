@@ -2,7 +2,7 @@
 
 namespace PhpTemplates;
 
-use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Traits\CanParseNodes;
 
 class TemplateFunction 
@@ -71,58 +71,18 @@ class TemplateFunction
     
     public function parse()
     {
-        if ($this->wasRecentlyLoaded && method_exists($this->node, 'querySelector')) {
-            if ($extends = $this->node->querySelector('extends')) {
-                $this->extends($extends);
-            }
-            if ($props = $this->node->querySelector('props')) {
-                $this->props = $this->getProps($props);
-            }
-        }
         $this->parseNode($this->node);
-
+    //dom($this->node);
         $this->register();
     }
     
     protected function register()
     {
-        if ($this->trimHtml) {
-            $htmlString = $this->trimHtml($this->node);
-        }
-        elseif ($this->node->ownerDocument) {
-            $htmlString = $this->node->ownerDocument->saveHtml($this->node);
-        } else {
-            $htmlString = $this->node->saveHtml();
-        }
+        $htmlString = (string)$this->node;
+        $htmlString = $this->replaceSpecialBlocksBlocks($htmlString);
 
         $htmlString = $this->getTemplateFunction($htmlString);
         $this->process->addTemplateFunction($this->name, $htmlString);
-    }
-
-    private function extends($extends)
-    {
-        $extendedTemplate = $extends->getAttribute('template');
-        (new TemplateFunction($this->process, $extendedTemplate))->parse();
-
-        $this->process->addEventListener('rendering', $this->name, "function(\$template, \$data) {
-            \$comp = Parsed::template('$extendedTemplate', \$data);
-            \$comp->addSlot('default', \$template);
-            \$comp->render(\$data);
-            return false;
-        }");
-
-        $extends->parentNode->removeChild($extends);
-    }
-
-    private function getProps($propsNode)
-    {
-        $props = [];
-        foreach ($propsNode->attributes as $attr) {
-            $props[$attr->nodeName] = $attr->nodeValue;
-        }
-        $propsNode->parentNode->removeChild($propsNode);
-        
-        return $props;
     }
 
     /**
@@ -147,13 +107,20 @@ class TemplateFunction
         }
         
         $this->process->addDependencyFile($srcFile);
-        $node = new HTML5DOMDocument();
 
         $html = file_get_contents($srcFile);
         $html = $this->removeHtmlComments($html);
-        $html = $this->collectBrokingBlocks($html);
+        //$html = $this->collectBrokingBlocks($html);
         $this->trimHtml = strpos($html, '<body') === false;
-        $node->loadHtml($html);
+        $node = DomNode::fromString($html, ['preservePatterns' => [
+            '/(?<!<)<\?php(.*?)\?>/s',
+            '/(?<!@)@php(.*?)@endphp/s',
+            '/{{(((?!{{).)*)}}/',
+        ]]);
+if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace('/[\n\r\t\s]*|(="")*/', '', $html))) {
+    d('nu se pupa '.$srcFile);
+    echo "\n$y\n$x"; die();
+}
 
         return $node;
     }
@@ -162,26 +129,15 @@ class TemplateFunction
         return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
     }
     
-    private function collectBrokingBlocks($html)
+    private function replaceSpecialBlocksBlocks($html)
     {
-        
-        $html = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
-            $rid = '__r'.uniqid();
-            $this->process->toBeReplaced($rid, $m[0]);
-            return $rid.'="__empty__"';
-        }, $html);
-        
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
-            $rid = '__r'.uniqid();
-            $this->process->toBeReplaced($rid, '<?php ' . $m[1] . ' ?>');
-            return $rid.'="__empty__"';
+            return '<?php ' . $m[1] . ' ?>';
         }, $html);
         
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
-                $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, "<?php e($eval); ?>");
-                return $rid.'="__empty__"';
+                return "<?php e($eval); ?>";
             }
             return '';
         }, $html);

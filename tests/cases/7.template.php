@@ -2,7 +2,7 @@
     name="options"
     label="Options"
     :values="['o1']"
-/>
+></x-form-group>
 =====
 <div class="form-group">
     <label class="form-label">Options</label>

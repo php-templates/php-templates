@@ -5,6 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\Process;
+use PhpTemplates\Dom\DomNode;
 
 class Component extends AbstractEntity
 {
@@ -29,20 +30,21 @@ class Component extends AbstractEntity
 
             $dataString = Helper::arrayToEval($data);
             (new TemplateFunction($this->process, $this->name))->parse();
-    
-            $this->println(
-                sprintf('$this->comp[%d] = Parsed::template("%s", %s);', $this->depth, $this->name, $dataString)
-            );       
-            foreach ($this->childNodes() as $slot) {
+            $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
+                $this->depth, $this->name, $dataString
+            );      
+            $this->node->changeNode('#php', $nodeValue);
+
+            foreach ($this->node->childNodes as $slot) {
                 $this->parseNode($slot);
             }
             //d($this->caret);
-            $this->println(
-                sprintf('$this->comp[%d]->render($this->scopeData);', $this->depth)
-            );
+            $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
+            $this->node->appendChild(new DomNode('#php', $r));
         });
+                //dom($this->node->parentNode->parentNode->parentNode->parentNode);
 
-        $this->removeNode($this->node);
+        //$this->removeNode($this->node);
     }
 
     /**
@@ -56,12 +58,12 @@ class Component extends AbstractEntity
             $dataString = Helper::arrayToEval($data);
             (new TemplateFunction($this->process, $this->name))->parse();
     
-            $this->println(
-                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s));', 
-                $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString)
+            $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
+                $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
             );
+            $this->node->changeNode('#php', $r);
             
-            foreach ($this->childNodes() as $slot)
+            foreach ($this->node->childNodes as $slot)
             {
                 $this->parseNode($slot);
             }

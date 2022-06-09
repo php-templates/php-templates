@@ -4,6 +4,7 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Helper;
 use PhpTemplates\Process;
+use PhpTemplates\Dom\DomNode;
 
 class Block extends AbstractEntity
 {
@@ -28,20 +29,21 @@ class Block extends AbstractEntity
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
-            $this->println(
-                sprintf('$this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots));', 
+            
+            $nodeValue = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots)); ?>', 
                 $this->depth, 
                 $this->context->depth, 
                 $this->attrs['slot'], 
                 $dataString,
                 $this->name
-                )
             );
+            $this->node->changeNode('#block', $nodeValue);
+            
             foreach ($this->childNodes() as $i => $slot) {
                 // register block defaults 
-                if (!method_exists($slot, 'setAttribute')) {
-                    $_slot = $slot->ownerDocument->createElement('template');
-                    $_slot->appendChild($slot);
+                if (0&&!method_exists($slot, 'setAttribute')) {
+                    $_slot = new DomNode('template');
+                    $_slot->appendChild($slot->detach());
                     $slot = $_slot;
                 }
                 $slot->setAttribute('_index', $i+1);
@@ -54,19 +56,20 @@ class Block extends AbstractEntity
     {
         $this->depleteNode($this->node, function($data) {
             //$this->node->setAttribute('x',33);
+        //dom($this->node->root);
             $data = $this->fillNode(null, $data);
             $dataString = Helper::arrayToEval($data);
     
-            $this->println(
-                sprintf('$this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots);', 
+            $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots); ?>', 
                 $this->depth, 
                 $dataString,
                 $this->name
-                )
             );
-            foreach ($this->childNodes() as $i => $slot) {
-                // register block defaults 
-                if (!method_exists($slot, 'setAttribute')) {
+            $this->node->changeNode('#block', $nodeValue);
+            
+            foreach ($this->node->childNodes as $i => $slot) {
+                // register block defaults // TODO:
+                if (0&&!method_exists($slot, 'setAttribute')) {
                     $_slot = $slot->ownerDocument->createElement('template');
                     $_slot->appendChild($slot);
                     $slot = $_slot;
@@ -74,14 +77,13 @@ class Block extends AbstractEntity
                 $slot->setAttribute('_index', $i+1);
                 $this->parseNode($slot);
             }
-    
-            $this->println(
-                sprintf('$this->comp[%d]->render($this->scopeData);', $this->depth)
-            );
-        });
-
+   
+            $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
+            $this->node->appendChild(new DomNode('#php', $r));
+        });//dd($this->node->parentNode->parentNode);
+//dd(''.$this->node);
         // remove now...
-        $this->removeNode($this->node);
+        //$this->removeNode($this->node);
     }
 
     public function blockContext()

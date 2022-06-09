@@ -6,7 +6,7 @@
         <p>compslotdefault</p>
         <p>compslotdefault</p>
     </span>
-    <div class="">slot1slot1</div>
+    <div class>slot1slot1</div>
     <div>
         <div class="comp_slot">
             <span></span>
