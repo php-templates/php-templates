@@ -63,6 +63,11 @@ class Parser
         foreach ($chunks as $str) {
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
                 //d('close.'.$m[1]); //close tag m1
+                if (end($hierarchyQueue)->nodeName != $m[1]) {
+                    $node = new DomNode('#text', $str);
+                    $inBuildNode->appendChild($node);
+                    continue; // wrong close tag
+                }
                 $node = array_pop($hierarchyQueue);
                 //d('closing ', $node, $inBuildNode);
                 if ($node === $inBuildNode) {
