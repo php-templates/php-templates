@@ -40,23 +40,10 @@ class Parsed
     public $data = [];
 
     /**
-     * gained at render time, make an array_diff_keys between them and passed attributes to obdain the p-bind="$this->attrs" variables
-     * @var array
-     */
-    public $attrs = [];
-
-    /**
      * render function to be called
      * @var Closure
      */
     protected $func;
-
-    /**
-     * if the render function has been triggered
-     *
-     * @var boolean
-     */
-    protected $rendered = false;
     
     /**
      * Array of Parsed entities keyed by slot position
@@ -108,26 +95,21 @@ class Parsed
     public function addSlot($pos, self $renderable)
     {
         $this->slots[$pos][] = $renderable;
-        $renderable->setParent($this);
+
         return $renderable;
     }
     
     public function setSlots($slots)
     {
         $this->slots = $slots;
+
         return $this;
-    }
-    
-    public function setParent(self $parent)
-    {
-        if (!$this->parent) {
-            $this->parent = $parent;
-        }
     }
 
     public function setIndex($i)
     {
         $this->attrs['_index'] = $i;
+
         return $this;
     }
     
@@ -135,46 +117,20 @@ class Parsed
     {
         $this->scopeData = array_merge($parentScope, $this->data);
         $this->scopeData['_name'] = $this->name;
-        
-        $name = trim($this->name, './\\');
-        if (!isset($this->scopeData['_cpath'])) {
-            $this->scopeData['_cpath'] = $event = $name;
-        } else {
-            $event = explode('.', $this->scopeData['_cpath'])[0].'.'.$name;
-            $this->scopeData['_cpath'] .= '.'.$name;
-            $event = $this->scopeData['_cpath'];
-        }
 
-        if (!$this->rendered) {
-            $this->rendered = true; // stop infinite loop
-            $continue = DomEvent::event('rendering', $event, $this, $this->scopeData);
-            if (!$continue) {
-                return;
-            }
-        }
- 
         $func = $this->func;
-        $func($this->scopeData, $this->slots);
+        $func();
     }
     
     public function __get($prop)
     {
-        return $this->$prop;
-    }
-    
-    public function originParent()
-    {
-        $op = $this->parent;
-        while ($op->parent) {
-            $op = $op->parent;
-        }
-
-        return $op;
+        return $this->{$prop};
     }
     
     public function withName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 }

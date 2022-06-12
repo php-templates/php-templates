@@ -148,6 +148,12 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
         return $cb;
     }
     
+    /**
+     * Replace special syntaxes with php eval syntax
+     *
+     * @param [type] $html
+     * @return void
+     */
     private function replaceSpecialBlocks($html)
     {
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
@@ -177,22 +183,13 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
      * @param string $templateString
      * @return void
      */
-    protected function getTemplateFunction(string $templateString) 
+    protected function getTemplateFunction(string $templateString) : string
     {
-        $templateString = " ?> $templateString <?php ";
-        if ($this->props) {
-            $props = Helper::arrayToEval($this->props);
-            $fnheader = PHP_EOL."\$props = $props; ";
-            $fnheader .= ' $this->attrs = array_diff_key($this->data, $props);';
-            $fnheader .= ' $data = array_merge($props, $data);';
-        } else {
-            $fnheader = PHP_EOL.'$this->attrs = $this->data;';
-        }
-        $fnheader .= PHP_EOL.'extract($data);';
-        $fnDeclaration = 'function ($data, $slots) {';
-        $fnDeclaration .= $fnheader;
-        $fnDeclaration .= $templateString;
-        $fnDeclaration .= '}';
+        $fnDeclaration = 
+"function () {
+    extract(\$data);
+    ?> $templateString <?php 
+}";
 
         return $fnDeclaration;
     }

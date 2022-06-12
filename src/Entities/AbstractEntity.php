@@ -149,6 +149,7 @@ abstract class AbstractEntity
         $c_structs = [];
         $data = [];
         $binds = [];
+        $attrs = [];
         foreach ($extracted_attributes as $a) {
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) {
@@ -165,6 +166,10 @@ abstract class AbstractEntity
             } 
             elseif ($k[0] === ':') {
                 $binds[$k][] = $a->nodeValue;
+            }
+            elseif ($k[0] === '@') {
+                $k = substr($k, 1);
+                $attrs[$k] = $a->nodeValue;
             }
             else {
                 $data[$k][] = $a->nodeValue;
@@ -224,6 +229,10 @@ abstract class AbstractEntity
             $node = $condNode;
         }
         
+        $data['_attrs'] = $attrs;
+if (!empty($data['_attrs'])) {
+    dd($data);
+}
         return $data;
     }
 
@@ -270,84 +279,6 @@ abstract class AbstractEntity
             }
             $node->setAttribute($k, $val);
         }
-    }
-    
-    protected function childNodes($node = null)
-    {
-        if (!$node) {
-            $node = $this->node;
-        }
-        $cnodes = [];
-        if (!$node->childNodes) {
-            return $cnodes;
-        }
-        foreach ($node->childNodes as $cn) {
-            if (Helper::isEmptyNode($cn)) 
-            continue;
-            
-            $cnodes[] = $cn;
-        }
-        
-        return $cnodes;
-    }
-//remove it
-    protected function getNodeSlots($node, $forceDefault = false): array
-    {
-        $slots = [];
-        if (!$node->childNodes) {
-            return $slots;
-        }
-
-        // slots bound together using if else stmt should be keeped together
-        $lastPos = null;
-        foreach ($node->childNodes as $slotNode) {
-            if (Helper::isEmptyNode($slotNode)) {
-                continue;
-            }
-
-           $slotPosition = null;
-           if ($slotNode->nodeName !== '#text') {
-               $slotPosition = $slotNode->getAttribute('slot');
-               $slotNode->removeAttribute('slot');
-           }
-            if ($forceDefault || !$slotPosition) {
-                $slotPosition = 'default';
-            }
-
-            if ($slotNode->nodeName === '#text') {
-                $slots[$slotPosition][] = $slotNode;
-            }
-            elseif (!$slotNode->hasAttribute('p-elseif') && !$slotNode->hasAttribute('p-else')) {
-                // stands its own
-                $container = new DomDocument();dd(66);
-                $slotNode = $container->importNode($slotNode, true);
-                $container->appendChild($slotNode);
-                $slots[$slotPosition][] = $container;
-                $lastPos = $slotPosition;
-            } else {
-                // has dependencies above
-                if (isset($slots[$lastPos])) {dd(1);
-                    $i = count($slots[$lastPos]) -1;
-                    $slotNode = $slots[$lastPos][$i]->importNode($slotNode, true);
-                    $slots[$lastPos][$i]->appendChild($slotNode);
-                }
-            }
-        }
-
-        return $slots;
-    }
-    
-    protected function removeNode($node) {
-        $node->parentNode->removeChild($node);
-    }
-    
-    protected function nextSibling($node)
-    {
-        $node = $node->nextSibling;
-        while ($node && Helper::isEmptyNode($node)) {
-            $node = $node->nextSibling;
-        }
-        return $node;
     }
 
     public function __get($prop)

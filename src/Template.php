@@ -2,6 +2,8 @@
 
 namespace PhpTemplates;
 
+use Exception;
+
 class Template
 {
     /**
@@ -45,6 +47,7 @@ class Template
             }
 
             require_once($path);
+            
             return Parsed::template($requestName, $data)->setSlots($slots);
         }
     }
