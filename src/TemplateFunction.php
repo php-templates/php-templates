@@ -60,13 +60,14 @@ class TemplateFunction
             $this->name = $node;
             //$this->process = new Process($this->name, $cfg, $this->process);
             $cb = $this->load($path);
-            $this->wasRecentlyLoaded = true;
+
             if ($context) {
                 $this->node->parent($context->node);
             }
             if (is_callable($cb)) {
                 $cb($this->node);
             }
+            // events here
         }
         else {
             $this->node = $node;
@@ -79,7 +80,6 @@ class TemplateFunction
     public function parse()
     {
         $this->parseNode($this->node);
-    //dom($this->node);
         $this->register();
     }
     
