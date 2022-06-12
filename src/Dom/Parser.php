@@ -107,10 +107,10 @@ class Parser
     {
         $attrs = [];
         $originalStr = $str;
-        $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/', function($m) use (&$attrs) {
+        $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/', function($m) use (&$attrs, $str) {
             $attrs[] = [
                 $m[1],
-                $m[4]
+                isset($m[6]) ? $m[6] : $m[4]
             ];
             return '';
         }, $str);

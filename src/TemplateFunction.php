@@ -59,14 +59,21 @@ class TemplateFunction
             $path = end($path);
             $this->name = $node;
             //$this->process = new Process($this->name, $cfg, $this->process);
-            $node = $this->load($path);
+            $cb = $this->load($path);
             $this->wasRecentlyLoaded = true;
-        }    
-        elseif (is_string($context)) {
+            if ($context) {
+                $this->node->parent($context->node);
+            }
+            if (is_callable($cb)) {
+                $cb($this->node);
+            }
+        }
+        else {
+            $this->node = $node;
+        }
+        if (is_string($context)) {dd(777);
             $this->name = $context;
         }
-        
-        $this->node = $node;
     }
     
     public function parse()
@@ -108,7 +115,10 @@ class TemplateFunction
         
         $this->process->addDependencyFile($srcFile);
 
-        $html = file_get_contents($srcFile);
+        ob_start();
+        $cb = require($srcFile);
+        $html = ob_get_contents();
+        ob_end_clean();
         $html = $this->removeHtmlComments($html);
         //$html = $this->collectBrokingBlocks($html);
         $this->trimHtml = strpos($html, '<body') === false;
@@ -116,13 +126,16 @@ class TemplateFunction
             '/(?<!<)<\?php(.*?)\?>/s',
             '/(?<!@)@php(.*?)@endphp/s',
             '/{{(((?!{{).)*)}}/',
+            '/{\!\!(((?!{\!\!).)*)\!\!}/',
         ]]);
-if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace('/[\n\r\t\s]*|(="")*/', '', $html))) {
+if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html)))) {
     d('nu se pupa '.$srcFile);
     echo "\n$y\n$x"; die();
 }
 
-        return $node;
+        $this->node = $node;
+        
+        return $cb;
     }
 
     public function escapeSpecialCharacters($html) {
@@ -138,6 +151,13 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 return "<?php e($eval); ?>";
+            }
+            return '';
+        }, $html);
+        
+        $html = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php echo $eval; ?>";
             }
             return '';
         }, $html);

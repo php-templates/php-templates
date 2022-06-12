@@ -28,8 +28,8 @@ class Component extends AbstractEntity
         $this->depleteNode($this->node, function($data) {
             $data = $this->fillNode(null, $data);
 
-            $dataString = Helper::arrayToEval($data);
-            (new TemplateFunction($this->process, $this->name))->parse();
+            $dataString = Helper::arrayToEval($data);//d(1,get_class($this->context), $this->name);
+            (new TemplateFunction($this->process, $this->name, $this->context))->parse();
             $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
                 $this->depth, $this->name, $dataString
             );      

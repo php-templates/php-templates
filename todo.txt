@@ -31,4 +31,8 @@ la fel si salvarea lor in parsed, asta implica extra logica la optiunile de pe p
 repara playground
 
 
-TEST 17
+function () use($) {
+
+}
+
+= $this

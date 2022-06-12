@@ -211,8 +211,9 @@ class DomNode
             }
             $attrs = implode(' ', $attrs);
             $return .= "<{$this->nodeName} $attrs>";
+        //$this->nodeName == 'x' && d($return);
         }
-        
+        //$this->nodeName == 'x' && d($return);
         if ($this->nodeName == '#text' || !$this->nodeName) {
             $return .= $this->nodeValue;
             return $return;
@@ -234,6 +235,7 @@ class DomNode
             $return .= $indentNL . "</{$this->nodeName}>";
         }
         
+            //$this->nodeName == 'x' && dd($return);
         return $return;
     }
     
@@ -318,5 +320,10 @@ class DomNode
     {
         $this->nodeName = $nodeName;
         $this->nodeValue = $nodeValue;
+    }
+    
+    public function querySelector($selector = '')
+    {
+        return (new querySelector($this))->find($selector);
     }
 }
