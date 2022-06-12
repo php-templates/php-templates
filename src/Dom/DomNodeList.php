@@ -11,12 +11,12 @@ class DomNodeList implements \IteratorAggregate, \Countable
         $this->nodes = $nodes;
     }
     
-    public function count()
+    public function count(): int
     {
         return count($this->nodes);
     }
     
-    public function getIterator()
+    public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator(array_map(function($n) {
             return new DomNode($n);

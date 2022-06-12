@@ -24,10 +24,6 @@ class Process
     private $config;
 
     private $templateFunctions = [];
-    private $eventListeners = [];
-    private $tobereplaced = [
-        '="__empty__"' => '',
-    ];
 
     public function __construct(string $rfilepath, array $configs)
     {
@@ -98,19 +94,9 @@ class Process
         $this->templateFunctions[$key] = $fnBody;
     }
 
-    public function addEventListener(string $eventType, string $targetTplFn, $callbackFnBody)
-    {
-        $this->eventListeners[$eventType][$targetTplFn][] = $callbackFnBody;
-    }
-
     public function addDependencyFile($path)
     {
         DependenciesMap::add($this->name, $path);
-    }
-
-    public function toBeReplaced($key, $val)
-    {
-        $this->tobereplaced[$key] = $val;
     }
 
     public function getResult()
@@ -118,20 +104,11 @@ class Process
         $tpl = '<?php ';
         $tpl .= PHP_EOL."namespace PhpTemplates;";
         $tpl .= PHP_EOL."use PhpTemplates\Parsed;";
-        $tpl .= PHP_EOL."use PhpTemplates\DomEvent;";
         $tpl .= PHP_EOL;
         foreach ($this->templateFunctions as $name => $fn) {
             $tpl .= PHP_EOL."Parsed::\$templates['$name'] = $fn;";
         }
-        foreach ($this->eventListeners as $ev => $listeners) {
-            foreach ($listeners as $target => $cbcks) {
-                foreach ($cbcks as $cb) {
-                    $tpl .= PHP_EOL."new DomEvent('$ev', '$target', $cb);";
-                }
-            }
-        }
         
-        $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
         $tpl = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function($m) {
             return $m[1];
         }, $tpl);
@@ -142,7 +119,7 @@ class Process
     }
     
     public function __get($prop)
-    {debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    {
         return $this->{$prop};
     }
 }

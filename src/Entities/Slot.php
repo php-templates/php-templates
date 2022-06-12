@@ -22,29 +22,28 @@ class Slot extends AbstractEntity
 
     public function simpleNodeContext()
     {
-        $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);
-            $dataString = Helper::arrayToEval($data);
-    
-            $this->node->changeNode('#slot');
-            if ($this->hasSlotDefault) {
-                $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-                $slotDefault = new PhpNode('if', $if);
-                foreach ($this->node->childNodes as $cn) {
-                    // wrap cn into an empty node to not lose its condition structures on parsing process
-                    $wrapper = new DomNode('#wrapper');
-                    $wrapper->appendChild($cn->detach());
-                    $this->parseNode($cn);
-                    $slotDefault->appendChild($wrapper);
-                }
-                $this->node->appendChild($slotDefault);
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
+
+        $this->node->changeNode('#slot');
+        if ($this->hasSlotDefault) {
+            $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
+            $slotDefault = new PhpNode('if', $if);
+            foreach ($this->node->childNodes as $cn) {
+                // wrap cn into an empty node to not lose its condition structures on parsing process
+                $wrapper = new DomNode('#wrapper');
+                $wrapper->appendChild($cn->detach());
+                $this->parseNode($cn);
+                $slotDefault->appendChild($wrapper);
             }
-            
-            $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-            $r = '<?php $_slot->render(array_merge($this->scopeData, '.$dataString.')); ?>';
-            $append->appendChild(new DomNode('#php', $r));
-            $this->node->appendChild($append);
-        });
+            $this->node->appendChild($slotDefault);
+        }
+        
+        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
+        $r = '<?php $_slot->render(array_merge($this->scopeData, '.$dataString.')); ?>';
+        $append->appendChild(new DomNode('#php', $r));
+        $this->node->appendChild($append);
     }
 
     public function slotContext()
@@ -61,38 +60,35 @@ class Slot extends AbstractEntity
         $this->attrs['slot'] = 'default';
         $this->attrs['name'] = 'default';
 
-        $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);
-            $dataString = Helper::arrayToEval($data);
-  
-            $this->node->changeNode('#slot');
-            if ($this->hasSlotDefault) {
-                $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-                $slotDefault = new PhpNode('if', $if);
-                foreach ($this->node->childNodes as $cn) {
-                    $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-                    $node = new DomNode('#root');
-                    $node->appendChild($cn->detach());
-                    (new TemplateFunction($this->process, $node, $name))->parse();
-                    $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
-                        $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
-                    );
-                    $cn->changeNode('#php', $r);
-                    $cn->empty();
-                    $slotDefault->appendChild($cn->detach());
-                }
-                $this->node->appendChild($slotDefault);
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
+
+        $this->node->changeNode('#slot');
+        if ($this->hasSlotDefault) {
+            $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
+            $slotDefault = new PhpNode('if', $if);
+            foreach ($this->node->childNodes as $cn) {
+                $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+                $node = new DomNode('#root');
+                $node->appendChild($cn->detach());
+                (new TemplateFunction($this->process, $node, $name))->parse();
+                $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
+                    $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
+                );
+                $cn->changeNode('#php', $r);
+                $cn->empty();
+                $slotDefault->appendChild($cn->detach());
             }
-            
-            $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-            $r = sprintf('<?php $this->comp[%d]->addSlot("%s", $_slot); ?>',
-                $this->context->depth, $this->attrs['slot']
-            );
-            //$r = '<$_slot->render(array_merge($this->scopeData, '.$dataString.')); ';
-                //$dataString,
-                //$this->name
-            $append->appendChild(new DomNode('#php', $r));
-            $this->node->appendChild($append);
-        });
+            $this->node->appendChild($slotDefault);
+        }
+        
+        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
+        $r = sprintf('<?php $this->comp[%d]->addSlot("%s", $_slot); ?>',
+            $this->context->depth, $this->attrs['slot']
+        );
+        
+        $append->appendChild(new DomNode('#php', $r));
+        $this->node->appendChild($append);
     }
 }

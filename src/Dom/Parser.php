@@ -12,21 +12,7 @@ class Parser
     public function parse(string $str)
     {
         $str = $this->collectAndReplaceNoises($str);
-    /*  
-        >foo>bar>
-        '' foo bar ''
-        foo>foo>bar>bar
-        foo foo bar bar
-        la prima pun oricum
-        ultima nu primeste niciodata inapoi
-        
-        <foo<bar<
-        '' foo bar ''
-        foo<foo<bar<bar
-        foo foo bar bar
-        prima primeste doar daca e plina
-        ultima primeste doar daca e goala
-*/        
+          
         $arr = explode('>', $str);
         $max = count($arr) -1;
         $arr = array_map(function($str, $i) use($max) {
@@ -50,10 +36,8 @@ class Parser
         }
         
         // now we have an array containing '<div ..attrs>', or text sequences and we have to validate them                                                      
-        //d($tmp);
         $chunks = $this->validateAndRepairNodes($tmp);
         // now we have a list of valid tags
-        //d($chunks);
         
         $hierarchyQueue = [];
         $inBuildNode = new DomNode('#root');
@@ -69,7 +53,7 @@ class Parser
                     continue; // wrong close tag
                 }
                 $node = array_pop($hierarchyQueue);
-                //d('closing ', $node, $inBuildNode);
+
                 if ($node === $inBuildNode) {
                     $inBuildNode = end($hierarchyQueue);
                 }

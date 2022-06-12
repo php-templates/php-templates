@@ -23,23 +23,58 @@ abstract class AbstractEntity
      */
     protected $process;
 
-    protected $isHtml = false;
-    protected $trimHtml = false;
+    /**
+     * recursive parent context
+     *
+     * @var AbstractEntity $context
+     */
     protected $context;
+
+    /**
+     * current DomNode
+     *
+     * @var DomNode $node
+     */
     protected $node;
-    protected $caret;
+
+    /**
+     * Found attributes on current node
+     *
+     * @var array $attrs
+     */
+
     protected $attrs = [];
+    
+    /**
+     * Used to not override above variables in case of multi-level nest, eg:
+     * var1 = comp1
+     * var2 = var1->addSlot(x);
+     *
+     * @var integer
+     */
     protected $depth = 0;
-    protected $thread;
+    
+    /**
+     * prefix for special php blocks (p-if, p-for)
+     *
+     * @var string
+     */
     protected $pf = 'p-';
     
+    /**
+     * Creating a new instance by giving the main process as param, the node and the context
+     *
+     * @param Process $process
+     * @param string|DomNode $node string when is component, DomNode when is simple node
+     * @param AbstractEntity $context
+     */
     public function __construct(Process $process, $node, $context = null) //todo interfata ca param 3
     {
         if (is_string($context)) {
             $this->name = $context;
             $context = null;
         }
-        //if (is_string($node)) debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
@@ -55,11 +90,8 @@ abstract class AbstractEntity
 
         $this->process = $process;
         $this->node = $node;
-        if (method_exists($this->node, 'setAttribute')) {
-        // $this->node->setAttribute('i', $this->depth);
-        }
+
         $this->context = $context;
-        $this->makeCaret();
     }
     
     //abstract public function rootContext();
@@ -81,70 +113,24 @@ abstract class AbstractEntity
     }
     
     /**
-     * Create a caret above the parsed node for future refering in print process to avoid deleting parsed structures
+     * Wrap node inside control structures and returns the aggregated node datas as array (like :class and class under 1 single key named :class)
      *
-     * @return void
+     * @param [type] $node
+     * @param callable $cb
+     * @return array
      */
-    protected function makeCaret($refNode = null)
-    {return;
-        if (!$this->node->parentNode) {
-            // is hierarchical top
-            return;
-        }
-        elseif ($this->depth < 1) {
-            $node = $this->node;
-        }
-        else {
-            $context = $this->context;
-            while ($context->depth > 1) {
-                $context = $context->context;
-            }
-            $node = $context->caret;
-        }
-        if ($refNode) {
-            $node = $refNode;
-        }
-        
-        $this->caret = new DomNode('#text');
-        $node->parentNode->insertBefore($this->caret, $node);
-        
-    }
-
-    public function println(string $line, $end = false)
-    {return;
-        $line = '<?php ' . $line . ' ?>';
-
-        if ($end) {
-            if ($this->caret->nextSibling) {
-                $this->caret->parentNode->insertBefore(
-                    new DomNode('#text', PHP_EOL.$line),
-                    $this->caret->nextSibling
-                );
-            }
-            else {
-                $this->caret->parentNode->appendChild(new DomNode('#text', PHP_EOL.$line));
-            }
-        }
-        else {
-            $this->caret->parentNode->insertBefore(
-                new DomNode('#text', PHP_EOL.$line),
-                $this->caret
-            );
-        }
-    }
-    
-    protected function depleteNode($node, callable $cb, $isHtml = false)
+    protected function depleteNode($node): array
     {
-        $attrs = $node->attributes ? $node->attributes : [];
+        $attrs = $node->attributes;
         $extracted_attributes = [];
 
         foreach ($attrs as $a) {
             $k = $a->nodeName;
 
-            if (strpos($k, $this->pf) === 0) {
-                // unpack directive result attributes
-                $directiveName = substr($k, strlen($this->pf));
-                if ($directive = $this->process->getDirective($directiveName)) {
+            if (strpos($k, $this->pf) === 0) 
+            {
+                // check if is a custom directive and unpack its result as attributes
+                if ($directive = $this->process->getDirective(substr($k, strlen($this->pf)))) {
                     $result = $directive($a->nodeValue);
                     if (empty($result)) {
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
@@ -152,13 +138,14 @@ abstract class AbstractEntity
                     foreach ($result as $k => $val) {
                         $extracted_attributes[] = new DOMAttr($k, $val);
                     }
-                    // directive unpacked his data
+                    // directive unpacked his data, next attr!!!
                     continue;
                 }
             }
             $extracted_attributes[] = clone $a;
         }
 
+        // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
         $c_structs = [];
         $data = [];
         $binds = [];
@@ -184,8 +171,10 @@ abstract class AbstractEntity
             }
         }
 
+        // remove all node attrs
         $node->removeAttributes();
         
+        // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
         foreach ($data as $k => $val) {
             $bk = ':'.$k;
             $bind = isset($binds[$bk]) ? $binds[$bk] : null;
@@ -204,6 +193,7 @@ abstract class AbstractEntity
             }
         }
         
+        // implode attribute values, eg: '.class' with :class="@php echo x; @endphp" under 1 'magic' merger method 
         foreach ($binds as $bk => $bval) {
             $k = substr($bk, 1);
             if (count($bval) > 1) {
@@ -211,14 +201,11 @@ abstract class AbstractEntity
             } else {
                 $bval = $bval[0];
             }
-            if ($this->isHtml && 0) { // todo: findout
-                $rid = '__r'.uniqid();
-                $this->process->toBeReplaced($rid, $bval);
-                $bval = $rid;
-            }
+
             $data[$bk] = $bval;
         }
-        // imsert $c_structs
+
+        // now consider the control structures like p-if, p-for, etc
         $cstruct = null;
         $condNode = null;
         foreach ($c_structs as $struct) {
@@ -230,19 +217,24 @@ abstract class AbstractEntity
                 $condNode = $phpnode;
             }
             $cstruct = $phpnode;
-        }//d(''.$node);
+        }
         if ($condNode) {
             $node->parentNode->insertBefore($condNode, $node);
             $cstruct->appendChild($node->detach());
             $node = $condNode;
-            //=dd(''.$node);
         }
-        //dd(''.$node, $node);
         
-        $cb($data, $c_structs);
+        return $data;
     }
 
-    protected function fillNode($node, array $data) 
+    /**
+     * After the node has been depleted and has 0 attributes, proceed to populate it with parsed attributes
+     *
+     * @param DomNode|null $node when null, return the data attrs as array => case component($data=[])
+     * @param array $data
+     * @return mixed
+     */
+    protected function fillNode($node, array $data)
     {
         if (is_null($node)) {
             $_data = [];

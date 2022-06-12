@@ -25,26 +25,23 @@ class Component extends AbstractEntity
     
     public function templateFunctionContext()
     {
-        $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
 
-            $dataString = Helper::arrayToEval($data);//d(1,get_class($this->context), $this->name);
-            (new TemplateFunction($this->process, $this->name, $this->context))->parse();
-            $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
-                $this->depth, $this->name, $dataString
-            );      
-            $this->node->changeNode('#php', $nodeValue);
+        $dataString = Helper::arrayToEval($data);
+        (new TemplateFunction($this->process, $this->name, $this->context))->parse();
 
-            foreach ($this->node->childNodes as $slot) {
-                $this->parseNode($slot);
-            }
-            //d($this->caret);
-            $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
-            $this->node->appendChild(new DomNode('#php', $r));
-        });
-                //dom($this->node->parentNode->parentNode->parentNode->parentNode);
+        $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
+            $this->depth, $this->name, $dataString
+        );      
+        $this->node->changeNode('#php', $nodeValue);
 
-        //$this->removeNode($this->node);
+        foreach ($this->node->childNodes as $slot) {
+            $this->parseNode($slot);
+        }
+
+        $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
+        $this->node->appendChild(new DomNode('#php', $r));
     }
 
     /**
@@ -53,21 +50,20 @@ class Component extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $this->depleteNode($this->node, function($data) {
-            $data = $this->fillNode(null, $data);   
-            $dataString = Helper::arrayToEval($data);
-            (new TemplateFunction($this->process, $this->name))->parse();
-    
-            $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
-                $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
-            );
-            $this->node->changeNode('#php', $r);
-            
-            foreach ($this->node->childNodes as $slot)
-            {
-                $this->parseNode($slot);
-            }
-        });
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);   
+        $dataString = Helper::arrayToEval($data);
+        (new TemplateFunction($this->process, $this->name))->parse();
+
+        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
+            $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
+        );
+        $this->node->changeNode('#php', $r);
+        
+        foreach ($this->node->childNodes as $slot)
+        {
+            $this->parseNode($slot);
+        }
     }
 
     /**

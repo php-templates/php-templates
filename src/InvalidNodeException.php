@@ -21,7 +21,6 @@ class InvalidNodeException extends \Exception
             foreach ($d as $node)
             {
                 if (@$node->ownerDocument) {
-                //$node = $dom->importNode($node, true);
                     $content.= $node->ownerDocument->saveHtml($node);
                 }
                 else {

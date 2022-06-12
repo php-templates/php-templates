@@ -139,6 +139,7 @@ class QuerySelector
             return false;
         }
         unset($selector['nodeName']);
+
         foreach ($selector as $attr => $values) {
             $node_attr = $node->getAttribute($attr);
             if (!$node_attr) {
@@ -149,6 +150,7 @@ class QuerySelector
                 return false;
             }
         }
+        
         return true;
     }
     

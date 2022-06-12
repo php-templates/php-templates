@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Traits\CanParseNodes;
 
 class TemplateFunction 
@@ -16,63 +17,62 @@ class TemplateFunction
     protected $process;
 
     /**
-     * If the current template is parsed from a file, or from an existing DomNode (like slot nodes)
-     * @var boolean
-     */
-    private $wasRecentlyLoaded = false;
-
-    /**
-     * Data passed to component using node attributes
+     * the name ID of the template file
      *
-     * @var array
+     * @var string $name 
      */
-    private $data = [];
+    private $name;
 
     /**
-     * When a template file has <props/> node, if called as component tag, 
-     * make an array_diff_keys between them and passed attributes to obdain the p-bind="$this->attrs" variables
-     * @var array
+     * The dom object tree of the loaded phpt file
+     *
+     * @var DomNode
      */
-    private $props = [];
-
-
-// refactor end
-    
-    private $attrs; // computed at calling render function moment
-
-    private $name;
     private $node;
-    private $trimHtml = false;
-    private $depth = 0;
 
+    /**
+     * Gain a singlethon process as param and every entity will push/register data to it
+     *
+     * @param Process $process
+     * @param string|DomNode $node
+     * @param string|AbstractEntity|null $context
+     */
     public function __construct(Process $process, $node, $context = null)
     {
         $this->process = $process;
-        if (is_string($node)) {
+
+        if (is_string($node)) 
+        {
+            // obtaining config prefix pointing to settings collection then assign it to current process
             $path = array_filter(explode(':', $node));
-            if (count($path) > 1) {
-                $cfgKey = $path[0];
-            } else {
-                $cfgKey = 'default';
-            }
+            $cfgKey = count($path) > 1 ? $path[0] : 'default';
             $this->process->withConfig($cfgKey);
+
+            // obtaining relative template file path and load it using config's src path
             $path = end($path);
             $this->name = $node;
-            //$this->process = new Process($this->name, $cfg, $this->process);
             $cb = $this->load($path);
 
+            // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node
             if ($context) {
                 $this->node->parent($context->node);
             }
+            
+            // if template file is returning an callback function, execute it
             if (is_callable($cb)) {
                 $cb($this->node);
             }
-            // events here
+
+            //TODO: events before parsing a template
+
         }
         else {
+            // node was given by AbstractEntity
             $this->node = $node;
         }
-        if (is_string($context)) {dd(777);
+
+        // same as else above, node was given with a custom name
+        if (is_string($context)) {
             $this->name = $context;
         }
     }
@@ -83,10 +83,15 @@ class TemplateFunction
         $this->register();
     }
     
+    /**
+     * register parse result as template function
+     *
+     * @return void
+     */
     protected function register()
     {
         $htmlString = (string)$this->node;
-        $htmlString = $this->replaceSpecialBlocksBlocks($htmlString);
+        $htmlString = $this->replaceSpecialBlocks($htmlString);
 
         $htmlString = $this->getTemplateFunction($htmlString);
         $this->process->addTemplateFunction($this->name, $htmlString);
@@ -97,6 +102,7 @@ class TemplateFunction
      */
     public function load($rfilepath)
     {
+        // obtaining the template file path using multi-config mode
         $srcFile = null;
         $tried = [];
         foreach ($this->process->getSrcPaths() as $srcPath) {
@@ -113,21 +119,25 @@ class TemplateFunction
             throw new \Exception("Template file $message not found");
         }
         
+        // add file as dependency to template for creating hash of states
         $this->process->addDependencyFile($srcFile);
 
+        // geting file content (php function can be returned and executed in actual context)
         ob_start();
         $cb = require($srcFile);
         $html = ob_get_contents();
         ob_end_clean();
+
         $html = $this->removeHtmlComments($html);
-        //$html = $this->collectBrokingBlocks($html);
-        $this->trimHtml = strpos($html, '<body') === false;
+
+        // obtaining the DomNode
         $node = DomNode::fromString($html, ['preservePatterns' => [
             '/(?<!<)<\?php(.*?)\?>/s',
             '/(?<!@)@php(.*?)@endphp/s',
             '/{{(((?!{{).)*)}}/',
             '/{\!\!(((?!{\!\!).)*)\!\!}/',
         ]]);
+
 if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html)))) {
     d('nu se pupa '.$srcFile);
     echo "\n$y\n$x"; die();
@@ -137,12 +147,8 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
         
         return $cb;
     }
-
-    public function escapeSpecialCharacters($html) {
-        return str_replace(['&lt;', '&gt;', '&amp;'], ['&\lt;', '&\gt;', '&\amp;'], $html);
-    }
     
-    private function replaceSpecialBlocksBlocks($html)
+    private function replaceSpecialBlocks($html)
     {
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
             return '<?php ' . $m[1] . ' ?>';
@@ -165,22 +171,12 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
         return $html;
     }
 
-    public function trimHtml($dom)
-    {
-        $body = $dom->getElementsByTagName('body')->item(0);
-
-        if (!$body) {
-            return '';
-        }
-
-        $content = '';
-        foreach ($body->childNodes as $node)
-        {
-            $content.= $dom->saveHtml($node).PHP_EOL;
-        }
-        return $content;
-    }
-    
+    /**
+     * Obtaining the template function of the phpt to be used in document
+     *
+     * @param string $templateString
+     * @return void
+     */
     protected function getTemplateFunction(string $templateString) 
     {
         $templateString = " ?> $templateString <?php ";

@@ -15,7 +15,7 @@ trait CanParseNodes {
         $fn = end($fn);
 
         $fn = lcfirst($fn).'Context';
-//d($node->nodeName.'.'.$fn.$this->root($node));
+
         if ($node->nodeName === 'slot') {
             (new Slot($this->process, $node, $this))->{$fn}();
         }
