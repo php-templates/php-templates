@@ -12,7 +12,7 @@ $html = '
 <div class="class2">
     <span id="id" a></span>
 </div>
-<div class="class1">
+<div class="class1" b>
     <span id="id"></span>    
 </div>
 <span class="class1">
@@ -20,7 +20,7 @@ $html = '
 </span>';
 
 $node = DomNode::fromString($html);
-$result = $node->querySelector('.class2 > #id');
+$result = $node->querySelector('div ~ div');
 foreach ($result as $r)
 {
     d("\n-----\n".$r);

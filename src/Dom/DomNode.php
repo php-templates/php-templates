@@ -322,6 +322,40 @@ class DomNode
         $this->nodeValue = $nodeValue;
     }
     
+    public function getNextSibling()
+    {
+        $i = null; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $j => $cn) {
+            if ($cn === $this) {
+                $i = $j;
+                break;
+            }
+        }
+        
+        if (isset($siblings[$i+1])) {
+            return $siblings[$i+1];
+        }
+    }
+    
+    public function getNextSiblings()
+    {
+        $result = [];
+        $i = false; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $cn) {
+            if ($cn === $this) {
+                $i = true;
+                continue;
+            }
+            if ($i) {
+                $result[] = $cn;
+            }
+        }
+        
+        return $result;
+    }
+    
     public function querySelector($selector = '')
     {
         return (new querySelector($this))->find($selector);

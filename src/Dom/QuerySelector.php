@@ -122,6 +122,13 @@ class QuerySelector
                 $found[] = $next;
             }
         }
+        elseif ($mode == '~') {
+            foreach ($node->nextSiblings as $sn) {
+                if ($this->nodeIsMatched($sn, $selector)) {
+                    $found[] = $sn;
+                }
+            }
+        }
         
         return $found;
     }
