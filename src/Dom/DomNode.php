@@ -33,6 +33,8 @@ class DomNode
     protected $parentNode;
     protected $childNodes = [];
     
+    public $shortClose = false;
+    
     public function __construct(string $nodeName, string $nodeValue = '')
     {
         self::$last_id++;
@@ -116,8 +118,11 @@ class DomNode
         $this->attrs = [];
     }
     
-    public function appendChild(self $node) 
+    public function appendChild($node) 
     {
+        if (is_string($node)) {
+            $node = self::fromString($node); //TODO: si la restul
+        }
         // set parent node first
         $node->parent($this);
         $this->childNodes[] = $node;
@@ -210,8 +215,7 @@ class DomNode
                 $attrs[] = ($attr->nodeValue === '') ? $attr->nodeName : $attr->nodeName . '="' . $attr->nodeValue . '"';
             }
             $attrs = implode(' ', $attrs);
-            $return .= "<{$this->nodeName} $attrs>";
-        //$this->nodeName == 'x' && d($return);
+            $return .= "<{$this->nodeName} $attrs".($this->shortClose ? '/>' : '>');
         }
         //$this->nodeName == 'x' && d($return);
         if ($this->nodeName == '#text' || !$this->nodeName) {
@@ -228,7 +232,7 @@ class DomNode
         }
         
         // NODE END
-        if ($this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
+        if (!$this->shortClose && $this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
             if (!$this->childNodes) {
                 $indentNL = '';
             }

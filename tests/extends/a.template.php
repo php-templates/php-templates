@@ -1,4 +1,4 @@
-<template i="extends/parent">
+<template is="extends/parent">
 <a>
     <foo></foo>
 </a>

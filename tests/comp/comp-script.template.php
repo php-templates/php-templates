@@ -2,10 +2,15 @@
     comp script
 </div>
 
+<script>execution</script>
+
 <?php 
 return function($node)
 {
-    //dd($node->root->childNodes[0]->debug());
-    $node->root->childNodes[0]->childNodes[1]->detach();
-} 
+    $head = $node->root->querySelector('head')[0];
+    $body = $node->root->querySelector('body')[0];
+    $script2 = $node->querySelector('script')[0];
+    $head->appendChild('<script src="cdn">cdn script</script>');
+    $body->appendChild($script2->detach());
+}
 ?>

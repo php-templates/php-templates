@@ -10,7 +10,7 @@
 -----
 
 <!-- pass data to extended template -->
-<?php $this->scopeData['bind_me'] = 'bound'; ?>
+@php $this->scopeData['bind_me'] = 'bound'; @endphp
 <template is="extends/b"></template>
 =====
 <parent2>

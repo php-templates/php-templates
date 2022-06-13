@@ -119,7 +119,7 @@ class Parsed
         $this->scopeData['_name'] = $this->name;
 
         $func = $this->func;
-        $func();
+        $func(array_merge($this->scopeData, $this->data));
     }
     
     public function __get($prop)

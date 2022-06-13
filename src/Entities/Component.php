@@ -53,7 +53,7 @@ class Component extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $data = $this->fillNode(null, $data);   
         $dataString = Helper::arrayToEval($data);
-        (new TemplateFunction($this->process, $this->name))->parse();
+        (new TemplateFunction($this->process, $this->name, $this->context))->parse();
 
         $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString

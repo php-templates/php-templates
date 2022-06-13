@@ -1,10 +1,10 @@
-<?php 
+@php
 $foo = 'foo';
 $bar = 'bar';
 $arr = ['arr1', 'arr2'];
 $true = 1;
 $false = 0;
-?>
+@endphp
 
 <simple :foo="$foo" bar="$bar"></simple>
 =====
@@ -20,7 +20,7 @@ $false = 0;
 -----
 
 <!-- bindings in component -->
-<template is="props/b" :true="$true" false="$false" foo="$foo"></template>
+<template is="props/b" :true="$true" @false="'$false'" @foo="'$foo'"></template>
 =====
 <b true="1"><bind false="$false" foo="$foo"></bind></b>
 

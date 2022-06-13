@@ -1,3 +1,3 @@
 <div class="form-group">
-    <textarea class="form-control" p-bind="$this->attrs"></textarea>
+    <textarea class="form-control" p-bind="$_attrs"></textarea>
 </div>

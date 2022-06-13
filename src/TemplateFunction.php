@@ -22,6 +22,8 @@ class TemplateFunction
      * @var string $name 
      */
     private $name;
+    
+    private $depth = 0;
 
     /**
      * The dom object tree of the loaded phpt file
@@ -58,13 +60,13 @@ class TemplateFunction
                 $this->node->parent($context->node);
             }
             
+            //TODO: events before parsing a template
+            DomEvent::event('parsing', $this->name, $this->node);
+            
             // if template file is returning an callback function, execute it
             if (is_callable($cb)) {
                 $cb($this->node);
             }
-
-            //TODO: events before parsing a template
-
         }
         else {
             // node was given by AbstractEntity
@@ -138,8 +140,20 @@ class TemplateFunction
             '/{\!\!(((?!{\!\!).)*)\!\!}/',
         ]]);
 
-if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html)))) {
+$x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node);
+$y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html));
+$x = str_replace("'", '"', $x);
+$y = str_replace("'", '"', $y);
+ 
+if (0 && $x != $y) {
     d('nu se pupa '.$srcFile);
+    //$node->querySelector('body')[0]->empty();
+    //dd(''.$node);
+    //d($node->debug());
+    while ($x && $y && substr($x, 0, 300) == substr($y, 0, 300)) {
+        $x = substr($x, 300);
+        $y = substr($y, 300);
+    }
     echo "\n$y\n$x"; die();
 }
 
@@ -186,7 +200,10 @@ if (($x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node)) != ($y = preg_replace
     protected function getTemplateFunction(string $templateString) : string
     {
         $fnDeclaration = 
-"function () {
+"function (\$data) {
+    if (!isset(\$data['_attrs'])) {
+        \$data['_attrs'] = [];
+    }
     extract(\$data);
     ?> $templateString <?php 
 }";

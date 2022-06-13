@@ -1,9 +1,9 @@
-<?php 
+@php
 $array = [1, 2];
 $array_map = ['foo' => 'f1', 'bar' => 'f2'];
 $true = true;
 $false = false;
-?>
+@endphp
 
 <div class="x" p-foreach="$array as $a">
     <span></span>

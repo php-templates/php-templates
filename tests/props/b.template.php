@@ -1,5 +1,5 @@
 
 
 <b :true="$true">
-    <bind p-bind="$this->attrs"></bind>    
+    <bind p-bind="$_attrs"></bind>    
 </b>

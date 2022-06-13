@@ -12,7 +12,7 @@
 =====
 <div class="comp_slot_default">
     <span><p>compslotdefault</p></span>
-    <div class="">slot1</div>
+    <div class>slot1</div>
     <div>
         <div class="comp_slot">
             <span></span>

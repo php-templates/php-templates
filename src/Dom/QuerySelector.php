@@ -64,7 +64,7 @@ class QuerySelector
         // preg match dupa  selectors
         $is = [];
         $selector = preg_replace_callback('/\[([\w\d\-\$:@]+)=(((?!\]).)*)\]/', function($m) use (&$is) {
-            $is[$m[1]][] = $m[2];
+            $is[$m[1]][] = trim($m[2], '"\'');
             return '';
         }, $selector);
         preg_replace_callback('/([\.\#]*)(((?![\.#]).)*)/', function($m) use (&$is) {

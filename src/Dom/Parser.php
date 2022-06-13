@@ -34,11 +34,12 @@ class Parser
                 }
             }
         }
-        
+     
         // now we have an array containing '<div ..attrs>', or text sequences and we have to validate them                                                      
         $chunks = $this->validateAndRepairNodes($tmp);
         // now we have a list of valid tags
         
+    //dd($chunks);
         $hierarchyQueue = [];
         $inBuildNode = new DomNode('#root');
         $hierarchyQueue[] = $inBuildNode;
@@ -48,12 +49,13 @@ class Parser
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
                 //d('close.'.$m[1]); //close tag m1
                 if (end($hierarchyQueue)->nodeName != $m[1]) {
-                    $node = new DomNode('#text', $str);
-                    $inBuildNode->appendChild($node);
+                    // TODO:throw error no close tag
+                    // wrong close, ignore it is better
+                    //$node = new DomNode('#text', $str);
+                    //$inBuildNode->appendChild($node);
                     continue; // wrong close tag
                 }
                 $node = array_pop($hierarchyQueue);
-
                 if ($node === $inBuildNode) {
                     $inBuildNode = end($hierarchyQueue);
                 }
@@ -65,12 +67,15 @@ class Parser
                     $node->addAttribute($attr[0], $attr[1]);
                 }
                 $inBuildNode->appendChild($node);
-                //TODO: if is not self closing tag, or short closing tag, don t push to hierarchy queue
+                // if is not self closing tag, or short closing tag, don t push to hierarchy queue
                 //d('appending to queue', $node);
                 preg_match('/\/\s*>$/', $str, $m);
                 if (!$m && !$node->isSelfClosingTag()) {
                     $hierarchyQueue[] = $node;
                     $inBuildNode = $node;
+                } 
+                elseif ($m) {
+                    $node->shortClose = true;
                 }
             } 
             elseif ($this->keepEmptyTextNodes || trim($str)) {
@@ -89,9 +94,10 @@ class Parser
     
     private function getTagAttributes($str)
     {
+//$x = strpos($str, 'M68.982,108.52892q-11.5965-18.582-23.49-37.242-11.895-18.6555-23.49-36.2v73.442H0V2.23092H23.192q12.042,17.9895,23.713,36.052,11.66852,18');
         $attrs = [];
         $originalStr = $str;
-        $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/', function($m) use (&$attrs, $str) {
+        $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/s', function($m) use (&$attrs, $str) {
             $attrs[] = [
                 $m[1],
                 isset($m[6]) ? $m[6] : $m[4]
@@ -99,7 +105,7 @@ class Parser
             return '';
         }, $str);
      
-        preg_match_all('/ (((?![ >]).)+)/', $str, $html5attrs);
+        preg_match_all('/ (((?![ \/>]).)+)/', $str, $html5attrs);
         if (isset($html5attrs[1])) {
             $html5attrs = array_map(function($attr) {
                 return [$attr, ''];
@@ -134,6 +140,9 @@ class Parser
     
     private function collectAndReplaceNoises($str)
     {
+        // isolate scripts cuz are dangerous
+        $str = $this->freezeTagContent($str, 'script');
+        
         // handle php tags {{ and @php and <?= and scripts
         foreach ($this->preservePatterns as $regexp) {
             $str = preg_replace_callback($regexp, function($m) {
@@ -142,6 +151,7 @@ class Parser
                 return $rid;
             }, $str);
         }
+        
         return $str;
     }
     
@@ -150,7 +160,7 @@ class Parser
         $this->preservePatterns[] = $regexp;
     }
     
-    private function validateAndRepairNodes($arr)
+    private function validateAndRepairNodes($arr, $limit = 0)
     {
         $result = [];
         $push = '';
@@ -177,6 +187,9 @@ class Parser
             else {
                 $result[] = $str;
                 $push = '';
+                if ($limit) {
+                    return $result;
+                }
             }
         }
         
@@ -184,10 +197,72 @@ class Parser
     }
     
     private function isCompleteTag($str) {
-        
-        $str = preg_replace('/="(((?!").)*)"/', '', $str);
-        $str = preg_replace("/='(((?!').)*)'/", '', $str);
-        
-        return strpos($str, '"') === false && strpos($str, "'") === false;
+        $x = $str;
+        $str = preg_replace('/="(((?!").)*)"/s', '', $str);
+        $str = preg_replace("/='(((?!').)*)'/s", '', $str);
+        $isComplete = strpos($str, '"') === false && strpos($str, "'") === false;
+       // strpos($str, '<path') == 0 && !$isComplete && dd('baaa'.$x.$str);
+        return $isComplete;
+    }
+    
+    private function freezeTagContent($str, $tag) 
+    {
+        $arr = preg_split("/<\/\s*{$tag}>/", $str);
+        $max = count($arr) -1;
+        $arr = array_map(function($str, $i) use($max, $tag) {
+            if ($i < $max) {
+                return $str.'</'.$tag.'>';
+            }
+            return $str;
+        }, $arr, array_keys($arr));
+        //dd($arr);
+        // now we have an array like
+        // ['foo bar <script>fnfnfn', '</script>dhdhdh']
+        $tmp = [];
+        foreach ($arr as $str) {
+            $arr = explode('<'.$tag, $str);
+            $max = count($arr) -1;
+            foreach ($arr as $i => $str) {
+                if (($i > 0)) {
+                    $tmp[] = '<'.$tag.$str;
+                } 
+                else {
+                    $tmp[] = $str;
+                }
+            }
+        }
+        $arr = $tmp;
+        // now we have an array like
+        // ['foo bar', '<script ___>fnfnfn</script>', 'dhdhdh']
+       
+        foreach ($arr as &$str) {
+            if (strpos($str, '<'.$tag) === 0) {
+                $_arr = explode('>', $str);
+                $max = count($_arr) -1;
+                $_arr = array_map(function($str, $i) use($max) {
+                    if ($i < $max) {
+                        return $str.'>';
+                    }
+                    return $str;
+                }, $_arr, array_keys($_arr));
+                
+                $chunks = $this->validateAndRepairNodes($_arr, 1);
+                // now we have an array like
+                // ['<script ___>', 'fnfnfn']
+                // and we have to isolate content and keep tag
+                
+                $tagDecl = array_shift($chunks);
+                $content = implode('', $chunks);
+                $content = substr($content, 0, -(strlen($tag)+3));
+               
+                if (trim($content)) {
+                    $rid = '__r'.uniqid();
+                    $this->noises[$rid] = $content;
+                    $str = $tagDecl.$rid.'</'.$tag.'>';
+                }
+            }
+        }
+
+        return implode('', $arr);
     }
 }

@@ -106,6 +106,9 @@ class Helper {
 
         $stream = [];
         foreach ($arr as $key => $value) {
+            if (is_array($value)) {
+                $value = self::arrayToEval($value);
+            }
             $stream[] = "'$key' => $value";
         }
         

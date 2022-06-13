@@ -229,10 +229,10 @@ abstract class AbstractEntity
             $node = $condNode;
         }
         
-        $data['_attrs'] = $attrs;
-if (!empty($data['_attrs'])) {
-    dd($data);
-}
+        if ($attrs) {
+            $data['_attrs'] = $attrs;
+        }
+        
         return $data;
     }
 
@@ -250,7 +250,8 @@ if (!empty($data['_attrs'])) {
             foreach ($data as $k => &$val) {
                 if ($k[0] === ':') {
                     $k = substr($k, 1);
-                } else {
+                } 
+                elseif ($k != '_attrs') {
                     $val = "'$val'";
                 }
                 $_data[$k] = $val;
