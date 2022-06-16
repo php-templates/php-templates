@@ -1,38 +1,24 @@
-cp empty ca attr trb sa ramana empty nu hiidden=""
+
 throw error daca o directiva nu exista-> ba nu, scoate attr
 
-renunta la replace braking blocks, se pot face asa: phpt-gt; phpt-lt; phpt-amp;
-
-nodurile child de extends sunt sloturi 
-deci nu e nevoie de extends(
-
 trait care face parse trb sa fie un factory initiat de la bun inceput si el va delega tot cu config cu orice, va tine loc si la process si muta templ fn
+ba nu, va fi pe abstract entity, voi avea un entity Root care e chemat din afara primul, toate petodele vor fi protected si voi putea avea event uri de before si after
 
 pune facadele la punct
 un main app pe fiecare
 phpt laravelserviceprovider
 un bootstrap care sa buteze facadele cu application
-procesul tine config si poate aplica directive ce se mostenesc
 
 template::config()
-template::srcpath multiplu, de gasit varianta cea mai ok, cel mai ok ar fi daca as suprascrie o functie, un loader care sa imi intoarca path ul
-dar nu as mai avea un default ca fallback... 
-sau si.si iar cand zic src_path, zic default path
+new template(src dest, options)
+template addpath(alias, src, options)
+template adddirective(?alias, name, fn)
 
-teste noua implementare directives
 la final de render trb resetate staticele ca va face conflict modular
-doc head fiix
 
-path access using . notation, implica event cu > 
-first chunk e prefix setare
-setarile vor fi salvate pe chei, cu una default
-la fel si salvarea lor in parsed, asta implica extra logica la optiunile de pe proces, nested oplon variation cu reset la final
+nested oplon variation cu reset la final
 
 repara playground
 
-
-function () use($) {
-
-}
-
-= $this
+de prevenit recursivitati pe insert nodes
+query selectors si spatiile in [attr=val val] => cauta intai match exact, apoi spart, nicidecum spart amandoua

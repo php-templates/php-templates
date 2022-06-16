@@ -55,17 +55,22 @@ class TemplateFunction
             $this->name = $node;
             $cb = $this->load($path);
 
+
+            // we create a virtual reference in order to not lose node in events, aka node->detach()
+            $wrapper = new DomNode('#root');
             // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node
             if ($context) {
-                $this->node->parent($context->node);
+                $wrapper->parent($context->node);
             }
-            
+            $node = $wrapper->appendChild($this->node->detach());
+            $this->node = $wrapper;
+        
             //TODO: events before parsing a template
-            DomEvent::event('parsing', $this->name, $this->node);
+            DomEvent::event('parsing', $this->name, $node);
             
             // if template file is returning an callback function, execute it
             if (is_callable($cb)) {
-                $cb($this->node);
+                $cb($node);
             }
         }
         else {
@@ -156,7 +161,7 @@ if (0 && $x != $y) {
     }
     echo "\n$y\n$x"; die();
 }
-
+        
         $this->node = $node;
         
         return $cb;

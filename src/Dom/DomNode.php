@@ -35,12 +35,21 @@ class DomNode
     
     public $shortClose = false;
     
-    public function __construct(string $nodeName, string $nodeValue = '')
+    public function __construct(string $nodeName, $nodeValue = '')
     {
         self::$last_id++;
         $this->nodeId = self::$last_id;
         $this->nodeName = trim($nodeName);
-        $this->nodeValue = $nodeValue;
+        if (is_array($nodeValue)) {
+            foreach ($nodeValue as $k => $val) {
+                if (is_array($val)) {
+                    $val = var_export($val, true);
+                }
+                $this->setAttribute($k, $val);
+            }
+        } else {
+            $this->nodeValue = $nodeValue;
+        }
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
     }
     
@@ -126,6 +135,8 @@ class DomNode
         // set parent node first
         $node->parent($this);
         $this->childNodes[] = $node;
+        
+        return $node;
     }
     
     public function insertBefore($node, self $refNode)
@@ -144,6 +155,8 @@ class DomNode
         } else {
             $this->appendChild($node);
         }
+        
+        return $node;
     }
     
     public function removeChild(self $node)
@@ -207,15 +220,16 @@ class DomNode
     public function __toString()
     {
         // NODE START
-        $indentNL = $this->getIndent();
+        // don t indent texts
+        $indentNL = $this->shouldIndent() ? $this->getIndent() : '';
         $return = $indentNL;
         if ($this->nodeName[0] != '#' && $this->nodeName) {
             $attrs = [];
             foreach ($this->attrs as $attr) {
                 $attrs[] = ($attr->nodeValue === '') ? $attr->nodeName : $attr->nodeName . '="' . $attr->nodeValue . '"';
             }
-            $attrs = implode(' ', $attrs);
-            $return .= "<{$this->nodeName} $attrs".($this->shortClose ? '/>' : '>');
+            $attrs = $attrs ? (' '.implode(' ', $attrs)) : '';
+            $return .= '<'.$this->nodeName.$attrs.($this->shortClose ? '/>' : '>');
         }
         //$this->nodeName == 'x' && d($return);
         if ($this->nodeName == '#text' || !$this->nodeName) {
@@ -241,6 +255,17 @@ class DomNode
         
             //$this->nodeName == 'x' && dd($return);
         return $return;
+    }
+    
+    private function shouldIndent() 
+    {
+        if ($this->nodeName == '#text' && trim($this->nodeValue)) {
+            return false;
+        }
+        if (isset($this->childNodes[0]) && $this->childNodes[0]->nodeName == '#text' && trim($this->childNodes[0]->nodeValue)) {
+            return false;
+        }
+        return true;
     }
     
     public function parent($parentNode)
@@ -362,6 +387,11 @@ class DomNode
     
     public function querySelector($selector = '')
     {
-        return (new querySelector($this))->find($selector);
+        return (new QuerySelector($this))->find($selector, false);
+    }
+    
+    public function querySelectorAll($selector = '')
+    {
+        return (new QuerySelector($this))->find($selector);
     }
 }

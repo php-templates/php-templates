@@ -17,7 +17,7 @@
         <select p-elseif="$type === 'select'" class="form-control">
             <option p-foreach="$options as $val => $label" :value="$val" p-raw="$val == $value ? 'checked' : ''">{{ $label }}</option>
         </select>
-        <textarea p-elseif="$type === 'textarea'" class="form-control" :placeholder="$placeholder ?? $label" p-bind="$this->attrs">{{ $value }}</textarea>
+        <textarea p-elseif="$type === 'textarea'" class="form-control" :placeholder="$placeholder ?? $label" p-bind="$_attrs">{{ $value }}</textarea>
     </slot>
     <span p-if="!empty($error)" class="error">{{ $error }}</span>
 </div>

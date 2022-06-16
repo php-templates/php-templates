@@ -25,7 +25,7 @@ class QuerySelector
         $this->node = $node;
     }
     
-    public function find(string $selector)
+    public function find(string $selector, $many = true)
     {
         $modes = [
             '>',
@@ -49,8 +49,16 @@ class QuerySelector
                     $_nodes,
                     $this->searchForNodes($node, $this->whatIsThis($s), $mode)
                 );
+                if (!$selectors && $_nodes && !$many) {
+                    // if not querySelectorAll, return first occurrence
+                    return $_nodes[0];
+                }
             }
             $nodes = $_nodes;
+        }
+        
+        if (!$nodes && !$many) {
+            return null;
         }
         
         return $nodes;

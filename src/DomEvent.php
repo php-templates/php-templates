@@ -9,12 +9,15 @@ class DomEvent
 
     public static function event($ev, $name, $template)
     {
-        if (!isset(self::$events[$ev])) {
+        if (!isset(self::$events[$ev][$name])) {
             return true;
         }
         
-        foreach (self::$events[$ev] as $cb) {
-            $cb($template);
+        foreach (self::$events[$ev][$name] as $cb) {
+            $newNode = $cb($template);
+            if ($newNode) {
+                $template = $newNode; //TODO: documentat
+            }
         }
     }
 
@@ -25,6 +28,8 @@ class DomEvent
     
     public static function on($ev, $name, $cb)
     {
+        if ($ev != 'parsing') return;
+        //d($cb);
         self::$events[$ev][$name][] = $cb;
     }
 }

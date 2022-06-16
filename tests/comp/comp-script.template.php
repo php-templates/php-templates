@@ -7,9 +7,9 @@
 <?php 
 return function($node)
 {
-    $head = $node->root->querySelector('head')[0];
-    $body = $node->root->querySelector('body')[0];
-    $script2 = $node->querySelector('script')[0];
+    $head = $node->root->querySelector('head');
+    $body = $node->root->querySelector('body');
+    $script2 = $node->querySelector('script');
     $head->appendChild('<script src="cdn">cdn script</script>');
     $body->appendChild($script2->detach());
 }

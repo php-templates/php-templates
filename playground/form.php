@@ -2,20 +2,23 @@
 
 require('./../autoload.php');
 
-use PhpTemplates\Facades\Template;
+use PhpTemplates\Template;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Config;
+use PhpTemplates\Dom\DomNode;
 
-Config::set('src_path', __DIR__.'/views/');
-Config::set('dest_path', __DIR__.'/results/');
-Config::set('aliased', [
+$template = new Template(__DIR__.'/views/', __DIR__.'/results/');
+$aliases =[
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
     'x-card' => 'components/card',
     'x-helper' => 'components/helper',
-]);
+];
+foreach ($aliases as $k => $val) {
+    $template->addAlias($k, $val);
+}
 
-$folder_path = Config::get('dest_path').'*';
+$folder_path = __DIR__.'/results/*';
 $files = glob($folder_path);//dd($folder_path);
 foreach($files as $file) {
     if (is_file($file)) unlink($file);
@@ -32,92 +35,89 @@ $data['gender'] = 'male';
 $data['entry_male'] = 'Male';
 $data['entry_female'] = 'Femele';
 
-// DomEvents to manipulate the original
+// DomEvents to manipulate the original Dom
 // add an event on rendering user-profile-form.form-fields block
-DomEvent::on('rendering', 'user-profile-form.form-fields', function($t, $data) {
-    // $t is the block instance and we can add slots to any position using index
-   // we can pass $data by reference and manipulate it too, manipulating $t->data won't take any effect in that stage 
-   
-    // we call Template::get to load a template with data. If the template is already loaded above, in user-profile-form, won't be done a new file request
-    $extraField = Template::get('components/form-group', [
+DomEvent::on('parsing', 'user-profile-form', function($node) {
+    $extraField = new DomNode('x-form-group', [
         'type' => 'text',
         'label' => 'Event added',
-        'value' => 'Priceless',
+        'value' => 'Price',
         'class' => 'bg-success',
         '_index' => -1
     ]);
-    $extraField2 = Template::get('components/form-group', [
-        //'type' => 'text',
+    $extraField2 = new DomNode('x-form-group', [
         'label' => 'Event added2',
-        //'value' => 'Priceless2',
         'class' => 'bg-success',
         '_index' => 3,
     ]);
+    
     // we can add slots programatically like this, in this case the compoment will be parsed&cached separate from the rest
-    $extraField2->addSlot('default', Template::get('components/input-group', [
+    // note that we specified options atrribute with bind syntax
+    $extraField2->appendChild(new DomNode('x-input-group', [
         'type' => 'select',
-        'options' => ['o1' => 'o1', 'o2' => 'o2'],
+        ':options' => ['o1' => 'o1', 'o2' => 'o2'],
         'value' => 'o2',
     ]));
-    // we can have a non parsable template like this (pure php and html). It will produce a Parsed instance with no name
-    $btn = Template::raw(function() {
-        echo '<div class="text-right bg-success">
+    
+    // we can add raw html nodes like this
+    $btn = DomNode::fromString(
+        '<div class="text-right bg-success" _index="999">
             <button class="btn btn-primary">Submit</button>
-        </div>';
-    }, ['_index' => 999]);
+        </div>'
+    );
     // we can remove an element
-    $removed = $t->slots['form-fields'][4];
-    unset($t->slots['form-fields'][4]);
-    $t->slots['form-fields'][] = $extraField;
-    $t->slots['form-fields'][] = $extraField2;
-    $t->slots['form-fields'][] = $btn;
+    $removed = $node->querySelectorAll('x-form-group')[4];
+    $removed->detach();
+    
+    // append newly generated nodes
+    $block = $node->querySelector('block[name="form-fields"]');
+    $block->appendChild($extraField);
+    $block->appendChild($extraField2);
+    $block->appendChild($btn);
+    
     // we can change an element context and position
-    $removed->data['class'] = 'bg-danger';
-    $removed->render($data);
+    $removed->addAttribute('class', 'bg-danger');
+    $node->appendChild($removed);
 });
 
-DomEvent::on('rendering', 'components/navbar.nav-items', function($t, $data) {
-    $navItem = $t->addSlot('nav-items', Template::get('components/dropdown', [
+DomEvent::on('parsing', 'components/navbar', function($node) {
+    $navItems = $node->querySelector('block[name="nav-items"]');
+    $navItem = $navItems->appendChild(new DomNode('template', [
+        'is' => 'components/dropdown',
         '_index' => 99,
         'text' => 'Event Added'
     ]));
-    $navItem->addSlot('default', Template::raw(function() { ?>
-      <a class="dropdown-item" href="#">Action</a>
+    $navItem->appendChild(DomNode::fromString(
+      '<a class="dropdown-item" href="#">Action</a>
       <a class="dropdown-item" href="#">Another action</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#">Something else here</a> <?php
-    }));
+      <a class="dropdown-item" href="#">Something else here</a>'
+    ));
 });
 
-// we can limitate by index renders like this
-// Info: returning false on event rendering component will cancel its rendering
-$y = false;
-DomEvent::on('rendering', 'user-profile-form.components/card', function($t, $data) use (&$y) {
-    if ($y) {
-        return;
-    }
-    $y = true;
-   
+DomEvent::on('parsing', 'user-profile-form', function($node) {
+    $formCard = $node->querySelector('x-card[title="My"]');
     // we can fully change layout, wrapping template in tabs
-    $tabs = Template::get('components/tabs', [
-        'tabs' => [
+    $tabs = $formCard->parentNode->insertBefore(new DomNode('template', [
+        'is' => 'components/tabs', 
+        ':tabs' => [
             'user-profile-form' => 'Form',
             'stats' => 'Stats'
         ]
-    ]);
-    $tabs->addSlot('default', Template::raw(function() use ($t, $data) { ?>
-        <div class="tab-pane fade show active" id="user-profile-form" role="tabpanel">
-            <?php $t->render($data); ?>
-        </div> <?php
-    }));
-    $tabs->addSlot('default', Template::raw(function() use ($t, $data) { ?>
-        <div class="tab-pane fade show" id="stats" role="tabpanel">
-            <?php Template::get('stats', $data)->render($data); ?>
-        </div> <?php
-    }));
-    $tabs->render($data);
+    ]), $formCard);
     
-    return false;
+    // we detach main node, given on callback function and wrap it within a tab
+    $tab = $tabs->appendChild(DomNode::fromString(
+        '<div class="tab-pane fade show active" id="user-profile-form" role="tabpanel"></div>'
+    ));
+    $tab->querySelector('div')->appendChild($formCard->detach());
+    
+    $tab = $tabs->appendChild(DomNode::fromString(
+        '<div class="tab-pane fade show" id="stats" role="tabpanel"></div>'
+    ));
+    $tab->querySelector('div')->appendChild(new DomNode('template', ['is' => 'stats']));
+    
+    return $tabs;
 });
 
 for ($i=0;$i<=50;$i++) {
@@ -127,8 +127,10 @@ for ($i=0;$i<=50;$i++) {
     ];
 }
 
-DomEvent::on('rendering', 'user-profile-form.components/tabs', function($t, &$data) use($products) {
-    $data['tabs']['pics'] = 'Pictures';
+DomEvent::on('rendering', 'user-profile-form', function($node) use($products) {
+    $tabs = $node->querySelector('template[is="components/tabs"]');
+    $tabs->setAttribute(':tabs', str_replace(')', "pics => 'Pictures')", $tabs->getAttribute(':tabs')));
+    
     $data['products'] = $products;
     $t->addSlot('default', Template::raw(function() use ($t, $data) { ?>
         <div class="tab-pane fade show" id="pics" role="tabpanel">
@@ -139,4 +141,4 @@ DomEvent::on('rendering', 'user-profile-form.components/tabs', function($t, &$da
 // dom events end
 
 // the original
-Template::load('user-profile-form', $data);
+$template->load('user-profile-form', $data);

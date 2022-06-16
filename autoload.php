@@ -44,7 +44,6 @@ function buf($self, $name = '', $depth = 0)
     echo '</div></div>';
 }
 
-require_once('vendor/autoload.php');
 require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');

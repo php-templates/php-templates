@@ -37,6 +37,7 @@ class Parser
      
         // now we have an array containing '<div ..attrs>', or text sequences and we have to validate them                                                      
         $chunks = $this->validateAndRepairNodes($tmp);
+        //dd($chunks);
         // now we have a list of valid tags
         
     //dd($chunks);

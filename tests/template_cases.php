@@ -61,8 +61,8 @@ foreach($files as $f) {
     $data = [];
     $parser->load($rfilepath);
     $results = ob_get_clean();
-    $results = explode('<body>', $results);
-    $results = end($results);
+    //$results = explode('<body>', $results);
+    //$results = end($results);
     $results = explode('-----',$results);
     foreach ($results as $i => $result) {
         if (empty($expected[$i])) {
