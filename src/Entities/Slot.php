@@ -92,4 +92,14 @@ class Slot extends AbstractEntity
         $append->appendChild(new DomNode('#php', $r));
         $this->node->appendChild($append);
     }
+    
+    public function rootContext() {
+        return $this->simpleNodeContext();
+    }
+    public function templateContext() {
+        //todo
+    }
+    public function blockContext() {
+        //todo
+    }
 }

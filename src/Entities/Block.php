@@ -78,6 +78,11 @@ class Block extends AbstractEntity
         $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
         $this->node->appendChild(new DomNode('#php', $r));
     }
+    
+    public function rootContext()
+    {
+        return $this->simpleNodeContext();
+    }
 
     public function blockContext()
     {

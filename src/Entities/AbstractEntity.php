@@ -15,7 +15,7 @@ use PhpTemplates\Dom\PhpNode;
 
 abstract class AbstractEntity
 {
-    use CanParseNodes;
+   
     
     /**
      * Current processing thread contextual data holder (like config, parsed index, other cross entities shared data)
@@ -68,13 +68,12 @@ abstract class AbstractEntity
      * @param string|DomNode $node string when is component, DomNode when is simple node
      * @param AbstractEntity $context
      */
-    public function __construct(Process $process, $node, $context = null) //todo interfata ca param 3
+    public function __construct(Process $process, $node, AbstractEntity $context = null) //todo interfata ca param 3
     {
-        if (is_string($context)) {
-            $this->name = $context;
-            $context = null;
+        if ($process->config->prefix) {
+            $this->pf = $process->config->prefix;
         }
-
+        
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
@@ -84,32 +83,53 @@ abstract class AbstractEntity
             }
         }
 
-        if (isset($this->process->config['prefix'])) {
-            $this->pf = $this->process->config['prefix'];
-        }
-
         $this->process = $process;
-        $this->node = $node;
-
         $this->context = $context;
+        $this->node = $node;
     }
     
-    //abstract public function rootContext();
-    //abstract public function componentContext();
-    //abstract public function slotContext();
-   
-    /**
-     * Get root Entity in a nested context (first element in a nested structure)
-     *
-     * @return AbstractParser
-     */
-    public function getRoot(): AbstractEntity
+    abstract public function rootContext();
+    abstract public function componentContext();
+    abstract public function slotContext();
+    abstract public function simpleNodeContext();
+    abstract public function blockContext();
+    abstract public function templateContext();
+    
+    protected function parseNode($node)
     {
-        if ($this->depth === 0) {
-            return $this;
+        $fn = explode('\\', get_class($this));
+        $fn = end($fn);
+
+        $fn = lcfirst($fn).'Context';
+
+        if ($node->nodeName === 'slot') {
+            (new Slot($this->process, $node, $this))->{$fn}();
+        }
+        elseif ($node->nodeName === 'block') {
+            (new Block($this->process, $node, $this))->{$fn}();
+        }
+        elseif ($this->isComponent($node)) {
+            // component load node
+            (new Component($this->process, $node, $this))->{$fn}();
+        }
+        elseif ($node->nodeName === 'template') {
+            (new Template($this->process, $node, $this))->{$fn}();
+        }
+        else {
+            (new SimpleNode($this->process, $node, $this))->{$fn}();
+        }
+    }
+    
+    protected function isComponent($node)
+    {
+        if (!@$node->nodeName) {
+            return null;
+        }
+        if ($node->nodeName === 'template') {
+            return $node->getAttribute('is');
         }
         
-        return $this->context->getRoot();
+        return $this->process->getAliased($node->nodeName);
     }
     
     /**

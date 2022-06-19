@@ -14,15 +14,15 @@ class SimpleNode extends AbstractEntity
 
     public function simpleNodeContext()
     {
-        $this->templateFunctionContext();
+        $this->rootContext();
     }
 
     public function templateContext()
     {
-        return $this->templateFunctionContext();
+        return $this->rootContext();
     }
 
-    public function templateFunctionContext()
+    public function rootContext()
     {
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
@@ -42,7 +42,7 @@ class SimpleNode extends AbstractEntity
         $this->fillNode($this->node, $data);
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
-        (new TemplateFunction($this->process, $this->node, $name))->parse();
+        (new Root($this->process, $this->node, $name))->rootContext();
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
 
         $slot = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots)); ?>', 

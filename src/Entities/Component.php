@@ -20,16 +20,17 @@ class Component extends AbstractEntity
     
     public function simpleNodeContext()
     {
-        $this->templateFunctionContext();
+        $this->rootContext();
     }
     
-    public function templateFunctionContext()
+    public function rootContext()
     {
         $data = $this->depleteNode($this->node);
         $data = $this->fillNode(null, $data);
 
+       
         $dataString = Helper::arrayToEval($data);
-        (new TemplateFunction($this->process, $this->name, $this->context))->parse();
+        (new Root($this->process, null, $this->name, $this->context))->rootContext();
 
         $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
             $this->depth, $this->name, $dataString
@@ -80,6 +81,10 @@ class Component extends AbstractEntity
      */
     public function slotContext()
     {
-        $this->templateFunctionContext();
+        $this->rootContext();
+    }
+    
+    public function templateContext() {
+        // todo
     }
 }

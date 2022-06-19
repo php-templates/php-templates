@@ -22,3 +22,9 @@ repara playground
 
 de prevenit recursivitati pe insert nodes
 query selectors si spatiile in [attr=val val] => cauta intai match exact, apoi spart, nicidecum spart amandoua
+process e de fapt app, rename it
+app va fi responsabil de loading files
+de fiecare data cand face load la un string isi va face withconfig
+al treilea param la root e name, nu am nevoie de context
+
+teste pt multi config

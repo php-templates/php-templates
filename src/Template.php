@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use Exception;
+use PhpTemplates\Entities\Root;
 
 class Template
 {
@@ -35,12 +36,13 @@ class Template
             // paths will fallback on default Config in case of file not found or setting not found
             $doc = new Document($this->destPath, $requestName);
             if ($path = $doc->exists($this->destPath) && 0) {} 
-            else {
+            else 
+            {
                 try {
-                $process = new Process($rfilepath, $this->configs);
-                (new TemplateFunction($process, $rfilepath))->parse();
-                $doc->setContent($process->getResult());
-                $path = $doc->save();
+                    $process = new Process($rfilepath, $this->configs);
+                    (new Root($process, null, $rfilepath))->rootContext();
+                    $doc->setContent($process->getResult());
+                    $path = $doc->save();
                 } catch(Exception $e) {
                     throw new Exception($e->getMessage());
                 }
