@@ -11,11 +11,17 @@ use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-$parser = new Template('./', './results/');
+$parser = new Template(__DIR__, __DIR__.'/results/');
 $parser->addAlias('x-form-group', 'components/form-group');
 $parser->addAlias('x-input-group', 'components/input-group');
 $parser->addAlias('x-card', 'components/card');
 $parser->addAlias('x-helper', 'components/helper');
+
+$parser->addPath('cases2', __DIR__.'/cases2/');
+$parser->addAlias('x-form-group', 'components/form-group', 'cases2');
+$parser->addDirective('mydirective', function() {
+    return ['mydirective' => 2];
+}, 'cases2');
 
 $parser->addDirective('checked', function($eval) {
     return [

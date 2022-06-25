@@ -30,13 +30,20 @@ class Process
     {
         $this->name = $rfilepath;
         $this->configs = $configs;
+        $this->config = reset($configs);
     }
 
-    public function withConfig(string $key): self
+    public function withConfig(string $key, \Closure $cb): self
     {
+        if (!isset($this->configs[$key])) {
+            throw new \Exception("Config key '$key' does not exists");
+        }
+        $oldKey = $this->config->name;
         $this->config = $this->configs[$key];
+        $result = $cb($this);
+        $this->config = $this->configs[$oldKey];
 
-        return $this;
+        return $result;
     }
     
     /**
@@ -65,6 +72,7 @@ class Process
      */
     public function getAliased(string $alias)
     {
+        //$alias == 'x-form-group' && $this->config->name == 'cases2' && dd($this->configs['cases2']->aliased);
         if (isset($this->config->aliased[$alias])) {
             return $this->config->aliased[$alias];
         }
@@ -108,11 +116,16 @@ class Process
     {
         // obtaining config prefix pointing to settings collection then assign it to current process
         $path = array_filter(explode(':', $name));
-        $cfgKey = count($path) > 1 ? $path[0] : 'default';
-        $this->withConfig($cfgKey);
-
+        if (count($path) > 1) {
+            $cfgKey = $path[0];
+        } else {
+            $cfgKey = $this->config->name;
+        }
+        
         // obtaining relative template file path and load it using config's src path
         $rfilepath = end($path);
+    return $this->withConfig($cfgKey, function() {
+            
         
         // obtaining the template file path using multi-config mode
         $srcFile = null;
@@ -142,13 +155,15 @@ class Process
         ob_end_clean();
 
         $html = $this->removeHtmlComments($html);
-
+new Parser(options)->parseFile(cu obstart)
         // obtaining the DomNode
-        $node = DomNode::fromString($html, ['preservePatterns' => [
-            '/(?<!<)<\?php(.*?)\?>/s',
-            '/(?<!@)@php(.*?)@endphp/s',
-            '/{{(((?!{{).)*)}}/',
-            '/{\!\!(((?!{\!\!).)*)\!\!}/',
+        $node = DomNode::fromString($html, [
+            'srcFile' => $srcFile,
+            'preservePatterns' => [
+                '/(?<!<)<\?php(.*?)\?>/s',
+                '/(?<!@)@php(.*?)@endphp/s',
+                '/{{(((?!{{).)*)}}/',
+                '/{\!\!(((?!{\!\!).)*)\!\!}/',
         ]]);
 
 $x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node);
@@ -169,10 +184,13 @@ if (0 && $x != $y) {
 }
         
         return [$node, $cb];
+        });
     }
     
     protected function removeHtmlComments($content = '') {
-    	return preg_replace('~<!--.+?-->~ms', '', $content);
+    	return preg_replace_callback('~<!--.+?-->~ms', function($m) {
+    	    return str_repeat("\n", substr_count($m[0], "\n")+1);
+    	}, $content);
     }
 
     public function getResult()

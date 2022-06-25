@@ -7,7 +7,6 @@ class Config
     private $name;
 
     private $srcPath;
-    private $trackChanges = true; // TODO:
     private $aliased = [];
     private $directives = [];
 

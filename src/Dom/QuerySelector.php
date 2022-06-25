@@ -153,6 +153,9 @@ class QuerySelector
             if (!$node_attr) {
                 return false;
             }
+            if ($node_attr == reset($values)) {
+                return true;
+            }
             $node_attr = array_filter(explode(' ', $node_attr));
             if (count(array_intersect($node_attr, $values)) != count($values)) {
                 return false;

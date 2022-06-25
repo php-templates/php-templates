@@ -4,30 +4,13 @@ namespace PhpTemplates;
 
 class InvalidNodeException extends \Exception 
 {
+    protected $code = 0;                        // user defined exception code
+    protected $file;  
+    
     public function __construct($msg, $node)
     {
-        parent::__construct($msg."\n".$this->dom($node));
-    }
-    
-    protected function dom($d)
-    {
-        if (is_string($d)) {
-            $content = $d;
-        } else {
-            if (!is_iterable($d)) {
-                $d = [$d];
-            } 
-            $content = '';
-            foreach ($d as $node)
-            {
-                if (@$node->ownerDocument) {
-                    $content.= $node->ownerDocument->saveHtml($node);
-                }
-                else {
-                    $content.= $node->saveHtml();
-                }
-            }
-        }
-        return $content;
+        parent::__construct($msg);
+        $this->file = $node->srcFile;
+        $this->line = $node->lineNumber;
     }
 }

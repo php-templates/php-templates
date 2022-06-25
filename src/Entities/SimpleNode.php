@@ -62,7 +62,7 @@ class SimpleNode extends AbstractEntity
         $dataString = Helper::arrayToEval($this->attrs);
         $name = $this->context->name .'?slot='.Helper::uniqid();
 
-        (new TemplateFunction($this->process, $this->node, $name))->parse();
+        (new Root($this->process, $this->node, $name))->rootContext();
 
         $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots)); ?>', 
             $this->depth, $this->context->depth, $this->context->name, $name, $dataString

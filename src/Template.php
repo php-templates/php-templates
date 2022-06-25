@@ -12,6 +12,8 @@ class Template
      */
     protected $configs = [];
     protected $destPath;
+    public $trackChanges = false;
+    public $debugMode = true;
     
     public function __construct(string $srcPath, string $destPath) {
         $this->destPath = $destPath;
@@ -34,18 +36,18 @@ class Template
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
-            $doc = new Document($this->destPath, $requestName);
-            if ($path = $doc->exists($this->destPath) && 0) {} 
+            $doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
+            if (($path = $doc->exists()) && !$this->debugMode) {} 
             else 
             {
-                try {
+                //try {
                     $process = new Process($rfilepath, $this->configs);
                     (new Root($process, null, $rfilepath))->rootContext();
                     $doc->setContent($process->getResult());
                     $path = $doc->save();
-                } catch(Exception $e) {
-                    throw new Exception($e->getMessage());
-                }
+                //} catch(Exception $e) {
+             //       throw new Exception($e->getMessage());
+                //}
             }
 
             require_once($path);

@@ -2,12 +2,16 @@
 
 namespace PhpTemplates\Dom;
 
+use PhpTemplates\InvalidNodeException;
+
 class Parser
 { 
     private $noises = [];
     
     private $preservePatterns = [];
     private $keepEmptyTextNodes = false;   
+    private $currentLineRange = [0, 0];
+    private $srcFile;
     
     public function parse(string $str)
     {
@@ -45,12 +49,21 @@ class Parser
         $inBuildNode = new DomNode('#root');
         $hierarchyQueue[] = $inBuildNode;
         $x = $inBuildNode;
-        
+        // iterate over each array chunk and build the virtual dom
         foreach ($chunks as $str) {
+            // save node line position for debugging
+            $this->currentLineRange[0] = $this->currentLineRange[1];
+            $this->currentLineRange[1] += substr_count($str, "\n");
+            preg_match_all('/\@phpt_eols-(\d+)/', $str, $m);
+            if ($m[1]) {
+                $this->currentLineRange[1] += array_sum($m[1]);
+            }
+            
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
                 //d('close.'.$m[1]); //close tag m1
                 if (end($hierarchyQueue)->nodeName != $m[1]) {
                     // TODO:throw error no close tag
+                    throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
                     // wrong close, ignore it is better
                     //$node = new DomNode('#text', $str);
                     //$inBuildNode->appendChild($node);
@@ -67,6 +80,8 @@ class Parser
                 foreach ($attrs as $attr) {
                     $node->addAttribute($attr[0], $attr[1]);
                 }
+                $node->srcFile = $this->srcFile;
+                $node->lineNumber = $this->currentLineRange[0];
                 $inBuildNode->appendChild($node);
                 // if is not self closing tag, or short closing tag, don t push to hierarchy queue
                 //d('appending to queue', $node);
@@ -88,6 +103,7 @@ class Parser
         //dd(''.$x);
        // die();
         if (isset($hierarchyQueue[0])) {
+            //dd($hierarchyQueue[0]->debug());
             return $hierarchyQueue[0];
         }
         return null;
@@ -95,7 +111,10 @@ class Parser
     
     private function getTagAttributes($str)
     {
-//$x = strpos($str, 'M68.982,108.52892q-11.5965-18.582-23.49-37.242-11.895-18.6555-23.49-36.2v73.442H0V2.23092H23.192q12.042,17.9895,23.713,36.052,11.66852,18');
+        preg_match_all('/\@phpt_eols-(\d+)/', $str, $m);
+        if ($m[1]) {
+            $this->currentLineRange[1] += array_sum($m[1]);
+        }
         $attrs = [];
         $originalStr = $str;
         $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/s', function($m) use (&$attrs, $str) {
@@ -147,7 +166,7 @@ class Parser
         // handle php tags {{ and @php and <?= and scripts
         foreach ($this->preservePatterns as $regexp) {
             $str = preg_replace_callback($regexp, function($m) {
-                $rid = '__r'.uniqid();
+                $rid = '__r'.uniqid().'@phpt_eols-'.substr_count($m[0], "\n");
                 $this->noises[$rid] = $m[0];
                 return $rid;
             }, $str);

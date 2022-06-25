@@ -31,8 +31,10 @@ class Root extends AbstractEntity
             throw new \Exception('Node or name must be given');
         }
         elseif (is_null($node) && $name) {
+            find config file, load e de abstract entitiy, nu de process si va chema parser.parsefile iar parser va fi cel care executa callback ul, si intoarce doar un nod, atata
+            
             list($node, $cb) = $process->load($name);
-    
+            lucru care va intoarce node si cb
             // we create a virtual reference in order to not lose node in events, aka node->detach()
             $wrapper = new DomNode('#root');
             // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node

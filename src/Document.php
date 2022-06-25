@@ -11,11 +11,13 @@ class Document
     protected $destPath;
     protected $name;
     protected $content = '';
+    protected $trackChanges = true;
 
-    public function __construct(string $destPath, string $name, $content = '') {
+    public function __construct(string $destPath, string $name, $content = '', $trackChanges = true) {
         $this->destPath = $destPath;
         $this->name = $name;
         $this->content = $content;
+        $this->trackChanges = $trackChanges;
     }
 
     public function setContent(string $content) {
@@ -34,30 +36,33 @@ class Document
         return $outFile;
     }
 
-    public function exists($basePath)
+    public function exists()
     {
         $f = $this->getDestFile();
         if (file_exists($f)) {
             return $f;
         }
+        
         return false;
     }
 
     protected function getDestFile()
     {
-        $dependencies = DependenciesMap::get($this->name);
-
-        asort($dependencies);
-        $hash = [$this->name];
-        foreach ($dependencies as $f) {
-            $file = $f;
-            $hash[] = $f.':'.@filemtime($file);
-        }
-
         $pf = rtrim($this->destPath, '/').'/';
         $name = str_replace(['/', ':'], '_', $this->name);// todo
-
-        $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
+        
+        if ($this->trackChanges) {
+            $dependencies = DependenciesMap::get($this->name);
+            asort($dependencies);
+            $hash = [$this->name];
+            foreach ($dependencies as $f) {
+                $file = $f;
+                $hash[] = $f.':'.@filemtime($file);
+            }
+            $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
+        } else {
+            $outFile = $pf.$name;
+        }
 
         return $outFile.'.php';
     }

@@ -6,7 +6,7 @@ class DomNode
 {
     private static $last_id = 0;
     
-     private $selfClosingTags = [
+    private $selfClosingTags = [
         'area',
         'base',
         'br',
@@ -34,6 +34,8 @@ class DomNode
     protected $childNodes = [];
     
     public $shortClose = false;
+    public $lineNumber = 0;
+    public $srcFile;
     
     public function __construct(string $nodeName, $nodeValue = '')
     {
@@ -53,9 +55,25 @@ class DomNode
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
     }
     
+    public static function fromFile(string $srcFile, $options = []): self
+    {
+        $parser = new Parser();
+        if (isset($options['preservePatterns'])) {
+            foreach ($options['preservePatterns'] as $p) {
+                $parser->addPreservePattern($p);
+            }
+        }
+        
+        return $parser->parseFile($srcFile);
+    }
+    
     public static function fromString(string $str, $options = []): self
     {
-        $parser = new Parser;
+        $parser = new Parser();
+        if (isset($options['srcFile'])) {die('remove this');
+            // just for debug
+            $parser->srcFile = $options['srcFile'];
+        }
         if (isset($options['preservePatterns'])) {
             foreach ($options['preservePatterns'] as $p) {
                 $parser->addPreservePattern($p);
@@ -132,6 +150,7 @@ class DomNode
         if (is_string($node)) {
             $node = self::fromString($node); //TODO: si la restul
         }
+        $this->assertNotContained($this, $node);
         // set parent node first
         $node->parent($this);
         $this->childNodes[] = $node;
@@ -141,6 +160,10 @@ class DomNode
     
     public function insertBefore($node, self $refNode)
     {
+        if (is_string($node)) {
+            $node = self::fromString($node); //TODO: si la restul
+        }
+        $this->assertNotContained($this, $node);
         $node->parent($this);
         $i = null;//TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
         foreach ($this->childNodes as $j => $cn) {
@@ -187,12 +210,15 @@ class DomNode
     public function cloneNode()
     {
         $arr = $this->__toArray();
-        return self::fromArray($arr);
+        $clone = self::fromArray($arr);
+        $clone->srcFile = $this->srcFile;
+        $clone->lineNumber = $this->lineNumber;
+        return $clone;
     }
     
     public function debug()
     {
-        $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId];
+        $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId, 'line' => $this->lineNumber];
         if ($this->nodeName == '#text') {
             $x['text'] = $this->nodeValue;
         }
@@ -383,6 +409,38 @@ class DomNode
         }
         
         return $result;
+    }
+    
+    public function getSrcFile() 
+    {
+        $root = $this;
+        while (!$root->srcFile && $root->nodeName != '#root') {
+            $root = $this->parentNode;
+        }
+        return $root->srcFile;
+    }
+    
+    private function assertNotContained($parent, $append) 
+    {
+        if ($parent === $append) {
+            throw new \Exception('Parent Node is contained by appended Node. This will cause recursivity');
+        }
+        foreach ($append->childNodes as $cn) {
+            $this->assertNotContained($parent, $cn);
+        }
+    }
+    
+    public function d()
+    {
+        echo PHP_EOL;
+        echo htmlentities((string) $this);
+        echo PHP_EOL;
+    }
+    
+    public function dd() 
+    {
+        $this->d();
+        die();
     }
     
     public function querySelector($selector = '')

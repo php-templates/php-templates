@@ -38,11 +38,24 @@ class Template extends AbstractEntity
             $node->appendChild($cn->detach());
         }
         
-        (new TemplateFunction($this->process, $node, $name))->parse();
+        (new Root($this->process, $node, $name, $this->context))->rootContext();
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
         $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->setSlots($this->slots)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString
         );
         $this->node->changeNode('#pho', $r);
+    }
+    
+    public function rootContext() {
+        $this->simpleNodeContext();
+    }
+    public function slotContext() {
+        $this->simpleNodeContext();
+    }
+    public function blockContext() {
+        throw new InvalidNodeException('Template tag is not allowed as block child', $this->node->parentNode);
+    }
+    public function templateContext() {
+        $this->simpleNodeContext();
     }
 }

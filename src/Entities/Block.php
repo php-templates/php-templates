@@ -4,6 +4,7 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Helper;
 use PhpTemplates\Process;
+use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Dom\DomNode;
 
 class Block extends AbstractEntity
@@ -88,5 +89,12 @@ class Block extends AbstractEntity
     {
         $this->node->setAttribute('slot', $this->context->name);
         $this->componentContext();
+    }
+    
+    public function slotContext() {
+        throw new InvalidNodeException('Block cannot be used inside a slot', $this->node);
+    }
+    public function templateContext() {
+        $this->simpleNodeContext();
     }
 }

@@ -7,6 +7,7 @@ use PhpTemplates\TemplateFunction;
 use PhpTemplates\Process;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNode;
+use PhpTemplates\InvalidNodeException;
 
 class Slot extends AbstractEntity
 {
@@ -48,8 +49,8 @@ class Slot extends AbstractEntity
 
     public function slotContext()
     {
-        $this->node->changeNode('#slot');
-        // throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node->parentNode);
+        //$this->node->changeNode('#slot');
+        throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node->parentNode);
     }
 
     /**
@@ -73,7 +74,7 @@ class Slot extends AbstractEntity
                 $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
                 $node = new DomNode('#root');
                 $node->appendChild($cn->detach());
-                (new TemplateFunction($this->process, $node, $name))->parse();
+                (new Root($this->process, $node, $name, $this->context))->rootContext();
                 $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
                     $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
                 );
@@ -97,9 +98,9 @@ class Slot extends AbstractEntity
         return $this->simpleNodeContext();
     }
     public function templateContext() {
-        //todo
+        $this->simpleNodeContext();
     }
     public function blockContext() {
-        //todo
+        throw new InvalidNodeException('Invalid slot location (slot in block not allowed)', $this->node->parentNode);
     }
 }

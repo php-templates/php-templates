@@ -18,12 +18,6 @@ foreach ($aliases as $k => $val) {
     $template->addAlias($k, $val);
 }
 
-$folder_path = __DIR__.'/results/*';
-$files = glob($folder_path);//dd($folder_path);
-foreach($files as $file) {
-    if (is_file($file)) unlink($file);
-}
-
 $data['entry_firstname'] = 'Firstname';
 $data['firstname'] = 'Florin';
 $data['entry_lastname'] = 'Lastname';
