@@ -3,8 +3,10 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\Parser;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Entities\AbstractEntity;
+use PhpTemplates\Parsed;
 use PhpTemplates\Traits\CanParseNodes;
 use PhpTemplates\Process;
 
@@ -15,6 +17,7 @@ class Root extends AbstractEntity
      *
      * @var string $name 
      */
+    private $namespacePath;
     private $name;
 
     /**
@@ -27,36 +30,118 @@ class Root extends AbstractEntity
     public function __construct(Process $process, DomNode $node = null, string $name, $context = null)
     {
         $this->name = $name;
+        $this->context = $context;
+        $this->process = $process;
+        
         if (is_null($node) && !$name) {
             throw new \Exception('Node or name must be given');
         }
-        elseif (is_null($node) && $name) {
-            find config file, load e de abstract entitiy, nu de process si va chema parser.parsefile iar parser va fi cel care executa callback ul, si intoarce doar un nod, atata
+        elseif (is_null($node) && $name) 
+        {
+            // find config file, load e de abstract entitiy, nu de process si va chema parser.parsefile iar parser va fi cel care executa callback ul, si intoarce doar un nod, atata
             
-            list($node, $cb) = $process->load($name);
-            lucru care va intoarce node si cb
-            // we create a virtual reference in order to not lose node in events, aka node->detach()
-            $wrapper = new DomNode('#root');
-            // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node
-            if ($context) {
-                $wrapper->parent($context->node);
-            }
-            $node = $wrapper->appendChild($node->detach());
-        
-            //events before parsing a template
-            DomEvent::event('parsing', $name, $node);
-            
-            // if template file is returning an callback function, execute it
-            if (is_callable($cb)) {
-                $cb($node);
-            }
-            
-            $node = $wrapper;
+            $node = $this->load($name);
         }
         
         parent::__construct($process, $node, $context);
     }
+
+    /**
+     * Load the given route document using this.document settings with fallback on default settings
+     * @param string $name can contin config namespace with a form like: Ns:template/name 
+     */
+    public function load(string $name)
+    {
+        // obtaining config prefix pointing to settings collection then assign it to current process but preserve old config key to return to initial state
+        $path = array_filter(explode(':', $name));
+        $this->namespacePath = count($path) > 1 ? $path[0] : $this->process->config->name;
+        
+        // obtaining relative template file path and load it using config's src path
+        $rfilepath = end($path);
+
+        // obtaining the template file path using multi-config mode
+        $srcFile = null;
+        $tried = [];
+
+        // try to find file on current config, else try to load it from default config
+        foreach ($this->getSrcPaths($this->namespacePath) as $srcPath) {
+            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
+            if (file_exists($filepath)) {
+                $srcFile = $filepath;
+                break;
+            }
+            $tried[] = $filepath;
+        }
+
+        // file not found in any2 config
+        if (!$srcFile) {
+            $message = implode(' or ', $tried);
+            throw new \Exception("Template file $message not found");
+        }
+        
+        // add file as dependency to template for creating hash of states
+        $this->process->addDependencyFile($srcFile);
+
+        $parser = new Parser();
+        // we create a virtual dom to make impossible loosing actual node inside events (which would break the system)
+        $wrapper = new DomNode('#root');
+        // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node
+        if ($this->context) {
+            $wrapper->parent($this->context->node);
+        }
+        $parser->beforeCallback(function($node) use ($wrapper, $name) {
+            $wrapper->appendChild($node->detach());
+            //events before parsing a template
+            DomEvent::event('parsing', $name, $node);
+        });
+        $node = $parser->parseFile($srcFile);
+
+        //TEMPORAR
+        ob_start();
+        require($srcFile);
+        $html = ob_get_contents();
+        ob_end_clean();
+        $x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node);
+        $y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html));
+        $x = str_replace("'", '"', $x);
+        $y = str_replace("'", '"', $y);
+        
+        if (0 && $x != $y) {
+            d('nu se pupa '.$srcFile);
+            //$node->querySelector('body')[0]->empty();
+            //dd(''.$node);
+            //d($node->debug());
+            while ($x && $y && substr($x, 0, 300) == substr($y, 0, 300)) {
+                $x = substr($x, 300);
+                $y = substr($y, 300);
+            }
+            echo "\n$y\n$x"; die();
+        }
+        //TEMPORAR
+        
+        return $wrapper;
+    }    
     
+    /**
+     * return merged paths [current config, default]
+     *
+     * @return array
+     */
+    protected function getSrcPaths(string $configKey = ''): array
+    {
+        $paths = [];
+
+        $config2 = $this->process->configs[$configKey];
+
+        if ($config2->name != 'default') {
+            $paths = (array)$config2->srcPath;
+        }
+
+        $paths = array_merge($paths, (array)$this->process->configs['default']->srcPath);
+
+        return $paths;
+    }
+
     /**
      * register parse result as template function
      *
@@ -79,7 +164,7 @@ class Root extends AbstractEntity
      * @param [type] $html
      * @return void
      */
-    protected function replaceSpecialBlocks($html)
+    protected function replaceSpecialBlocks($html): string
     {
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
             return '<?php ' . $m[1] . ' ?>';
@@ -108,7 +193,7 @@ class Root extends AbstractEntity
      * @param string $templateString
      * @return void
      */
-    protected function getTemplateFunction(string $templateString) : string
+    protected function getTemplateFunction(string $templateString): string
     {
         $fnDeclaration = 
 "function (\$data) {
@@ -129,8 +214,16 @@ class Root extends AbstractEntity
     
     public function rootContext()
     {
-        $this->parseNode($this->node);
-        $this->register();
+        if ($this->namespacePath) {
+            $this->process->withConfig($this->namespacePath, function() {
+                $this->parseNode($this->node);
+                $this->register();
+            });
+        } 
+        else {
+            $this->parseNode($this->node);
+            $this->register();
+        }
     }
     
     public function simpleNodeContext() {

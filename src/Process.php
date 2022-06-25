@@ -33,7 +33,7 @@ class Process
         $this->config = reset($configs);
     }
 
-    public function withConfig(string $key, \Closure $cb): self
+    public function withConfig(string $key, \Closure $cb)
     {
         if (!isset($this->configs[$key])) {
             throw new \Exception("Config key '$key' does not exists");
@@ -46,24 +46,6 @@ class Process
         return $result;
     }
     
-    /**
-     * return merged paths [current config, default]
-     *
-     * @return array
-     */
-    public function getSrcPaths(): array
-    {
-        $paths = [];
-
-        if ($this->config->name != 'default') {
-            $paths = (array)$this->config->srcPath;
-        }
-
-        $paths = array_merge($paths, (array)$this->configs['default']->srcPath);
-
-        return $paths;
-    }
-
     /**
      * Get component path from current config with fallback on default , or null
      *
@@ -106,91 +88,6 @@ class Process
     public function addDependencyFile($path)
     {
         DependenciesMap::add($this->name, $path);
-    }
-    
-    /**
-     * Load the given route document using this.document settings with fallback on default settings
-     * The process config will now be the new one of the given file prefix, so take care to preserve it before any load
-     */
-    public function load(string $name)
-    {
-        // obtaining config prefix pointing to settings collection then assign it to current process
-        $path = array_filter(explode(':', $name));
-        if (count($path) > 1) {
-            $cfgKey = $path[0];
-        } else {
-            $cfgKey = $this->config->name;
-        }
-        
-        // obtaining relative template file path and load it using config's src path
-        $rfilepath = end($path);
-    return $this->withConfig($cfgKey, function() {
-            
-        
-        // obtaining the template file path using multi-config mode
-        $srcFile = null;
-        $tried = [];
-
-        foreach ($this->getSrcPaths() as $srcPath) {
-            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
-            if (file_exists($filepath)) {
-                $srcFile = $filepath;
-                break;
-            }
-            $tried[] = $filepath;
-        }
-
-        if (!$srcFile) {
-            $message = implode(' or ', $tried);
-            throw new \Exception("Template file $message not found");
-        }
-        
-        // add file as dependency to template for creating hash of states
-        $this->addDependencyFile($srcFile);
-
-        // geting file content (php function can be returned and executed in actual context)
-        ob_start();
-        $cb = require($srcFile);
-        $html = ob_get_contents();
-        ob_end_clean();
-
-        $html = $this->removeHtmlComments($html);
-new Parser(options)->parseFile(cu obstart)
-        // obtaining the DomNode
-        $node = DomNode::fromString($html, [
-            'srcFile' => $srcFile,
-            'preservePatterns' => [
-                '/(?<!<)<\?php(.*?)\?>/s',
-                '/(?<!@)@php(.*?)@endphp/s',
-                '/{{(((?!{{).)*)}}/',
-                '/{\!\!(((?!{\!\!).)*)\!\!}/',
-        ]]);
-
-$x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node);
-$y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html));
-$x = str_replace("'", '"', $x);
-$y = str_replace("'", '"', $y);
- 
-if (0 && $x != $y) {
-    d('nu se pupa '.$srcFile);
-    //$node->querySelector('body')[0]->empty();
-    //dd(''.$node);
-    //d($node->debug());
-    while ($x && $y && substr($x, 0, 300) == substr($y, 0, 300)) {
-        $x = substr($x, 300);
-        $y = substr($y, 300);
-    }
-    echo "\n$y\n$x"; die();
-}
-        
-        return [$node, $cb];
-        });
-    }
-    
-    protected function removeHtmlComments($content = '') {
-    	return preg_replace_callback('~<!--.+?-->~ms', function($m) {
-    	    return str_repeat("\n", substr_count($m[0], "\n")+1);
-    	}, $content);
     }
 
     public function getResult()

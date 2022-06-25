@@ -2,17 +2,52 @@
 
 namespace PhpTemplates\Dom;
 
+use Closure;
 use PhpTemplates\InvalidNodeException;
 
 class Parser
 { 
-    private $noises = [];
+    protected $noises = [];
     
-    private $preservePatterns = [];
-    private $keepEmptyTextNodes = false;   
-    private $currentLineRange = [0, 0];
-    private $srcFile;
+    protected $preservePatterns = [
+        '/(?<!<)<\?php(.*?)\?>/s',
+        '/(?<!@)@php(.*?)@endphp/s',
+        '/{{(((?!{{).)*)}}/',
+        '/{\!\!(((?!{\!\!).)*)\!\!}/',
+    ];
+    protected $keepEmptyTextNodes = false;   
+    protected $currentLineRange = [0, 0];
+    protected $beforeCallback;
+    protected $srcFile;
     
+    /**
+     * Parse file into dom nodes
+     *
+     * @param string $srcFile
+     * @return DomNode
+     */
+    public function parseFile(string $srcFile): DomNode
+    {
+        // geting file content (php function can be returned and executed in actual context)
+        ob_start();
+        $cb = require($srcFile);
+        $html = ob_get_contents();
+        ob_end_clean();
+
+        $html = $this->removeHtmlComments($html);
+
+        $this->srcFile = $srcFile;
+
+        $node = $this->parse($html);
+        if ($cb2 = $this->beforeCallback) {
+            $cb2($node);
+        }
+        
+        is_callable($cb) && $cb($node);
+
+        return $node;
+    }
+
     public function parse(string $str)
     {
         $str = $this->collectAndReplaceNoises($str);
@@ -41,10 +76,8 @@ class Parser
      
         // now we have an array containing '<div ..attrs>', or text sequences and we have to validate them                                                      
         $chunks = $this->validateAndRepairNodes($tmp);
-        //dd($chunks);
+
         // now we have a list of valid tags
-        
-    //dd($chunks);
         $hierarchyQueue = [];
         $inBuildNode = new DomNode('#root');
         $hierarchyQueue[] = $inBuildNode;
@@ -60,14 +93,8 @@ class Parser
             }
             
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
-                //d('close.'.$m[1]); //close tag m1
                 if (end($hierarchyQueue)->nodeName != $m[1]) {
-                    // TODO:throw error no close tag
                     throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
-                    // wrong close, ignore it is better
-                    //$node = new DomNode('#text', $str);
-                    //$inBuildNode->appendChild($node);
-                    continue; // wrong close tag
                 }
                 $node = array_pop($hierarchyQueue);
                 if ($node === $inBuildNode) {
@@ -100,16 +127,26 @@ class Parser
                 $inBuildNode->appendChild($node);
             }
         }
-        //dd(''.$x);
-       // die();
+
         if (isset($hierarchyQueue[0])) {
-            //dd($hierarchyQueue[0]->debug());
             return $hierarchyQueue[0];
         }
+
         return null;
     }
+
+    public function beforeCallback(Closure $cb)
+    {
+        $this->beforeCallback = $cb;
+    }
     
-    private function getTagAttributes($str)
+    protected function removeHtmlComments($content = '') {
+    	return preg_replace_callback('~<!--.+?-->~ms', function($m) {
+    	    return str_repeat("\n", substr_count($m[0], "\n")+1);
+    	}, $content);
+    }
+
+    protected function getTagAttributes($str)
     {
         preg_match_all('/\@phpt_eols-(\d+)/', $str, $m);
         if ($m[1]) {
@@ -158,7 +195,7 @@ class Parser
         return array_values($_attrs);
     }
     
-    private function collectAndReplaceNoises($str)
+    protected function collectAndReplaceNoises($str)
     {
         // isolate scripts cuz are dangerous
         $str = $this->freezeTagContent($str, 'script');
@@ -180,7 +217,7 @@ class Parser
         $this->preservePatterns[] = $regexp;
     }
     
-    private function validateAndRepairNodes($arr, $limit = 0)
+    protected function validateAndRepairNodes($arr, $limit = 0)
     {
         $result = [];
         $push = '';
@@ -216,7 +253,7 @@ class Parser
         return $result;
     }
     
-    private function isCompleteTag($str) {
+    protected function isCompleteTag($str) {
         $x = $str;
         $str = preg_replace('/="(((?!").)*)"/s', '', $str);
         $str = preg_replace("/='(((?!').)*)'/s", '', $str);
@@ -225,7 +262,7 @@ class Parser
         return $isComplete;
     }
     
-    private function freezeTagContent($str, $tag) 
+    protected function freezeTagContent($str, $tag) 
     {
         $arr = preg_split("/<\/\s*{$tag}>/", $str);
         $max = count($arr) -1;
