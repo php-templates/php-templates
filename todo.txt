@@ -38,3 +38,5 @@ parser trb sa incarce fisiere si se rezolva problema cu line nr
 lops should be scoped
 
 verbatim no parse node
+
+vezi ca nu se face cache la componenta, nu verifica nimeni daca exista deja, sa nu o mai parsesze

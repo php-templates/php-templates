@@ -55,8 +55,8 @@ class Process
     public function getAliased(string $alias)
     {
         //$alias == 'x-form-group' && $this->config->name == 'cases2' && dd($this->configs['cases2']->aliased);
-        if (isset($this->config->aliased[$alias])) {
-            return $this->config->aliased[$alias];
+        if ($this->config->name != 'default' && isset($this->config->aliased[$alias])) {
+            return $this->config->name.':'.$this->config->aliased[$alias];
         }
         elseif (isset($this->configs['default']->aliased[$alias])) {
             return $this->configs['default']->aliased[$alias];
