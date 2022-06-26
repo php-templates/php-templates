@@ -70,17 +70,13 @@ class DomNode
     public static function fromString(string $str, $options = []): self
     {
         $parser = new Parser();
-        if (isset($options['srcFile'])) {die('remove this');
-            // just for debug
-            $parser->srcFile = $options['srcFile'];
-        }
         if (isset($options['preservePatterns'])) {
             foreach ($options['preservePatterns'] as $p) {
                 $parser->addPreservePattern($p);
             }
         }
         
-        return $parser->parse($str);
+        return $parser->parseString($str);
     }
     
     public static function fromArray($arr)
@@ -218,7 +214,7 @@ class DomNode
     
     public function debug()
     {
-        $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId, 'line' => $this->lineNumber];
+        $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId, 'file' => $this->srcFile, 'line' => $this->lineNumber];
         if ($this->nodeName == '#text') {
             $x['text'] = $this->nodeValue;
         }

@@ -49,8 +49,7 @@ class Slot extends AbstractEntity
 
     public function slotContext()
     {
-        //$this->node->changeNode('#slot');
-        throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node->parentNode);
+        throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node);
     }
 
     /**

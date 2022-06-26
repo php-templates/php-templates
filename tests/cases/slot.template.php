@@ -34,12 +34,6 @@
 
 -----
 
-<template is="comp/comp_illegat_slot_in_slot"></template>
-=====
-<div></div>
-
------
-
 <template is="comp/slot_default_in_slot_default"></template>
 =====
 <div class="sdefsdef">

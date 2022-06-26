@@ -65,7 +65,11 @@ foreach($files as $f) {
     
     ob_start();
     $data = [];
-    $parser->load($rfilepath);
+    try {
+        $parser->load($rfilepath);
+    } catch(Exception $e) {
+        echo $e->getMessage() . ' in ' . $e->getFile() . ' at line ' . $e->getLine();
+    }
     $results = ob_get_clean();
     //$results = explode('<body>', $results);
     //$results = end($results);

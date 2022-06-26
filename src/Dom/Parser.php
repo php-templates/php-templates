@@ -48,6 +48,19 @@ class Parser
         return $node;
     }
 
+    public function parseString(string $html)
+    {
+        $bt = debug_backtrace(5);
+        while (count($bt) > 1 &&  strpos($bt[0]['file'], 'Dom\\DomNode.php') !== false) {
+            array_shift($bt);
+        }
+        
+        $this->srcFile = $bt[0]['file'];
+        $this->currentLineRange = [$bt[0]['line'], $bt[0]['line']];
+
+        return $this->parse($html);
+    }
+
     public function parse(string $str)
     {
         $str = $this->collectAndReplaceNoises($str);
