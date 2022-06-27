@@ -43,6 +43,7 @@ class Root extends AbstractEntity
         }
         
         parent::__construct($process, $node, $context);
+        $this->depth = 0;
     }
 
     /**
@@ -94,29 +95,6 @@ class Root extends AbstractEntity
             DomEvent::event('parsing', $name, $node);
         });
         $node = $parser->parseFile($srcFile);
-
-        //TEMPORAR
-        ob_start();
-        require($srcFile);
-        $html = ob_get_contents();
-        ob_end_clean();
-        $x = preg_replace('/[\n\r\t\s]*|(="")*/', '', $node);
-        $y = preg_replace('/[\n\r\t\s]*|(="")*/', '', str_replace('=\'""\'', '=""""', $html));
-        $x = str_replace("'", '"', $x);
-        $y = str_replace("'", '"', $y);
-        
-        if (0 && $x != $y) {
-            d('nu se pupa '.$srcFile);
-            //$node->querySelector('body')[0]->empty();
-            //dd(''.$node);
-            //d($node->debug());
-            while ($x && $y && substr($x, 0, 300) == substr($y, 0, 300)) {
-                $x = substr($x, 300);
-                $y = substr($y, 300);
-            }
-            echo "\n$y\n$x"; die();
-        }
-        //TEMPORAR
         
         return $wrapper;
     }    

@@ -258,7 +258,7 @@ class DomNode
             $return .= $this->nodeValue;
             return $return;
         }
-        elseif ($this->nodeName[0] == '#') {
+        elseif ($this->nodeName[0] == '#' && trim($this->nodeValue)) {
             $return .= $this->nodeValue;
         }
         
@@ -275,7 +275,6 @@ class DomNode
             $return .= $indentNL . "</{$this->nodeName}>";
         }
         
-            //$this->nodeName == 'x' && dd($return);
         return $return;
     }
     

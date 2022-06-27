@@ -1,18 +1,11 @@
 
 throw error daca o directiva nu exista-> ba nu, scoate attr, ba nu,,, lasa attr
-
 phpt laravelserviceprovider
-
-nested oplon variation cu reset la final
 
 solve all todos
 
 reset la final
-cfg remove x 
-pune la pnct config 
 
-lops should be scoped
-
+loops should be scoped
 verbatim no parse node
 
-config add alias as array bulk

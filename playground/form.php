@@ -8,15 +8,13 @@ use PhpTemplates\Config;
 use PhpTemplates\Dom\DomNode;
 
 $template = new Template(__DIR__.'/views/', __DIR__.'/results/');
-$aliases =[
+$cfg = $template->getConfig();
+$cfg->addAlias([
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
     'x-card' => 'components/card',
     'x-helper' => 'components/helper',
-];
-foreach ($aliases as $k => $val) {
-    $template->addAlias($k, $val);
-}
+]);
 
 $data['entry_firstname'] = 'Firstname';
 $data['firstname'] = 'Florin';

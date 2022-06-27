@@ -13,22 +13,24 @@ header("Content-Type: text/plain");
 
 $parser = new Template(__DIR__, __DIR__.'/results/');
 $cfg = $parser->getConfig();
-$parser->addAlias('x-form-group', 'components/form-group');
-$parser->addAlias('x-input-group', 'components/input-group');
-$parser->addAlias('x-card', 'components/card');
-$parser->addAlias('x-helper', 'components/helper');
-
-$parser->addPath('cases2', __DIR__.'/cases2/');
-$parser->addAlias('x-form-group', 'components/form-group', 'cases2');
-$parser->addDirective('mydirective', function() {
-    return ['mydirective' => 2];
-}, 'cases2');
-
-$parser->addDirective('checked', function($eval) {
+$cfg->addAlias([
+    'x-form-group' => 'components/form-group',
+    'x-input-group' => 'components/input-group',
+    'x-card' => 'components/card',
+    'x-helper' => 'components/helper'
+]);
+$cfg->addDirective('checked', function($eval) {
     return [
         'p-raw' => $eval.' ? "checked" : ""'
     ];
 });
+
+$parser->addPath('cases2', __DIR__.'/cases2/');
+$cfg = $parser->getConfig('cases2');
+$cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
+$cfg->addDirective('mydirective', function() {
+    return ['mydirective' => 2];
+}, 'cases2');
 
 
 $files = array_diff(scandir('./results'), array('.', '..'));

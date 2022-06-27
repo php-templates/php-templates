@@ -104,7 +104,7 @@ class Process
             return $m[1];
         }, $tpl);
         
-        //$tpl = preg_replace('/[\n ]+ *\n+/', "\n", $tpl);
+        $tpl = preg_replace('/[\n ]+ *\n+/', "\n", $tpl);
 
         return $tpl;
     }

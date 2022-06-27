@@ -30,9 +30,14 @@ class Config
         $this->directives[$key] = $callable;
     }
     
-    public function addAlias(string $key, string $component): void
+    public function addAlias($key, string $component = ''): void
     {
-        $this->aliased[$key] = $component;
+        if (!is_array($key)) {
+            $aliased = [$key => $component];
+        } else {
+            $aliased = $key;
+        }
+        $this->aliased = array_merge($this->aliased, $aliased);
     }
 
     public function hasDirective(string $key): bool

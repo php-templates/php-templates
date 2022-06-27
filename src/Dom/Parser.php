@@ -93,6 +93,8 @@ class Parser
         // now we have a list of valid tags
         $hierarchyQueue = [];
         $inBuildNode = new DomNode('#root');
+        $inBuildNode->srcFile = $this->srcFile;
+        $inBuildNode->lineNumber = $this->currentLineRange[0];
         $hierarchyQueue[] = $inBuildNode;
         $x = $inBuildNode;
         // iterate over each array chunk and build the virtual dom
@@ -139,6 +141,11 @@ class Parser
                 $node = new DomNode('#text', $str);
                 $inBuildNode->appendChild($node);
             }
+        }
+        
+        if (count($hierarchyQueue) > 1) {
+            // some nodes not closed
+            throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
         }
 
         if (isset($hierarchyQueue[0])) {
