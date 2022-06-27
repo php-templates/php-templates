@@ -1,42 +1,18 @@
 
 throw error daca o directiva nu exista-> ba nu, scoate attr, ba nu,,, lasa attr
 
-pune facadele la punct
-un main app pe fiecare
 phpt laravelserviceprovider
-un bootstrap care sa buteze facadele cu application
-
-template::config()
-new template(src dest, options)
-template addpath(alias, src, options)
-template adddirective(?alias, name, fn)
-
-la final de render trb resetate staticele ca va face conflict modular
 
 nested oplon variation cu reset la final
 
-process e de fapt app, rename it
-app va fi responsabil de loading files
-de fiecare data cand face load la un string isi va face withconfig
-al treilea param la root e name, nu am nevoie de context
-
-nodurile ar putea sa care meta cu orivire la src file si line in src file? asta pentru a putea afisa erori clare…  dar ce fac cu event urile… inainte de closure, fac un flag pe root si ii zic ca e de fapt randul si linia unde se trigger event ul, faza e ca trb facut pe fiecare cb
-nodurile trb sa tina line nr, iar replace-urile sa aiba si nr de linii ocupate
-trb sa am si un firstroot care sa ia primul #root care are srcfile setat, altfel ma duc mereu la primul root dupa fisier,.,
-
 solve all todos
 
-teste pt multi config
-nu revine la cfg initial pe ultimul nod dupa ce a facut parse
-process withconfig(k, function(p) la urma default
-
+reset la final
 cfg remove x 
 pune la pnct config 
-
-parser trb sa incarce fisiere si se rezolva problema cu line nr
 
 lops should be scoped
 
 verbatim no parse node
 
-vezi ca nu se face cache la componenta, nu verifica nimeni daca exista deja, sa nu o mai parsesze
+config add alias as array bulk

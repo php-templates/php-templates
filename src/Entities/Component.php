@@ -30,7 +30,9 @@ class Component extends AbstractEntity
 
        
         $dataString = Helper::arrayToEval($data);
-        (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        if (!$this->process->hasTemplateFunction($this->name)) {
+            (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        }
 
         $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
             $this->depth, $this->name, $dataString
@@ -54,7 +56,9 @@ class Component extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $data = $this->fillNode(null, $data);   
         $dataString = Helper::arrayToEval($data);
-        (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        if (!$this->process->hasTemplateFunction($this->name)) {
+            (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        }
 
         $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString

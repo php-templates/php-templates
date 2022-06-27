@@ -39,7 +39,6 @@ class Root extends AbstractEntity
         elseif (is_null($node) && $name) 
         {
             // find config file, load e de abstract entitiy, nu de process si va chema parser.parsefile iar parser va fi cel care executa callback ul, si intoarce doar un nod, atata
-            
             $node = $this->load($name);
         }
         

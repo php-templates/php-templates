@@ -61,6 +61,15 @@ class Template
         return Parsed::raw(null, $cb, $data);
     }
     
+    public function getConfig(string $key = 'default'): Config
+    {
+        if (!isset($this->configs[$key])) {
+            throw new \Exception("Config key $key does not exists");
+        }
+        
+        return $this->configs[$key];
+    }
+    
     /**
      * Add additional parse src path
      */
@@ -79,28 +88,6 @@ class Template
         } else {
             $this->configs[$name]->setSrcPath($srcPath);
         }
-    }
-    
-    public function addDirective(string $key, \Closure $callable, $path = 'default'): void
-    {
-        if (!isset($this->configs[$path])) {
-            throw new \Exception('Config path not found');
-        } 
-        elseif ($this->configs[$path]->hasDirective($key)) {
-            throw new \Exception('Directive already exists');
-        }
-        $this->configs[$path]->addDirective($key, $callable);
-    }
-
-    public function addAlias(string $key, string $value, $path = 'default'): void
-    {
-        if (!isset($this->configs[$path])) {
-            throw new \Exception('Config path not found');
-        } 
-        elseif ($this->configs[$path]->hasAlias($key)) {
-            throw new \Exception('Alias already exists');
-        }
-        $this->configs[$path]->addAlias($key, $value);
     }
     
     public function setDestPath($dest)

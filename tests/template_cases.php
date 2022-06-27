@@ -12,6 +12,7 @@ use PhpTemplates\TemplateFunction;
 header("Content-Type: text/plain");
 
 $parser = new Template(__DIR__, __DIR__.'/results/');
+$cfg = $parser->getConfig();
 $parser->addAlias('x-form-group', 'components/form-group');
 $parser->addAlias('x-input-group', 'components/input-group');
 $parser->addAlias('x-card', 'components/card');
