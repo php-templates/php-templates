@@ -356,9 +356,10 @@ class DomNode
         foreach ($this->attrs as $i => $attr) {
             if ($attr->nodeName == $name) {
                 unset($this->attrs[$i]);
-                return;
+                return $this;
             }
         }
+        return $this;
     }
     
     public function isSelfClosingTag()

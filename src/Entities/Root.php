@@ -85,16 +85,22 @@ class Root extends AbstractEntity
         $parser = new Parser();
         // we create a virtual dom to make impossible loosing actual node inside events (which would break the system)
         $wrapper = new DomNode('#root');
-        // if contenxt given, aka Component used in Template, assign it's parent to give possibility of accessing root node
-        if ($this->context) {
-            $wrapper->parent($this->context->node);
-        }
+        
         $parser->beforeCallback(function($node) use ($wrapper, $name) {
             $wrapper->appendChild($node->detach());
             //events before parsing a template
+            $wrapper->parent($this->process->getRootNode());
             DomEvent::event('parsing', $name, $node);
         });
         $node = $parser->parseFile($srcFile);
+        
+        // findout process upper component and assign it as main root
+        // dom has only one node which is a component, skip
+        // if process already has a root, skip
+        // method getRootNode will also check for any possible parents added with phpt callbacks, but no one will do that
+        if (!$this->process->getRootNode() && $this->isRootNode($node)) {
+            $this->process->setRootNode($wrapper);
+        }
         
         return $wrapper;
     }    
@@ -217,5 +223,20 @@ class Root extends AbstractEntity
     }
     public function templateContext() {
         $this->rootContext();
+    }
+    
+    private function isRootNode($node) 
+    {
+        // check equal level nodes 
+        // if any siblings tags, or only one nodw, return false
+        if ($node->nodeName && $node->nodeName[0] != '#') {
+            return !$this->isComponent($node);
+        }
+        $isRoot = true;
+        foreach ($node->childNodes as $cn) {
+            $isRoot = $isRoot && $this->isRootNode($cn);
+        }
+
+        return $isRoot;
     }
 }

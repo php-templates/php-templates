@@ -129,5 +129,6 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
         if (method_exists($this->template, $m)) {
             return call_user_func_array([$this->template, $m], $args);
         }//flushFinderCache
+        //TODO:THROW ERROR ELSE
     }
 }

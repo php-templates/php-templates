@@ -72,7 +72,7 @@ class Helper {
     }
     
     public static function isComponent($node)
-    {
+    {die('rrrrr');
         if (!@$node->nodeName) {
             return null;
         }

@@ -10,6 +10,7 @@ use PhpTemplates\Dom\DomNode;
 
 class Process
 {
+    private $rootNode;
     /**
      * Name of the initiator file
      */
@@ -107,6 +108,14 @@ class Process
         $tpl = preg_replace('/[\n ]+ *\n+/', "\n", $tpl);
 
         return $tpl;
+    }
+    
+    public function getRootNode() {
+        return $this->rootNode;
+    }
+    
+    public function setRootNode($node) {
+        $this->rootNode = $node;
     }
     
     public function __get($prop)

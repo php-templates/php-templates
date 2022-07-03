@@ -8,9 +8,9 @@ namespace PhpTemplates;
  * @param string $string
  * @return void
  */
-function e(string $string) 
+function e($string) 
 {
-    echo htmlspecialchars($string);
+    echo htmlspecialchars((string)$string);
 }
 
 /**

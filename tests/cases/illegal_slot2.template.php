@@ -7,4 +7,4 @@
 }
 ?>
 =====
-Invalid slot location (slot in slot not allowed) in F:\dev\exegeza\vendor\florin-botea\php-templates\tests\temp\illegal_slot2.template.php at line 6
+Invalid slot location (slot in slot not allowed) in illegal_slot2.template.php at line 6

@@ -155,7 +155,7 @@ abstract class AbstractEntity
                     if (empty($result)) {
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
                     }
-                    foreach ($result as $k => $val) {
+                    foreach ($result as $k => $val) {//TODO vezi daca e folosit 
                         $extracted_attributes[] = new DOMAttr($k, $val);
                     }
                     // directive unpacked his data, next attr!!!

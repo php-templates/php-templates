@@ -71,7 +71,8 @@ foreach($files as $f) {
     try {
         $parser->load($rfilepath);
     } catch(Exception $e) {
-        echo $e->getMessage() . ' in ' . $e->getFile() . ' at line ' . $e->getLine();
+        $_f = explode('/', $e->getFile());
+        echo $e->getMessage() . ' in ' . end($_f) . ' at line ' . $e->getLine();
     }
     $results = ob_get_clean();
     //$results = explode('<body>', $results);

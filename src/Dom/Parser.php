@@ -51,7 +51,7 @@ class Parser
     public function parseString(string $html)
     {
         $bt = debug_backtrace(5);
-        while (count($bt) > 1 &&  strpos($bt[0]['file'], 'Dom\\DomNode.php') !== false) {
+        while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
             array_shift($bt);
         }
         

@@ -124,7 +124,9 @@ class Parsed
     
     public function __get($prop)
     {
-        return $this->{$prop};
+        if (isset($this->{$prop})) {
+            return $this->{$prop};
+        }
     }
     
     public function withName($name)
@@ -132,6 +134,11 @@ class Parsed
         $this->name = $name;
 
         return $this;
+    }
+    
+    public function withData(array $data)
+    {
+        $this->data = array_merge($data, $this->data);
     }
 }
 
