@@ -43,7 +43,7 @@ class Component extends AbstractEntity
             $this->parseNode($slot);
         }
 
-        $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
+        $r = sprintf('<?php $this->comp[%d]->render(); ?>', $this->depth);
         $this->node->appendChild(new DomNode('#php', $r));
     }
 

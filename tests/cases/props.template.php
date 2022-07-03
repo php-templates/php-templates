@@ -37,16 +37,3 @@ $false = 0;
     <div>myname1</div>
     <div>myname2</div>
 </c>
-
------
-
-<!-- bind data to a component slot -->
-<template is="props/c">
-    <template is="comp/comp_slot">{{ $name }}</template>
-</template>
-=====
-<c>
-    <div class="comp_slot">
-        <span>myname</span>
-    </div>
-</c>

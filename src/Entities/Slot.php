@@ -42,7 +42,7 @@ class Slot extends AbstractEntity
         }
         
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-        $r = '<?php $_slot->render(array_merge($this->scopeData, '.$dataString.')); ?>';
+        $r = '<?php $_slot->render('.$dataString.'); ?>';
         $append->appendChild(new DomNode('#php', $r));
         $this->node->appendChild($append);
     }

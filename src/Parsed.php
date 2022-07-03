@@ -139,6 +139,8 @@ class Parsed
     public function withData(array $data)
     {
         $this->data = array_merge($data, $this->data);
+        
+        return $this;
     }
 }
 

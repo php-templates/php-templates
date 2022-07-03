@@ -31,7 +31,7 @@ class Block extends AbstractEntity
         $data = $this->fillNode(null, $data);
         $dataString = Helper::arrayToEval($data);
         
-        $nodeValue = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots)); ?>', 
+        $nodeValue = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("***block", %s)->withName("%s")->withData($this->scopeData)->setSlots($this->slots)); ?>', 
             $this->depth, 
             $this->context->depth, 
             $this->attrs['slot'], 
@@ -58,7 +58,7 @@ class Block extends AbstractEntity
         $data = $this->fillNode(null, $data);
         $dataString = Helper::arrayToEval($data);
 
-        $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->setSlots($this->slots); ?>', 
+        $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("***block", %s)->withName("%s")->withData($this->scopeData)->setSlots($this->slots); ?>', 
             $this->depth, 
             $dataString,
             $this->name

@@ -1,5 +1,5 @@
 
-throw error daca o directiva nu exista-> ba nu, scoate attr, ba nu,,, lasa attr
+throw error daca o directiva nu exista
 phpt laravelserviceprovider
 
 solve all todos
@@ -10,3 +10,12 @@ loops should be scoped
 verbatim no parse node
 
 fa ceva cu Helper mare
+
+blocurile pot fi ordonate at compile time?
+
+testeaza cine are prioritate pe slot content ca si variabila, cea globala, sau cea care vine din componenta binded
+
+stricat shared,,, adauga composers
+adauga fn de shared si composer pe template.php care actioneaza in maniera ca seteaza pe parsed ceva variabila
+parsed va fi un obiect instantiat din afara de template inainte de includere parsed .php  si e trecut abia la includes
+poate pot face tpl no name inline fn. ar fi mai readable

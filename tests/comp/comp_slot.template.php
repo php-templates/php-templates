@@ -1,3 +1,3 @@
 <div class="comp_slot">
-    <span><slot></slot></span>
+    <span><slot :name="$name ?? null"></slot></span>
 </div>
