@@ -4,14 +4,14 @@ require('../autoload.php');
 
 use PhpTemplates\Config;
 use PhpTemplates\Parsed;
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-$parser = new Template(__DIR__, __DIR__.'/results/');
+$parser = new PhpTemplate(__DIR__, __DIR__.'/results/');
 $cfg = $parser->getConfig();
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',
@@ -71,7 +71,8 @@ foreach($files as $f) {
     try {
         $parser->load($rfilepath);
     } catch(Exception $e) {
-        $_f = explode('/', $e->getFile());
+        $_f = str_replace('\\', '/', $e->getFile());
+        $_f = explode('/', $_f);
         echo $e->getMessage() . ' in ' . end($_f) . ' at line ' . $e->getLine();
     }
     $results = ob_get_clean();

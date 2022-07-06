@@ -10,14 +10,14 @@ die();
 
 use PhpTemplates\Config;
 use PhpTemplates\Parsed;
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-$parser = new Template('./', './results/');
+$parser = new PhpTemplate('./', './results/');
 $parser->addAlias('x-form-group', 'components/form-group');
 $parser->addAlias('x-input-group', 'components/input-group');
 $parser->addAlias('x-card', 'components/card');

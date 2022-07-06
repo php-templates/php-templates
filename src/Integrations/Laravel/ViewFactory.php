@@ -2,7 +2,7 @@
 
 namespace PhpTemplates\Integrations\Laravel;
 
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 
 class ViewFactory implements \Illuminate\Contracts\View\Factory
 {
@@ -11,7 +11,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     
     public function __construct($laravel)
     {
-        $this->template = new Template(config('view.paths.0'), config('view.compiled'));
+        $this->template = new PhpTemplate(config('view.paths.0'), config('view.compiled'));
         $this->template->replacePath('errors', 'eee');
     }
     

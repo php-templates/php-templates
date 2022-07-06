@@ -99,7 +99,7 @@ This is not how ***Php-templates*** actually works, but this is how it conceptua
 
 In order to render a template:
 ```
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 
 Template::load('Garage', $data)`. 
 
@@ -293,7 +293,7 @@ at the beginning of the files that represent these pages.
 
 Now we just need to call 
 ```
-PhpTemplates\Template::load('product', $data);
+PhpTemplates\PhpTemplate::load('product', $data);
 // and php-templates will do the rest
 ```
 In the background, ***Php-Templatess*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Also, both templates have access to the data passed as a parameter.

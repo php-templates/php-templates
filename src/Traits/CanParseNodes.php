@@ -6,7 +6,7 @@ use PhpTemplates\Entities\Block;
 use PhpTemplates\Entities\Component;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\Slot;
-use PhpTemplates\Entities\Template;
+use PhpTemplates\Entities\PhpTemplate;
 
 trait CanParseNodes {
     protected function parseNode($node)
@@ -26,7 +26,7 @@ trait CanParseNodes {
             (new Component($this->process, $node, $this))->{$fn}();
         }
         elseif ($node->nodeName === 'template') {
-            (new Template($this->process, $node, $this))->{$fn}();
+            (new PhpTemplate($this->process, $node, $this))->{$fn}();
         }
         else {
             (new SimpleNode($this->process, $node, $this))->{$fn}();

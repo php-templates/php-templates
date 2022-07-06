@@ -2,8 +2,8 @@
 
 require('./../autoload.php');
 
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 
-$t = new Template(__DIR__.'/views/', __DIR__.'/results/');
+$t = new PhpTemplate(__DIR__.'/views/', __DIR__.'/results/');
 
 $t->load('document-scoped-scripts');

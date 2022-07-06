@@ -5,7 +5,7 @@ namespace PhpTemplates;
 use Exception;
 use PhpTemplates\Entities\Root;
 
-class Template
+class PhpTemplate
 {
     /**
      * configs keyed by namespace

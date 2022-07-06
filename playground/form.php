@@ -2,12 +2,12 @@
 
 require('./../autoload.php');
 
-use PhpTemplates\Template;
+use PhpTemplates\PhpTemplate;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Config;
 use PhpTemplates\Dom\DomNode;
 
-$template = new Template(__DIR__.'/views/', __DIR__.'/results/');
+$template = new PhpTemplate(__DIR__.'/views/', __DIR__.'/results/');
 $cfg = $template->getConfig();
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',

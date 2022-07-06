@@ -1,7 +1,7 @@
 ## Introduction
 Php-templates is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, Php-templates does not restrict you from using plain PHP code in your templates. In fact, all Php-templates templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning Php-templates adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax. Php-templates template files use the `.template.php` file extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). 
 
-Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to call `PhpTemplates\Template::load({path}, $data)` (path will be relative to `src_path`, without extension `template.php`) to render it. If you only want a template instance to render it later, you can call `Template::get({path}, $attrs)`, then call `render($data)`. `$attrs` will be described later, in Components section.
+Each template will become a closure function indexed on Parsed global object by its name path, but all of these are Php-templates job. You just have to call `PhpTemplates\PhpTemplate::load({path}, $data)` (path will be relative to `src_path`, without extension `template.php`) to render it. If you only want a template instance to render it later, you can call `Template::get({path}, $attrs)`, then call `render($data)`. `$attrs` will be described later, in Components section.
 
 ## Displaying data
 Like in most template engines, data is escaped against html entities and displayed using `{{}}`. You can anytime call php pure echo in order to display raw data.
@@ -124,7 +124,7 @@ If you find yourself in a situation where a layout is too repetitive, and only t
     </body>
 </html>
 ```
-Products, categories and many other pages will use the same structure. This can be simplified by declaring an html node `<extends template="layout/app"/>` at the beginning of the files that represent these pages. Now we just need to call `PhpTemplates\Template::load('product' | 'category', $data)`.  In the background, Php-templates will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Also, both templates have access to the data passed as a parameter.
+Products, categories and many other pages will use the same structure. This can be simplified by declaring an html node `<extends template="layout/app"/>` at the beginning of the files that represent these pages. Now we just need to call `PhpTemplates\PhpTemplate::load('product' | 'category', $data)`.  In the background, Php-templates will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Also, both templates have access to the data passed as a parameter.
 The extension is valid in any other situation.  All that is required is a default slot on the parent template and its data requirements to be met.
 
 ## Events
