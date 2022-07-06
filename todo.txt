@@ -19,3 +19,15 @@ stricat shared,,, adauga composers
 adauga fn de shared si composer pe template.php care actioneaza in maniera ca seteaza pe parsed ceva variabila
 parsed va fi un obiect instantiat din afara de template inainte de includere parsed .php  si e trecut abia la includes
 poate pot face tpl no name inline fn. ar fi mai readable
+
+doar componentele vor crea clase, nu si tpl root
+
+code implicat: root::register() va fi chemat doar in contextul unei componente
+in caz contrar, intoarce functia rezultata si mai departe o foloseste cine o foloseste
+ba nu  mutam spart functionalitatile register  pe abstract, sparte, un get result
+comp cheama getresult si apoi addtmpl pe process
+un map pe process da classname pe hastemplfn
+
+daca e rootcontext cu context null, first parse, nu face register, gen fn ci adauga content la document
+=>gresit, totul trb sa fie class, mai putin sloturile
+replace any tplfn with semantic name, gen compclass
