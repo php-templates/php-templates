@@ -40,7 +40,7 @@ class Template extends AbstractEntity
         
         (new Root($this->process, $node, $name, $this->context))->rootContext();
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
+        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Template::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString
         );
         $this->node->changeNode('#pho', $r);

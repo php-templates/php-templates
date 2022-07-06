@@ -6,7 +6,7 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\DomEvent;
 use PhpTemplates\Entities\AbstractEntity;
-use PhpTemplates\Parsed;
+use PhpTemplates\Template;
 use PhpTemplates\Traits\CanParseNodes;
 use PhpTemplates\Process;
 

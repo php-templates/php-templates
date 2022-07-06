@@ -3,7 +3,7 @@
 require('../autoload.php');
 
 use PhpTemplates\Config;
-use PhpTemplates\Parsed;
+use PhpTemplates\Template;
 use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
 use PhpTemplates\Process;

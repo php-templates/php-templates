@@ -34,7 +34,7 @@ class Component extends AbstractEntity
             (new Root($this->process, null, $this->name, $this->context))->rootContext();
         }
 
-        $nodeValue = sprintf('<?php $this->comp[%d] = Parsed::template("%s", %s); ?>', 
+        $nodeValue = sprintf('<?php $this->comp[%d] = Template::template("%s", %s); ?>', 
             $this->depth, $this->name, $dataString
         );      
         $this->node->changeNode('#php', $nodeValue);
@@ -60,7 +60,7 @@ class Component extends AbstractEntity
             (new Root($this->process, null, $this->name, $this->context))->rootContext();
         }
 
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)); ?>', 
+        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Template::template("%s", %s)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
         );
         $this->node->changeNode('#php', $r);

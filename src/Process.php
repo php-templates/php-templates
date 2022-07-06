@@ -95,10 +95,10 @@ class Process
     {
         $tpl = '<?php ';
         $tpl .= PHP_EOL."namespace PhpTemplates;";
-        $tpl .= PHP_EOL."use PhpTemplates\Parsed;";
+        $tpl .= PHP_EOL."use PhpTemplates\Template;";
         $tpl .= PHP_EOL;
         foreach ($this->templateFunctions as $name => $fn) {
-            $tpl .= PHP_EOL."Parsed::\$templates['$name'] = $fn;";
+            $tpl .= PHP_EOL."Template::\$templates['$name'] = $fn;";
         }
         
         $tpl = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function($m) {

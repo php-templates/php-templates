@@ -45,7 +45,7 @@ class SimpleNode extends AbstractEntity
         (new Root($this->process, $this->node, $name))->rootContext();
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
 
-        $slot = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
+        $slot = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Template::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString
         );
         $this->node->changeNode('#slot', $slot);
@@ -64,7 +64,7 @@ class SimpleNode extends AbstractEntity
 
         (new Root($this->process, $this->node, $name))->rootContext();
 
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Parsed::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
+        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Template::template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
             $this->depth, $this->context->depth, $this->context->name, $name, $dataString
         );
         $this->node->changeNode('#php', $r);

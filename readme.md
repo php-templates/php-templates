@@ -95,7 +95,7 @@ $garage = function() {
     $bicycle();
 }
 ```
-This is not how ***Php-templates*** actually works, but this is how it conceptually works. In fact, each entity will have an object instance of type `PhpTemplates\Parsed` wraping its template function and providing contextual data.
+This is not how ***Php-templates*** actually works, but this is how it conceptually works. In fact, each entity will have an object instance of type `PhpTemplates\Template` wraping its template function and providing contextual data.
 
 In order to render a template:
 ```
@@ -338,7 +338,7 @@ Considering we add our event on a block or slot
 DomEvent::on('rendering', 'user-profile-form.form-fields', function($template, &$data) {
     // here we have full access to manipulate the rendering context as we want
     // The rendering entity instance is binded to $this variable
-    // take a look at Parsed::class render() function to see how it works
+    // take a look at Template::class render() function to see how it works
 
     $input = Template::get('form-group', [
         'name' => 'country',

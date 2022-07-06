@@ -4,7 +4,7 @@ namespace PhpTemplates;
 
 use Closure;
 
-class Parsed
+class Template
 {
     /**
      * Array of templateFunctions keyed by relative template file path
@@ -46,7 +46,7 @@ class Parsed
     protected $func;
     
     /**
-     * Array of Parsed entities keyed by slot position
+     * Array of Template entities keyed by slot position
      * @var array
      */
     public $slots = [];
@@ -144,7 +144,7 @@ class Parsed
     }
 }
 
-Parsed::$templates['***block'] = function($data) {
+Template::$templates['***block'] = function($data) {
     extract($data);
     if (isset($this->slots[$this->name])) {
         usort($this->slots[$this->name], function($a, $b) {

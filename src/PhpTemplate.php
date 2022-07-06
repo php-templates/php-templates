@@ -30,8 +30,8 @@ class PhpTemplate
 
     public function get(string $rfilepath, array $data = [], $slots = [])
     {
-        if (isset(Parsed::$templates[$rfilepath])) {
-            return Parsed::template($rfilepath, $data);
+        if (isset(Template::$templates[$rfilepath])) {
+            return Template::template($rfilepath, $data);
         } else {
             $requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
@@ -52,13 +52,13 @@ class PhpTemplate
 
             require_once($path);
             
-            return Parsed::template($requestName, $data)->setSlots($slots);
+            return Template::template($requestName, $data)->setSlots($slots);
         }
     }
 
     public function raw(\Closure $cb, $data = [])
     {
-        return Parsed::raw(null, $cb, $data);
+        return Template::raw(null, $cb, $data);
     }
     
     public function getConfig(string $key = 'default'): Config
