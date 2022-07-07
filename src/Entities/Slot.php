@@ -74,7 +74,7 @@ class Slot extends AbstractEntity
                 $node = new DomNode('#root');
                 $node->appendChild($cn->detach());
                 (new Root($this->process, $node, $name, $this->context))->rootContext();
-                $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", Template::template("%s", %s)); ?>', 
+                $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
                     $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
                 );
                 $cn->changeNode('#php', $r);

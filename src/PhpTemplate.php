@@ -12,6 +12,8 @@ class PhpTemplate
      */
     protected $configs = [];
     protected $destPath;
+    protected $sharedData = [];
+    protected $dataComposers = [];
     public $trackChanges = false;
     public $debugMode = true;
     
@@ -49,11 +51,25 @@ class PhpTemplate
              //       throw new Exception($e->getMessage());
                 //}
             }
-
-            require_once($path);
             
-            return Template::template($requestName, $data)->setSlots($slots);
+            $result = require_once($path);
+            
+            return $result
+            ->withData($data)
+            ->withSharedData($this->sharedData)
+            ->withDataComposers($this->dataComposers)
+            ->setSlots($slots);
         }
+    }
+    
+    public function shareData(array $data) 
+    {
+        $this->sharedData = array_merge($this->sharedData, $data);
+    }
+    
+    public function dataComposer(string $name, \Closure $cb) 
+    {
+        $this->dataComposers[$name][] = $cb;
     }
 
     public function raw(\Closure $cb, $data = [])

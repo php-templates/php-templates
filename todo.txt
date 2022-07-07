@@ -31,3 +31,5 @@ un map pe process da classname pe hastemplfn
 daca e rootcontext cu context null, first parse, nu face register, gen fn ci adauga content la document
 =>gresit, totul trb sa fie class, mai putin sloturile
 replace any tplfn with semantic name, gen compclass
+
+fn in loc de slot

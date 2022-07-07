@@ -23,6 +23,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function exists($view)
     {
+        // TODO:
         return true;
     }
 
@@ -62,11 +63,12 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function share($key, $value = null)
     {
-        if (is_array($key)) {
-            $this->sharedData = array_merge($this->sharedData, $value);
+        if (!is_array($key)) {
+            $data = [$key => $value];
         } else {
-            $this->sharedData[$key] = $value;
+            $data = $key;
         }
+        $this->template->shareData($data);
     }
 
     /**
@@ -78,7 +80,10 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function composer($views, $callback)
     {
-        //
+        $views = (array) $views;
+        foreach ($views as $view) {
+            $this->template->dataComposer($view, $callback);
+        }
     }
 
     /**

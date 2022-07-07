@@ -96,10 +96,17 @@ class Process
         $tpl = '<?php ';
         $tpl .= PHP_EOL."namespace PhpTemplates;";
         $tpl .= PHP_EOL."use PhpTemplates\Template;";
+        $tpl .= PHP_EOL."use PhpTemplates\TemplateRepository;";
         $tpl .= PHP_EOL;
+        $tpl .= '$tr = new TemplateRepository();';
+        
+        $callerTemplate = end($this->templateFunctions);
+        $callerTemplateName = key($this->templateFunctions);
+        unset($this->templateFunctions[$callerTemplateName]);
         foreach ($this->templateFunctions as $name => $fn) {
-            $tpl .= PHP_EOL."Template::\$templates['$name'] = $fn;";
+            $tpl .= PHP_EOL."\$tr->add('$name', $fn);";
         }
+        $tpl .= PHP_EOL."return new Template(\$tr, '$callerTemplateName', $callerTemplate);";
         
         $tpl = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function($m) {
             return $m[1];

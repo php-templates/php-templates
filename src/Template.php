@@ -4,15 +4,9 @@ namespace PhpTemplates;
 
 use Closure;
 
+// aka parsed template
 class Template
 {
-    /**
-     * Array of templateFunctions keyed by relative template file path
-     *
-     * @var array
-     */
-    public static $templates = [];
-
     /**
      * Parent / context
      * @var self
@@ -62,24 +56,26 @@ class Template
      * @var array numeric indexes representing depth level
      */
     public $block = [];
-    
+    /*
     public static function template($name, $data = [])
     {
         return new self($name, self::$templates[$name], $data);
-    }
+    }*/
     
+    /*
     public static function raw($name, \Closure $fn, $data = [])
     {
         if (!$name) {
             $name = uniqid();
         }
         return new self($name, $fn, $data);
-    }
+    }*/
     
-    private function __construct($name, \Closure $fn, $attrs = [])
+    public function __construct(TemplateRepository $repository, $name, \Closure $fn, $data = [])
     {
+        $this->repository = $repository;
         $this->name = $name;
-        $this->data = $attrs;
+        $this->data = $data;
         
         $this->func = \Closure::bind($fn, $this);
     }
@@ -119,7 +115,7 @@ class Template
         $this->scopeData['_name'] = $this->name;
 
         $func = $this->func;
-        $func(array_merge($this->scopeData, $this->data));
+        $func(array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name), $this->scopeData));
     }
     
     public function __get($prop)
@@ -142,18 +138,23 @@ class Template
         
         return $this;
     }
-}
-
-Template::$templates['***block'] = function($data) {
-    extract($data);
-    if (isset($this->slots[$this->name])) {
-        usort($this->slots[$this->name], function($a, $b) {
-            $i1 = isset($a->data['_index']) ? $a->data['_index'] : 0;
-            $i2 = isset($b->data['_index']) ? $b->data['_index'] : 0;
-            return $i1 - $i2;
-        });
-        foreach ($this->slots($this->name) as $_slot) {
-            $_slot->render($this->scopeData);
-        }
+    
+    public function withSharedData(array $data)
+    {
+        $this->repository->shareData($data);
+        
+        return $this;
     }
-};
+    
+    public function withDataComposers(array $data)
+    {
+        $this->repository->dataComposers($data);
+        
+        return $this;
+    }
+    
+    public function template(string $name, array $data = []) 
+    {
+        return $this->repository->get($name, $data);
+    }
+}

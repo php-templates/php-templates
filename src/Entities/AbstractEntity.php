@@ -268,6 +268,7 @@ abstract class AbstractEntity
         if (is_null($node)) {
             $_data = [];
             foreach ($data as $k => &$val) {
+                $k = trim($k);
                 if ($k[0] === ':') {
                     $k = substr($k, 1);
                 } 
