@@ -11,7 +11,7 @@ Tired of writing syntax like:
 @endif | {% endif %}
 ```
 in any php template engine you are using?
-If you indent control structures, soon, you will have an unreadable document. If you don't indent, you will have ambiguous control structures to follow. Where it starts. Where it ends? Want a simplified and pleasant syntax that is easy to follow and mentain? Want reusable components like form groups that are easy to interact with and set values?
+
 What about:
 ```
 <div p-if="$foo" class="foo" :class="$bar">
@@ -20,104 +20,37 @@ What about:
     </div>
 </div>
 ```
-? Is a vue.js inspired syntax, but in PHP.
+?
 
-***Php-Templatess*** is a template engine based on [HTML5DOMDocument](https://github.com/ivopetkov/html5-dom-document-php). Unlike some PHP templating engines, ***Php-Templatess*** does not restrict you from using plain PHP code in your templates. In fact, all ***Php-Templatess*** templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templatess*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax. However, because of using DomDocument, there are some known limitations, but also solutions/workarounds.
-1. ###### You can't have php tags outside of a node attribute value
-The following syntax would confuse DomDocument on parsing:
-```
-<input type="checkbox" <?php echo $true ? 'checked' : ''; ?>>
-``` 
-The above syntax is invalid (and ugly). However, you have `p-raw` directive for this, or you can create your own custom directives (see **Custom directives** section):
-```
-<input type="checkbox" p-raw="$true ? 'checked' : ''">
-// -> <input type="checkbox" <?php echo $true ? 'checked' : ''; ?>>
-```
-or after defining a custom directive that echo `checked` when passed condition is true:
-```
-<input type="checkbox" p-checked="$true">
-```
+***Php-Templatess*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates - with condition of writing it inside @php ... @endphp blocks. In fact, all ***Php-Templates*** templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
-2. ###### You can't have a dynamic node name
-In situations that requires dynamic tag names based on condition (for example when we want a tag to be a `p` or `h1`):
-``` 
-<<?php echo $true ? 'h1' : 'p'>>
-    ...
-</<?php echo $true ? 'h1' : 'p'>>
-```
-using ***Php-Templatess***, you will have to treat that node open and close tag as pure string and taking in consideration that ***Php-Templatess*** will treat it like a string too (***Php-Templatess*** syntax on that tag won't be parsed)
-```
-<?php echo '<div class="'.(true ? 'some-class' : '').'">'; ?>
-    <p p-foreach="[1,2] as $i"></p>
-<?php echo '</div>'; ?>
-```
-3. ###### Missing closing tags will lead to unexpected behaviours and for now are hard to debug
-However, now you have tools for auto closing tags and highlightings tools, and a new template engine for better templating.
-
-4. ###### please, let me know if you found other limitations.
-
-## How it works
+## Setting up
 ***Php-Templatess*** files use the `.template.php` extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). Now, `dest_path` won't be used by developer, is just the place where parsed templates are stored.
 ```
-use PhpTemplates\Config;
-
-Config::set('src_path', '/views');
-Config::set('dest_path', '/parsed');
-
-// the file /views/components/form-group.template.php will be parsed and results /parsed/components_formgroup_{hash}.php
+use PhpTemplates\PhpTemplate;
+$tpl = new PhpTemplate($src_path = '/views', $dest_path = '/parsed');
 ```
-
 *___In the next parts, we will refer to `src_path` files as components or templates as the same thing. Also, parsed components that are ready to be rendered will be refered as instances___*
-
-Each template entity (components, slots, blocks then loaded template itself) will be recomposed with minimal redundance and executed to match the desired structure. For example:
-- template `Garage` is composed with templates `Bicycle` and `Car`
-- template `Car` has component `Wheel`
-- template `Bicycle` has `Wheel` too, but with different aspect parameters
-- component `Wheel` will be parsed only once and be used in template `Car` and `Bicycle` with given `parameters`.
-
-For this to work, ***php-templates*** will create and map structures like this: 
-```
-// pseudo code, pseudo result
-$wheel = function($data = ['size' => 12]) {
-    ...html here
-};
-$car = function() {
-    ...html here
-    $wheel(['size' => 16])
-}
-$bicycle = function() {
-    ...html here
-    $wheel(['size' => 3])
-}
-$garage = function() {
-    ...html here
-    $car();
-    $bicycle();
-}
-```
-This is not how ***Php-templates*** actually works, but this is how it conceptually works. In fact, each entity will have an object instance of type `PhpTemplates\Template` wraping its template function and providing contextual data.
 
 In order to render a template:
 ```
-use PhpTemplates\PhpTemplate;
-
-Template::load('Garage', $data)`. 
+// this will echo html content
+$tpl->load('user-form', $data);` //where user form is user-form.template.php file located under src_path
 
 // If you only want a template instance to render it later, or to programatically assign it to another template render context
-$car = Template::get('Garage/Car', $attrs)`
+$modal = $tpl->get('auth/modal', $data)`
 
-// manipulate template attrs or data
-$car->attrs['color'] = 'red';
-$car->data['owner'] = 'me';
+// manipulate template data
+$modal->data['owner'] = 'me';
 
 // when you want to render that template
-$car->render($data)
+$modal->render($extraData)
 ```
-Difference between `$attrs` and `$data` will be described later, in Components section.
+Passed $data is assumed to be an map array which will be extracted to template scope.
 
 ## Displaying data
-Like in most template engines, data is escaped against html entities and displayed using `{{  }}` syntax. You can anytime call pure php in order to display raw, unescaped data.
-Html nodes attributes are set using `:` bind syntax.
+Like in most template engines, data is escaped against html entities and displayed using `{{ $var }}` syntax. You can use `{!! $var !!}` syntax in order to display raw, unescaped data.
+Php values are passed to html nodes attributes using `:` bind syntax.
 The following:
 ``` 
 <div class="card" :class="$foo === 1 ? 'active' : ''"></div>
@@ -126,14 +59,8 @@ will produce:
 ``` 
 <div class="card <?php echo $foo === 1 ? 'active' : ''; ?>"></div>
 ```
-*Info: you can't have more than one binding of the same type per node*
-```
-<div :class="$x" :class="$y"></div>
-// will result 
-<div class="<?php echo $x; ?>"></div> 
-```
 
-As you can see, any valid continuing `echo ` php syntax is allowed between `""`. 
+As you can see, any valid continuing `echo ` php syntax is allowed `:attr="$__HERE__"`. 
 ```
 :attribute="{php_syntax}"
 is translated to
@@ -158,21 +85,26 @@ will produce:
 As you can see, control structures can be combined in many ways, even multiple `foreach` on same node. There is no operator precedence, but order of attributes matters, especially when one loop deppends of variables set by the parent loop.
 
 ## Custom directives
-You may create your own parse rules using `Config::addDirective()`. 
+You may create your own parse rules using `Config::addDirective()`. Directives are functions which returns arrays of `attr -> value` which will be attached to Node before parsing it.
 ```
-use PhpTemplates\Config;
-
-Config::addDirective('checked', function($expression) {
-    // p-checked="$expression" will be evaluated as 
-    // <?php echo {anything_that_function_returns}; ?>
-    
-    // the function must return a valid php expression as string
-    return "$expression ? 'checked' : ''";
+$cfg = $tpl->getConfig();
+$cfg->addDirective('checked', function($eval) {
+    return [
+        'p-raw' => $eval.' ? "checked" : ""' // like <node p-raw="$eval ? 'checked' : ''" />
+    ];
+    // p-raw is a built in directive which says: print me only value (HTMLT5 attrs like)
+});
+// OR
+$cfg->addDirective('auth', function() {
+    return [
+        'p-if' => $isAuthCheck // like <node p-if="$isAuthCheck" />
+    ];
 });
 ```
 Now we can use our directive like this:
 ```
 <input type="checkbox" p-checked="1 < 3">
+<input p-auth>
 ```
 
 ## Components
@@ -191,24 +123,22 @@ You can reuse parts of design by making them components. Just put the html code 
 
 Now we can use our component like this:
 ```
-<template is="components/form-group" type="text" name="will_be_passed_as_string" $value="$any_valid_php = ['even_array_declaration']" required="required" />
+<template is="components/form-group" type="text" name="string" :value="$value = 'any php expression'" @required="'required'" />
 ```
-Every component will be mapped on a global object and will be reused in case of second call with the given node attributes as parameters.
+Every component will be mapped on current rendering process and will be reused in case of second call with the given node attributes as parameters.
 
 Each attribute passed on a component node will be included in one associative array which will be extracted in component function scope to be available there. Attributes passed with bind syntax (`:`) will be evaluated as php variables/syntax. Attributes passed without bind syntax will be treated as strings.
-
-`p-bind="$_attrs"` is a special syntax which says that `<input` will receive as attributes all `$key => $value` of `$data` that was not used in template. In our case, `form-group` has not used var `$required`, so this value will be passed to input.
+Please notice `p-bind="$_attrs"` - is a built in syntax which says that `<input` will receive as attributes all attributes passed using `@attr="value"` syntax. To be noted that this syntax is evaluated as php, so don't put strings without quote as values.
 You can also have control structures on components nodes.
 
 ### Component aliasing
 If you have an extensivelly used component, you can alias it by calling `Config::set('aliased', $what)`
 ```
-use PhpTemplates/Config;
-
-Config::set('aliased', ['form-group' => 'components/form-group']);
+$cfg = $tpl->getConfig();
+$cfg->addAlias('form-group', 'components/form-group'); // array with key value supported too
 
 // Now we can reffer to our component by this:
-<form-group type="text"/>
+<form-group type="text" value="123"/>
 ```
 !!! Disclaimer: ***php-Templatess*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
@@ -237,7 +167,7 @@ Slots can be named or default. Slots can have default values or not. To customiz
     <input type="number" slot="default">
 </form-group>
 ```
-No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. To pass a node as value to a slot, you have to use `slot="{slot_name}"` attribute. That node will replace {slot_name} in our component context.
+No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. To pass a node as value to a slot, you have to use `slot="{slot_name}"` attribute. That node will replace {slot_name} in our component context. Multiple nodes can fill the same slot name.
 
 ## Blocks
 Blocks are declared with `<block name="{block_name}">nodes here</block>` syntax. A block name is required. They work the same as a slot, they are treated like slots, but with 2 differences:
@@ -283,87 +213,33 @@ If you find yourself in a situation where a layout is too repetitive, and only t
     </body>
 </html>
 ```
-Products, categories and many other pages will use the same structure. This can be simplified by declaring an html node 
+Products, categories and many other pages will use the same structure. This can be simplified by declaring an html node wrapper representing extended template:
 ```
-<extends template="layout/app"/>
-
-... specific html content of product page 
+<template is="layout/app">
+   specific html content of product page 
+</template>
 ```
-at the beginning of the files that represent these pages. 
-
 Now we just need to call 
 ```
-PhpTemplates\PhpTemplate::load('product', $data);
+$tpl->load('product', $data);
 // and php-templates will do the rest
 ```
 In the background, ***Php-Templatess*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Also, both templates have access to the data passed as a parameter.
-The extension is valid in any other situation.  All that is required is a default slot on the parent template and its data requirements to be met. Extending feature is related to the next one - ***Events***.
+The extension is valid in any other situation given by using slots.
 
 ## Events
-Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. Events are executed before rendering a component, template or a block can be listened and allow the alteration of the context in which they are executed (received data, received slots, order of rendered block items). Events can be ***general*** (attached to a template / component) or ***specific*** (eliptic or full path to targeted entity, mentioned separated with `.`). Events can be attached on components, slots or blocks. The syntax that will be used to attach an event:
+Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. For now, events are parsing time only. Please keep in mind that template cache can't detect events attached nodes modifications in order to re-transpile, so you have to reset them manually. If you find yourself working on events based UI, you can enable debug mode `$tpl->debugMode = true;` and `$tpl->trackChanges = true;` to prevent overfilling dest folder with old cached files and to parse without cache (at each request).
+The syntax that will be used to attach an event:
 ```
 use PhpTemplates\DomEvent;
 
-new DomEvent('rendering', '{event_name}', $callback); 
-// or 
-DomEvent::on('rendering', '{event_name}', $callback);
+DomEvent::on('parsing', '{template_name}', function($node) {
+    // you can manipulate $node here using syntaxes like: $node->querySelector('div')
+    // appendChild('…html content here')
+    // insertBefore(newNode, $anotherNode)
+    // insertAfter
+    // detach()
+});
 ```
 Of course, this must be registered before template calling.
-
-On each rendering event, ***php-Templatess*** will keep a record of the current path consisting of the parent templates + the current template joined by `.`.
-When logging an event, a hierarchical selection rule similar to css ***descendants selector*** (`body header .my_class1 .myclass_2 {}`) applies, except that the name represents the relative name of the templates. If the `false` value is returned on any event callback, the rendering of the template in question is canceled.
-
-Let's take an example. Considering we have the following templates: `user-profile-form` and `form-group`. First one contains a few of the second one. Now, we want to attach events on all `user-profile-form.form-group`:
-```
-$i = 0;
-DomEvent::on('rendering', 'user-profile-form.form-group', function($template, &$data) use (&$i) {
-    $i++;
-
-    // make first element required
-    if ($i === 1) {
-        $data['required'] = true;
-        // or
-        $this->attrs['required'] = true;
-    }
-
-    // stop rendering age field 
-    if ($this->attrs['name'] === 'age') {
-        return false;
-    }
-});
-```
-
-Considering we add our event on a block or slot
-```
-DomEvent::on('rendering', 'user-profile-form.form-fields', function($template, &$data) {
-    // here we have full access to manipulate the rendering context as we want
-    // The rendering entity instance is binded to $this variable
-    // take a look at Template::class render() function to see how it works
-
-    $input = Template::get('form-group', [
-        'name' => 'country',
-        'type' => 'select',
-        'options' => ['o1' => 'Ro', 'o2' => 'Gb'],
-        'value' => 'o1',
-        // _index attr here if event target is 
-    ]);
-
-    // if above components accepts slots, we can add them like this:
-    // example of raw template (unparsed, on fly)
-    $label = Template::raw(function() {
-        echo '<label><i class="fa fa-help"></i>My label</label>'
-    });
-    $input->addSlot($position = 'label', $label);
-
-    // finally, hook our input to render list
-    $this->slots['form-fields'][] = $input;
-    // if we have a slot event, we must insert the node at desired index in the above array
-
-    // if form-fields is a block entity we can also change the order of displayed fields
-    foreach ($this->slots['form-fields'] as $node) {
-        // $node->attrs['_index'] = anything you want
-    }
-});
-```
-
-The examples found in [playground/form](https://github.com/florin-botea/***php-Templatess***/blob/dev/playground/form.php) may be used as sample of the power of that feature.
+Examples may be found in [playground/form](https://github.com/florin-botea/***php-Templatess***/blob/dev/playground/form.php) may be used as sample of the power of that feature.

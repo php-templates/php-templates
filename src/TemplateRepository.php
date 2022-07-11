@@ -42,7 +42,7 @@ class TemplateRepository
         return $this->sharedData;
     }
     
-    public function getComposedData(string $name) 
+    public function getComposedData(string $name, $existingData = []) 
     {
         if (empty($this->dataComposers[$name])) {
             return [];
@@ -53,7 +53,7 @@ class TemplateRepository
         
         $data = [];
         foreach ($this->dataComposers[$name] as $cb) {
-            $data = array_merge($data, $cb());
+            $data = array_merge($data, $cb($existingData));
         }
         
         $this->composedData = $data;

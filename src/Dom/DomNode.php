@@ -429,7 +429,9 @@ class DomNode
     public function d()
     {
         echo PHP_EOL;
+        echo '<pre>';
         echo htmlentities((string) $this);
+        echo '</pre>';
         echo PHP_EOL;
     }
     

@@ -115,7 +115,7 @@ class Template
         $this->scopeData['_name'] = $this->name;
 
         $func = $this->func;
-        $func(array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name), $this->scopeData));
+        $func(array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name, $this->data), $this->scopeData));
     }
     
     public function __get($prop)
