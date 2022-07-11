@@ -1,8 +1,10 @@
 <?php
 
+/*
 error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
+*/
 
 if (!function_exists('dd')) {
     function dd(...$data) {
@@ -27,21 +29,6 @@ function d(...$data) {
         //echo '</pre>';
         echo PHP_EOL;
     } 
-}
-
-function dom($dom)
-{
-    echo PHP_EOL.'-------------'.PHP_EOL.$dom.PHP_EOL.'-------------'.PHP_EOL;
-    die();
-}   
-
-function buf($self, $name = '', $depth = 0)
-{
-    if (empty($_GET['debug'])) return;
-    echo '<div style="padding-left:'.($depth*0).'px"><div style="background:#e6e6e6; border: 1px solid black; margin-bottom:10px; padding:5px;">';
-    echo '<div><b>'. $name .'</b></div>';
-    echo htmlspecialchars($self->codebuffer->getStream());
-    echo '</div></div>';
 }
 
 require_once(__DIR__.'/src/helpers.php');
