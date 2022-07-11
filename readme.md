@@ -27,7 +27,10 @@ What about:
 ## Setting up
 ***Php-Templatess*** files use the `.template.php` extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). Now, `dest_path` won't be used by developer, is just the place where parsed templates are stored.
 ```
+required_once 'path/to/phpt/autoload.php';
+
 use PhpTemplates\PhpTemplate;
+
 $tpl = new PhpTemplate($src_path = '/views', $dest_path = '/parsed');
 ```
 *___In the next parts, we will refer to `src_path` files as components or templates as the same thing. Also, parsed components that are ready to be rendered will be refered as instances___*
