@@ -111,25 +111,6 @@ DomEvent::on('parsing', 'user-profile-form', function($node) {
     
     return $tabs;
 });
-
-for ($i=0;$i<=50;$i++) {
-    $products[] = [
-        'name' => uniqid(),
-        'price' => rand(0, 100)
-    ];
-}
-
-DomEvent::on('rendering', 'user-profile-form', function($node) use($products) {
-    $tabs = $node->querySelector('template[is="components/tabs"]');
-    $tabs->setAttribute(':tabs', str_replace(')', "pics => 'Pictures')", $tabs->getAttribute(':tabs')));
-    
-    $data['products'] = $products;
-    $t->addSlot('default', Template::raw(function() use ($t, $data) { ?>
-        <div class="tab-pane fade show" id="pics" role="tabpanel">
-            <?php Template::get('products', $data)->render($data); ?>
-        </div> <?php
-    }));
-});
 // dom events end
 
 // the original

@@ -69,6 +69,69 @@ As you can see, any valid continuing `echo ` php syntax is allowed `:attr="$__HE
 is translated to
 attribute="<?php echo {php_syntax}"
 ```
+## Passing data
+### To loaded template:
+```
+$tpl->load('tpl-file', $data);
+// or
+$tpl->get('tpl-file', $data)
+… 
+->render($extraData);
+```
+will make available any `$data` key as variable inside `tpl-file`
+### To a simple node
+```
+// $bar = 'baz';
+<div class="foo" :class="$bar">
+// resulting <div class="foo baz">
+
+<div class="foo" :class="bar">
+// error, undefined constant `bar`
+```
+### To component (read below about components)
+```
+// $bar = 123
+// $baz = [1,2,3];
+<my-component foo="foo" :bar="$bar" :baz="$baz" :abc="['array']" />
+// will make available in my-component the given variables.
+
+<my-component @rows="5" @required="'required'"/>
+// inside <my-component> we will have all @attrs available on $_attrs variable and may have a p-bind="$_attrs" syntax on a textarea node (for example) do dynamically pass attributes whitout requireing to manually declare the assignments.
+// now, we can have in my-component a syntax like <textarea p-bind="$_attrs"> to produce <textarea rows="5" required="required">
+```
+### To slot (read below about slots)
+```
+// my-component.template.php
+@php
+  $foo = 123;
+@endphp
+<div>
+    <slot :foo="$foo" bar="bar" :baz="$baz"></slot>
+</div>
+
+// app.template.php
+<my-component :baz="5">
+    <div>
+        {{ $foo }} and {{ $bar }} {{ $baz }} available here
+    </div>
+</my-component>
+```
+### Global Share data
+```
+$tpl->shareData($data);
+// will make $data key variables available to any template file (with low precedence, meaning those variables may be overriden by codeflow passed params)
+```
+### Composing data for specific components
+```
+<template is="file-name" foo="123">
+
+$tpl->dataComposer('file-name', function($data) {
+    // $data is an array containing attributes passed to the file-name invocation tag, in our case ['foo' => 123]
+    // extra processing here
+    return [… extra-data as key => value]
+});
+```
+
 ## Control structures
 Allowed control structures are 'if', 'elseif', 'else', 'for', 'foreach'.
 You can place any of this allowed control structures prefixed with `p-` as attribute of the node you want to control.
@@ -227,22 +290,23 @@ Now we just need to call
 $tpl->load('product', $data);
 // and php-templates will do the rest
 ```
-In the background, ***Php-Templatess*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Also, both templates have access to the data passed as a parameter.
+In the background, ***Php-Templatess*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Keep in mind that you need to irigate above extended component with given data using bind syntax.
 The extension is valid in any other situation given by using slots.
 
 ## Events
 Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. For now, events are parsing time only. Please keep in mind that template cache can't detect events attached nodes modifications in order to re-transpile, so you have to reset them manually. If you find yourself working on events based UI, you can enable debug mode `$tpl->debugMode = true;` and `$tpl->trackChanges = true;` to prevent overfilling dest folder with old cached files and to parse without cache (at each request).
+
 The syntax that will be used to attach an event:
 ```
 use PhpTemplates\DomEvent;
 
 DomEvent::on('parsing', '{template_name}', function($node) {
     // you can manipulate $node here using syntaxes like: $node->querySelector('div')
-    // appendChild('…html content here')
+    // appendChild('…html content string here')
     // insertBefore(newNode, $anotherNode)
     // insertAfter
     // detach()
 });
 ```
 Of course, this must be registered before template calling.
-Examples may be found in [playground/form](https://github.com/florin-botea/***php-Templatess***/blob/dev/playground/form.php) may be used as sample of the power of that feature.
+Examples may be found in [playground/form](https://github.com/florin-botea/php-templates/blob/dev/playground/form.php) may be used as sample of the power of this feature.
