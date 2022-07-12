@@ -2,91 +2,104 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\TemplateFunction;
+use PhpTemplates\Process;
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\PhpNode;
+use PhpTemplates\InvalidNodeException;
 
-class Slot extends Parser implements Mountable
+class Slot extends AbstractEntity
 {
-    protected $document;
-    protected $name;
-    protected $i;
-    protected $nest;
-    protected $codebuffer;
-    
-    public function __construct(Document $doc, $i = 0, $nest = false)
+    protected $attrs = ['name' => 'default', 'slot' => 'default'];
+    private $hasSlotDefault;
+
+    public function __construct(Process $process, $node, AbstractEntity $context)
     {
-        $this->document = $doc;
-        $this->i = $i;
-        $this->nest = $nest;
-        $this->codebuffer = new CodeBuffer;
+        parent::__construct($process, $node, $context);
+
+        $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }
 
-    public function mount(HTML5DOMElement $node): void
+    public function simpleNodeContext()
     {
-        $this->insertSlot($node);
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
 
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
-            $node
+        $this->node->changeNode('#slot');
+        if ($this->hasSlotDefault) {
+            $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
+            $slotDefault = new PhpNode('if', $if);
+            foreach ($this->node->childNodes as $cn) {
+                // wrap cn into an empty node to not lose its condition structures on parsing process
+                $wrapper = new DomNode('#wrapper');
+                $wrapper->appendChild($cn->detach());
+                $this->parseNode($cn);
+                $slotDefault->appendChild($wrapper);
+            }
+            $this->node->appendChild($slotDefault);
+        }
+        
+        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
+        $r = '<?php $_slot->render('.$dataString.'); ?>';
+        $append->appendChild(new DomNode('#php', $r));
+        $this->node->appendChild($append);
+    }
+
+    public function slotContext()
+    {
+        throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node);
+    }
+
+    /**
+     * <myComp><slot name="mytitle" slot="title"></slot></myComp>
+     *
+     */
+    public function componentContext()
+    {
+        $this->attrs['slot'] = 'default';
+        $this->attrs['name'] = 'default';
+
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
+
+        $this->node->changeNode('#slot');
+        if ($this->hasSlotDefault) {
+            $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
+            $slotDefault = new PhpNode('if', $if);
+            foreach ($this->node->childNodes as $cn) {
+                $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+                $node = new DomNode('#root');
+                $node->appendChild($cn->detach());
+                (new Root($this->process, $node, $name, $this->context))->rootContext();
+                $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
+                    $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
+                );
+                $cn->changeNode('#php', $r);
+                $cn->empty();
+                $slotDefault->appendChild($cn->detach());
+            }
+            $this->node->appendChild($slotDefault);
+        }
+        
+        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
+        $r = sprintf('<?php $this->comp[%d]->addSlot("%s", $_slot); ?>',
+            $this->context->depth, $this->attrs['slot']
         );
-        $this->document->toberemoved[] = $node;
+        
+        $append->appendChild(new DomNode('#php', $r));
+        $this->node->appendChild($append);
     }
-
-    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf)
-    {
-        $this->codebuffer = $cbf;
-
-        $this->insertSlot($node);
+    
+    public function rootContext() {
+        return $this->simpleNodeContext();
     }
-
-    public function insertSlot($node)
-    {
-        $nodeData = Helper::nodeStdClass($node);
-        $this->name = $nodeData->name;
-
-        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $node) {
-            if (!$this->nest) {
-                //$this->codebuffer->raw("DomEvent::event('renderingSlots', '$this->name', \$this->slots['$this->name'] ?? [], []);");
-            }
-            $this->codebuffer->if('!empty($this->slots["'.$this->name.'"])', function() use ($nodeData) {
-                $this->codebuffer->foreach("\$this->slots['$this->name'] as \$slot", function() use ($nodeData) {
-                    $dataString = Helper::arrayToEval($nodeData->attributes);
-                    if ($this->nest) {
-                        $this->codebuffer->raw("\$this->comp[{$this->i}]->addSlot('{$nodeData->slot}', \$slot);");
-                    } else {
-                        $this->codebuffer->raw('$slot->render(array_merge($this->data, '.$dataString.'));');
-                    }
-                });
-            }); 
-            if ($slotDefault = $this->getNodeSlots($node, true)) {
-                $slotDefault = $slotDefault['default'];
-                // check for empty cn first
-                $this->codebuffer->else(null, function() use ($slotDefault) {
-                    foreach ($slotDefault as $_node) {
-                        // skip empty nodes
-                        if ($_node->nodeName === 'slot') {
-                            continue;
-                        }
-                        
-                        $_name = $isComponent = Helper::isComponent($_node);
-                        $_name = $_name ? $_name : 'slot_default?id='.uniqid();
-                        if ($isComponent) {
-                            (new Component($this->document, $_name))->_mount($_node, $this->codebuffer);
-                        } else {
-                            $_nodeData = Helper::nodeStdClass($_node);
-                            (new Parser($this->document, $_name))->parse($_node);
-                            $this->codebuffer->nestedExpression($_nodeData->statements, function() use ($_name, $_nodeData) {
-                                $this->codebuffer->raw('$this->comp[0] = Parsed::template("'.$_name.'", $_attrs);');
-                                $this->codebuffer->raw('$this->comp[0]->setSlots($slots);');
-                                $this->codebuffer->raw('$this->comp[0]->render($this->data);');
-                            });
-                        }
-                    }
-                });
-            }
-        });
+    public function templateContext() {
+        $this->simpleNodeContext();
+    }
+    public function blockContext() {
+        throw new InvalidNodeException('Invalid slot location (slot in block not allowed)', $this->node->parentNode);
     }
 }

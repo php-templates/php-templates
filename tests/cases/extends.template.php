@@ -10,8 +10,8 @@
 -----
 
 <!-- pass data to extended template -->
-<?php $this->data['bind_me'] = 'bound'; ?>
-<template is="extends/b"></template>
+@php $this->scopeData['bind_me'] = 'bound'; @endphp
+<template is="extends/b" :bind_me="$this->scopeData['bind_me']"></template>
 =====
 <parent2>
     bound
@@ -21,7 +21,7 @@
 -----
 
 <!-- multi-extends -->
-<template is="extends/c"></template>
+<template is="extends/c" :bind_me="$this->scopeData['bind_me']"></template>
 =====
 <parent4>
     parent4

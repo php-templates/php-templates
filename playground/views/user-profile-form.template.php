@@ -1,7 +1,8 @@
-<extends template="layouts/app"/>
-
+<template is="layouts/app">
 <x-card title="My form">
-    <!-- <block></block> -->
+    <!-- <block>
+    hgg
+    </block> -->
     <block name="form-fields">
         <div class="row">
             <x-form-group type="text" class="col-6"
@@ -43,3 +44,4 @@
         </x-form-group>
     </block>
 </x-card>
+</template>

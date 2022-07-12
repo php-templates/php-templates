@@ -4,81 +4,59 @@ namespace PhpTemplates;
 
 class Config
 {
-    private function __construct() {}
-    
-    private static $data = [
-        'prefix' => 'p-',// for flow control structures @if, @else
-        'src_path' => 'views/',
-        'dest_path' => 'parsed/',
-        'track_changes' => true,// track dependencies changes
-        'trim_html' => false,
-    ];
-    
+    private $name;
+
+    private $srcPath;
+    private $aliased = [];
+    private $directives = [];
+
     const allowedControlStructures = [
-        'if', 'elseif', 'else', 'for', 'foreach', 'raw'
+        'if', 'elseif', 'else', 'for', 'foreach'
     ];
     
     const attrCumulative = [
         'class', 'id'
     ];
     
-    const attrDataBindEager = 'data';
-    const attrIsComponent = 'is';
-    
-    public static function all()
-    {
-        return self::$data;
-    }
-    
-    public static function set($key, $value = null)
-    {
-        if (is_array($key)) {// nu merge // todo
-            self::$data = array_merge_recursive(self::$data, $key);
-        } else {
-            self::$data[$key] = $value;
-        }
-    }
-    
-    public static function add($key, $value = null)
-    {
-        if (!isset(self::$data[$key])) {
-            self::$data[$key] = [$value];
-        } else {
-            self::$data[$key][] = $value;
-        }
-    }
-    
-    public static function get($key, $fback = null)
-    {
-        if (isset(self::$data[$key])) {
-            return self::$data[$key];
-        }
-        return $fback;
+    private $prefix = 'p-';
+   
+    public function __construct($name, $srcPath) {
+        $this->name = $name;
+        $this->srcPath = $srcPath;
     }
 
-    public static function getComponentByAlias($name)
+    public function addDirective(string $key, \Closure $callable): void
     {
-        if (!isset(self::$data['aliased']) || !isset(self::$data['aliased'][$name])) {
-            return null;
+        $this->directives[$key] = $callable;
+    }
+    
+    public function addAlias($key, string $component = ''): void
+    {
+        if (!is_array($key)) {
+            $aliased = [$key => $component];
+        } else {
+            $aliased = $key;
         }
+        $this->aliased = array_merge($this->aliased, $aliased);
+    }
 
-        return self::$data['aliased'][$name];
+    public function hasDirective(string $key): bool
+    {
+        return isset($this->directives[$key]);
     }
     
-    public static function addDirective($name, $value = null)
+    public function hasAlias(string $key): bool
     {
-        self::$data['directives'][$name] = $value;
+        return isset($this->aliased[$key]);
     }
     
-    public static function directive($name, $val)
+    public function setSrcPath($val)
     {
-        if (empty(self::$data['directives'][$name])) {
-            return false;
-        }
-        $directive = self::$data['directives'][$name];
-        if (is_callable($directive)) {
-            return $directive($val);
-        }
-        return $directive;
+        $this->srcPath = $val;
+    }
+    
+    public function __get($prop)
+    {
+        return isset($this->{$prop}) ? $this->{$prop} : null;
     }
 }

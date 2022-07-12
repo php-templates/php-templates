@@ -1,11 +1,11 @@
-<?php isset($value) ?: $value = array_keys($tabs)[0]; ?> 
+@php isset($value) ?: $value = array_keys($tabs)[0]; @endphp 
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item" p-foreach="$tabs as $i => $tab">
-    <?php if (isset($this->slots['tab.'.$i])) {
+    @php if (isset($this->slots['tab.'.$i])) {
         $this->slots['tab.'.$i]->render($data);
-    } else { ?>
+    } else { @endphp
     <a class="nav-link" :class="$value === $i ? 'active' : ''" data-toggle="tab" :href="'#'.$i" role="tab" :aria-controls="$i" :aria-selected="$i === $value ? 'true' : 'false'">{{ $tab }}</a>
-    <?php } ?>
+    @php } @endphp
   </li>
 </ul>
 <div class="tab-content" id="myTabContent">

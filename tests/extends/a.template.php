@@ -1,5 +1,5 @@
-<extends template="extends/parent"></extends>
-
+<template is="extends/parent">
 <a>
     <foo></foo>
 </a>
+</template>

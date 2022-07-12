@@ -5,4 +5,4 @@
     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
       <slot></slot>
     </div>
-</li>
+</div>

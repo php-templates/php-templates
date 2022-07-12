@@ -2,106 +2,92 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\TemplateFunction;
+use PhpTemplates\Process;
+use PhpTemplates\Dom\DomNode;
 
-class Component extends Parser implements Mountable
+class Component extends AbstractEntity
 {
-    protected $document;
-    protected $name;
-    protected $codebuffer;
-    
-    public function __construct(Document $doc, string $name)
+    protected $attrs = ['is' => null];
+
+    public function __construct(Process $process, $node, AbstractEntity $context)
     {
-        $this->document = $doc;
-        $this->name = $name;
-        $this->codebuffer = new CodeBuffer;
+        parent::__construct($process, $node, $context);
+
+        $this->name = $this->isComponent($this->node);
+    }
+    
+    public function simpleNodeContext()
+    {
+        $this->rootContext();
+    }
+    
+    public function rootContext()
+    {
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+
+        $dataString = Helper::arrayToEval($data);
+        if (!$this->process->hasTemplateFunction($this->name)) {
+            (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        }
+
+        $nodeValue = sprintf('<?php $this->comp[%d] = $this->template("%s", %s); ?>', 
+            $this->depth, $this->name, $dataString
+        );      
+        $this->node->changeNode('#php', $nodeValue);
+
+        foreach ($this->node->childNodes as $slot) {
+            $this->parseNode($slot);
+        }
+
+        $r = sprintf('<?php $this->comp[%d]->render(); ?>', $this->depth);
+        $this->node->appendChild(new DomNode('#php', $r));
     }
 
-    public function mount(HTML5DOMElement $node): void
+    /**
+     * When a component is passed as slot to another component
+     */
+    public function componentContext()
     {
-        $this->insertComponent($node);
+        $this->attrs['slot'] = 'default';
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);   
+        $dataString = Helper::arrayToEval($data);
+        if (!$this->process->hasTemplateFunction($this->name)) {
+            (new Root($this->process, null, $this->name, $this->context))->rootContext();
+        }
 
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode($this->codebuffer->getStream(true)),
-            $node
+        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
+            $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
         );
-
-        $this->document->toberemoved[] = $node;
+        $this->node->changeNode('#php', $r);
+        
+        foreach ($this->node->childNodes as $slot)
+        {
+            $this->parseNode($slot);
+        }
     }
 
-    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf)
+    /**
+     * When component is passed as block default
+     */
+    public function blockContext()
     {
-        // capture all buffer input to outside buffer
-        $this->codebuffer = $cbf;
-        $this->insertComponent($node);
+        $this->node->setAttribute('slot', $this->context->name);
+        $this->componentContext();
     }
 
-    protected function insertComponent($node)
+    /**
+     * When a component is passed as slot default
+     */
+    public function slotContext()
     {
-        $nodeData = Helper::nodeStdClass($node);
-        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
-            $this->codebuffer->component($this->name, $nodeData->attributes);
-            // parse component dispatched, only if not already parsed
-            if (!isset($this->document->templates[$this->name])) {
-                (new Parser($this->document, $this->name))->parse();
-            }
-
-            $slots = $this->getNodeSlots($node);
-            foreach ($slots as $slotPosition => $slotNodes) {
-                foreach ($slotNodes as $slotNode) {
-                    if ($slotNode->nodeName === 'slot') {
-                        // slot in slot
-                        (new Slot($this->document, 0, true))->_mount($slotNode, $this->codebuffer);
-                    }
-                    // case anonymous component
-                    elseif ($slotNode->nodeName === 'template' && !$slotNode->getAttribute('is')) {
-                        (new AnonymousComponent($this->document))->_mount($slotNode, $this->codebuffer);
-                    }
-                    elseif ($slotNode->nodeName === 'block') {
-                        (new Block($this->document))->_mount($slotNode, $this->codebuffer);
-                    }
-                    else {
-                        $this->insertComponentSlot($slotPosition, $slotNode);
-                    }
-                }
-            }
-            $this->codebuffer->raw('$this->comp[0]->render($this->data);');
-        });
+        $this->rootContext();
     }
     
-    protected function insertComponentSlot($slotPosition, $slotNode, $i = 0)
-    {
-        $nodeData = Helper::nodeStdClass($slotNode->childNodes->item(0) ?? $slotNode);
-        //$this->codebuffer->nestedExpression($nodeData->statements, function() use ($nodeData, $slotNode, $slotPosition, $i) {
-            $name = $isComponent = Helper::isComponent($slotNode);
-            $name = $name ? $name : $this->name.'_slot_'.$slotPosition.'?id='.uniqid();
- 
-            // ->addSlot()
-            //dd($nodeData, $slotNode->childNodes-);
-            $this->codebuffer->slot($i, $slotPosition, $name, $nodeData->attributes);
-            if (!isset($this->document->templates[$name])) {
-                (new Parser($this->document, $name))->parse($isComponent ? null : $slotNode);
-                //TODO: data here
-            }
-            if ($slotNode->nodeName !== '#text') {
-                //$slotNode->removeAttribute('slot');
-            }
-            
-            if ($isComponent) {
-                $slots = $this->getNodeSlots($slotNode);
-                foreach ($slots as $slotPosition => $slotNodes) {
-                    foreach ($slotNodes as $slotNode) {
-                        $this->insertComponentSlot($slotPosition, $slotNode, $i+1);
-                    }
-                }
-            } else {
-                $next = $i+1; // anticipam urmatoarea variabila pentru 
-                $this->codebuffer->raw("\$this->comp[{$next}]->setSlots(\$slots);");
-            }
-        //});
+    public function templateContext() {
+        $this->simpleNodeContext();
     }
 }

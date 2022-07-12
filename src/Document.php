@@ -8,62 +8,20 @@ use PhpTemplates\DependenciesMap;
 
 class Document
 {
+    protected $destPath;
     protected $name;
+    protected $content = '';
+    protected $trackChanges = true;
 
-    public $templates = [];
-    public $eventListeners = [];
-    public $tobereplaced = [
-        '="__empty__"' => '',
-        '&gt;' => '>',
-        '&amp;\gt;' => '&gt;',
-        '&lt;' => '<',
-        '&amp;\lt;' => '&lt;',
-        '&amp;' => '&',
-        '&amp;\amp;' => '&amp;',
-        '<php>' => '<?php',
-        '</php>' => '?>'
-        /*'?&gt;' => '?>',
-        '-&gt;' => '->',*/
-    ];
-    public $toberemoved = [];
-    public $templateBlocks = [];
-
-    public function __construct(string $name)
-    {
+    public function __construct(string $destPath, string $name, $content = '', $trackChanges = true) {
+        $this->destPath = $destPath;
         $this->name = $name;
+        $this->content = $content;
+        $this->trackChanges = $trackChanges;
     }
 
-    public function addEventListener($ev, $target, $cb)
-    {
-        $this->eventListeners[$ev][$target][] = $cb;
-    }
-
-    public function render(): string
-    {
-        $tpl = '<?php ';
-        $tpl .= "\nuse PhpTemplates\Parsed;";
-        $tpl .= "\nuse PhpTemplates\DomEvent;";
-        foreach ($this->templates as $name => $fn) {
-            $tpl .= "\nParsed::\$templates['$name'] = $fn;";
-        }
-        foreach ($this->templateBlocks as $t => $block) {
-            foreach ($block as $name => $fn) {
-                $tpl .= "\nParsed::\$templateBlocks['$t']['$name'] = $fn;";
-            }
-        }
-        foreach ($this->eventListeners as $ev => $listeners) {
-            foreach ($listeners as $target => $cbcks) {
-                foreach ($cbcks as $cb) {
-                    $tpl .= "\nnew DomEvent('$ev', '$target', $cb);";
-                }
-            }
-        }
-
-        $tpl = str_replace(array_keys($this->tobereplaced), array_values($this->tobereplaced), $tpl);
-
-        $tpl = preg_replace('/\?>[ \t\n\r]*<\?php/', '', $tpl);
-
-        return $tpl;
+    public function setContent(string $content) {
+        $this->content = $content;
     }
 
     public function save(string $outFile = null)
@@ -71,15 +29,11 @@ class Document
         if (!$outFile) {
             $outFile = $this->getDestFile();
         }
-        ///dd($outFile);
-        file_put_contents($outFile, $this->render());
+
+        file_put_contents($outFile, $this->content);
         DependenciesMap::save();
 
         return $outFile;
-    }
-
-    public function __get($prop) {
-        return $this->$prop;
     }
 
     public function exists()
@@ -88,29 +42,28 @@ class Document
         if (file_exists($f)) {
             return $f;
         }
+        
         return false;
     }
 
     protected function getDestFile()
     {
-        $dependencies = DependenciesMap::get($this->name);
-        $pf = trim(Config::get('src_path'), '/').'/';
-        asort($dependencies);
-        $hash = [$this->name];
-        foreach ($dependencies as $f) {
-            $file = $pf.$f.'.template.php';
-            $hash[] = $f.':'.filemtime($file);
+        $pf = rtrim($this->destPath, '/').'/';
+        $name = str_replace(['/', ':'], '_', $this->name);// todo
+        
+        if ($this->trackChanges) {
+            $dependencies = DependenciesMap::get($this->name);
+            asort($dependencies);
+            $hash = [$this->name];
+            foreach ($dependencies as $f) {
+                $file = $f;
+                $hash[] = $f.':'.@filemtime($file);
+            }
+            $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
+        } else {
+            $outFile = $pf.$name;
         }
 
-        $pf = trim(Config::get('dest_path'), '/').'/';
-        $name = str_replace('/', '_', $this->name);// todo
-        $outFile = $pf.$name.'_'.substr(base_convert(md5(implode(';', $hash)), 16, 32), 0, 8);
-
         return $outFile.'.php';
-    }
-
-    public function registerDependency($name)
-    {
-        DependenciesMap::add($this->name, $name);
     }
 }

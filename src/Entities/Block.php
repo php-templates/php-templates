@@ -2,97 +2,99 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\CodeBuffer;
-use PhpTemplates\Document;
 use PhpTemplates\Helper;
-use PhpTemplates\Parser;
-use IvoPetkov\HTML5DOMElement;
+use PhpTemplates\Process;
+use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Dom\DomNode;
 
-class Block extends Parser implements Mountable
+class Block extends AbstractEntity
 {
-    protected $document;
+    protected $attrs = ['name' => null];
+
     protected $name;
-    protected $codebuffer;
-    
-    public function __construct(Document $doc)
+
+    public function __construct(Process $process, $node, AbstractEntity $context = null)
     {
-        $this->document = $doc;
-        $this->codebuffer = new CodeBuffer;
+        parent::__construct($process, $node, $context);
+        //todo: set name with throw error
+        $this->name = $node->getAttribute('name');
     }
 
     /**
-     * 2 components having same block name will conflict... we must make them unique somehow
+     * When a block is passed as a component slot
      */
-    protected function getName($name) {
-        return $name.'?id='.uniqid();
-    }
+    public function componentContext()
+    {  
+        $this->attrs['slot'] = 'default';
 
-    public function mount(HTML5DOMElement $node): void
-    {
-        $nodeData = Helper::nodeStdClass($node);
-        $this->name = $this->getName($nodeData->name);
-        $this->insertBlock($node);
-
-        $node->parentNode->insertBefore(
-            $node->ownerDocument->createTextNode("<?php Parsed::template('$this->name', [])->setSlots(\$slots)->render(\$this->data); ?>"),
-            $node
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
+        
+        $nodeValue = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("***block", %s)->withName("%s")->withData($this->scopeData)->setSlots($this->slots)); ?>', 
+            $this->depth, 
+            $this->context->depth, 
+            $this->attrs['slot'], 
+            $dataString,
+            $this->name
         );
-        $this->document->toberemoved[] = $node;
+        $this->node->changeNode('#block', $nodeValue);
+        
+        foreach ($this->node->childNodes as $i => $slot) {
+            // register block defaults 
+            if (0&&!method_exists($slot, 'setAttribute')) {
+                $_slot = new DomNode('template');
+                $_slot->appendChild($slot->detach());
+                $slot = $_slot;
+            }
+            $slot->setAttribute('_index', $i+1);
+            $this->parseNode($slot);
+        }
     }
-
-    public function _mount(HTML5DOMElement $node, CodeBuffer $cbf = null): string
+    
+    public function simpleNodeContext()
     {
-        $nodeData = Helper::nodeStdClass($node);
-        $this->name = $this->getName($nodeData->name);
-        $this->insertBlock($node);
-        if ($cbf) {
-            $cbf->slot(0, $nodeData->slot, $this->name, $nodeData->attributes);
+        $data = $this->depleteNode($this->node);
+        $data = $this->fillNode(null, $data);
+        $dataString = Helper::arrayToEval($data);
+
+        $nodeValue = sprintf('<?php $this->comp[%d] = $this->template("***block", %s)->withName("%s")->withData($this->scopeData)->setSlots($this->slots); ?>', 
+            $this->depth, 
+            $dataString,
+            $this->name
+        );
+        $this->node->changeNode('#block', $nodeValue);
+        
+        foreach ($this->node->childNodes as $i => $slot) {
+            // register block defaults // TODO:
+            if (0&&!method_exists($slot, 'setAttribute')) {
+                $_slot = $slot->ownerDocument->createElement('template');
+                $_slot->appendChild($slot);
+                $slot = $_slot;
+            }
+            $slot->setAttribute('_index', $i+1);
+            $this->parseNode($slot);
         }
 
-        return $this->name;
+        $r = sprintf('<?php $this->comp[%d]->render($this->scopeData); ?>', $this->depth);
+        $this->node->appendChild(new DomNode('#php', $r));
+    }
+    
+    public function rootContext()
+    {
+        return $this->simpleNodeContext();
     }
 
-    /**
-     * we keep this outside for recursive calling from mount()
-     */
-    private function insertBlock($node)
+    public function blockContext()
     {
-        $nodeData = Helper::nodeStdClass($node);
-        $this->codebuffer->nestedExpression($nodeData->statements, function() use ($node, $nodeData) {
-            $this->codebuffer->block($nodeData->name);// declaration, set slots, set sort slots, 
-            $dataString = Helper::arrayToEval($nodeData->attributes);
-            // insert child blocks/slots/components
-            $i = 0;
-            foreach ($node->childNodes as $childNode) {
-                if (Helper::isEmptyNode($childNode)) {
-                    continue;
-                }
-
-                $i++;
-                $_nodeData = Helper::nodeStdClass($childNode);
-                $_dataString = Helper::arrayToEval($_nodeData->attributes);
-                
-                // case block
-                if ($childNode->nodeName === 'block') {
-                    // insert block nested
-                    $_name = (new Block($this->document))->_mount($childNode);
-                    $this->codebuffer->blockItem($nodeData->name, $_name, array_merge($nodeData->attributes, $_nodeData->attributes, ['_index' => $i]));
-                    continue;
-                }
-
-                // case component or not
-                $_name = $isComponent = Helper::isComponent($childNode);
-                $_name = $_name ? $_name : 'block_'.$nodeData->name.'_slot?id='.uniqid();
-                if (!isset($this->document->templates[$_name])) {
-                    (new Parser($this->document, $_name))->parse($isComponent ? null : $childNode);
-                }
-                $this->codebuffer->blockItem($nodeData->name, $_name, array_merge($nodeData->attributes, $_nodeData->attributes, ['_index' => $i]));
-            }
-
-            $this->codebuffer->render('block', $nodeData->name);
-        });
-        
-        $htmlString = CodeBuffer::getTemplateFunction($this->codebuffer->getStream(true));
-        $this->document->templates[$this->name] = $htmlString;
+        $this->node->setAttribute('slot', $this->context->name);
+        $this->componentContext();
+    }
+    
+    public function slotContext() {
+        throw new InvalidNodeException('Block cannot be used inside a slot', $this->node);
+    }
+    public function templateContext() {
+        $this->simpleNodeContext();
     }
 }

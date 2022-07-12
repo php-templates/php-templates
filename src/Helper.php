@@ -6,6 +6,14 @@ use PhpTemplates\Config;
 
 class Helper {
     
+    private static $uid = 0;
+
+    public static function uniqid()
+    {
+        self::$uid += 1;
+        return self::$uid;
+    }
+
     public static function nodeStdClass($node, $context = '')
     {
         $specials = ['is', 'slot'];
@@ -35,7 +43,7 @@ class Helper {
             {
                 $k = substr($k, 2);
                 if (in_array($k, Config::allowedControlStructures)) {
-                    $result->statements[$k] = $val;
+                    $result->statements[] = [$k, $val];
                 }
             }
             elseif (in_array(trim($k, ':'), Config::attrCumulative) && !empty($result->attributes[$k])) {
@@ -64,7 +72,7 @@ class Helper {
     }
     
     public static function isComponent($node)
-    {
+    {die('rrrrr');
         if (!@$node->nodeName) {
             return null;
         }
@@ -75,26 +83,31 @@ class Helper {
         return Config::getComponentByAlias($node->nodeName);
     }
     
-    public static function arrayToEval(array $arr, $simple = false, $unescape = ':')
-    {// todo nu va mergw cu array de genul [$foo, $bar]
+    public static function arrayToEval(array $arr, $simple = false)
+    {
+        // todo nu va mergw cu array de genul [$foo, $bar]
         if (!$arr) {
             return '[]';
         }
         $isAssoc = array_keys($arr) !== range(0, count($arr) - 1);
         if (!$isAssoc || $simple) {
+            $binds = isset($arr['p-bind']) ? $arr['p-bind'] : null;
+            unset($arr['p-bind']);
             $arr = var_export($arr, true);
             $arr = str_replace(['array (', ')', '\n', '\r', PHP_EOL], ['[', ']', '', '', ''], $arr);
             $arr = preg_replace('/\d+[ ]*\\=>[ ]*/', '', $arr);
             //var_dump(utf8_encode ($arr));dd();
-            return trim($arr, ',');
+            $arr = trim($arr, ',');
+            if ($binds) {
+                return "array_merge($binds, $arr)";
+            }
+            return $arr;
         }
-        
+
         $stream = [];
         foreach ($arr as $key => $value) {
-            if (strpos($key, $unescape) === 0) {
-                $key = str_replace($unescape, '', $key);
-            } else {
-                $value = "'$value'";
+            if (is_array($value)) {
+                $value = self::arrayToEval($value);
             }
             $stream[] = "'$key' => $value";
         }
@@ -104,5 +117,15 @@ class Helper {
     
     public static function isEmptyNode($node) {
         return $node->nodeName === '#text' && !trim($node->nodeValue);
+    }
+    
+    public static function mergeAttrs(...$attrs)// spread
+    {
+        foreach ($attrs as $attr) {
+            if (!is_string($attr)) {
+                return $attrs;
+            }
+        }
+        return implode(' ', $attrs);
     }
 }

@@ -1,6 +1,6 @@
 <!-- multi-extends -->
-<?php $this->data['bind_me'] = 'bound'; ?>
-<template is="extends/c"></template>
+@php $this->scopeData['bind_me'] = 'bound'; @endphp
+<template is="extends/c" :bind_me="$this->scopeData['bind_me']"></template>
 =====
 <parent4>
     parent4
