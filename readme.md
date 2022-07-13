@@ -22,10 +22,10 @@ What about:
 ```
 ?
 
-***Php-Templatess*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates - with condition of writing it inside @php ... @endphp blocks. In fact, all ***Php-Templates*** templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
+***Php-Templates*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates - with condition of writing it inside @php ... @endphp blocks. In fact, all ***Php-Templates*** templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
 ## Setting up
-***Php-Templatess*** files use the `.template.php` extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). Now, `dest_path` won't be used by developer, is just the place where parsed templates are stored.
+***Php-Templates*** files use the `.template.php` extension and stored in `src_path` configured path and they are parsed and 'cached' in `dest_path` in plain path mode (`foo/bar.template.php` will cached as `foo_bar_{hash}.php`). Now, `dest_path` won't be used by developer, is just the place where parsed templates are stored.
 ```
 required_once 'path/to/phpt/autoload.php';
 
@@ -206,7 +206,7 @@ $cfg->addAlias('form-group', 'components/form-group'); // array with key value s
 // Now we can reffer to our component by this:
 <form-group type="text" value="123"/>
 ```
-!!! Disclaimer: ***php-Templatess*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
+!!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
 ## Slots
 Slots increases a component reusability by leting us to control a defined component layout from outside.
@@ -290,11 +290,11 @@ Now we just need to call
 $tpl->load('product', $data);
 // and php-templates will do the rest
 ```
-In the background, ***Php-Templatess*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Keep in mind that you need to irigate above extended component with given data using bind syntax.
+In the background, ***Php-Templates*** will create a `layout/app` template instance to which it will add the loaded template instance as the default slot. Keep in mind that you need to irigate above extended component with given data using bind syntax.
 The extension is valid in any other situation given by using slots.
 
 ## Events
-Events are a key point in the development of a modular interface and the thing that makes ***Php-Templatess*** perfect for this. For now, events are parsing time only. Please keep in mind that template cache can't detect events attached nodes modifications in order to re-transpile, so you have to reset them manually. If you find yourself working on events based UI, you can enable debug mode `$tpl->debugMode = true;` and `$tpl->trackChanges = true;` to prevent overfilling dest folder with old cached files and to parse without cache (at each request).
+Events are a key point in the development of a modular interface and the thing that makes ***Php-Templates*** perfect for this. For now, events are parsing time only. Please keep in mind that template cache can't detect events attached nodes modifications in order to re-transpile, so you have to reset them manually. If you find yourself working on events based UI, you can enable debug mode `$tpl->debugMode = true;` and `$tpl->trackChanges = true;` to prevent overfilling dest folder with old cached files and to parse without cache (at each request).
 
 The syntax that will be used to attach an event:
 ```
