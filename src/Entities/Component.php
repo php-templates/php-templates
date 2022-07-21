@@ -11,7 +11,7 @@ class Component extends AbstractEntity
 {
     protected $attrs = ['is' => null];
 
-    public function __construct(Process $process, $node, AbstractEntity $context)
+    public function __construct(Process $process, DomNode $node, AbstractEntity $context)
     {
         parent::__construct($process, $node, $context);
 

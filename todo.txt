@@ -18,3 +18,45 @@ testeaza cine are prioritate pe slot content ca si variabila, cea globala, sau c
 fn in loc de slot
 
 strange scope data trecute pe slot pe $_scope pentru a putea fi folosite doar cu alias
+
+
+.t.php
+
+init like this:
+Config $cfg (alias, src)
+ConfigHolder $cfgh ($defaultcfg, destpath)
+$cfgh->add()  cfg may access ownerConfigholder
+new Document(name, new DependenciesMap(path))
+new ViewFactory(document, new viewParser(document, cfgh, eventholder))
+
+View aka parsed
+View view = viewfactory->make(name, data = []);
+  viewfactory->_get(name)
+    viewParser
+      ->_parseFile(rfilepath)
+      kfgk = obtaining gfgkey by tpl name
+      rfp = obtainin file path without cfg prefix
+      cfg = cfg->_getConfigholder getcfh(kfgk)
+      new Root(document, cfg, nullode, name, context);
+        document->addtf cfgpf + rfpath
+
+view->assign(k, val);
+view->render(data)
+
+EventHolder $eh ()
+$eh->add('rendering', 'tpl', function)
+
+larafacades
+Template::addConfig()
+Template::on()
+Template::getConfig()->directive()
+Template::directive()
+
+init
+cfg = new Config
+cfgh = new ConfigHolder(cfg, destPath)
+depmap = new DependenciesMap('path/to/file')
+doc = new Document('file.t.php', depmap)
+eventholder = new EventHolder()
+parser = new viewParser(document, cfgh, eventholder)
+viewFactory = new ViewFactory(doc, parser)

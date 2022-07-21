@@ -13,7 +13,7 @@ class Block extends AbstractEntity
 
     protected $name;
 
-    public function __construct(Process $process, $node, AbstractEntity $context = null)
+    public function __construct(Process $process, DomNode $node, AbstractEntity $context = null)
     {
         parent::__construct($process, $node, $context);
         //todo: set name with throw error
