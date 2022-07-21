@@ -54,9 +54,9 @@ Template::directive()
 
 init
 cfg = new Config
-cfgh = new ConfigHolder(cfg, destPath)
+cfgh = new ConfigHolder(cfg)
 depmap = new DependenciesMap('path/to/file')
-doc = new Document('file.t.php', depmap)
+doc = new Document('file.t.php', destpath, depmap)
 eventholder = new EventHolder()
 parser = new viewParser(document, cfgh, eventholder)
 viewFactory = new ViewFactory(doc, parser)

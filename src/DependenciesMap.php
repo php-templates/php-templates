@@ -4,36 +4,33 @@ namespace PhpTemplates;
 
 class DependenciesMap
 {
-    private function __construct() {}
+    private $file;
+    private $map;
     
-    private static $map = null;
-    
-    public static function init()
+    public function __construct(string $file) 
     {
-        if (self::$map === null && file_exists(__DIR__.'/dependencies_map.php')) {
-            self::$map = require_once(__DIR__.'/dependencies_map.php');
-        }
+        $this->file = $file;
+        $this->map = require_once($file);
     }
     
-    public static function add(string $doc, string $requestName)
+    public function add(string $doc, string $requestName)
     {
-        if (!isset(self::$map['files'][$doc]) || !in_array($requestName, self::$map['files'][$doc]))
+        if (!isset($this->map['files'][$doc]) || !in_array($requestName, $this->map['files'][$doc]))
         {
-            self::$map['files'][$doc][] = $requestName;
+            $this->map['files'][$doc][] = $requestName;
         }
     }
     
-    public static function save()
+    public function save()
     {
-        file_put_contents(__DIR__.'/dependencies_map.php', '<?php return '.var_export(self::$map, true).';');
+        file_put_contents($this->file, '<?php return '.var_export($this->map, true).';');
     }
     
-    public static function get(string $doc)
+    public function get(string $forFile)
     {
-        if (isset(self::$map['files'][$doc])) {
-            return self::$map['files'][$doc];
+        if (isset($this->map['files'][$forFile])) {
+            return $this->map['files'][$forFile];
         }
         return [];
     }
-} 
-DependenciesMap::init();
+}

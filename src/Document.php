@@ -2,22 +2,22 @@
 
 namespace PhpTemplates;
 
-use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Config;
 use PhpTemplates\DependenciesMap;
 
 class Document
 {
-    protected $destPath;
-    protected $name;
-    protected $content = '';
-    protected $trackChanges = true;
-
-    public function __construct(string $destPath, string $name, $content = '', $trackChanges = true) {
-        $this->destPath = $destPath;
-        $this->name = $name;
-        $this->content = $content;
-        $this->trackChanges = $trackChanges;
+    private $inputFile;
+    private $outputFolder;
+    private $dependenciesMap;
+    
+    public $trackChanges = true;
+    
+    public function __construct(string $inputFile, string $outputFolder, DependenciesMap $dependenciesMap) 
+    {
+        $this->inputFile = $inputFile;
+        $this->outputFolder = $outputFolder;
+        $this->dependenciesMap = $dependenciesMap;
     }
 
     public function setContent(string $content) {
@@ -31,7 +31,7 @@ class Document
         }
 
         file_put_contents($outFile, $this->content);
-        DependenciesMap::save();
+        $this->dependenciesMap->save();
 
         return $outFile;
     }
@@ -49,12 +49,12 @@ class Document
     protected function getDestFile()
     {
         $pf = rtrim($this->destPath, '/').'/';
-        $name = str_replace(['/', ':'], '_', $this->name);// todo
+        $name = str_replace(['/', ':'], '_', $this->inputFile);// todo more tests, more generalist
         
         if ($this->trackChanges) {
-            $dependencies = DependenciesMap::get($this->name);
+            $dependencies = $this->dependenciesMap->get($this->inputFile);
             asort($dependencies);
-            $hash = [$this->name];
+            $hash = [$this->inputFile];
             foreach ($dependencies as $f) {
                 $file = $f;
                 $hash[] = $f.':'.@filemtime($file);

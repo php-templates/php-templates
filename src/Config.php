@@ -24,6 +24,12 @@ class Config
         $this->name = $name;
         $this->srcPath = $srcPath;
     }
+    
+    public function configHolder(ConfigHolder $holder): self
+    {
+        $this->configHolder = $holder;
+        return $this;
+    }
 
     public function addDirective(string $key, \Closure $callable): void
     {
