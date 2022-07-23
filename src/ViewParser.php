@@ -4,24 +4,25 @@ namespace PhpTemplates;
 
 class ViewParser
 {
-    public function __construct(ConfigHolder $configs, EventHolder $eventHolder) 
+    private $entityFactory;
+    
+    public function __construct(EntityFactory $entityFactory) 
     {
-        //todo
+        $this->entityFactory = $entityFactory;
     }
     
     public function parse(Document $document): string // return result path
     {
-        kfgk = obtaining gfgkey by tpl name
-        rfp = obtainin file path without cfg prefix
-        cfg = cfg->_getConfigholder getcfh(kfgk)
-        new Root(document, cfg, nullode, name, context);
-        document->addtf cfgpf + rfpath
-        
-        (new Root($process, null, $rfilepath))->rootContext();
-        $this->document->setContent($process->getResult());
-        $path = $this->document->save();
+        // enter in parsing recursion process by making an artificial component tag node
+        //$node = new DomNode('template', ['is' => $document->getName()]);
+        node = $this->document->load(x); // will register dependencies
+        this document register(node, name, config to be passed further) aka new root
+        //$entity = $this->entityFactory->make($node, $name = '', $context = null);
         
         
-        
+        $config = $this->configHolder->getConfig();
+        (new Component($document, $node, $config, $this->eventHolder))->rootContext();
+        //$document->setContent($process->getResult());
+        $path = $document->save();
     }
 }
