@@ -4,6 +4,7 @@ namespace PhpTemplates\Entities;
 
 use DOMAttr;
 use PhpTemplates\Config;
+use PhpTemplates\ViewParser;
 use PhpTemplates\Helper;
 use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Directive;
@@ -15,13 +16,8 @@ use PhpTemplates\Dom\PhpNode;
 
 abstract class AbstractEntity
 {
-   
-    
-    /**
-     * Current processing thread contextual data holder (like config, parsed index, other cross entities shared data)
-     * @var Process
-     */
-    protected $process;
+    protected $parser;
+    protected $config;
 
     /**
      * recursive parent context
@@ -68,12 +64,8 @@ abstract class AbstractEntity
      * @param string|DomNode $node string when is component, DomNode when is simple node
      * @param AbstractEntity $context
      */
-    public function __construct(Process $process, $node, AbstractEntity $context = null) //todo interfata ca param 3
+    public function __construct(ViewParser $parser, Config $config, DomNode $node, AbstractEntity $context = null) //todo interfata ca param 3
     {
-        if ($process->config->prefix) {
-            $this->pf = $process->config->prefix;
-        }
-        
         if ($context) {
             $ct_type = explode('\\', get_class($context));
             $ct_type = end($ct_type);
@@ -83,7 +75,8 @@ abstract class AbstractEntity
             }
         }
 
-        $this->process = $process;
+        $this->parser = $parser;
+        $this->config = $config;
         $this->context = $context;
         $this->node = $node;
     }
@@ -95,42 +88,7 @@ abstract class AbstractEntity
     abstract public function blockContext();
     abstract public function templateContext();
     
-    protected function parseNode($node)
-    {
-        $fn = explode('\\', get_class($this));
-        $fn = end($fn);
-
-        $fn = lcfirst($fn).'Context';
-
-        if ($node->nodeName === 'slot') {
-            (new Slot($this->process, $node, $this))->{$fn}();
-        }
-        elseif ($node->nodeName === 'block') {
-            (new Block($this->process, $node, $this))->{$fn}();
-        }
-        elseif ($this->isComponent($node)) {
-            // component load node
-            (new Component($this->process, $node, $this))->{$fn}();
-        }
-        elseif ($node->nodeName === 'template') {
-            (new Template($this->process, $node, $this))->{$fn}();
-        }
-        else {
-            (new SimpleNode($this->process, $node, $this))->{$fn}();
-        }
-    }
     
-    protected function isComponent($node)
-    {
-        if (!@$node->nodeName) {
-            return null;
-        }
-        if ($node->nodeName === 'template') {
-            return $node->getAttribute('is');
-        }
-        
-        return $this->process->getAliased($node->nodeName);
-    }
     
     /**
      * Wrap node inside control structures and returns the aggregated node datas as array (like :class and class under 1 single key named :class)
@@ -150,7 +108,7 @@ abstract class AbstractEntity
             if (strpos($k, $this->pf) === 0) 
             {
                 // check if is a custom directive and unpack its result as attributes
-                if ($directive = $this->process->getDirective(substr($k, strlen($this->pf)))) {
+                if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
                     $result = $directive($a->nodeValue);
                     if (empty($result)) {
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);

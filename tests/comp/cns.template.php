@@ -2,7 +2,7 @@
     <slot><span><slot name="sn"></slot></span></slot>
 </div>
 
-<div class="sdefsdef">
+<div class="sdefsdeff">
     <slot name="sn1"><span><slot name="sn2">foo</slot></span></slot>
 </div>
 

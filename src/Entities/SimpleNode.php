@@ -27,7 +27,7 @@ class SimpleNode extends AbstractEntity
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
-            $this->parseNode($slot);
+            $this->parser->parseNode($slot, $this->config, $this);
         }
 
         $this->fillNode($this->node, $data);
@@ -37,19 +37,30 @@ class SimpleNode extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['_index'] = 0;
-
+        
+        $root = new DomNode('#root');
+        $this->node->parentNode->insertBefore($root, $this->node);
+        $root->appendChild($this->node->detach());
+//$this->node->parentNode->parentNode->dd();
         $data = $this->depleteNode($this->node);
         $this->fillNode($this->node, $data);
-        $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
+        //$name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
-        (new Root($this->process, $this->node, $name))->rootContext();
+        foreach ($this->node->childNodes as $cn) {
+            $this->parser->parseNode($cn, $this->config, $this);
+        }
+        //dd($root->parentNode->dd());
+        $fn = $this->parser->nodeToTemplateFunction($root, true);
+        //(new Root($this->process, $this->node, $name))->rootContext();
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
+//TODO: findout what to do with data
 
-        $slot = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
-            $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString
+        $slot = sprintf('<?php $this->comp[%d]->addSlot("%s", %s); ?>', 
+            $this->context->depth, $this->attrs['slot'], $fn
         );
-        $this->node->changeNode('#slot', $slot);
-        $this->node->empty();
+        
+        $root->changeNode('#slot', $slot);
+        $root->empty();
     }
     
     public function blockContext()
@@ -78,7 +89,7 @@ class SimpleNode extends AbstractEntity
     {
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
-            $this->parseNode($slot);
+            $this->parser->parseNode($slot, $this->config, $this);
         }
         $this->fillNode($this->node, $data);
     }

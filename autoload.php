@@ -8,7 +8,7 @@ ini_set('error_reporting', E_ALL);
 
 if (!function_exists('dd')) {
     function dd(...$data) {
-        //print_r(debug_backtrace());
+        //debug_print_backtrace(2);die();
         foreach ($data as $d) {
             //var_dump($d);
             //echo '<pre>';

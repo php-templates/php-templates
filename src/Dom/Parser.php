@@ -26,7 +26,7 @@ class Parser
      * @param string $srcFile
      * @return DomNode
      */
-    public function parseFile(string $srcFile): DomNode
+    public function parseFile(string $srcFile)
     {
         // geting file content (php function can be returned and executed in actual context)
         ob_start();
@@ -39,13 +39,12 @@ class Parser
         $this->srcFile = $srcFile;
 
         $node = $this->parse($html);
-        if ($cb2 = $this->beforeCallback) {
-            $cb2($node);
-        }
+        //TODO: wrapper 
         
-        is_callable($cb) && $cb($node);
-
-        return $node;
+        return (object) [
+            'node' => $node,
+            'callback' => $cb
+        ];
     }
 
     public function parseString(string $html)

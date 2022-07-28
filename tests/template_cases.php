@@ -3,6 +3,11 @@
 require('../autoload.php');
 
 use PhpTemplates\Config;
+use PhpTemplates\ConfigHolder;
+use PhpTemplates\DependenciesMap;
+use PhpTemplates\EventHolder;
+use PhpTemplates\ViewParser;
+use PhpTemplates\ViewFactory;
 use PhpTemplates\Template;
 use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
@@ -11,8 +16,15 @@ use PhpTemplates\TemplateFunction;
 
 header("Content-Type: text/plain");
 
-$parser = new PhpTemplate(__DIR__, __DIR__.'/results/');
-$cfg = $parser->getConfig();
+$cfg = new Config('default', __DIR__);
+$cfgHolder = new ConfigHolder($cfg);
+$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
+$eventHolder = new EventHolder();
+$parser = new ViewParser($cfgHolder, $eventHolder);
+$viewFactory = new ViewFactory('./results', $parser, $dependenciesMap);
+$cfgHolder = $parser->getConfigHolder();
+$cfg = $cfgHolder->get();
+
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
@@ -25,13 +37,12 @@ $cfg->addDirective('checked', function($eval) {
     ];
 });
 
-$parser->addPath('cases2', __DIR__.'/cases2/');
-$cfg = $parser->getConfig('cases2');
+$cfg = new Config('cases2', __DIR__.'/cases2/');
 $cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
 $cfg->addDirective('mydirective', function() {
     return ['mydirective' => 2];
 }, 'cases2');
-
+$cfgHolder->add($cfg);
 
 $files = array_diff(scandir('./results'), array('.', '..'));
 foreach($files as $file){ // iterate files
@@ -69,7 +80,8 @@ foreach($files as $f) {
     ob_start();
     $data = [];
     try {
-        $parser->load($rfilepath);
+        $view = $viewFactory->make($rfilepath);
+        $view->render();
     } catch(Exception $e) {
         $_f = str_replace('\\', '/', $e->getFile());
         $_f = explode('/', $_f);

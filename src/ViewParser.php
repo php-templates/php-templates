@@ -2,27 +2,253 @@
 
 namespace PhpTemplates;
 
+use PhpTemplates\Dom\Parser;
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Entities\AbstractEntity;
+use PhpTemplates\Entities\SimpleNode;
+use PhpTemplates\Entities\Component;
+use PhpTemplates\Entities\Slot;
+use PhpTemplates\Entities\Template;
+
 class ViewParser
 {
-    private $entityFactory;
+    private $configHolder;
+    private $eventHolder;
+    private $templates =[];
     
-    public function __construct(EntityFactory $entityFactory) 
+    public function __construct(ConfigHolder $configHolder, EventHolder $eventHolder) 
     {
-        $this->entityFactory = $entityFactory;
+        $this->configHolder = $configHolder;
+        $this->eventHolder = $eventHolder;
+    }
+    
+    public function getConfigHolder(): ConfigHolder
+    {
+        return $this->configHolder;
     }
     
     public function parse(Document $document): string // return result path
     {
-        // enter in parsing recursion process by making an artificial component tag node
-        //$node = new DomNode('template', ['is' => $document->getName()]);
-        node = $this->document->load(x); // will register dependencies
-        this document register(node, name, config to be passed further) aka new root
-        //$entity = $this->entityFactory->make($node, $name = '', $context = null);
+        $this->document = $document;
+        $name = $document->getInputFile();
         
+        $this->resolveComponent($name, $this->configHolder->get());
+
+        //$this->document->addTemplate($name, $tplfn);
         
-        $config = $this->configHolder->getConfig();
-        (new Component($document, $node, $config, $this->eventHolder))->rootContext();
-        //$document->setContent($process->getResult());
-        $path = $document->save();
+        $filePath = $this->document->save();
+        
+        return $filePath;
+    }
+    
+    public function parseNode(DomNode $node, Config $config, AbstractEntity $context = null) 
+    {
+        if (!$this->document) {
+            throw new \Exception('Set the document first by calling parse() method');
+        }
+        
+        if ($context) {
+            $fn = explode('\\', get_class($context));
+            $fn = end($fn);
+            $fn = lcfirst($fn).'Context';
+        } else {
+            $fn = 'rootContext';
+        }
+
+        if ($node->nodeName === 'slot') {
+            $entity = new Slot($this, $config, $node, $context);
+        }
+        elseif ($name = $this->isComponent($node, $config)) {//TODO: intotdeauna intorc cobfih:
+            // component load node
+            $this->resolveComponent($name, $config); // if doc not having this, get it from parser instance cache, or parse it again
+            $entity = new Component($this, $config, $node, $name, $context);
+        }
+        elseif ($node->nodeName === 'template') {
+            $entity = new Template($this, $config, $node, $context);
+        }
+        else {
+            $entity = new SimpleNode($this, $config, $node, $context);
+        }
+        
+        $entity->{$fn}();
+    }
+    
+    public function resolveComponent(string $name, Config $config) 
+    {
+        //strpos($name, 'fg2-1') && dd($name);
+        if (strpos($name, ':')) {
+            list($cfgKey, $rfilepath) = explode(':', $name);
+            $config = $this->configHolder->get($cfgKey);
+        } else {
+            $rfilepath = $name;
+            $name = $config->getName().':'.$rfilepath;
+        }
+        
+        if ($this->configHolder->get()->getName() == $config->getName()) {
+            // default config, don tnamespace
+            //$name = $rfilepath;
+        }
+        //strpos($rfilepath, 'fg2-1') && dd($name);
+        
+        if (!isset($this->templates[$name])) {  
+            $node = $this->load($rfilepath, $config);
+            $this->parseNode($node, $config);
+            $tplfn = $this->nodeToTemplateFunction($node);
+        
+            $this->templates[$name] = $tplfn;            
+        }
+        
+       
+        
+        $this->document->addTemplate($name, $this->templates[$name]);
+    }
+    
+    private function parsggeComponent(string $name, Config $config) 
+    {
+        if ($this->hasTemplate($name)) {
+            return;
+        }
+       
+
+    }
+    
+    public function nodeToTemplateFunction(DomNode $node, $asSlot = false): string
+    {//TODO: prin noduri se pastreaza indent ul
+        $html = (string) $node;
+        
+        $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
+            return '<?php ' . $m[1] . ' ?>';
+        }, $html);
+        
+        $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php e($eval); ?>";
+            }
+            return '';
+        }, $html);
+        
+        $templateString = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
+            if ($eval = trim($m[1])) {
+                return "<?php echo $eval; ?>";
+            }
+            return '';
+        }, $html);
+        
+        if ($asSlot) {
+        $fnDeclaration = 'function ($data)' . PHP_EOL
+        . '{' . PHP_EOL
+        . '$data = array_merge($this->scopeData, $data);' . PHP_EOL
+        . 'extract($data);' . PHP_EOL
+        . '?> '. $templateString .' <?php' . PHP_EOL
+        . '}';            
+        }
+        else {
+        $fnDeclaration = 'function ($data) {' . PHP_EOL
+        . '$data["_attrs"] = isset($data["_attrs"]) ? $data["_attrs"] : [];' . PHP_EOL
+        . 'extract($data);' . PHP_EOL
+        . '?> '. $templateString .' <?php' . PHP_EOL
+        . '}';
+        }
+
+        return $fnDeclaration;
+    }
+    
+    private function load(string $rfilepath, Config $config): DomNode
+    {
+        $srcFile = $this->resolvePath($rfilepath, $config);
+        
+        // add file as dependency to template for creating hash of states
+        //$this->process->addDependencyFile($srcFile);
+
+        $parser = new Parser();
+        $result = $parser->parseFile($srcFile);
+        $node = $result->node;
+        $cb = $result->callback;
+        
+        // we create a virtual dom to make impossible loosing actual node inside events (which would break the system)
+        $wrapper = new DomNode('#root');
+        $wrapper->appendChild($node->detach());
+        $name = $config->getName() . ':' . $rfilepath;
+        
+        // ownerDocument
+        
+        $this->eventHolder->event('parsing', $name, $node);
+        is_callable($cb) && $cb($node, $this->document->getRootNode());
+        
+        // findout process upper component and assign it as main root
+        // dom has only one node which is a component, skip
+        // if process already has a root, skip
+        // method getRootNode will also check for any possible parents added with phpt callbacks, but no one will do that
+        if (!$this->document->getRootNode() && $this->isRootNode($node, $config)) {
+            $this->document->setRootNode($wrapper);
+        }
+        
+        return $wrapper;
+    }
+    
+    private function resolvePath($rfilepath, Config $config, $tried = []) 
+    {
+        $srcFile = null;
+        // try to find file on current config, else try to load it from default config
+        foreach ($config->getPath() as $srcPath) {
+            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
+            if (file_exists($filepath)) {
+                $srcFile = $filepath;
+                break;
+            }
+            $tried[] = $filepath;
+        }
+
+        // file not found in any2 config
+        if (!$srcFile) {
+            $message = implode(' or ', $tried);
+            throw new \Exception("Template file $message not found");
+        }        
+        
+        return $srcFile;
+    }
+    
+    public function isComponent(DomNode $node, Config $config)
+    {
+        if (!$node->nodeName) {
+            return null;
+        }
+        if ($node->nodeName == 'template') {
+            $rfilepath = $node->getAttribute('is');
+        } else {
+            $rfilepath = $config->getAliased($node->nodeName);
+        }
+        //strpos($rfilepath, 'fg2-1') && dd($rfilepath);
+        if (!$rfilepath) {
+            return null;
+        }
+        
+        if (strpos($rfilepath, ':')) {
+            $name = $rfilepath;
+        } else {
+            $name = $config->getName() . ':' . $rfilepath;
+        }
+        
+        return $name;
+    }
+    
+    private function isRootNode(DomNode $node, Config $config) 
+    {
+        // check equal level nodes 
+        // if any siblings tags, or only one nodw, return false
+        if ($node->nodeName && $node->nodeName[0] != '#') {
+            return !$this->isComponent($node, $config);
+        }
+        $isRoot = true;
+        foreach ($node->childNodes as $cn) {
+            $isRoot = $isRoot && $this->isRootNode($cn, $config);
+        }
+
+        return $isRoot;
+    }
+    
+    public function hasTemplate(string $name) 
+    {
+        return isset($this->templates[$name]);
     }
 }

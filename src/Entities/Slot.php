@@ -4,7 +4,8 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
-use PhpTemplates\Process;
+use PhpTemplates\ViewParser;
+use PhpTemplates\Config;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\InvalidNodeException;
@@ -14,15 +15,19 @@ class Slot extends AbstractEntity
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
 
-    public function __construct(Process $process, DomNode $node, AbstractEntity $context)
+    public function __construct(ViewParser $parser, Config $config, DomNode $node, AbstractEntity $context)
     {
-        parent::__construct($process, $node, $context);
+        parent::__construct($parser, $config, $node, $context);
 
         $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }
 
     public function simpleNodeContext()
     {
+        $wrapper = new DomNode('#slot');
+        $this->node->parentNode->insertBefore($wrapper, $this->node);
+        $wrapper->appendChild($this->node->detach());
+        
         $data = $this->depleteNode($this->node);
         $data = $this->fillNode(null, $data);
         $dataString = Helper::arrayToEval($data);
@@ -30,21 +35,22 @@ class Slot extends AbstractEntity
         $this->node->changeNode('#slot');
         if ($this->hasSlotDefault) {
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-            $slotDefault = new PhpNode('if', $if);
-            foreach ($this->node->childNodes as $cn) {
+            $this->node->setAttribute('p-if', $if);
+            //$slotDefault = new PhpNode('if', $if);
+            $this->parser->parseNode($this->node, $this->config, $this->context);
+            //foreach ($this->node->childNodes as $cn) {
                 // wrap cn into an empty node to not lose its condition structures on parsing process
-                $wrapper = new DomNode('#wrapper');
-                $wrapper->appendChild($cn->detach());
-                $this->parseNode($cn);
-                $slotDefault->appendChild($wrapper);
-            }
-            $this->node->appendChild($slotDefault);
+                //$wrapper = new DomNode('#wrapper');
+                //$wrapper->appendChild($cn->detach());
+                //$slotDefault->appendChild($wrapper);
+            //}
+            //$this->node->appendChild($slotDefault);
         }
         
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-        $r = '<?php $_slot->render('.$dataString.'); ?>';
+        $r = '<?php $_slot('.$dataString.'); ?>';
         $append->appendChild(new DomNode('#php', $r));
-        $this->node->appendChild($append);
+        $wrapper->appendChild($append);
     }
 
     public function slotContext()
@@ -60,20 +66,41 @@ class Slot extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['name'] = 'default';
+        
+        // mime like we have a simple node as component slot containing a slot node too
+        $wrapper = new DomNode('#slot');
+        $this->node->parentNode->insertBefore($wrapper, $this->node);
+        $wrapper->appendChild($this->node->detach());
 
-        $data = $this->depleteNode($this->node);
-        $data = $this->fillNode(null, $data);
-        $dataString = Helper::arrayToEval($data);
+        //$data = $this->depleteNode($this->node);
+        //$data = $this->fillNode(null, $data);
+        //$dataString = Helper::arrayToEval($data);
+        //$wrapper->setAttribute('slot', $this->attrs['slot']);
+        $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
 
+        $this->parser->parseNode($wrapper, $this->config, $this->context);
+return;
         $this->node->changeNode('#slot');
         if ($this->hasSlotDefault) {
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-            $slotDefault = new PhpNode('if', $if);
+            $this->node->setAttribute('p-if', $if);
+            //$slotDefault = new PhpNode('if', $if);
+            //$this->node->parentNode->insertBefore($slotDefault, $this->node);
+            //$slotDefault->appendChild($this->node->detach());
+            
+            $this->parser->parseNode($this->node, $this->config, $this);
+            
             foreach ($this->node->childNodes as $cn) {
-                $name = $this->attrs['name'] .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-                $node = new DomNode('#root');
+                $this->parser->parseNode($cn, $this->config, $this);
+            }
+            
+            $node = new DomNode('#root');
+            foreach ($this->node->childNodes as $cn) {
                 $node->appendChild($cn->detach());
-                (new Root($this->process, $node, $name, $this->context))->rootContext();
+                
+                $this->parser->parseNode($cn, $this->config, $this);
+                //(new Root($this->process, $node, $name, $this->context))->rootContext();
+                
                 $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
                     $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
                 );

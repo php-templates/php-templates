@@ -10,7 +10,11 @@ class DependenciesMap
     public function __construct(string $file) 
     {
         $this->file = $file;
-        $this->map = require_once($file);
+        if (is_file($file)) {
+            $this->map = require_once($file);
+        } else {
+            $this->map = [];
+        }
     }
     
     public function add(string $doc, string $requestName)

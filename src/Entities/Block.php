@@ -40,7 +40,7 @@ class Block extends AbstractEntity
         );
         $this->node->changeNode('#block', $nodeValue);
         
-        foreach ($this->node->childNodes as $i => $slot) {
+        foreach ($this->node->childNodes as $i => $slot) {continue;
             // register block defaults 
             if (0&&!method_exists($slot, 'setAttribute')) {
                 $_slot = new DomNode('template');

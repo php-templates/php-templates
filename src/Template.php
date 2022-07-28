@@ -88,11 +88,9 @@ class Template
         return [];
     }
     
-    public function addSlot($pos, self $renderable)
+    public function addSlot($pos, Closure $renderable)
     {
         $this->slots[$pos][] = $renderable;
-
-        return $renderable;
     }
     
     public function setSlots($slots)
@@ -132,21 +130,21 @@ class Template
         return $this;
     }
     
-    public function withData(array $data)
+    public function with(array $data)
     {
         $this->data = array_merge($data, $this->data);
         
         return $this;
     }
     
-    public function withSharedData(array $data)
+    public function withShared(array $data)
     {
         $this->repository->shareData($data);
         
         return $this;
     }
     
-    public function withDataComposers(array $data)
+    public function withComposers(array $data)
     {
         $this->repository->dataComposers($data);
         

@@ -4,18 +4,19 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
-use PhpTemplates\Process;
+use PhpTemplates\ViewParser;
+use PhpTemplates\Config;
 use PhpTemplates\Dom\DomNode;
 
 class Component extends AbstractEntity
 {
     protected $attrs = ['is' => null];
 
-    public function __construct(Process $process, DomNode $node, AbstractEntity $context)
+    public function __construct(ViewParser $parser, Config $config, DomNode $node, string $name, AbstractEntity $context)
     {
-        parent::__construct($process, $node, $context);
+        parent::__construct($parser, $config, $node, $context);
 
-        $this->name = $this->isComponent($this->node);
+        $this->name = $name;
     }
     
     public function simpleNodeContext()
@@ -29,17 +30,14 @@ class Component extends AbstractEntity
         $data = $this->fillNode(null, $data);
 
         $dataString = Helper::arrayToEval($data);
-        if (!$this->process->hasTemplateFunction($this->name)) {
-            (new Root($this->process, null, $this->name, $this->context))->rootContext();
-        }
-
+        
         $nodeValue = sprintf('<?php $this->comp[%d] = $this->template("%s", %s); ?>', 
             $this->depth, $this->name, $dataString
         );      
         $this->node->changeNode('#php', $nodeValue);
 
         foreach ($this->node->childNodes as $slot) {
-            $this->parseNode($slot);
+            $this->parser->parseNode($slot, $this->config, $this);
         }
 
         $r = sprintf('<?php $this->comp[%d]->render(); ?>', $this->depth);
@@ -52,12 +50,21 @@ class Component extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $data = $this->depleteNode($this->node);
-        $data = $this->fillNode(null, $data);   
-        $dataString = Helper::arrayToEval($data);
-        if (!$this->process->hasTemplateFunction($this->name)) {
-            (new Root($this->process, null, $this->name, $this->context))->rootContext();
-        }
+        
+        $wrapper = new DomNode('#slot');
+        $this->node->parentNode->insertBefore($wrapper, $this->node);
+        $wrapper->appendChild($this->node->detach());
+        
+        //$data = $this->depleteNode($this->node);
+        //$data = $this->fillNode(null, $data);   
+        //$dataString = Helper::arrayToEval($data);
+        $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
+
+        $this->parser->parseNode($wrapper, $this->config, $this->context);
+        return;
+        //if (!$this->process->hasTemplateFunction($this->name)) {
+            //(new Root($this->process, null, $this->name, $this->context))->rootContext();
+        //}
 
         $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
             $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
@@ -89,5 +96,14 @@ class Component extends AbstractEntity
     
     public function templateContext() {
         $this->simpleNodeContext();
+    }
+    
+    private function register()
+    {
+        $node = $this->load($name, $config);
+        $this->parseNode($node, $config);
+        $tplfn = $this->nodeToTemplateFunction($node);
+        
+        $this->document->addTemplate($name, $tplfn);
     }
 }

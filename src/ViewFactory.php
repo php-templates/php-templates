@@ -13,21 +13,21 @@ class ViewFactory
     /*
     protected $configs = [];
     protected $destPath;
-    protected $sharedData = [];
-    protected $dataComposers = [];
     public $trackChanges = false;
     public $debugMode = true; */
-    private $document;
-    private $parser;
+    protected $composers = [];
+    private $sharedData = [];
+    private $outputFolder;
+    private $viewParser;
+    private $dependenciesMap;
     
-    public function __construct(Document $document, ViewParser $parser) {
+    public function __construct(string $outputFolder, ViewParser $viewParser, DependenciesMap $dependenciesMap) {
     //public function __construct(string $srcPath, string $destPath) {
-        //$this->destPath = $destPath;
+        $this->outputFolder = $outputFolder;
+        $this->viewParser = $viewParser;
+        $this->dependenciesMap = $dependenciesMap;
         //$this->configs['default'] = new Config('default', $srcPath);
         // TODO
-        document creat each time on make()
-        $this->document = $document;
-        $this->parser = $parser;
     }
     
     public function render(string $rfilepath, array $data = [], $slots = [])
@@ -40,22 +40,21 @@ class ViewFactory
 
     public function make(string $rfilepath, array $data = [], $slots = [])
     {
-        new Document
+        $document = new Document($rfilepath, $this->outputFolder, $this->dependenciesMap);
             //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
             //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
-            if (($path = $this->document->exists()) && !$this->debugMode) {} 
+            if (($path = $document->exists()) && !$this->debugMode) {} 
             else 
             {
-                $config = $this->configForTemplate($rfilepath);
-                $node = $this->load($rfilepath, $config); // events
-                $this->parseNode($node, $config, $context = null);
+                //$parser = new ViewParser;
+                $path = $this->viewParser->parse($document);
                 
                 
                 //$path = $this->parser->parse($this->document);
                
-                $this->parser->parseFile($name, $config = null);
+                //$this->parser->parseFile($name, $config = null);
                 //try {
                     //$process = new Process($rfilepath, $this->configs);
                     //(new Root($process, null, $rfilepath))->rootContext();
@@ -64,7 +63,7 @@ class ViewFactory
                 //} catch(Exception $e) {
              //       throw new Exception($e->getMessage());
                 //}
-                $this->parser->parseNode($node, $config, $context);
+                //$this->parser->parseNode($node, $config, $context);
             }
             
             $result = require_once($path);
@@ -75,16 +74,6 @@ class ViewFactory
             ->withComposers($this->composers)
             ->setSlots($slots);
         
-    }
-    
-    private function parseNode($node, $config, $context = null) 
-    {
-        normal if
-        new x 
-        if is component check in document if is registered, if not, 
-        _node = $this->load()
-        $this->parseNode($node, $config)
-        $this->registerTemplateFun(node)
     }
     
     public function share(array $data) 

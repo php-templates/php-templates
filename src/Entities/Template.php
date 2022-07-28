@@ -18,8 +18,8 @@ class Template extends AbstractEntity
     {
         $data = $this->depleteNode($this->node);
         $this->node->changeNode('#template');
-        foreach ($this->node->childNodes as $slot) {
-            $this->parseNode($slot);
+        foreach ($this->node->childNodes as $cn) {
+            $this->parser->parseNode($cn, $this->config, $this);
         }
         $this->fillNode($this->node, $data);
     }
@@ -27,10 +27,17 @@ class Template extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $this->attrs['_index'] = 0;
-
-        $data = $this->depleteNode($this->node);
-        $this->fillNode($this->node, $data);
+        
+        $wrapper = new DomNode('#slot');
+        $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
+        $this->node->parentNode->insertBefore($wrapper, $this->node);
+        $wrapper->appendChild($this->node->detach());
+        
+        $this->parser->parseNode($wrapper, $this->config, $this->context);
+        return;
+        
+        //$data = $this->depleteNode($this->node);
+        //$this->fillNode($this->node, $data);
 
         $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
         $node = new DomNode('#root');

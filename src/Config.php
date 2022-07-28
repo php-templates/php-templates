@@ -22,7 +22,7 @@ class Config
    
     public function __construct($name, $srcPath) {
         $this->name = $name;
-        $this->srcPath = $srcPath;
+        $this->srcPath = (array) $srcPath;
     }
     
     public function configHolder(ConfigHolder $holder): self
@@ -46,12 +46,12 @@ class Config
         $this->aliased = array_merge($this->aliased, $aliased);
     }
 
-    public function hasDirective(string $key): bool
+    public function hashhhDirective(string $key): bool
     {
         return isset($this->directives[$key]);
     }
     
-    public function hasAlias(string $key): bool
+    public function hasbbbAlias(string $key): bool
     {
         return isset($this->aliased[$key]);
     }
@@ -59,6 +59,51 @@ class Config
     public function setSrcPath($val)
     {
         $this->srcPath = $val;
+    }
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+    
+    public function getPath() 
+    {
+        return $this->srcPath;
+    }
+    public function addPath(string $path) 
+    {
+        $this->srcPath[] = $path;
+    }
+    
+    public function getName() 
+    {
+        return $this->name;
+    }
+    
+    public function getAliased(string $name) 
+    {
+        return $this->aliased[$name] ?? null;
+    }
+    public function hasAlias(string $name) 
+    {
+        return isset($this->aliased[$name]);
+    }
+    public function getAliases() 
+    {
+        return $this->aliased;
+    }
+    
+    public function getDirective(string $name) 
+    {
+        return $this->directives[$name] ?? null;
+    }
+    public function hasDirective(string $name) 
+    {
+        return isset($this->directives[$name]);
+    }
+    
+    public function getDirectives() 
+    {
+        return $this->directives;
     }
     
     public function __get($prop)
