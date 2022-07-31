@@ -1,5 +1,5 @@
-@php $this->scopeData['val'] = [1,2]; $this->scopeData['name'] = "myname"; @endphp
+@php $val = [1,2]; $name = "myname"; @endphp
 
 <c>
-    <slot :val="$this->scopeData['val']" :name="$this->scopeData['name']"></slot>
+    <slot :val="$val" :name="$name"></slot>
 </c>

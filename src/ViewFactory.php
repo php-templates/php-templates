@@ -18,14 +18,17 @@ class ViewFactory
     protected $composers = [];
     private $sharedData = [];
     private $outputFolder;
-    private $viewParser;
     private $dependenciesMap;
+    private $configHolder;
+    private $eventHolder;
     
-    public function __construct(string $outputFolder, ViewParser $viewParser, DependenciesMap $dependenciesMap) {
+    public function __construct(string $outputFolder, DependenciesMap $dependenciesMap, ConfigHolder $configHolder, EventHolder $eventHolder) {
     //public function __construct(string $srcPath, string $destPath) {
         $this->outputFolder = $outputFolder;
         $this->viewParser = $viewParser;
         $this->dependenciesMap = $dependenciesMap;
+        $this->configHolder = $configHolder;
+        $this->eventHolder = $eventHolder;
         //$this->configs['default'] = new Config('default', $srcPath);
         // TODO
     }
@@ -48,9 +51,8 @@ class ViewFactory
             if (($path = $document->exists()) && !$this->debugMode) {} 
             else 
             {
-                //$parser = new ViewParser;
-                $path = $this->viewParser->parse($document);
-                
+                $parser = new ViewParser($document, $this->configHolder, $this->eventHolder);
+                $path = $parser->parse();
                 
                 //$path = $this->parser->parse($this->document);
                
@@ -122,4 +124,15 @@ class ViewFactory
     {
         $this->destPath = $dest;
     }
+    
+    public function getConfigHolder(): ConfigHolder
+    {
+        return $this->configHolder;
+    }
+    
+    public function getEventHolder(): ConfigHolder
+    {
+        return $this->eventHolder;
+    }
+    
 }

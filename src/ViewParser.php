@@ -5,6 +5,7 @@ namespace PhpTemplates;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
+use PhpTemplates\Entities\TextNode;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\Component;
 use PhpTemplates\Entities\Slot;
@@ -12,12 +13,14 @@ use PhpTemplates\Entities\Template;
 
 class ViewParser
 {
+    private $document;
     private $configHolder;
     private $eventHolder;
     private $templates =[];
     
-    public function __construct(ConfigHolder $configHolder, EventHolder $eventHolder) 
+    public function __construct(Document$document, ConfigHolder $configHolder, EventHolder $eventHolder) 
     {
+        $this->document = $document;
         $this->configHolder = $configHolder;
         $this->eventHolder = $eventHolder;
     }
@@ -27,10 +30,9 @@ class ViewParser
         return $this->configHolder;
     }
     
-    public function parse(Document $document): string // return result path
+    public function parse(): string // return result path
     {
-        $this->document = $document;
-        $name = $document->getInputFile();
+        $name = $this->document->getInputFile();
         
         $this->resolveComponent($name, $this->configHolder->get());
 
@@ -43,10 +45,11 @@ class ViewParser
     
     public function parseNode(DomNode $node, Config $config, AbstractEntity $context = null) 
     {
+        //$GLOBALS['x'] = $this->document->getInputFile() == './temp/d';
         if (!$this->document) {
             throw new \Exception('Set the document first by calling parse() method');
         }
-        
+        //$GLOBALS['x'] && $node->d();
         if ($context) {
             $fn = explode('\\', get_class($context));
             $fn = end($fn);
@@ -55,11 +58,15 @@ class ViewParser
             $fn = 'rootContext';
         }
 
-        if ($node->nodeName === 'slot') {
+        if ($node->nodeName === '#text') {
+            $entity = new TextNode($this, $config, $node, $context);
+        }
+        elseif ($node->nodeName === 'slot') {
             $entity = new Slot($this, $config, $node, $context);
         }
         elseif ($name = $this->isComponent($node, $config)) {//TODO: intotdeauna intorc cobfih:
             // component load node
+            //$this->document->getInputFile() == './temp/d' && d($name);
             $this->resolveComponent($name, $config); // if doc not having this, get it from parser instance cache, or parse it again
             $entity = new Component($this, $config, $node, $name, $context);
         }
@@ -74,7 +81,7 @@ class ViewParser
     }
     
     public function resolveComponent(string $name, Config $config) 
-    {
+    {//$this->document->getInputFile() == './temp/d' && d($name);
         //strpos($name, 'fg2-1') && dd($name);
         if (strpos($name, ':')) {
             list($cfgKey, $rfilepath) = explode(':', $name);
@@ -89,7 +96,8 @@ class ViewParser
             //$name = $rfilepath;
         }
         //strpos($rfilepath, 'fg2-1') && dd($name);
-        
+         
+         //$GLOBALS['x'] && d($this->templates[$name]);
         if (!isset($this->templates[$name])) {  
             $node = $this->load($rfilepath, $config);
             $this->parseNode($node, $config);
@@ -97,8 +105,8 @@ class ViewParser
         
             $this->templates[$name] = $tplfn;            
         }
-        
-       
+//$this->document->getInputFile() == './temp/d' && d($name);
+       //strpos($name, 'tends/parent2') && dd($this->templates[$name]);
         
         $this->document->addTemplate($name, $this->templates[$name]);
     }
@@ -115,24 +123,6 @@ class ViewParser
     public function nodeToTemplateFunction(DomNode $node, $asSlot = false): string
     {//TODO: prin noduri se pastreaza indent ul
         $html = (string) $node;
-        
-        $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
-            return '<?php ' . $m[1] . ' ?>';
-        }, $html);
-        
-        $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
-            if ($eval = trim($m[1])) {
-                return "<?php e($eval); ?>";
-            }
-            return '';
-        }, $html);
-        
-        $templateString = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
-            if ($eval = trim($m[1])) {
-                return "<?php echo $eval; ?>";
-            }
-            return '';
-        }, $html);
         
         if ($asSlot) {
         $fnDeclaration = 'function ($data)' . PHP_EOL

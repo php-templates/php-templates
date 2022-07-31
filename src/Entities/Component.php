@@ -30,17 +30,17 @@ class Component extends AbstractEntity
         $data = $this->fillNode(null, $data);
 
         $dataString = Helper::arrayToEval($data);
-        
-        $nodeValue = sprintf('<?php $this->comp[%d] = $this->template("%s", %s); ?>', 
-            $this->depth, $this->name, $dataString
+       
+        $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", %s); ?>', 
+            $this->id, $this->name, $dataString
         );      
         $this->node->changeNode('#php', $nodeValue);
-
+//dd($nodeValue);
         foreach ($this->node->childNodes as $slot) {
             $this->parser->parseNode($slot, $this->config, $this);
         }
 
-        $r = sprintf('<?php $this->comp[%d]->render(); ?>', $this->depth);
+        $r = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
         $this->node->appendChild(new DomNode('#php', $r));
     }
 
@@ -59,15 +59,15 @@ class Component extends AbstractEntity
         //$data = $this->fillNode(null, $data);   
         //$dataString = Helper::arrayToEval($data);
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
-
+//dd($this->id);
         $this->parser->parseNode($wrapper, $this->config, $this->context);
         return;
         //if (!$this->process->hasTemplateFunction($this->name)) {
             //(new Root($this->process, null, $this->name, $this->context))->rootContext();
         //}
 
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
-            $this->depth, $this->context->depth, $this->attrs['slot'], $this->name, $dataString
+        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", %s)); ?>', 
+            $this->id, $this->context->getId(), $this->attrs['slot'], $this->name, $dataString
         );
         $this->node->changeNode('#php', $r);
         

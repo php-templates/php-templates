@@ -34,10 +34,15 @@ class Slot extends AbstractEntity
 
         $this->node->changeNode('#slot');
         if ($this->hasSlotDefault) {
+            $wrapperDefault = new DomNode('#slot');
+            foreach ($this->node->childNodes as $cn) {
+                $wrapperDefault->appendChild($cn->detach());
+            }
+            $this->node->appendChild($wrapperDefault);
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-            $this->node->setAttribute('p-if', $if);
+            $wrapperDefault->setAttribute('p-if', $if);
             //$slotDefault = new PhpNode('if', $if);
-            $this->parser->parseNode($this->node, $this->config, $this->context);
+            $this->parser->parseNode($wrapperDefault, $this->config, $this->context);
             //foreach ($this->node->childNodes as $cn) {
                 // wrap cn into an empty node to not lose its condition structures on parsing process
                 //$wrapper = new DomNode('#wrapper');
@@ -50,12 +55,13 @@ class Slot extends AbstractEntity
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
         $r = '<?php $_slot('.$dataString.'); ?>';
         $append->appendChild(new DomNode('#php', $r));
-        $wrapper->appendChild($append);
+        $this->node->appendChild($append);
+        //$wrapper->dd();
     }
 
     public function slotContext()
     {
-        throw new InvalidNodeException('Invalid slot location (slot in slot not allowed)', $this->node);
+        // nu va ajunge niciodata aici
     }
 
     /**
@@ -102,7 +108,7 @@ return;
                 //(new Root($this->process, $node, $name, $this->context))->rootContext();
                 
                 $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
-                    $this->depth, $this->context->depth, $this->attrs['slot'], $name, '[]'
+                    $this->id, $this->context->getId(), $this->attrs['slot'], $name, '[]'
                 );
                 $cn->changeNode('#php', $r);
                 $cn->empty();
@@ -113,7 +119,7 @@ return;
         
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
         $r = sprintf('<?php $this->comp[%d]->addSlot("%s", $_slot); ?>',
-            $this->context->depth, $this->attrs['slot']
+            $this->context->getId(), $this->attrs['slot']
         );
         
         $append->appendChild(new DomNode('#php', $r));

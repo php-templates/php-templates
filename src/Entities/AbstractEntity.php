@@ -18,6 +18,7 @@ abstract class AbstractEntity
 {
     protected $parser;
     protected $config;
+    protected $id;
 
     /**
      * recursive parent context
@@ -79,6 +80,8 @@ abstract class AbstractEntity
         $this->config = $config;
         $this->context = $context;
         $this->node = $node;
+        $this->id = uniqid();
+        //$this->node->setAttribute('id', $this->id);
     }
     
     abstract public function rootContext();
@@ -139,6 +142,7 @@ abstract class AbstractEntity
             }
             $k = $a->nodeName;
        
+            // reserved attrs
             if (array_key_exists($k, $this->attrs)) {
                 $this->attrs[$k] = $a->nodeValue;
             } 
@@ -259,6 +263,11 @@ abstract class AbstractEntity
             }
             $node->setAttribute($k, $val);
         }
+    }
+    
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function __get($prop)

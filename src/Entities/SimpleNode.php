@@ -55,8 +55,8 @@ class SimpleNode extends AbstractEntity
         $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
 //TODO: findout what to do with data
 
-        $slot = sprintf('<?php $this->comp[%d]->addSlot("%s", %s); ?>', 
-            $this->context->depth, $this->attrs['slot'], $fn
+        $slot = sprintf('<?php $this->comp["%s"]->addSlot("%s", %s); ?>', 
+            $this->context->getId(), $this->attrs['slot'], $fn
         );
         
         $root->changeNode('#slot', $slot);
@@ -75,8 +75,8 @@ class SimpleNode extends AbstractEntity
 
         (new Root($this->process, $this->node, $name))->rootContext();
 
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
-            $this->depth, $this->context->depth, $this->context->name, $name, $dataString
+        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
+            $this->id, $this->context->getId(), $this->context->name, $name, $dataString
         );
         $this->node->changeNode('#php', $r);
         $this->node->empty();
@@ -87,6 +87,8 @@ class SimpleNode extends AbstractEntity
      */
     public function slotContext()
     {
+        $this->rootContext();
+        return;
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
             $this->parser->parseNode($slot, $this->config, $this);

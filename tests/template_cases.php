@@ -14,15 +14,14 @@ use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
 
-header("Content-Type: text/plain");
+//header("Content-Type: text/plain");
 
 $cfg = new Config('default', __DIR__);
 $cfgHolder = new ConfigHolder($cfg);
 $dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$parser = new ViewParser($cfgHolder, $eventHolder);
-$viewFactory = new ViewFactory('./results', $parser, $dependenciesMap);
-$cfgHolder = $parser->getConfigHolder();
+$viewFactory = new ViewFactory('./results', $dependenciesMap, $cfgHolder, $eventHolder);
+$cfgHolder = $viewFactory->getConfigHolder();
 $cfg = $cfgHolder->get();
 
 $cfg->addAlias([
@@ -82,12 +81,12 @@ foreach($files as $f) {
     try {
         $view = $viewFactory->make($rfilepath);
         $view->render();
+        $results = ob_get_clean();
     } catch(Exception $e) {
         $_f = str_replace('\\', '/', $e->getFile());
         $_f = explode('/', $_f);
         echo $e->getMessage() . ' in ' . end($_f) . ' at line ' . $e->getLine();
     }
-    $results = ob_get_clean();
     //$results = explode('<body>', $results);
     //$results = end($results);
     $results = explode('-----',$results);
