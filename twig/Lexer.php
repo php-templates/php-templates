@@ -48,7 +48,7 @@ class Lexer
     public const REGEX_DQ_STRING_PART = '/[^#"\\\\]*(?:(?:\\\\.|#(?!\{))[^#"\\\\]*)*/As';
     public const PUNCTUATION = '()[]{}?:.,|';
 
-    public function __construct(Environment $env, array $options = [])
+    public function __construct(ExtensionSet $env, array $options = [])
     {
         $this->env = $env;
 

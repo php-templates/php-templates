@@ -11,9 +11,9 @@ if (!function_exists('dd')) {
         //debug_print_backtrace(2);die();
         foreach ($data as $d) {
             //var_dump($d);
-            //echo '<pre>';
+            echo '<pre>';
             print_r($d);
-            //echo '</pre>';
+            echo '</pre>';
         }
         die();
     }
@@ -44,7 +44,7 @@ spl_autoload_register(function ($class) {
         }
     }
     elseif (strpos($class, 'Twig\\') === 0) {
-        $class = str_replace($path, '', $class);
+        $class = str_replace('Twig\\', '', $class);
         $file = __DIR__.'/twig/'.$class.'.php';
         $file = str_replace('\\', '/', $file);
         if (file_exists($file)) {
