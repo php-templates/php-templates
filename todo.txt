@@ -60,3 +60,13 @@ doc = new Document('file.t.php', destpath, depmap)
 eventholder = new EventHolder()
 parser = new viewParser(document, cfgh, eventholder)
 viewFactory = new ViewFactory(doc, parser)
+
+
+loader ca la twig -> filesystem
+ideea de Source::class ca wrapper pentru filepath
+$e->setSourceContext($source);
+
+
+lexer duce greul…  asta e baza
+stream = lexer tokenize
+parser->parse(stream)
