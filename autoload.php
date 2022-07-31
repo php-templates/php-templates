@@ -43,12 +43,4 @@ spl_autoload_register(function ($class) {
             require_once($file);
         }
     }
-    elseif (strpos($class, 'Twig\\') === 0) {
-        $class = str_replace('Twig\\', '', $class);
-        $file = __DIR__.'/twig/'.$class.'.php';
-        $file = str_replace('\\', '/', $file);
-        if (file_exists($file)) {
-            require_once($file);
-        }
-    }
 });

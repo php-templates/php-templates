@@ -11,11 +11,14 @@ class TextNode extends SimpleNode
 {
     public function rootContext()
     {
-        $x = $this->addContextualVariables(
-            '$foo = 123; foreach($foo as
-            $bar); 
-            $foo[$bar]; $foo[\'bar\']; \'$dolars\' "\$dolars" "$yes"'
-        );
+        $x = '{% set foo = 123 %}';
+        $x .= PHP_EOL . '{% foreach($foo as $bar) %}';
+        $x .= PHP_EOL . '{% endforeach %}';
+        $x .= PHP_EOL . '{{ $foo[$bar] | someFilter }}  dsad dsa ';
+        $x .= PHP_EOL . '{# comment #}';
+        $x .= PHP_EOL . '{{ \'yoy\' }}';
+
+        $x = $this->addContextualVariables($x);
         dd($x);
         
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
