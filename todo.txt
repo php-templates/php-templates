@@ -70,3 +70,12 @@ $e->setSourceContext($source);
 lexer duce greul…  asta e baza
 stream = lexer tokenize
 parser->parse(stream)
+
+context get cu fb pe globale si return by ref
+context set cu get
+ambele trec prin loop check
+perform isset issue
+
+sters root context, viewrepository, class
+
+domnodeattribute implements domnoneattrinterface

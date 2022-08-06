@@ -31,7 +31,7 @@ class Template
      *
      * @var array
      */
-    public $data = [];
+    public $context = [];
 
     /**
      * render function to be called
@@ -57,25 +57,25 @@ class Template
      */
     public $block = [];
     /*
-    public static function template($name, $data = [])
+    public static function template($name, $context = [])
     {
-        return new self($name, self::$templates[$name], $data);
+        return new self($name, self::$templates[$name], $context);
     }*/
     
     /*
-    public static function raw($name, \Closure $fn, $data = [])
+    public static function raw($name, \Closure $fn, $context = [])
     {
         if (!$name) {
             $name = uniqid();
         }
-        return new self($name, $fn, $data);
+        return new self($name, $fn, $context);
     }*/
     
-    public function __construct(TemplateRepository $repository, $name, \Closure $fn, $data = [])
+    public function __construct(TemplateRepository $repository, $name, \Closure $fn, Context $context = null)
     {
         $this->repository = $repository;
         $this->name = $name;
-        $this->data = $data;
+        $this->context = $context;
         
         $this->func = \Closure::bind($fn, $this);
     }
@@ -107,13 +107,16 @@ class Template
         return $this;
     }
     
-    public function render($parentScope = [])
+    public function render()
     {
-        $this->scopeData = array_merge($parentScope, $this->data);
-        $this->scopeData['_name'] = $this->name;
+        //$this->context->merge($parentScope);
+        //$this->scopeData = array_merge($parentScope, $this->context);
+        //$this->scopeData['_name'] = $this->name;
 
         $func = $this->func;
-        $func(array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name, $this->data), $this->scopeData));
+        $func($this->context);
+            
+        //array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name, $this->context), $this->scopeData));
     }
     
     public function __get($prop)
@@ -130,29 +133,33 @@ class Template
         return $this;
     }
     
-    public function with(array $data)
+    public function with(array $data = [])
     {
-        $this->data = array_merge($data, $this->data);
+        if (!$this->context) {
+            $this->context = new Context($data);
+        } else {
+            $this->context->merge($data);
+        }
         
         return $this;
     }
     
-    public function withShared(array $data)
+    public function withShared(array $context)
     {
-        $this->repository->shareData($data);
+        $this->repository->shareData($context);
         
         return $this;
     }
     
-    public function withComposers(array $data)
+    public function withComposers(array $context)
     {
-        $this->repository->dataComposers($data);
+        $this->repository->dataComposers($context);
         
         return $this;
     }
     
-    public function template(string $name, array $data = []) 
+    public function template(string $name, Context $context = null) 
     {
-        return $this->repository->get($name, $data);
+        return $this->repository->get($name, $context);
     }
 }

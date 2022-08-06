@@ -119,7 +119,7 @@ class Parser
                 $node = new DomNode($m[1]);
                 $attrs = $this->getTagAttributes($str);
                 foreach ($attrs as $attr) {
-                    $node->addAttribute($attr[0], $attr[1]);
+                    $node->addAttribute(new DomNodeAttr($attr[0], $attr[1]));
                 }
                 $node->srcFile = $this->srcFile;
                 $node->lineNumber = $this->currentLineRange[0];

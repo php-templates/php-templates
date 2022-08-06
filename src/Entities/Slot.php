@@ -29,8 +29,8 @@ class Slot extends AbstractEntity
         $wrapper->appendChild($this->node->detach());
         
         $data = $this->depleteNode($this->node);
-        $data = $this->fillNode(null, $data);
-        $dataString = Helper::arrayToEval($data);
+        $dataString = $this->fillNode(null, $data);
+        //$dataString = Helper::arrayToEval($data);
 
         $this->node->changeNode('#slot');
         if ($this->hasSlotDefault) {
@@ -52,9 +52,9 @@ class Slot extends AbstractEntity
             //$this->node->appendChild($slotDefault);
         }
         
-        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-        $r = '<?php $_slot('.$dataString.'); ?>';
-        $append->appendChild(new DomNode('#php', $r));
+        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $slot');
+        $r = '($slot)($subcontext('.$dataString.'))';
+        $append->appendChild(new PhpNode('', $r));
         $this->node->appendChild($append);
         //$wrapper->dd();
     }

@@ -122,20 +122,22 @@ class ViewParser
     
     public function nodeToTemplateFunction(DomNode $node, $asSlot = false): string
     {//TODO: prin noduri se pastreaza indent ul
-        $html = (string) $node;
+        $templateString = $node->__toString(function($self) {
+            dd($self);
+        });
         
         if ($asSlot) {
-        $fnDeclaration = 'function ($data)' . PHP_EOL
+        $fnDeclaration = 'function (Context $context)' . PHP_EOL
         . '{' . PHP_EOL
-        . '$data = array_merge($this->scopeData, $data);' . PHP_EOL
-        . 'extract($data);' . PHP_EOL
+        //. '$data = array_merge($this->scopeData, $data);' . PHP_EOL
+        //. 'extract($data);' . PHP_EOL
         . '?> '. $templateString .' <?php' . PHP_EOL
         . '}';            
         }
         else {
-        $fnDeclaration = 'function ($data) {' . PHP_EOL
-        . '$data["_attrs"] = isset($data["_attrs"]) ? $data["_attrs"] : [];' . PHP_EOL
-        . 'extract($data);' . PHP_EOL
+        $fnDeclaration = 'function (Context $context) {' . PHP_EOL
+        //. '$data["_attrs"] = isset($data["_attrs"]) ? $data["_attrs"] : [];' . PHP_EOL
+        //. 'extract($data);' . PHP_EOL
         . '?> '. $templateString .' <?php' . PHP_EOL
         . '}';
         }

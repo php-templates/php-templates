@@ -5,6 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\DomNodeAttr;
 use IvoPetkov\HTML5DOMDocument;
 
 class SimpleNode extends AbstractEntity
@@ -36,7 +37,7 @@ class SimpleNode extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $this->attrs['_index'] = 0;
+        //$this->attrs['_index'] = 0;
         
         $root = new DomNode('#root');
         $this->node->parentNode->insertBefore($root, $this->node);
@@ -51,8 +52,12 @@ class SimpleNode extends AbstractEntity
         }
         //dd($root->parentNode->dd());
         $fn = $this->parser->nodeToTemplateFunction($root, true);
-        //(new Root($this->process, $this->node, $name))->rootContext();
-        $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
+        //(new Root($this->process, $this->node, $name))->rootContext();,
+        $attrs = [];
+        foreach ($this->attrs as $k => $val) {
+            $attrs[] = new DomNodeAttr($k, $val);//todo, vezi daca e necesar
+        }
+        $dataString = $this->fillNode(null, $attrs);
 //TODO: findout what to do with data
 
         $slot = sprintf('<?php $this->comp["%s"]->addSlot("%s", %s); ?>', 

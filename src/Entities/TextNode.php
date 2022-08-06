@@ -2,25 +2,20 @@
 
 namespace PhpTemplates\Entities;
 
-use Twig\Extension\CoreExtension;
-use Twig\ExtensionSet;
-use Twig\Lexer;
-use Twig\Source;
+use PhpTemplates\Traits\IsContextual;
 
 class TextNode extends SimpleNode
 {
+    use IsContextual;
+    
     public function rootContext()
     {
-        $x = '{% set foo = 123 %}';
-        $x .= PHP_EOL . '{% foreach($foo as $bar) %}';
-        $x .= PHP_EOL . '{% endforeach %}';
-        $x .= PHP_EOL . '{{ $foo[$bar] | someFilter }}  dsad dsa ';
-        $x .= PHP_EOL . '{# comment #}';
-        $x .= PHP_EOL . '{{ \'yoy\' }}';
-
-        $x = $this->addContextualVariables($x);
-        dd($x);
-        
+        $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
+        parent::rootContext();
+    }
+    
+    public function simpleNodeContext() 
+    {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
         parent::rootContext();
     }
@@ -31,45 +26,28 @@ class TextNode extends SimpleNode
         parent::componentContext();
     }
     
-    private function replaceSpecialTags(string $string)
+    private function replaceSpecialTags(string $html)
     {
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
-            return '<?php ' . $m[1] . ' ?>';
+            return '<?php ' . $this->makeExpressionWithContext($m[1]) . ' ?>';
         }, $html);
         
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
+                $eval = $this->makeExpressionWithContext($eval);
                 return "<?php e($eval); ?>";
             }
             return '';
         }, $html);
         
-        $templateString = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
+        $html = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
             if ($eval = trim($m[1])) {
+                $eval = $this->makeExpressionWithContext($eval);
                 return "<?php echo $eval; ?>";
             }
             return '';
         }, $html);
-    }
-    
-    private function addContextualVariables(string $string) 
-    {
-        $extensionSet = new ExtensionSet();
-        $extensionSet->addExtension(new CoreExtension());
-        $lexer = new Lexer($extensionSet);
-        $stream = $lexer->tokenize(new Source($string, 'name.'.uniqid()));
-        dd($stream);
-        // $extensionSet->addExtension(new EscaperExtension($options['autoescape']));
-        // $extensionSet->addExtension(new OptimizerExtension($options['optimizations']));
-        // lexer duce greul…  asta e baza
-        // stream = lexer tokenize
-        // parser->parse(stream)
-
-        d($string);
-        // ((?!\\).)"[^"\\]*(?:\\.[^"\\]*)*"
-        // match all $ not inside of a string declaration, considering escapes
-        return preg_replace_callback("/(?<!=\\)'/", function($m) {
-            dd($m);
-        }, $string);
+        
+        return $html;
     }
 }

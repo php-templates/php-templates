@@ -49,6 +49,7 @@ class Document
         $tpl .= PHP_EOL."namespace PhpTemplates;";
         $tpl .= PHP_EOL."use PhpTemplates\Template;";
         $tpl .= PHP_EOL."use PhpTemplates\TemplateRepository;";
+        $tpl .= PHP_EOL."use PhpTemplates\Context;";
         $tpl .= PHP_EOL;
         $tpl .= '$tr = new TemplateRepository();';
         //dd($this->templates);

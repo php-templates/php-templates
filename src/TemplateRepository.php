@@ -66,9 +66,9 @@ class TemplateRepository
         $this->templates[$name] = $fn;
     }
     
-    public function get(string $name, array $data = []) 
+    public function get(string $name, Context $context) 
     {
-        $data = array_merge((array)$this->sharedData, $data);
-        return new Template($this, $name, $this->templates[$name], $data);
+        //$data = array_merge((array)$this->sharedData, $data);
+        return new Template($this, $name, $this->templates[$name], $context);
     }
 }

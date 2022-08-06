@@ -1,6 +1,6 @@
 <!-- pass data to extended template -->
-@php $this->scopeData['bind_me'] = 'bound'; @endphp
-<template is="extends/b" :bind_me="$this->scopeData['bind_me']"></template>
+@php $bind_me = 'bound'; @endphp
+<template is="extends/b" :bind_me="$bind_me"></template>
 =====
 <parent2>
     bound

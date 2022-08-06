@@ -2,33 +2,29 @@
 
 namespace PhpTemplates;
 
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\DomNodePhpBindAttr;
+use PhpTemplates\Dom\DomNodePhpValAttr;
+
 class ConfigHolder
 {
-    private $defaultConfig;
     private $configs = [];
     
     public function __construct(Config $defaultConfig) 
     {
         $defaultConfig->configHolder($this);
-        $this->defaultConfig = $defaultConfig;
         $this->configs['default'] = $defaultConfig;
-    }
-    
-    public function setDefault(Config $config)
-    {
-        $config->configHolder($this);
-        $this->defaultConfig = $config;
-        $this->configs['default'] = $config;
+        $this->addDefaultDirectives();
     }
     
     public function get(string $name = ''): Config
     {
         if (!$name) {
-            return $this->defaultConfig;
+            return $this->configs['default'];
         }
         
-        if ($name != $this->defaultConfig->getName()) {
-            return $this->merge($this->defaultConfig, $this->configs[$name]);
+        if ($name != $this->configs['default']->getName()) {
+            return $this->merge($this->configs['default'], $this->configs[$name]);
         }
         
         return $this->configs[$name];
@@ -40,7 +36,7 @@ class ConfigHolder
     }
     
     // todo, remove
-    public function getFromFilePath(string $path, Config $fallback = null) 
+    public function getFrdhdhdhomFilePath(string $path, Config $fallback = null) 
     {
         $path = array_filter(explode(':', $name));
         if (count($path) > 1) {
@@ -67,5 +63,30 @@ class ConfigHolder
         }
         
         return $cfg2;
+    }
+    
+    private function addDefaultDirectives() 
+    {
+        $cfg = $this->configs['default'];
+        
+        $cfg->addDirective('raw', function(DomNode $node, string $val) {
+            $node->addAttribute(new DomNodePhpValAttr('', $val));
+        });
+        
+        $cfg->addDirective('bind', function(DomNode $node, string $val) {
+            $node->addAttribute(new DomNodePhpBindAttr('', $val));
+        });
+        
+        $cfg->addDirective('checked', function(DomNode $node, string $val) {
+            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "checked" : ""'));
+        });
+        
+        $cfg->addDirective('selected', function(DomNode $node, string $val) {
+            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "selected=\"selected\" : ""'));
+        });
+        
+        $cfg->addDirective('disabled', function(DomNode $node, string $val) {
+            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "disabled" : ""'));
+        });
     }
 }

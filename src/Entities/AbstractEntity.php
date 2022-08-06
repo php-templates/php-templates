@@ -12,6 +12,9 @@ use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Process;
 use PhpTemplates\Traits\CanParseNodes;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\DomNodePhpValAttr;
+use PhpTemplates\Dom\DomNodeBindAttr;
+use PhpTemplates\Dom\DomNodeRawAttr;
 use PhpTemplates\Dom\PhpNode;
 
 abstract class AbstractEntity
@@ -102,30 +105,37 @@ abstract class AbstractEntity
      */
     protected function depleteNode($node): array
     {
-        $attrs = $node->attributes;
         $extracted_attributes = [];
-
+        // dispatch any existing directive
+        while ($node->attributes->count()) {
+            $attrs = $node->attributes;
+            $node->removeAttributes();
+        
         foreach ($attrs as $a) {
             $k = $a->nodeName;
-
             if (strpos($k, $this->pf) === 0) 
             {
                 // check if is a custom directive and unpack its result as attributes
+                // todo don t allow directive with cstruct name
+                // todo pass node to directive
                 if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
-                    $result = $directive($a->nodeValue);
-                    if (empty($result)) {
+                    //dd($directive);
+                    $directive($node, $a->nodeValue);
+                    /*if (empty($result)) {// todo throw error if no directive
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
                     }
                     foreach ($result as $k => $val) {//TODO vezi daca e folosit 
-                        $extracted_attributes[] = new DOMAttr($k, $val);
-                    }
+                        $extracted_attributes[] = new DomNodeAttr($k, $val);
+                    }*/
                     // directive unpacked his data, next attr!!!
                     continue;
                 }
             }
-            $extracted_attributes[] = clone $a;
+            $extracted_attributes[] = $a;
         }
-
+        }
+        // remove all node attrs
+        
         // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
         $c_structs = [];
         $data = [];
@@ -133,70 +143,44 @@ abstract class AbstractEntity
         $attrs = [];
         foreach ($extracted_attributes as $a) {
             $k = $a->nodeName;
-            if (strpos($k, $this->pf) === 0) {
-                $k = substr($k, strlen($this->pf));
-                if (in_array($k, Config::allowedControlStructures)) {
-                    $c_structs[] = [$k, $a->nodeValue];
-                    continue;
-                }
+            if (!$k) {
+                $data[] = $a;
             }
-            $k = $a->nodeName;
-       
-            // reserved attrs
-            if (array_key_exists($k, $this->attrs)) {
+            // reserved attrs, like slot, is
+            elseif (array_key_exists($k, $this->attrs)) {
                 $this->attrs[$k] = $a->nodeValue;
             } 
-            elseif ($k[0] === ':') {
-                $binds[$k][] = $a->nodeValue;
+            elseif (in_array(substr($k, strlen($this->pf)), Config::allowedControlStructures)) {
+                $a->nodeName = substr($k, strlen($this->pf));
+                $c_structs[] = $a;
             }
-            elseif ($k[0] === '@') {
-                $k = substr($k, 1);
-                $attrs[$k] = $a->nodeValue;
+            elseif ($k[0] == ':') {
+                $binds[substr($k, 1)] = new DomNodePhpValAttr($k, $a->nodeValue);
+            }
+            elseif ($k[0] == '@') {
+                $attrs[$k] = new DomNodePhpValAttr($k, $a->nodeValue);
             }
             else {
-                $data[$k][] = $a->nodeValue;
+                $data[$k] = $a;
             }
         }
 
-        // remove all node attrs
-        $node->removeAttributes();
-        
         // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
-        foreach ($data as $k => $val) {
-            $bk = ':'.$k;
+        foreach ($data as $bk => $a) {
+            //$bk = ':' . $k;
             $bind = isset($binds[$bk]) ? $binds[$bk] : null;
-            
             if ($bind) {
-                $val = array_map(function($attr) {
-                    return "'$attr'";
-                }, $val);
-                $val = array_merge($val, $bind);
-                $val = 'attr('.implode(',',$val).')';
-                unset($binds[$bk]);
-                unset($data[$k]);
-                $data[$bk] = $val;
+                $bind->merge($a);
             } else {
-                $data[$k] = implode(' ', $val);
+                $binds[$bk] = $a;
             }
-        }
-        
-        // implode attribute values, eg: '.class' with :class="@php echo x; @endphp" under 1 'magic' merger method 
-        foreach ($binds as $bk => $bval) {
-            $k = substr($bk, 1);
-            if (count($bval) > 1) {
-                $bval = 'attr('.implode(',',$bval).')';
-            } else {
-                $bval = $bval[0];
-            }
-
-            $data[$bk] = $bval;
         }
 
         // now consider the control structures like p-if, p-for, etc
         $cstruct = null;
         $condNode = null;
         foreach ($c_structs as $struct) {
-            list($statement, $args) = $struct;
+            list($statement, $args) = [$struct->nodeName, $struct->nodeValue];
             $phpnode = new PhpNode($statement, $args);
             if ($cstruct) {
                 $cstruct->appendChild($phpnode);
@@ -212,10 +196,10 @@ abstract class AbstractEntity
         }
         
         if ($attrs) {
-            $data['_attrs'] = $attrs;
+            $binds['_attrs'] = $attrs;
         }
         
-        return $data;
+        return $binds;
     }
 
     /**
@@ -228,41 +212,105 @@ abstract class AbstractEntity
     protected function fillNode($node, array $data)
     {
         if (is_null($node)) {
-            $_data = [];
-            foreach ($data as $k => &$val) {
-                $k = trim($k);
-                if ($k[0] === ':') {
-                    $k = substr($k, 1);
-                } 
-                elseif ($k != '_attrs') {
-                    $val = "'$val'";
-                }
-                $_data[$k] = $val;
+            if (isset($data['_attrs'])) {
+                $attrs = array_map(function($a) {
+                    return $a->toArrayString();
+                }, $data['_attrs']);
+                unset($data['_attrs']);
+                $attrs = "'_attrs' => [" . implode(', ', $attrs) . ']';
+            } else {
+                $attrs = '';
             }
-            return $_data;
+            
+            $data = array_map(function($a) {
+                return $a->toArrayString();
+            }, $data);
+            if ($attrs) {
+                $data[] = $attrs;
+            }
+            $data = '[' . implode(', ', $data) . ']';
+            
+            return $data;
         }
 
-        if (!method_exists($node, 'setAttribute')) {
-            return;
-        }
-        foreach ($data as $k => $val) {
+        foreach ($data as $attr) {
+            $node->addAttribute($attr);
+            continue;
+            
+            
+            
             if ($k[0] === ':') {
                 $k = substr($k, 1);
-                $rid = '__r'.uniqid();
                 $val = "<?php echo $val; ?>";
             }
             elseif ($k === 'p-bind') {
-                $rid = '__r'.uniqid();
+                //$rid = '__r'.uniqid();
                 $k = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>';
+                $k = $this->addContext($val, true);
                 $val = '';
             }
             elseif ($k === 'p-raw') {
-                $rid = '__r'.uniqid();
+                //$rid = '__r'.uniqid();
+                $val = $this->addContext($val);
                 $k = "<?php echo $val; ?>";
                 $val = '';
             }
-            $node->setAttribute($k, $val);
+            
         }
+    }
+    
+    protected function addContvggext(string $string, $loop = false)
+    {
+        // replace any \\ withneutral chars only to find unescaped quotes positions
+        $tmp = str_replace('\\', '__', $string);
+        preg_match_all('/(?<!\\\\)[`\'"]/', $tmp, $m, PREG_OFFSET_CAPTURE);
+        $stringRanges = [];
+        $stringRange = null;
+        $last = array_key_last($m[0]);
+        foreach ($m[0] ?? [] as $k => $m) {
+            if ($stringRange && $stringRange['char'] == $m[0]) {
+                $stringRange['end'] = $m[1];
+                $stringRanges[] = $stringRange;
+                $stringRange = null;
+            }
+            elseif (!$stringRange) {
+                $stringRange['char'] = $m[0];
+                $stringRange['start'] = $m[1];
+            }
+            elseif ($stringRange && $k == $last) {
+                // todo throw error unclosed string
+            }
+        }
+        
+        $stringRange = null;
+        // match all $ not inside of a string declaration, considering escapes
+        $count = null;
+        $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function($m) use (&$stringRange, &$stringRanges) {
+            if (empty($m[1][0]) || $m[1][0] == 'this') {
+                return '$' . $m[1][0];
+            }
+            $var = $m[1][0];
+            $pos = $m[0][0];
+            
+            if ($stringRange && ($stringRange['start'] > $pos || $pos > $stringRange['end'])) {
+                $stringRange = null;
+            }
+            if (!$stringRange && $stringRanges && $stringRanges[0]['start'] < $pos && $pos < $stringRanges[0]['end']) {
+                $stringRange = array_shift($stringRanges);
+            }
+            
+            // check if is interpolation
+            if (!$stringRange || $stringRange['char'] != "'") {
+                if ($loop) {
+                    return '$context->loop()->'.$var;
+                }
+                return '$context->'.$var;
+            } 
+            return '$' . $var;
+        }, $string, -1, $count, PREG_OFFSET_CAPTURE);
+        
+        return $string;
+        //dd($string);
     }
     
     public function getId()

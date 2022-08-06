@@ -27,11 +27,11 @@ class Component extends AbstractEntity
     public function rootContext()
     {
         $data = $this->depleteNode($this->node);
-        $data = $this->fillNode(null, $data);
+        $dataString = $this->fillNode(null, $data);
 
-        $dataString = Helper::arrayToEval($data);
+        //$dataString = Helper::arrayToEval($data);
        
-        $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", %s); ?>', 
+        $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", new Context(%s)); ?>', 
             $this->id, $this->name, $dataString
         );      
         $this->node->changeNode('#php', $nodeValue);
@@ -66,7 +66,7 @@ class Component extends AbstractEntity
             //(new Root($this->process, null, $this->name, $this->context))->rootContext();
         //}
 
-        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", %s)); ?>', 
+        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", new Context(%s))); ?>', 
             $this->id, $this->context->getId(), $this->attrs['slot'], $this->name, $dataString
         );
         $this->node->changeNode('#php', $r);

@@ -13,6 +13,7 @@ use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
+use PhpTemplates\Dom\DomNodeAttr;
 
 //header("Content-Type: text/plain");
 
@@ -30,17 +31,16 @@ $cfg->addAlias([
     'x-card' => 'components/card',
     'x-helper' => 'components/helper'
 ]);
-$cfg->addDirective('checked', function($eval) {
-    return [
-        'p-raw' => $eval.' ? "checked" : ""'
-    ];
+$cfg->addDirective('checked', function($node, $val) {
+    $node->addAttribute(new DomNodeAttr('p-raw', '$val ? "checked" : ""'));
 });
 
 $cfg = new Config('cases2', __DIR__.'/cases2/');
 $cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
-$cfg->addDirective('mydirective', function() {
-    return ['mydirective' => 2];
-}, 'cases2');
+$cfg->addDirective('mydirective', function($node, $val) {
+    $node->addAttribute(new DomNodeAttr('mydirective', 2));
+});
+
 $cfgHolder->add($cfg);
 
 $files = array_diff(scandir('./results'), array('.', '..'));

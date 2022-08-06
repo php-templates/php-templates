@@ -70,6 +70,9 @@ class ViewFactory
             
             $result = require_once($path);
             
+            // check shared
+            //$context = new Context($data);
+            
             return $result
             ->with($data)
             ->withShared($this->sharedData)

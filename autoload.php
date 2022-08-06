@@ -15,7 +15,7 @@ if (!function_exists('dd')) {
             print_r($d);
             echo '</pre>';
         }
-        die();
+        exit();
     }
 }
 

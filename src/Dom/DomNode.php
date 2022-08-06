@@ -91,12 +91,14 @@ class DomNode
         return $node;
     }
     
-    public function addAttribute(string $nodeName, string $nodeValue)
-    {
-        $attr = (object) [
-            'nodeName' => $nodeName,
-            'nodeValue' => $nodeValue
-        ];
+    public function addAttribute(DomNodeAttr $nodeName)
+    {//todo
+        if ($nodeName instanceof DomNodeAttr) {
+            $attr = $nodeName;
+        } else {
+            $attr = new DomNodeAttr($nodeName, $nodeValue);
+        }
+        
         $this->attrs[] = $attr;
     }
     
@@ -109,11 +111,7 @@ class DomNode
             }
         }
         
-        $attr = (object) [
-            'nodeName' => $nodeName,
-            'nodeValue' => $nodeValue
-        ];
-        $this->attrs[] = $attr;
+        $this->addAttribute(new DomNodeAttr($nodeName, $nodeValue));
     }
     
     public function getAttribute(string $name)
@@ -246,11 +244,7 @@ class DomNode
         $indentNL = $this->shouldIndent() ? $this->getIndent() : '';
         $return = $indentNL;
         if ($this->nodeName[0] != '#' && $this->nodeName) {
-            $attrs = [];
-            foreach ($this->attrs as $attr) {
-                $attrs[] = ($attr->nodeValue === '') ? $attr->nodeName : $attr->nodeName . '="' . $attr->nodeValue . '"';
-            }
-            $attrs = $attrs ? (' '.implode(' ', $attrs)) : '';
+            $attrs = $this->attrs ? (' '.implode(' ', $this->attrs)) : '';
             $return .= '<'.$this->nodeName.$attrs.($this->shortClose ? '/>' : '>');
         }
         //$this->nodeName == 'x' && d($return);

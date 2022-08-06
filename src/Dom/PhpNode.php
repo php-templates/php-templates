@@ -2,20 +2,28 @@
 
 namespace PhpTemplates\Dom;
 
+use PhpTemplates\Traits\IsContextual;
+
 class PhpNode extends DomNode
 {
+    use IsContextual;
+    
     public function __toString()
     {
         // NODE START
         $indentNL = $this->getIndent();
         $return = $indentNL;
         
-        if ($this->nodeValue || $this->nodeValue == '0') {
-            $expr = "{$this->nodeName} ({$this->nodeValue})";
-        } else {
-            $expr = $this->nodeName;
+        if ($this->nodeName && $this->nodeName != '#text' && ($this->nodeValue || $this->nodeValue == '0')) {
+            $expr = "{$this->nodeName} ({$this->nodeValue}) {";
+        } 
+        elseif($this->nodeName && $this->nodeName != '#text') {
+            $expr = $this->nodeName . ' {';
         }
-        $return .= "<?php $expr { ?>";
+        else {
+            $expr = $this->nodeValue . ';';
+        }
+        $return .= '<?php ' . $this->makeExpressionWithContext($expr) . ' ?>';
         
         // NODE CONTENT
         foreach ($this->childNodes as $cn) {
@@ -23,7 +31,9 @@ class PhpNode extends DomNode
         }
         
         // NODE END
-        $return .= $indentNL . '<?php } ?>';
+        if ($this->nodeName && $this->nodeName != '#text') {
+            $return .= $indentNL . '<?php } ?>';
+        }
         
         return $return;
     }
