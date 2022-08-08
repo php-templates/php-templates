@@ -31,6 +31,20 @@ function d(...$data) {
     } 
 }
 
+function xd($data) {
+    $x = debug_backtrace();
+    //print_r($x[0]['file'].'->'.$x[0]['line']);
+    //foreach ($data as $d) {
+        //var_dump($d);
+        //echo '<pre>';
+        print_r($data ?? 'null');
+        //echo '</pre>';
+        echo PHP_EOL;
+        return $data;
+    //} 
+}
+
+
 require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');

@@ -127,7 +127,7 @@ class ViewParser
         });
         
         if ($asSlot) {
-        $fnDeclaration = 'function (Context $context)' . PHP_EOL
+        $fnDeclaration = 'function (/*Context $context*/) use ($context)' . PHP_EOL
         . '{' . PHP_EOL
         //. '$data = array_merge($this->scopeData, $data);' . PHP_EOL
         //. 'extract($data);' . PHP_EOL

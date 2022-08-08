@@ -79,3 +79,8 @@ perform isset issue
 sters root context, viewrepository, class
 
 domnodeattribute implements domnoneattrinterface
+
+
+the right way
+addslot fn(array data) use ($context) {
+context->subcontext(data)
