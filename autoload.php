@@ -37,7 +37,7 @@ function xd($data) {
     //foreach ($data as $d) {
         //var_dump($d);
         //echo '<pre>';
-        print_r($data ?? 'null');
+        print_r('--' . ($data ?? 'null'));
         //echo '</pre>';
         echo PHP_EOL;
         return $data;

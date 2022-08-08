@@ -39,7 +39,7 @@ class Context
         }
         elseif (isset($this->parent->$prop)) {
             // import from parent
-            $this->data[$prop] = $this->parent->prop;
+            $this->data[$prop] = $this->parent->$prop;
         }
         //$prop == 'slot' && !$this->data[$prop] && dd($this->parent->$prop);
         return $this->data[$prop];
