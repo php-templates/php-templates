@@ -25,7 +25,7 @@ class ViewFactory
     public function __construct(string $outputFolder, DependenciesMap $dependenciesMap, ConfigHolder $configHolder, EventHolder $eventHolder) {
     //public function __construct(string $srcPath, string $destPath) {
         $this->outputFolder = $outputFolder;
-        $this->viewParser = $viewParser;
+        // $this->viewParser = $viewParser;
         $this->dependenciesMap = $dependenciesMap;
         $this->configHolder = $configHolder;
         $this->eventHolder = $eventHolder;

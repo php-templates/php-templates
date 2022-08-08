@@ -2,7 +2,7 @@
 
 namespace PhpTemplates\Dom;
 
-class DomNamedNodeMap implements \IteratorAggregate, \Countable
+class DomNodeAttrList implements \IteratorAggregate, \Countable
 {
     private $nodes;
     

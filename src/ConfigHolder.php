@@ -3,8 +3,8 @@
 namespace PhpTemplates;
 
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\DomNodePhpBindAttr;
-use PhpTemplates\Dom\DomNodePhpValAttr;
+use PhpTemplates\Dom\PhpNodeBindAttr;
+use PhpTemplates\Dom\PhpNodeValAttr;
 
 class ConfigHolder
 {
@@ -70,23 +70,23 @@ class ConfigHolder
         $cfg = $this->configs['default'];
         
         $cfg->addDirective('raw', function(DomNode $node, string $val) {
-            $node->addAttribute(new DomNodePhpValAttr('', $val));
+            $node->addAttribute(new PhpNodeValAttr('', $val));
         });
         
         $cfg->addDirective('bind', function(DomNode $node, string $val) {
-            $node->addAttribute(new DomNodePhpBindAttr('', $val));
+            $node->addAttribute(new PhpNodeBindAttr('', $val));
         });
         
         $cfg->addDirective('checked', function(DomNode $node, string $val) {
-            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "checked" : ""'));
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "checked" : ""'));
         });
         
         $cfg->addDirective('selected', function(DomNode $node, string $val) {
-            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "selected=\"selected\" : ""'));
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "selected=\"selected\" : ""'));
         });
         
         $cfg->addDirective('disabled', function(DomNode $node, string $val) {
-            $node->addAttribute(new DomNodePhpValAttr('', $val . ' ? "disabled" : ""'));
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "disabled" : ""'));
         });
     }
 }

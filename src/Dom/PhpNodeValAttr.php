@@ -4,7 +4,7 @@ namespace PhpTemplates\Dom;
 
 use PhpTemplates\Traits\IsContextual;
 
-class DomNodePhpValAttr extends DomNodeAttr
+class PhpNodeValAttr extends DomNodeAttr
 {
     use IsContextual;
     

@@ -7,6 +7,7 @@ use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\DomNodeAttr;
 use IvoPetkov\HTML5DOMDocument;
+use PhpTemplates\Dom\PhpSlotAssignNode;
 
 class SimpleNode extends AbstractEntity
 {
@@ -39,9 +40,9 @@ class SimpleNode extends AbstractEntity
         $this->attrs['slot'] = 'default';
         //$this->attrs['_index'] = 0;
         
-        $root = new DomNode('#root');
-        $this->node->parentNode->insertBefore($root, $this->node);
-        $root->appendChild($this->node->detach());
+        $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default');
+        $this->node->parentNode->insertBefore($slotAssignNode, $this->node);
+        $slotAssignNode->appendChild($this->node->detach());
 //$this->node->parentNode->parentNode->dd();
         $data = $this->depleteNode($this->node);
         $this->fillNode($this->node, $data);
@@ -49,9 +50,9 @@ class SimpleNode extends AbstractEntity
 
         foreach ($this->node->childNodes as $cn) {
             $this->parser->parseNode($cn, $this->config, $this);
-        }
+        }//$slotAssignNode->dd();
         //dd($root->parentNode->dd());
-        $fn = $this->parser->nodeToTemplateFunction($root, true);
+        // $fn = $this->parser->nodeToTemplateFunction($root, true);
         //(new Root($this->process, $this->node, $name))->rootContext();,
         $attrs = [];
         foreach ($this->attrs as $k => $val) {
@@ -60,12 +61,14 @@ class SimpleNode extends AbstractEntity
         $dataString = $this->fillNode(null, $attrs);
 //TODO: findout what to do with data
 
-        $slot = sprintf('<?php $this->comp["%s"]->addSlot("%s", %s); ?>', 
-            $this->context->getId(), $this->attrs['slot'], $fn
-        );
         
-        $root->changeNode('#slot', $slot);
-        $root->empty();
+
+        // $slot = sprintf('<?php $this->comp["%s"]->addSlot("%s", %s); ?', 
+        //     $this->context->getId(), $this->attrs['slot'], $fn
+        // );
+        
+        // $root->changeNode('#slot', $slot);
+        // $root->empty();
     }
     
     public function blockContext()

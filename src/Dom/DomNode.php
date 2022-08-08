@@ -328,7 +328,7 @@ class DomNode
     
     public function getAttributes()
     {
-        return new DomNamedNodeMap($this->attrs);
+        return new DomNodeAttrList($this->attrs);
     }
     
     public function getRoot()

@@ -12,7 +12,7 @@ use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Process;
 use PhpTemplates\Traits\CanParseNodes;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\DomNodePhpValAttr;
+use PhpTemplates\Dom\PhpNodeValAttr;
 use PhpTemplates\Dom\DomNodeBindAttr;
 use PhpTemplates\Dom\DomNodeRawAttr;
 use PhpTemplates\Dom\PhpNode;
@@ -155,10 +155,10 @@ abstract class AbstractEntity
                 $c_structs[] = $a;
             }
             elseif ($k[0] == ':') {
-                $binds[substr($k, 1)] = new DomNodePhpValAttr($k, $a->nodeValue);
+                $binds[substr($k, 1)] = new PhpNodeValAttr($k, $a->nodeValue);
             }
             elseif ($k[0] == '@') {
-                $attrs[$k] = new DomNodePhpValAttr($k, $a->nodeValue);
+                $attrs[$k] = new PhpNodeValAttr($k, $a->nodeValue);
             }
             else {
                 $data[$k] = $a;
