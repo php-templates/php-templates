@@ -1,12 +1,12 @@
 <!-- bind data to a component slot -->
-<template is="props/c">
-    {{ $name }}
-    <template is="comp/comp_slot">{{ $name }}</template>
+<template is="props/c" p-scope="$s">
+    1{{ $s->name }}
+    <template is="comp/comp_slot">2{{ $s->name }}</template>
 </template>
 =====
 <c>
-    myname
+    1myname
     <div class="comp_slot">
-        <span>myname</span>
+        <span>2myname</span>
     </div>
 </c>

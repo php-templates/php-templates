@@ -2,19 +2,18 @@
 
 namespace PhpTemplates\Dom;
 
-use PhpTemplates\Traits\IsContextual;
-
 class PhpNodeValAttr extends DomNodeAttr
 {
-    use IsContextual;
-    
     private $merged = [];
    
     public function __toString() 
     {
         $name = ltrim($this->nodeName, ':@');
         if (!$this->merged) {
-            return $name .'="<?php e(' . $this->makeExpressionWithContext($this->nodeValue) . '); ?>"';
+            if (!$name) {
+                return '<?php e(' . $this->nodeValue . '); ?>';
+            }
+            return $name .'="<?php e(' . $this->nodeValue . '); ?>"';
         }
         $val = [];
         foreach ($this->merged as $attr) {
@@ -23,7 +22,11 @@ class PhpNodeValAttr extends DomNodeAttr
         $val[] = $this->nodeValue;
         $val = implode(', ', $val);
         
-        $val = '<?php attr(' . $this->makeExpressionWithContext($val) . '); ?>';
+        $val = '<?php attr(' . $val . '); ?>';
+        //d('--'.$this->nodeName);
+        if (!$this->nodeName) {
+            return $val;
+        }
         
         return $name . '="' . $val . '"';
     }
@@ -32,7 +35,7 @@ class PhpNodeValAttr extends DomNodeAttr
     {
         $name = ltrim($this->nodeName, ':@');
         if (!$this->merged) {
-            return "'". addslashes($name) . "' => " . $this->makeExpressionWithContext($this->nodeValue);
+            return "'". addslashes($name) . "' => " . $this->nodeValue;
         }dd('nu va merge');
         $val = [];
         foreach ($this->merged as $attr) {

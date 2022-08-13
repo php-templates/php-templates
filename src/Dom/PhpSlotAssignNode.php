@@ -2,20 +2,20 @@
 
 namespace PhpTemplates\Dom;
 
-use PhpTemplates\Traits\IsContextual;
-
 class PhpSlotAssignNode extends DomNode
 {
     private $targetComp;
     private $slotPos;
 
-    public function __construct(string $targetComp, string $slotPos)
+    public function __construct(string $targetComp, string $slotPos, string $scopeData = null)
     {
         parent::__construct('#php-slot-assign');
 
         $this->targetComp = $targetComp;
         $this->slotPos = $slotPos;
-        $this->appendChild(new DomNode('#php', '<?php $context = $context->subcontext($data); ?>'));
+        if ($scopeData) {
+            $this->appendChild(new DomNode('#php', '<?php $context = $context->subcontext(["'.trim(ltrim($scopeData, '$')).'" => new Context(func_get_args()[0])]); ?>'));
+        }
     }
 
     public function __toString()

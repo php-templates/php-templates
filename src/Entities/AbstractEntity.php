@@ -317,6 +317,11 @@ abstract class AbstractEntity
     {
         return $this->id;
     }
+    
+    public function getAttrs() 
+    {
+        return $this->attrs;
+    }
 
     public function __get($prop)
     {

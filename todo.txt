@@ -15,7 +15,7 @@ blocurile pot fi ordonate at compile time?
 
 testeaza cine are prioritate pe slot content ca si variabila, cea globala, sau cea care vine din componenta binded
 
-fn in loc de slot
+fn in loc de sldft
 
 strange scope data trecute pe slot pe $_scope pentru a putea fi folosite doar cu alias
 

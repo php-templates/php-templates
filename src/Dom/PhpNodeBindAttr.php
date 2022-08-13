@@ -2,15 +2,12 @@
 
 namespace PhpTemplates\Dom;
 
-use PhpTemplates\Traits\IsContextual;
-
 class PhpNodeBindAttr extends DomNodeAttr
 {
-    use IsContextual;
     
     public function __toString() 
     {
-        return '<?php bind(' . $this->makeExpressionWithContext($this->nodeValue) . '); ?>';
+        return '<?php bind(' . $this->nodeValue . '); ?>';
     }
     
     public function toArrayString()

@@ -44,7 +44,7 @@ class Document
     }
     
     public function getResult()
-    {
+    {//$this->_bindVariablesToContext('$this->template("default:props/a", new Context([\'bar\' => $bar, \'true\' => $true, \'foo\' => \'$foo\']));');die();
         $tpl = '<?php ';
         $tpl .= PHP_EOL."namespace PhpTemplates;";
         $tpl .= PHP_EOL."use PhpTemplates\Template;";
@@ -52,7 +52,11 @@ class Document
         $tpl .= PHP_EOL."use PhpTemplates\Context;";
         $tpl .= PHP_EOL;
         $tpl .= '$tr = new TemplateRepository();';
-        //dd($this->templates);
+        
+        foreach ($this->templates as $t => $fn) {
+            $this->templates[$t] = $this->bindVariablesToContext($fn);
+        }
+        
         $callerTemplate = end($this->templates);
         $callerTemplateName = key($this->templates);
         unset($this->templates[$callerTemplateName]);
@@ -122,5 +126,91 @@ class Document
     
     public function setRootNode($node) {
         $this->rootNode = $node;
+    }
+    
+    private function bindVariablesToContext(string $string) 
+    {
+        //d($string);
+        $preserve = [
+            //'$this->' => '__r-' . uniqid(),
+            //'Context $context' => '__r-' . uniqid(),
+            'use ($context)' => '__r-' . uniqid(),
+            'array $data' => '__r-' . uniqid(),
+            '$context = $context->subcontext' => '__r-' . uniqid(),
+        ];
+        
+        $string = str_replace(array_keys($preserve), $preserve, $string);
+        $preserve = array_flip($preserve);
+        
+        $string = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
+            return '<?php ' . $this->_bindVariablesToContext($m[1]) . ' ?>';
+        }, $string);        
+     
+        $string = str_replace(array_keys($preserve), $preserve, $string);
+        
+        return $string;
+    }
+    
+    private function _bindVariablesToContext(string $string) 
+    {
+        //d($string);
+        // replace any \\ withneutral chars only to find unescaped quotes positions
+        $tmp = str_replace('\\', '__', $string);
+        preg_match_all('/(?<!\\\\)[`\'"]/', $tmp, $m, PREG_OFFSET_CAPTURE);
+        $stringRanges = [];
+        $stringRange = null;
+        $last = array_key_last($m[0]);
+        foreach ($m[0] ?? [] as $k => $m) {
+            if ($stringRange && $stringRange['char'] == $m[0]) {
+                $stringRange['end'] = $m[1];
+                $stringRanges[] = $stringRange;
+                $stringRange = null;
+            }
+            elseif (!$stringRange) {
+                $stringRange['char'] = $m[0];
+                $stringRange['start'] = $m[1];
+            }
+            elseif ($stringRange && $k == $last) {
+                // todo throw error unclosed string
+            }
+        }
+        
+        $stringRange = null;
+        // match all $ not inside of a string declaration, considering escapes
+        $count = null;//d($stringRanges);
+        $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function($m) use (&$stringRange, &$stringRanges) {//d($m);
+            if (empty($m[1][0]) || $m[1][0] == 'this') {
+                return '$' . $m[1][0];
+            }
+            $var = $m[1][0];
+            $pos = $m[0][1];
+            
+            if ($stringRange && ($stringRange['start'] > $pos || $pos > $stringRange['end'])) {
+                $stringRange = null;
+            }
+            if (!$stringRange) {
+            while ($stringRanges) {
+                if ($pos > $stringRanges[0]['end']) {
+                    array_shift($stringRanges);
+                }
+                elseif ($stringRanges[0]['start'] < $pos && $pos < $stringRanges[0]['end']) {
+                    $stringRange = array_shift($stringRanges);
+                    break;
+                }
+                else {
+                    // not yet your time
+                    break;
+                }
+            }
+            }
+            //d('range is',$stringRange??'null');
+            // check if is interpolation
+            if (!$stringRange || $stringRange['char'] != "'") {
+                return '$context->'.$var;
+            } 
+            return '$' . $var;
+        }, $string, -1, $count, PREG_OFFSET_CAPTURE);
+        //d($string);
+        return $string;
     }
 }

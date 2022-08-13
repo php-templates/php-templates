@@ -31,9 +31,6 @@ $cfg->addAlias([
     'x-card' => 'components/card',
     'x-helper' => 'components/helper'
 ]);
-$cfg->addDirective('checked', function($node, $val) {
-    $node->addAttribute(new DomNodeAttr('p-raw', '$val ? "checked" : ""'));
-});
 
 $cfg = new Config('cases2', __DIR__.'/cases2/');
 $cfg->addAlias('x-form-group', 'components/form-group', 'cases2');

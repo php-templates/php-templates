@@ -2,17 +2,16 @@
 
 namespace PhpTemplates\Dom;
 
-use PhpTemplates\Traits\IsContextual;
+use PhpTemplates\Config;
 
 class PhpNode extends DomNode
-{
-    use IsContextual;
-    
+{ 
     public function __toString()
     {
         // NODE START
         $indentNL = $this->getIndent();
         $return = $indentNL;
+        $isLoop = in_array($this->nodeName, ['for', 'foreach']); 
         
         if ($this->nodeName && $this->nodeName != '#text' && ($this->nodeValue || $this->nodeValue == '0')) {
             $expr = "{$this->nodeName} ({$this->nodeValue}) {";
@@ -23,7 +22,7 @@ class PhpNode extends DomNode
         else {
             $expr = $this->nodeValue . ';';
         }
-        $return .= '<?php ' . $this->makeExpressionWithContext($expr) . ' ?>';
+        $return .= '<?php ' . ($isLoop ? '$loopStart(); ' : '') . $expr . ' ?>';
         
         // NODE CONTENT
         foreach ($this->childNodes as $cn) {
@@ -32,9 +31,9 @@ class PhpNode extends DomNode
         
         // NODE END
         if ($this->nodeName && $this->nodeName != '#text') {
-            $return .= $indentNL . '<?php } ?>';
+            $return .= $indentNL . '<?php } ' .($isLoop ? '$loopEnd(); ' : ''). '?>';
         }
-        
+        //d($return);
         return $return;
     }
     

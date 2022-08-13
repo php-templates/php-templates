@@ -10,7 +10,7 @@ use PhpTemplates\Dom\DomNode;
 
 class Component extends AbstractEntity
 {
-    protected $attrs = ['is' => null];
+    protected $attrs = ['is' => null, 'p-scope' => null];
 
     public function __construct(ViewParser $parser, Config $config, DomNode $node, string $name, AbstractEntity $context)
     {
@@ -37,6 +37,7 @@ class Component extends AbstractEntity
         $this->node->changeNode('#php', $nodeValue);
 //dd($nodeValue);
         foreach ($this->node->childNodes as $slot) {
+            //todo: grupam dupa slots o fn ceva?
             $this->parser->parseNode($slot, $this->config, $this);
         }
 
@@ -49,6 +50,7 @@ class Component extends AbstractEntity
      */
     public function componentContext()
     {
+        //dd('nu va mai ajunge aici');
         $this->attrs['slot'] = 'default';
         
         $wrapper = new DomNode('#slot');

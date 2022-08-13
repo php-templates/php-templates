@@ -38,9 +38,9 @@ class SimpleNode extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
+        $scopeData = $this->context->getAttrs()['p-scope'];
         //$this->attrs['_index'] = 0;
-        
-        $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default');
+        $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
         $this->node->parentNode->insertBefore($slotAssignNode, $this->node);
         $slotAssignNode->appendChild($this->node->detach());
 //$this->node->parentNode->parentNode->dd();

@@ -53,8 +53,9 @@ class Slot extends AbstractEntity
         }
         
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $slot');
+        // todo: solve this hack
         $r = '($slot)('.$dataString.')';
-        $append->appendChild(new PhpNode('', $r));
+        $append->appendChild(new DomNode('#php', '<?php ' . $r . '; ?>'));
         $this->node->appendChild($append);
         //$wrapper->dd();
     }

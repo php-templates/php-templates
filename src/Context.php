@@ -7,13 +7,13 @@ class Context
     //private static $baseid = 1;
     
     //private $id;
-    private $parent;
-    private $loopContext;
+    public $parent;
+    public $loopContext;
     private $loopDepth = 0;
-    private $data;
+    public $data;// scope getable as obj
     
     public function __construct(array $data = [], self $parent = null) 
-    {
+    {//d($data);
         $this->data = $data ?? [];
         $this->parent = $parent;
         
@@ -25,22 +25,26 @@ class Context
     {
         //d($this->id.'get'.$prop);
         //d($this);
-        if (isset($this->loopContext->$prop)) {
+        if (isset($this->loopContext) && $this->loopContext->has($prop)) {
+            //$prop == 'name' && dd($this->loopContext->parent->name);
             return $this->loopContext->$prop;
         }
         
         if (array_key_exists($prop, $this->data)) {
+            //!$this->data[$prop] && dd($this-> );
             return $this->data[$prop];
         }
         
         //d($this->data);
-        if (!array_key_exists($prop, $this->data) && !isset($this->parent->$prop)) {
-            $this->data[$prop] = null;
-        }
-        elseif (isset($this->parent->$prop)) {
+        if (isset($this->parent->$prop)) {//d('->'.$this->parent->$prop);
             // import from parent
             $this->data[$prop] = $this->parent->$prop;
         }
+        if (!array_key_exists($prop, $this->data)) {
+            $this->data[$prop] = null;
+        }
+        
+        //empty($this->data[$prop]) && dd($this->parent);
         //$prop == 'slot' && !$this->data[$prop] && dd($this->parent->$prop);
         return $this->data[$prop];
     }
@@ -71,6 +75,7 @@ class Context
     
     public function subcontext(array $data = []) 
     {
+        //empty($data['name']) && !d($this->parent) && debug_print_backtrace(2);
         return new Context($data, $this);
     }
     
@@ -88,5 +93,9 @@ class Context
         if ($this->loopDepth <= 0) {
             $this->loopContext = null;
         }
+    }
+    
+    public function has(string $prop) {
+        return array_key_exists($prop, $this->data);
     }
 }

@@ -1,8 +1,8 @@
 <!-- bind from slot to surface -->
 
-<template is="props/c">
+<template is="props/c" p-scope="$s">
     <template>
-        <div p-foreach="$val as $v">{{ $name.$v }}</div>
+        <div p-foreach="$s->val as $v">{{ $s->name.$v }}</div>
     </template>
 </template>
 =====
