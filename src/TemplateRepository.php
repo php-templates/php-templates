@@ -12,7 +12,7 @@ class TemplateRepository
     
     public function __construct() 
     {
-        $this->templates['***block'] = function($data) {
+        $this->hgyvgygtemplates['***block'] = function($data) {
             extract($data);
             if (isset($this->slots[$this->name])) {
                 usort($this->slots[$this->name], function($a, $b) {

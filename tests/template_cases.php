@@ -71,7 +71,7 @@ foreach($files as $f) {
     }
     $file = str_replace('cases/', 'temp/', $file);
     file_put_contents($file, $test);
-    $rfilepath = str_replace('.template.php', '', $file);
+    $rfilepath = str_replace('.t.php', '', $file);
     
     ob_start();
     $data = [];

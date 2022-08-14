@@ -183,7 +183,7 @@ class ViewParser
         $srcFile = null;
         // try to find file on current config, else try to load it from default config
         foreach ($config->getPath() as $srcPath) {
-            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.template.php';
+            $filepath = rtrim($srcPath, '/').'/'.$rfilepath.'.t.php';
             if (file_exists($filepath)) {
                 $srcFile = $filepath;
                 break;
