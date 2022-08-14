@@ -17,7 +17,6 @@ class Parser
     ];
     protected $keepEmptyTextNodes = false;   
     protected $currentLineRange = [0, 0];
-    protected $beforeCallback;
     protected $srcFile;
     
     /**
@@ -26,7 +25,7 @@ class Parser
      * @param string $srcFile
      * @return DomNode
      */
-    public function parseFile(string $srcFile)
+    public function padhdhdhdrseFile(string $srcFile)
     {
         // geting file content (php function can be returned and executed in actual context)
         ob_start();
@@ -47,7 +46,7 @@ class Parser
         ];
     }
 
-    public function parseString(string $html)
+    public function parsdhdhdheString(string $html)
     {
         $bt = debug_backtrace(5);
         while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
@@ -60,8 +59,12 @@ class Parser
         return $this->parse($html);
     }
 
-    public function parse(string $str)
+    public function parse(Source $source)
     {
+        $this->noises = [];
+        $this->currentLineRange = [$source->getStartLine(), $source->getStartLine()];
+        $this->srcFile = $source->getFile();
+        $str = (string) $source;
         $str = $this->collectAndReplaceNoises($str);
           
         $arr = explode('>', $str);

@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use PhpTemplates\Dom\Parser;
+use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Entities\TextNode;
@@ -151,11 +152,14 @@ class ViewParser
         
         // add file as dependency to template for creating hash of states
         //$this->process->addDependencyFile($srcFile);
-
+        ob_start();
+        $cb = require($srcFile);
+        $source = ob_get_contents();
+        ob_end_clean();
+        
+        $source = new Source($source, $srcFile);
         $parser = new Parser();
-        $result = $parser->parseFile($srcFile);
-        $node = $result->node;
-        $cb = $result->callback;
+        $node = $parser->parse($source);
         
         // we create a virtual dom to make impossible loosing actual node inside events (which would break the system)
         $wrapper = new DomNode('#root');

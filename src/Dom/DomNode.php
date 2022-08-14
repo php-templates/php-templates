@@ -55,7 +55,7 @@ class DomNode
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
     }
     
-    public static function fromFile(string $srcFile, $options = []): self
+    public static function frdhdhdhomFile(string $srcFile, $options = []): self
     {
         $parser = new Parser();
         if (isset($options['preservePatterns'])) {
@@ -69,14 +69,17 @@ class DomNode
     
     public static function fromString(string $str, $options = []): self
     {
-        $parser = new Parser();
-        if (isset($options['preservePatterns'])) {
-            foreach ($options['preservePatterns'] as $p) {
-                $parser->addPreservePattern($p);
-            }
+        $bt = debug_backtrace(5);
+        while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
+            array_shift($bt);
         }
         
-        return $parser->parseString($str);
+        $srcFile = $bt[0]['file'];
+        $startLine = $bt[0]['line'];
+        $source = new Source($str, $srcFile, $startLine);
+        $parser = new Parser();
+        
+        return $parser->parse($source);
     }
     
     public static function fromArray($arr)
