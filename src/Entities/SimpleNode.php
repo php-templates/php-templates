@@ -29,7 +29,7 @@ class SimpleNode extends AbstractEntity
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
-            $this->parser->parseNode($slot, $this->config, $this);
+            $this->factory->make($slot, $this)->parse();
         }
 
         $this->fillNode($this->node, $data);
@@ -49,7 +49,7 @@ class SimpleNode extends AbstractEntity
         //$name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
         foreach ($this->node->childNodes as $cn) {
-            $this->parser->parseNode($cn, $this->config, $this);
+            $this->factory->make($cn, $this)->parse();
         }//$slotAssignNode->dd();
         //dd($root->parentNode->dd());
         // $fn = $this->parser->nodeToTemplateFunction($root, true);

@@ -19,7 +19,7 @@ class ViewParser
     private $eventHolder;
     private $templates =[];
     
-    public function __construct(Document$document, ConfigHolder $configHolder, EventHolder $eventHolder) 
+    public function __construct(Document $document, ConfigHolder $configHolder, EventHolder $eventHolder) 
     {
         $this->document = $document;
         $this->configHolder = $configHolder;
@@ -34,6 +34,9 @@ class ViewParser
     public function parse(): string // return result path
     {
         $name = $this->document->getInputFile();
+        $factory = new EntityFactory($this->document, $this->configHolder);
+        $entity = $factory->make(new DomNode('template', ['is' => $name]), null, $this->configHolder->get());
+        $entity->parse();
         
         $this->resolveComponent($name, $this->configHolder->get());
 
@@ -44,7 +47,7 @@ class ViewParser
         return $filePath;
     }
     
-    public function parseNode(DomNode $node, Config $config, AbstractEntity $context = null) 
+    public function parseNgggode(DomNode $node, Config $config, AbstractEntity $context = null) 
     {
         //$GLOBALS['x'] = $this->document->getInputFile() == './temp/d';
         if (!$this->document) {
@@ -65,7 +68,7 @@ class ViewParser
         elseif ($node->nodeName === 'slot') {
             $entity = new Slot($this, $config, $node, $context);
         }
-        elseif ($name = $this->isComponent($node, $config)) {//TODO: intotdeauna intorc cobfih:
+        elseif ($name = Component::isComponent($node, $config)) {//TODO: intotdeauna intorc cobfih:
             // component load node
             //$this->document->getInputFile() == './temp/d' && d($name);
             $this->resolveComponent($name, $config); // if doc not having this, get it from parser instance cache, or parse it again
@@ -81,7 +84,7 @@ class ViewParser
         $entity->{$fn}();
     }
     
-    public function resolveComponent(string $name, Config $config) 
+    public function resolveCoygggmponent(string $name, Config $config) 
     {//$this->document->getInputFile() == './temp/d' && d($name);
         //strpos($name, 'fg2-1') && dd($name);
         if (strpos($name, ':')) {
@@ -121,7 +124,7 @@ class ViewParser
 
     }
     
-    public function nodeToTemplateFunction(DomNode $node, $asSlot = false): string
+    public function yyttnodeToTemplateFunction(DomNode $node, $asSlot = false): string
     {//TODO: prin noduri se pastreaza indent ul
         $templateString = $node->__toString(function($self) {
             dd($self);
@@ -146,7 +149,7 @@ class ViewParser
         return $fnDeclaration;
     }
     
-    private function load(string $rfilepath, Config $config): DomNode
+    private function dhdhrhload(string $rfilepath, Config $config): DomNode
     {
         $srcFile = $this->resolvePath($rfilepath, $config);
         
@@ -169,7 +172,7 @@ class ViewParser
         // ownerDocument
         
         $this->eventHolder->event('parsing', $name, $node);
-        is_callable($cb) && $cb($node, $this->document->getRootNode());
+        is_callable($cb) && $cb($node, $this->eventHolder);
         
         // findout process upper component and assign it as main root
         // dom has only one node which is a component, skip
@@ -182,7 +185,7 @@ class ViewParser
         return $wrapper;
     }
     
-    private function resolvePath($rfilepath, Config $config, $tried = []) 
+    private function fjfbfbresolvePath($rfilepath, Config $config, $tried = []) 
     {
         $srcFile = null;
         // try to find file on current config, else try to load it from default config
@@ -204,7 +207,7 @@ class ViewParser
         return $srcFile;
     }
     
-    public function isComponent(DomNode $node, Config $config)
+    public function ifjrbrbsComponent(DomNode $node, Config $config)
     {
         if (!$node->nodeName) {
             return null;
@@ -228,7 +231,7 @@ class ViewParser
         return $name;
     }
     
-    private function isRootNode(DomNode $node, Config $config) 
+    private function ifjfhsRootNode(DomNode $node, Config $config) 
     {
         // check equal level nodes 
         // if any siblings tags, or only one nodw, return false
@@ -243,7 +246,7 @@ class ViewParser
         return $isRoot;
     }
     
-    public function hasTemplate(string $name) 
+    public function hadhdhsTemplate(string $name) 
     {
         return isset($this->templates[$name]);
     }

@@ -6,6 +6,8 @@ use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\ViewParser;
 use PhpTemplates\Config;
+use PhpTemplates\Document;
+use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\InvalidNodeException;
@@ -14,13 +16,6 @@ class Slot extends AbstractEntity
 {
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
-
-    public function __construct(ViewParser $parser, Config $config, DomNode $node, AbstractEntity $context)
-    {
-        parent::__construct($parser, $config, $node, $context);
-
-        $this->hasSlotDefault = count($this->node->childNodes) > 0;
-    }
 
     public function simpleNodeContext()
     {
@@ -42,7 +37,7 @@ class Slot extends AbstractEntity
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
             $wrapperDefault->setAttribute('p-if', $if);
             //$slotDefault = new PhpNode('if', $if);
-            $this->parser->parseNode($wrapperDefault, $this->config, $this->context);
+            $this->factory->make($wrapperDefault, $this->context)->parse();
             //foreach ($this->node->childNodes as $cn) {
                 // wrap cn into an empty node to not lose its condition structures on parsing process
                 //$wrapper = new DomNode('#wrapper');
@@ -85,7 +80,7 @@ class Slot extends AbstractEntity
         //$wrapper->setAttribute('slot', $this->attrs['slot']);
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
 
-        $this->parser->parseNode($wrapper, $this->config, $this->context);
+        $this->factory->make($wrapper, $this->context)->parse();
 return;
         $this->node->changeNode('#slot');
         if ($this->hasSlotDefault) {
@@ -135,5 +130,10 @@ return;
     }
     public function blockContext() {
         throw new InvalidNodeException('Invalid slot location (slot in block not allowed)', $this->node->parentNode);
+    }
+    
+    public function resolve(Document $document, EventHolder $eventHolder) 
+    {
+        $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }
 }

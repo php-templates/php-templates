@@ -3,24 +3,15 @@ throw error daca o directiva nu exista
 phpt laravelserviceprovider
 
 solve all todos
+document with no dest file
 
-reset la final
-
-loops should be scoped
 verbatim no parse node
 
 fa ceva cu Helper mare
 
-blocurile pot fi ordonate at compile time?
-
-testeaza cine are prioritate pe slot content ca si variabila, cea globala, sau cea care vine din componenta binded
-
 fn in loc de sldft
 
-strange scope data trecute pe slot pe $_scope pentru a putea fi folosite doar cu alias
-
-
-.t.php
+scope data trecute pe slot pe $_scope validare in caz de erori
 
 init like this:
 Config $cfg (alias, src)
@@ -29,58 +20,13 @@ $cfgh->add()  cfg may access ownerConfigholder
 new Document(name, new DependenciesMap(path))
 new ViewFactory(document, new viewParser(document, cfgh, eventholder))
 
-View aka parsed
-View view = viewfactory->make(name, data = []);
-  viewfactory->_get(name)
-    viewParser
-      ->_parseFile(rfilepath)
-      kfgk = obtaining gfgkey by tpl name
-      rfp = obtainin file path without cfg prefix
-      cfg = cfg->_getConfigholder getcfh(kfgk)
-      new Root(document, cfg, nullode, name, context);
-        document->addtf cfgpf + rfpath
-
-view->assign(k, val);
-view->render(data)
-
-EventHolder $eh ()
-$eh->add('rendering', 'tpl', function)
-
 larafacades
 Template::addConfig()
 Template::on()
 Template::getConfig()->directive()
 Template::directive()
 
-init
-cfg = new Config
-cfgh = new ConfigHolder(cfg)
-depmap = new DependenciesMap('path/to/file')
-doc = new Document('file.t.php', destpath, depmap)
-eventholder = new EventHolder()
-parser = new viewParser(document, cfgh, eventholder)
-viewFactory = new ViewFactory(doc, parser)
-
-
-loader ca la twig -> filesystem
-ideea de Source::class ca wrapper pentru filepath
+on error
 $e->setSourceContext($source);
 
-
-lexer duce greul…  asta e baza
-stream = lexer tokenize
-parser->parse(stream)
-
-context get cu fb pe globale si return by ref
-context set cu get
-ambele trec prin loop check
-perform isset issue
-
-sters root context, viewrepository, class
-
 domnodeattribute implements domnoneattrinterface
-
-
-the right way
-addslot fn(array data) use ($context) {
-context->subcontext(data)

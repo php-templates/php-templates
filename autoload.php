@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
 */
-
 if (!function_exists('dd')) {
     function dd(...$data) {
         //debug_print_backtrace(2);die();
@@ -28,20 +27,20 @@ function d(...$data) {
         print_r($d);
         //echo '</pre>';
         echo PHP_EOL;
-    } 
+    }
 }
 
 function xd($data) {
     $x = debug_backtrace();
     //print_r($x[0]['file'].'->'.$x[0]['line']);
     //foreach ($data as $d) {
-        //var_dump($d);
-        //echo '<pre>';
-        print_r('--' . ($data ?? 'null'));
-        //echo '</pre>';
-        echo PHP_EOL;
-        return $data;
-    //} 
+    //var_dump($d);
+    //echo '<pre>';
+    print_r('--' . ($data ?? 'null'));
+    //echo '</pre>';
+    echo PHP_EOL;
+    return $data;
+    //}
 }
 
 

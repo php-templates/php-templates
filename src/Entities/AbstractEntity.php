@@ -16,11 +16,17 @@ use PhpTemplates\Dom\PhpNodeValAttr;
 use PhpTemplates\Dom\DomNodeBindAttr;
 use PhpTemplates\Dom\DomNodeRawAttr;
 use PhpTemplates\Dom\PhpNode;
+use PhpTemplates\Document;
+use PhpTemplates\EventHolder;
+use PhpTemplates\EntityFactory;
 
 abstract class AbstractEntity
 {
-    protected $parser;
+    protected $factory;
     protected $config;
+    protected $eventHolder;
+    protected $document;
+   
     protected $id;
 
     /**
@@ -68,31 +74,23 @@ abstract class AbstractEntity
      * @param string|DomNode $node string when is component, DomNode when is simple node
      * @param AbstractEntity $context
      */
-    public function __construct(ViewParser $parser, Config $config, DomNode $node, AbstractEntity $context = null) //todo interfata ca param 3
+    public function __construct(DomNode $node, Config $config, ?AbstractEntity $context, Document $document, EntityFactory $factory, EventHolder $eventHolder)
     {
-        if ($context) {
-            $ct_type = explode('\\', get_class($context));
-            $ct_type = end($ct_type);
-
-            if (!in_array($ct_type, ['SimpleNode'])) {
-                $this->depth = $context->depth +1;
-            }
-        }
-
-        $this->parser = $parser;
+        $this->node = $node;
         $this->config = $config;
         $this->context = $context;
-        $this->node = $node;
+        $this->document = $document;
+        $this->factory = $factory;
+        $this->eventHolder = $eventHolder;
         $this->id = uniqid();
-        //$this->node->setAttribute('id', $this->id);
     }
     
-    abstract public function rootContext();
-    abstract public function componentContext();
-    abstract public function slotContext();
-    abstract public function simpleNodeContext();
-    abstract public function blockContext();
-    abstract public function templateContext();
+    //abstract public function rootContext();
+    abstract public function componentContext(); 
+    abstract public function slotContext(); 
+    abstract public function simpleNodeContext(); 
+    //abstract public function blockContext();
+    abstract public function templateContext(); 
     
     
     
@@ -322,8 +320,61 @@ abstract class AbstractEntity
     {
         return $this->attrs;
     }
+    
+    protected function isCompghftonent(DomNode $node)
+    {
+        if (!$node->nodeName) {
+            return null;
+        }
+        $config = $this->context->config;
+        if ($node->nodeName == 'template') {
+            $rfilepath = $node->getAttribute('is');
+        } else {
+            $rfilepath = $config->getAliased($node->nodeName);
+        }
+        //strpos($rfilepath, 'fg2-1') && dd($rfilepath);
+        if (!$rfilepath) {
+            return null;
+        }
+        
+        if (strpos($rfilepath, ':')) {
+            list($cfgKey, $rfilepath) = explode(':', $rfilepath);
+            $config = $this->viewParser->configHolder->get($cfgKey);
+        } else {
+        }
+        
+        if (!$config->isDefault()) {
+           
+            $rfilepath = $confg->getName() . ':' . $rfilepath;
+        }
+        
+        return new Component($this->viewParser, todo);
+    }
+    
+    public function parse() 
+    {
+        if ($this->context) {
+            $fn = explode('\\', get_class($this->context));
+            $fn = end($fn);
+            $fn = lcfirst($fn).'Context';
+        } 
+        else {
+            $fn = 'simpleNodeContext';
+        }
+        
+        $this->resolve($this->document, $this->eventHolder);
+        
+        return $this->{$fn}();
+    }
+    
+    public function getConfig() 
+    {
+        return $this->config;
+    }
+    
+    public function resolve(Document $document, EventHolder $eventHolder) {}
 
-    public function __get($prop)
+    public function __gggfget($prop)
     {
         return $this->$prop;
     }

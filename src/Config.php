@@ -30,6 +30,10 @@ class Config
         $this->configHolder = $holder;
         return $this;
     }
+    
+    public function getHolder() {
+        return $this->configHolder;
+    }
 
     public function addDirective(string $key, \Closure $callable): void
     {
@@ -104,6 +108,11 @@ class Config
     public function getDirectives() 
     {
         return $this->directives;
+    }
+    
+    public function isDefault() 
+    {
+        return $this->configHolder->get() === $this;
     }
     
     public function __get($prop)

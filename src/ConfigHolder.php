@@ -32,6 +32,7 @@ class ConfigHolder
     
     public function add(Config $config) 
     {
+        $config->configHolder($this);
         $this->configs[$config->name] = $config;
     }
     

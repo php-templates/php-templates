@@ -4,6 +4,7 @@ namespace PhpTemplates;
 
 use Exception;
 use PhpTemplates\Entities\Root;
+use PhpTemplates\Dom\DomNode;
 
 class ViewFactory
 {
@@ -43,7 +44,11 @@ class ViewFactory
 
     public function make(string $rfilepath, array $data = [], $slots = [])
     {
-        $document = new Document($rfilepath, $this->outputFolder, $this->dependenciesMap);
+        if ($this->outputFolder) {
+            $document = new Document($rfilepath, $this->outputFolder, $this->dependenciesMap, $this->eventHolder);
+        } else {
+            dd(23);
+        }
             //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
@@ -51,8 +56,13 @@ class ViewFactory
             if (($path = $document->exists()) && !$this->debugMode) {} 
             else 
             {
-                $parser = new ViewParser($document, $this->configHolder, $this->eventHolder);
-                $path = $parser->parse();
+                // parse it
+                $name = $document->getInputFile();
+                $factory = new EntityFactory($document, $this->configHolder, $this->eventHolder);
+                $entity = $factory->make(new DomNode('template', ['is' => $name]), null, $this->configHolder->get());
+                $entity->parse();
+                //$parser = new ViewParser($document, $this->configHolder, $this->eventHolder);
+                //$path = $parser->parse();
                 
                 //$path = $this->parser->parse($this->document);
                
@@ -68,7 +78,7 @@ class ViewFactory
                 //$this->parser->parseNode($node, $config, $context);
             }
             
-            $result = require_once($path);
+            $result = $document->save();
             
             // check shared
             //$context = new Context($data);

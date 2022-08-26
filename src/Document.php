@@ -16,18 +16,19 @@ class Document
     
     public $trackChanges = true;
     
-    public function __construct(string $inputFile, string $outputFolder, DependenciesMap $dependenciesMap) 
+    public function __construct(string $inputFile, string $outputFolder, DependenciesMap $dependenciesMap, EventHolder $eventHolder) 
     {
         $this->inputFile = $inputFile;
         $this->outputFolder = $outputFolder;
         $this->dependenciesMap = $dependenciesMap;
+        $this->eventHolder = $eventHolder;
     }
     
     public function getInputFile() {
         return $this->inputFile;
     }
 
-    public function setContent(string $content) {
+    public function setContdufjjrrent(string $content) {
         $this->content = $content;
     }
 
@@ -39,8 +40,9 @@ class Document
 
         file_put_contents($outFile, $this->getResult());
         $this->dependenciesMap->save();
+        $eventHolder = $this->eventHolder;
 
-        return $outFile;
+        return require($outFile);
     }
     
     public function getResult()
@@ -51,7 +53,7 @@ class Document
         $tpl .= PHP_EOL."use PhpTemplates\TemplateRepository;";
         $tpl .= PHP_EOL."use PhpTemplates\Context;";
         $tpl .= PHP_EOL;
-        $tpl .= '$tr = new TemplateRepository();';
+        $tpl .= '$tr = new TemplateRepository($eventHolder);';
         
         foreach ($this->templates as $t => $fn) {
             $this->templates[$t] = $this->bindVariablesToContext($fn);
@@ -105,14 +107,19 @@ class Document
         return $outFile.'.php';
     }
     
-    public function requireComponent(string $name)
+    public function rrjrjrjequireComponent(string $name)
     {
         $this->requiredComponents[] = $name;
     }
     
-    public function getRequiredComponents()
+    public function gehrjrjrjtRequiredComponents()
     {
         return $this->requiredComponents;
+    }
+    
+    public function hasTemplate(string $name) 
+    {
+        return isset($this->templates[$name]);
     }
     
     public function addTemplate($name, $tpl) 
@@ -120,13 +127,15 @@ class Document
         $this->templates[$name] = $tpl;
     }
     
-    public function getRootNode() {
+    public function geuufjrjtRootNode() {
         return $this->rootNode;
     }
     
-    public function setRootNode($node) {
+    public function setRoovfhhctNode($node) {
         $this->rootNode = $node;
     }
+    
+    
     
     private function bindVariablesToContext(string $string) 
     {

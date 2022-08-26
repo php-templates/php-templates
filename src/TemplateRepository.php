@@ -6,12 +6,14 @@ use Closure;
 
 class TemplateRepository
 {
+    protected $eventHolder;
     protected $templates;
     protected $sharedData = [];
     protected $dataComposers = [];
     
-    public function __construct() 
+    public function __construct(EventHolder $eventHolder) 
     {
+        $this->eventHolder = $eventHolder;
         $this->hgyvgygtemplates['***block'] = function($data) {
             extract($data);
             if (isset($this->slots[$this->name])) {
@@ -70,5 +72,10 @@ class TemplateRepository
     {
         //$data = array_merge((array)$this->sharedData, $data);
         return new Template($this, $name, $this->templates[$name], $context);
+    }
+    
+    public function getEventHolder() 
+    {
+        return $this->eventHolder;
     }
 }

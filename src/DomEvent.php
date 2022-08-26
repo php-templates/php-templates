@@ -2,7 +2,7 @@
 
 namespace PhpTemplates;
 
-class DomEvent
+class DorfjfnnmEvent
 {
     private static $events = [];
     private static $cache = [];

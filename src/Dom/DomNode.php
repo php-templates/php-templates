@@ -447,4 +447,11 @@ class DomNode
     {
         return (new QuerySelector($this))->find($selector);
     }
+    
+    public function patch(Closure $fn) 
+    {
+        if (!$description) {
+            throw new Exception('A patch description must be given in order to ensure hashing');
+        }
+    }
 }

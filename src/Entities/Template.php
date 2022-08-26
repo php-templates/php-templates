@@ -19,7 +19,7 @@ class Template extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $this->node->changeNode('#template');
         foreach ($this->node->childNodes as $cn) {
-            $this->parser->parseNode($cn, $this->config, $this);
+            $this->factory->make($cn, $this)->parse();
         }
         $this->fillNode($this->node, $data);
     }
@@ -33,7 +33,7 @@ class Template extends AbstractEntity
         $this->node->parentNode->insertBefore($wrapper, $this->node);
         $wrapper->appendChild($this->node->detach());
         
-        $this->parser->parseNode($wrapper, $this->config, $this->context);
+        $this->factory->make($wrapper, $this->context)->parse();
         return;
         
         //$data = $this->depleteNode($this->node);
