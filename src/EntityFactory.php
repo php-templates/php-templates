@@ -9,6 +9,7 @@ use PhpTemplates\Entities\Slot;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\TextNode;
 use PhpTemplates\Entities\Template;
+use PhpTemplates\Entities\Extends;
 use PhpTemplates\Document;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ConfigHolder;
@@ -78,7 +79,11 @@ class EntityFactory
         
         if ($node->nodeName == 'template' && $node->hasAttribute('is')) {
             $rfilepath = $node->getAttribute('is');
-        } else {
+        } 
+        elseif ($node->nodeName == 'template' && $node->hasAttribute('extends')) {
+            $rfilepath = $node->getAttribute('extends');
+        }
+        else {
             $rfilepath = $config->getAliased($node->nodeName);
         }
         //strpos($rfilepath, 'fg2-1') && dd($rfilepath);
@@ -97,6 +102,12 @@ class EntityFactory
         $node->changeNode('template');
         $node->setAttribute('is', $rfilepath);
         
+        if ($node->hasAttribute('extends')) {
+            
+            return new Extends($node, $config, $context, $this->document, $this, $this->eventHolder);
+        } 
+        
         return new Component($node, $config, $context, $this->document, $this, $this->eventHolder);
+        
     }
 }

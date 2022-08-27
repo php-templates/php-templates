@@ -30,3 +30,9 @@ on error
 $e->setSourceContext($source);
 
 domnodeattribute implements domnoneattrinterface
+
+static glob all files from entities si fiecare face test pe node
+playground bootstrap
+func get arg(0)
+entity numita <extends template=""> care primeste nu new context, ci context actual
+un mecanism care sa faca teste doar mixed automated
