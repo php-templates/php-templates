@@ -14,7 +14,7 @@ class PhpSlotAssignNode extends DomNode
         $this->targetComp = $targetComp;
         $this->slotPos = $slotPos;
         if ($scopeData) {
-            $this->appendChild(new DomNode('#php', '<?php $context = $context->subcontext(["'.trim(ltrim($scopeData, '$')).'" => new Context(func_get_args()[0])]); ?>'));
+            $this->appendChild(new DomNode('#php', '<?php $context = $context->subcontext(["'.trim(ltrim($scopeData, '$')).'" => new Context(func_get_arg(0))]); ?>'));
         }
     }
 

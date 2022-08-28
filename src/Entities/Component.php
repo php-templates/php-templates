@@ -14,10 +14,27 @@ use PhpTemplates\Dom\Parser;
 
 class Component extends AbstractEntity
 {
+    const WEIGHT = 100;
+    
     protected $attrs = [
         'is' => null,
         'p-scope' => null
     ];
+    
+    public static function test(DomNode $node, EntityInterface $context)
+    {
+        if (!$node->nodeName) {
+            return false;
+        }
+        
+        if ($node->nodeName == 'template' && $node->hasAttribute('is')) {
+            return true;
+        } 
+        
+        $config = $context->getConfig();
+        
+        return !!$config->getAliased($node->nodeName);
+    }
 
     public function simpleNodeContext() {
         $this->rootContext();
@@ -102,23 +119,37 @@ class Component extends AbstractEntity
         $this->document->addTemplate($name, $tplfn);
     }
     
+    public function startupEntityContext() {
+        return $this->simpleNodeContext();
+    }
+    
     public function resolve(Document $document, EventHolder $eventHolder)
     {
-        $this->name = $this->node->getAttribute('is');
+        $config = $this->context->getConfig();
+        if ($this->node->nodeName == 'template' && $this->node->hasAttribute('is')) {
+            $rfilepath = $this->node->getAttribute('is');
+        } 
+        else {
+            $rfilepath = $config->getAliased($this->node->nodeName);//dd($this->node.'', $this->node->hasAttribute('is'), $this->node->nodeName);
+        }
+        
+        if (strpos($rfilepath, ':')) {
+            list($cfgKey, $rfilepath) = explode(':', $rfilepath);
+            $config = $config->getHolder()->get($cfgKey);
+        }
+        
+        if (!$config->isDefault()) {
+            $this->name = $config->getName() . ':' . $rfilepath;
+        }
+        else {
+            $this->name = $rfilepath;
+        }
         
         if ($document->hasTemplate($this->name)) {
             return;
         }
         
-        if (strpos($this->name, ':')) {
-            // get own config
-            list($configKey, $rfilepath) = explode(':', $this->name);
-            $config = $this->config->getHolder()->get($configKey);
-        } else {
-            // get parent config
-            $config = $this->config;
-            $rfilepath = $this->name;
-        }
+       // d($this->name, $config->getName());
         
         $srcFile = $this->resolvePath($rfilepath, $config);
         // add file as dependency to template for creating hash of states
@@ -140,7 +171,7 @@ class Component extends AbstractEntity
         $eventHolder->event('parsing', $this->name, $node);
         is_callable($cb) && $cb($node, $eventHolder);
         
-        $entity = $this->factory->make($wrapper, null, $config);
+        $entity = $this->factory->make($wrapper, new StartupEntity($config));
         $entity->simpleNodeContext();
         
         $eventHolder->event('parsed', $this->name, $wrapper);

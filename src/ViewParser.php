@@ -6,6 +6,7 @@ use PhpTemplates\Dom\Parser;
 use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
+use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Entities\TextNode;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\Component;
@@ -35,7 +36,7 @@ class ViewParser
     {
         $name = $this->document->getInputFile();
         $factory = new EntityFactory($this->document, $this->configHolder);
-        $entity = $factory->make(new DomNode('template', ['is' => $name]), null, $this->configHolder->get());
+        $entity = $factory->make(new DomNode('template', ['is' => $name]), new StartupEntity($this->configHolder->get()));
         $entity->parse();
         
         $this->resolveComponent($name, $this->configHolder->get());

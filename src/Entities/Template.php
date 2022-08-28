@@ -12,7 +12,14 @@ use PhpTemplates\Dom\DomNode;
 */
 class Template extends AbstractEntity
 {
+    const WEIGHT = 90;
+    
     protected $attrs = [];
+
+    public static function test(DomNode $node, EntityInterface $context)
+    {
+        return $node->nodeName == 'template';
+    }
 
     public function simpleNodeContext()
     {

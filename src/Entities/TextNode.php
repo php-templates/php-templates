@@ -2,8 +2,18 @@
 
 namespace PhpTemplates\Entities;
 
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Entities\AbstractEntity;
+
 class TextNode extends SimpleNode
 {
+    const WEIGHT = 70;
+    
+    public static function test(DomNode $node, EntityInterface $context)
+    {
+        return $node->nodeName == '#text';
+    }
+    
     public function rootContext()
     {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));

@@ -4,12 +4,13 @@ namespace PhpTemplates;
 
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
+use PhpTemplates\Entities\EntityInterface;
 use PhpTemplates\Entities\Component;
 use PhpTemplates\Entities\Slot;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\TextNode;
 use PhpTemplates\Entities\Template;
-use PhpTemplates\Entities\Extends;
+use PhpTemplates\Entities\Extend;
 use PhpTemplates\Document;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ConfigHolder;
@@ -21,14 +22,18 @@ class EntityFactory
     private $configHolder;
     private $eventHolder;
     
+    private $entities = [];
+    
     public function __construct(Document $document, ConfigHolder $configHolder, EventHolder $eventHolder) 
     {
         $this->document = $document;
         $this->configHolder = $configHolder;
         $this->eventHolder = $eventHolder;
+        
+        $this->globEntities();
     }
     
-    public function make(DomNode $node, ?AbstractEntity $context = null, Config $config = null) 
+    public function make(DomNode $node, EntityInterface $context) 
     {
         if (!$this->document) {
             //throw new \Exception('Set the document first by calling parse() method');
@@ -39,10 +44,14 @@ class EntityFactory
         //} else {
             //$fn = 'rootContext';
         //}
-        if (!$config) {
-            $config = $context->getConfig();
+        
+        foreach ($this->entities as $entity) {
+            if ($entity::test($node, $context)) {
+                return new $entity($node, $context->getConfig(), $context, $this->document, $this, $this->eventHolder);
+            }
         }
 
+        return;
         if ($node->nodeName === '#text') {
             $entity = new TextNode($node, $config, $context, $this->document, $this, $this->eventHolder);
         }
@@ -104,10 +113,33 @@ class EntityFactory
         
         if ($node->hasAttribute('extends')) {
             
-            return new Extends($node, $config, $context, $this->document, $this, $this->eventHolder);
+            return new Extend($node, $config, $context, $this->document, $this, $this->eventHolder);
         } 
         
         return new Component($node, $config, $context, $this->document, $this, $this->eventHolder);
         
+    }
+    
+    private function globEntities() 
+    {
+        $files = array_filter(glob(__DIR__ . '/Entities/*'), 'is_file');
+        
+        $entities = [];
+        foreach ($files as $file) {
+            if (strpos($file, 'Abstract') || strpos($file, 'Interface') || strpos($file, 'StartupEntity')) {
+                continue;
+            }
+            
+            $entity = preg_split('/(\\/|\\\)/', $file);
+            $entity = str_replace('.php', '', end($entity));
+            $entity = '\\PhpTemplates\\Entities\\' . $entity;
+            $entities[] = $entity;
+        }
+        
+        usort($entities, function($b, $a) {
+            return $a::WEIGHT - $b::WEIGHT;
+        });
+        
+        $this->entities = $entities;
     }
 }

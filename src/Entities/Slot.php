@@ -14,8 +14,15 @@ use PhpTemplates\InvalidNodeException;
 
 class Slot extends AbstractEntity
 {
+    const WEIGHT = 80;
+    
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
+
+    public static function test(DomNode $node, EntityInterface $context)
+    {
+        return $node->nodeName == 'slot';
+    }
 
     public function simpleNodeContext()
     {

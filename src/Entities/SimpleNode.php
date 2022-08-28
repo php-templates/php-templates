@@ -14,6 +14,11 @@ class SimpleNode extends AbstractEntity
     //protected $isHtml = true;
     protected $attrs = [];
 
+    public static function test(DomNode $node, EntityInterface $context)
+    {
+        return true;
+    }
+
     public function simpleNodeContext()
     {
         $this->rootContext();

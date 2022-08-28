@@ -3,7 +3,7 @@
 namespace PhpTemplates;
 
 use Exception;
-use PhpTemplates\Entities\Root;
+use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Dom\DomNode;
 
 class ViewFactory
@@ -59,7 +59,7 @@ class ViewFactory
                 // parse it
                 $name = $document->getInputFile();
                 $factory = new EntityFactory($document, $this->configHolder, $this->eventHolder);
-                $entity = $factory->make(new DomNode('template', ['is' => $name]), null, $this->configHolder->get());
+                $entity = $factory->make(new DomNode('template', ['is' => $name]), new StartupEntity($this->configHolder->get()));
                 $entity->parse();
                 //$parser = new ViewParser($document, $this->configHolder, $this->eventHolder);
                 //$path = $parser->parse();

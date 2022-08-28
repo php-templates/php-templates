@@ -20,8 +20,10 @@ use PhpTemplates\Document;
 use PhpTemplates\EventHolder;
 use PhpTemplates\EntityFactory;
 
-abstract class AbstractEntity
+abstract class AbstractEntity implements EntityInterface
 {
+    const WEIGHT = 0;
+    
     protected $factory;
     protected $config;
     protected $eventHolder;
@@ -74,7 +76,7 @@ abstract class AbstractEntity
      * @param string|DomNode $node string when is component, DomNode when is simple node
      * @param AbstractEntity $context
      */
-    public function __construct(DomNode $node, Config $config, ?AbstractEntity $context, Document $document, EntityFactory $factory, EventHolder $eventHolder)
+    public function __construct(DomNode $node, Config $config, EntityInterface $context, Document $document, EntityFactory $factory, EventHolder $eventHolder)
     {
         $this->node = $node;
         $this->config = $config;
@@ -91,6 +93,7 @@ abstract class AbstractEntity
     abstract public function simpleNodeContext(); 
     //abstract public function blockContext();
     abstract public function templateContext(); 
+    //abstract public static function test(DomNode $node, AbstractEntity $context); 
     
     
     
