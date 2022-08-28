@@ -39,6 +39,10 @@ class SimpleNode extends AbstractEntity
 
         $this->fillNode($this->node, $data);
     }
+    
+    public function extendContext() {
+        $this->componentContext();
+    }
 
     public function componentContext()
     {

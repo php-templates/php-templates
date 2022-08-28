@@ -18,7 +18,8 @@ class Extend extends Component
     
     protected $attrs = [
         'template' => null,
-        'is' => null
+        'is' => null,
+        'extends' => null,
     ];
     
     public static function test(DomNode $node, EntityInterface $context)
@@ -44,5 +45,12 @@ class Extend extends Component
 
         $r = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
         $this->node->appendChild(new DomNode('#php', $r));
+    }
+    
+    public function resolve(Document $document, EventHolder $eventHolder)
+    {
+        $this->node->setAttribute('is', $this->node->getAttribute('extends'));
+        
+        parent::resolve($document, $eventHolder);
     }
 }

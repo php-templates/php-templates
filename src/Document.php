@@ -188,7 +188,7 @@ class Document
         // match all $ not inside of a string declaration, considering escapes
         $count = null;//d($stringRanges);
         $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function($m) use (&$stringRange, &$stringRanges) {//d($m);
-            if (empty($m[1][0]) || $m[1][0] == 'this') {
+            if (empty($m[1][0]) || $m[1][0] == 'this' || $m[1][0] == 'context') {
                 return '$' . $m[1][0];
             }
             $var = $m[1][0];

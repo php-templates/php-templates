@@ -5,14 +5,6 @@ phpt laravelserviceprovider
 solve all todos
 document with no dest file
 
-verbatim no parse node
-
-fa ceva cu Helper mare
-
-fn in loc de sldft
-
-scope data trecute pe slot pe $_scope validare in caz de erori
-
 init like this:
 Config $cfg (alias, src)
 ConfigHolder $cfgh ($defaultcfg, destpath)
@@ -30,9 +22,9 @@ on error
 $e->setSourceContext($source);
 
 domnodeattribute implements domnoneattrinterface
-
-static glob all files from entities si fiecare face test pe node
 playground bootstrap
-extends tests
+check all abstract fn
 
 un mecanism care sa faca teste doar mixed automated
+
+domnodeattribute single instance care primeste intr un foreach wrappere de nodeattr la fel, cu test, dar dupa ce executat dorectivele
