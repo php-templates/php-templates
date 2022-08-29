@@ -3,6 +3,7 @@ throw error daca o directiva nu exista
 phpt laravelserviceprovider
 
 solve all todos
+check for any static methods
 document with no dest file
 
 init like this:
