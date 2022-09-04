@@ -6,7 +6,7 @@ use PhpTemplates\PhpTemplate;
 
 class ViewFactory implements \Illuminate\Contracts\View\Factory
 {
-    private $sharedData = [];
+    private $shared = [];
     private $template;
     
     public function __construct($laravel)
@@ -51,7 +51,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     public function make($view, $data = [], $mergeData = [])
     {
         $view = new View($this->template, $view);
-        return $view->with(array_merge($this->sharedData, $data));
+        return $view->with(array_merge($this->shared, $data));
     }
 
     /**
@@ -68,7 +68,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
         } else {
             $data = $key;
         }
-        $this->template->shareData($data);
+        $this->template->share($data);
     }
 
     /**

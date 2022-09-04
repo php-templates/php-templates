@@ -22,7 +22,7 @@ class ViewFactory
     public $trackChanges = false;
     public $debugMode = true; */
     protected $composers = [];
-    private $sharedData = [];
+    private $shared = [];
     private $outputFolder;
    // private $dependenciesMap;
     private $configHolder;
@@ -79,7 +79,7 @@ class ViewFactory
             
             return $result
             ->with($data)
-            ->withShared($this->sharedData)
+            ->withShared($this->shared)
             ->withComposers($this->composers)
             ->setSlots($slots);
     }
@@ -108,7 +108,7 @@ class ViewFactory
             
             return $result
             ->with($data)
-            ->withShared($this->sharedData)
+            ->withShared($this->shared)
             ->withComposers($this->composers)
             ->setSlots($slots);
         
@@ -116,12 +116,12 @@ class ViewFactory
     
     public function share(array $data) 
     {
-        $this->sharedData = array_merge($this->sharedData, $data);
+        $this->shared = array_merge($this->shared, $data);
     }
     
     public function composer(string $name, \Closure $cb) 
     {
-        $this->dataComposers[$name][] = $cb;
+        $this->composers[$name][] = $cb;
     }
 
 //todo

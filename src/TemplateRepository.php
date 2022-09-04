@@ -7,60 +7,50 @@ use PhpTemplates\Cache\CacheInterface;
 
 class TemplateRepository
 {
-    protected $eventHolder;
     protected $templates;
-    protected $sharedData = [];
-    protected $dataComposers = [];
+    protected $eventHolder;
+    protected $composers = [];
+    
+    protected $shared = [];
+    protected $composed = [];
+    
     
     public function __construct(CacheInterface $cache, EventHolder $eventHolder) 
     {
         $this->cache = $cache;
         $this->eventHolder = $eventHolder;
-        $this->hgyvgygtemplates['***block'] = function($data) {
-            extract($data);
-            if (isset($this->slots[$this->name])) {
-                usort($this->slots[$this->name], function($a, $b) {
-                    $i1 = isset($a->data['_index']) ? $a->data['_index'] : 0;
-                    $i2 = isset($b->data['_index']) ? $b->data['_index'] : 0;
-                    return $i1 - $i2;
-                });
-                foreach ($this->slots($this->name) as $_slot) {
-                    $_slot->render($this->scopeData);
-                }
-            }
-        };
     }
     
-    public function shareData(array $data) 
+    public function share(array $data) 
     {
-        $this->sharedData = array_merge($this->sharedData, $data);
+        $this->shared = array_merge($this->shared, $data);
     }
     
-    public function dataComposers(array $data) 
+    public function composers(array $data) 
     {
-        $this->dataComposers = array_merge($this->dataComposers, $data);
+        $this->composers = array_merge($this->composers, $data);
     }
     
-    public function getSharedData() 
+    public function getShared() 
     {
-        return $this->sharedData;
+        return $this->shared;
     }
     
-    public function getComposedData(string $name, $existingData = []) 
+    public function compose(string $name, $existingData = []) 
     {
-        if (empty($this->dataComposers[$name])) {
+        if (empty($this->composers[$name])) {
             return [];
         } 
-        elseif (isset($this->composedData[$name])) {
-            return $this->composedData[$name];
+        elseif (isset($this->composed[$name])) {
+            return $this->composed[$name];
         }
         
         $data = [];
-        foreach ($this->dataComposers[$name] as $cb) {
+        foreach ($this->composers[$name] as $cb) {
             $data = array_merge($data, $cb($existingData));
         }
         
-        $this->composedData = $data;
+        $this->composed = $data;
         
         return $data;
     }
@@ -72,7 +62,7 @@ class TemplateRepository
     
     public function get(string $name, Context $context = null) 
     {
-        //$data = array_merge((array)$this->sharedData, $data);
+        //$data = array_merge((array)$this->shared, $data);
         return new Template($this, $name, $this->cache->get($name), $context);
     }
     

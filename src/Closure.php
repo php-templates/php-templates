@@ -21,8 +21,7 @@ class Closure
     {
         try {
             return call_user_func($this->closure, $args);
-        } catch(Exception $e)
-        {
+        } catch(Exception $e) {dd(123);
             $e->setMessage($e->getMessage() . "\n" . $this->source);
             throw($e);
         }

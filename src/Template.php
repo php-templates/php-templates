@@ -9,30 +9,17 @@ use PhpTemplates\Cache\CacheInterface;
 class Template
 {
     /**
-     * Parent / context
-     * @var self
-     */
-    protected $parent = null;
-
-    /**
      * called template function name
      * @var string
      */
     protected $name;
 
     /**
-     * Filled at render time, keeped here to allow further modifications on events callbacks
-     *
-     * @var array
-     */
-    public $scopeData = [];
-
-    /**
      * Data passed to component using node attributes
      *
-     * @var array
+     * @var Context
      */
-    public $context = [];
+    public $context;
 
     /**
      * render function to be called
@@ -46,17 +33,7 @@ class Template
      */
     public $slots = [];
 
-    /**
-     * recyclable for avoiding polluting function variables scope
-     * @var array numeric indexes representing depth level
-     */
-    public $comp = [];
-
-    /**
-     * recyclable for avoiding polluting function variables scope
-     * @var array numeric indexes representing depth level
-     */
-    public $block = [];
+    public $comp; //TODO: findout
     
     public function __construct(TemplateRepository $repository, $name, callable $fn, Context $context = null)
     {
@@ -96,14 +73,9 @@ class Template
     
     public function render()
     {
-        //$this->context->merge($parentScope);
-        //$this->scopeData = array_merge($parentScope, $this->context);
-        //$this->scopeData['_name'] = $this->name;
-
+        //TODO render event
         $func = $this->func;
         $func($this->context);
-            
-        //array_merge($this->repository->getSharedData(), $this->repository->getComposedData($this->name, $this->context), $this->scopeData));
     }
     
     public function __get($prop)
@@ -133,14 +105,14 @@ class Template
     
     public function withShared(array $context)
     {
-        $this->repository->shareData($context);
+        $this->repository->share($context);
         
         return $this;
     }
     
     public function withComposers(array $context)
     {
-        $this->repository->dataComposers($context);
+        $this->repository->composers($context);
         
         return $this;
     }
