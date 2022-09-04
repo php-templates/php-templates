@@ -1,10 +1,10 @@
 <?php
 
-/*
+
 error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
-*/
+
 if (!function_exists('dd')) {
     function dd(...$data) {
         //debug_print_backtrace(2);die();

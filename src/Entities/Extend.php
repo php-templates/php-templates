@@ -6,7 +6,7 @@ use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\ViewParser;
 use PhpTemplates\Config;
-use PhpTemplates\Document;
+use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\Source;
@@ -47,7 +47,7 @@ class Extend extends Component
         $this->node->appendChild(new DomNode('#php', $r));
     }
     
-    public function resolve(Document $document, EventHolder $eventHolder)
+    public function resolve(CacheInterface $document, EventHolder $eventHolder)
     {
         $this->node->setAttribute('is', $this->node->getAttribute('extends'));
         

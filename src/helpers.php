@@ -50,3 +50,13 @@ function bind(...$attrs)
     }
     echo implode(' ', $output);
 }
+
+function check_dependencies(array $files)
+{
+    foreach ($files as $file => $m) {
+        if ($m < filemtime($file)) {
+            return false;
+        }
+        return true;
+    }
+}

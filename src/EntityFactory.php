@@ -11,7 +11,7 @@ use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Entities\TextNode;
 use PhpTemplates\Entities\Template;
 use PhpTemplates\Entities\Extend;
-use PhpTemplates\Document;
+use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ConfigHolder;
 
@@ -24,7 +24,7 @@ class EntityFactory
     
     private $entities = [];
     
-    public function __construct(Document $document, ConfigHolder $configHolder, EventHolder $eventHolder) 
+    public function __construct(CacheInterface $document, ConfigHolder $configHolder, EventHolder $eventHolder) 
     {
         $this->document = $document;
         $this->configHolder = $configHolder;

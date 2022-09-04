@@ -6,11 +6,13 @@ use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\ViewParser;
 use PhpTemplates\Config;
-use PhpTemplates\Document;
+use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\Parser;
+use PhpTemplates\Context;
+use PhpTemplates\Closure;
 
 class Component extends AbstractEntity
 {
@@ -123,7 +125,7 @@ class Component extends AbstractEntity
         return $this->simpleNodeContext();
     }
     
-    public function resolve(Document $document, EventHolder $eventHolder)
+    public function resolve(CacheInterface $cache, EventHolder $eventHolder)
     {
         $config = $this->context->getConfig();
         if ($this->node->nodeName == 'template' && $this->node->hasAttribute('is')) {
@@ -145,7 +147,7 @@ class Component extends AbstractEntity
             $this->name = $rfilepath;
         }
         
-        if ($document->hasTemplate($this->name)) {
+        if ($cache->has($this->name)) {
             return;
         }
         
@@ -176,7 +178,11 @@ class Component extends AbstractEntity
         
         $eventHolder->event('parsed', $this->name, $wrapper);
         
-        $this->register($wrapper);
+        $fnSrc = $this->buildTemplateFunction($node);
+        //d($fnSrc);
+        $fn = Closure::fromSource(new Source($fnSrc, $srcFile), 'namespace PhpTemplates;');
+      //dd($fn);
+        $cache->set($this->name, $fn, new Source($fnSrc, $srcFile));
     }
     
     private function resolvePath($rfilepath, Config $config) 
@@ -199,16 +205,5 @@ class Component extends AbstractEntity
         }        
         
         return $srcFile;
-    }
-    
-    private function register(DomNode $node) 
-    {
-        $fnDeclaration = 'function (Context $context) {' . PHP_EOL
-        //. '$data["_attrs"] = isset($data["_attrs"]) ? $data["_attrs"] : [];' . PHP_EOL
-        //. 'extract($data);' . PHP_EOL
-        . '?> '. $node .' <?php' . PHP_EOL
-        . '}';
-        
-        $this->document->addTemplate($this->name, $fnDeclaration);
     }
 }

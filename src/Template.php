@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use Closure;
+use PhpTemplates\Cache\CacheInterface;
 
 // aka parsed template
 class Template
@@ -71,13 +72,13 @@ class Template
         return new self($name, $fn, $context);
     }*/
     
-    public function __construct(TemplateRepository $repository, $name, \Closure $fn, Context $context = null)
+    public function __construct(TemplateRepository $repository, $name, callable $fn, Context $context = null)
     {
         $this->repository = $repository;
         $this->name = $name;
         $this->context = $context;
         
-        $this->func = \Closure::bind($fn, $this);
+        $this->func = $fn->bindTo($this);
     }
     
     public function slots($pos)

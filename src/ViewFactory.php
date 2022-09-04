@@ -5,6 +5,11 @@ namespace PhpTemplates;
 use Exception;
 use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\Source;
+use PhpTemplates\Dom\Parser;
+use PhpTemplates\Entities\SimpleNode;
+use PhpTemplates\Cache\FileSystemCache;
+use PhpTemplates\Cache\NullCache;
 
 class ViewFactory
 {
@@ -19,15 +24,15 @@ class ViewFactory
     protected $composers = [];
     private $sharedData = [];
     private $outputFolder;
-    private $dependenciesMap;
+   // private $dependenciesMap;
     private $configHolder;
     private $eventHolder;
     
-    public function __construct(string $outputFolder, DependenciesMap $dependenciesMap, ConfigHolder $configHolder, EventHolder $eventHolder) {
+    public function __construct(?string $outputFolder, ConfigHolder $configHolder, EventHolder $eventHolder) {
     //public function __construct(string $srcPath, string $destPath) {
         $this->outputFolder = $outputFolder;
         // $this->viewParser = $viewParser;
-        $this->dependenciesMap = $dependenciesMap;
+        //$this->dependenciesMap = $dependenciesMap;
         $this->configHolder = $configHolder;
         $this->eventHolder = $eventHolder;
         //$this->configs['default'] = new Config('default', $srcPath);
@@ -41,47 +46,65 @@ class ViewFactory
         $template->render($data);
        // print_r('<br>'.(microtime(true) - $start_time));
     }
-
-    public function make(string $rfilepath, array $data = [], $slots = [])
+    
+    public function rawMake(string $phpt, $data = [], $slots = []) 
     {
-        if ($this->outputFolder) {
-            $document = new Document($rfilepath, $this->outputFolder, $this->dependenciesMap, $this->eventHolder);
-        } else {
-            dd(23);
-        }
+        $cache = $this->getCache();
+        $rfilepath = md5($phpt);
+ 
+        
             //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
             //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
-            if (($path = $document->exists()) && !$this->debugMode) {} 
-            else 
+            if (!$cache->load($rfilepath)) 
             {
-                // parse it
-                $name = $document->getInputFile();
-                $factory = new EntityFactory($document, $this->configHolder, $this->eventHolder);
-                $entity = $factory->make(new DomNode('template', ['is' => $name]), new StartupEntity($this->configHolder->get()));
-                $entity->parse();
-                //$parser = new ViewParser($document, $this->configHolder, $this->eventHolder);
-                //$path = $parser->parse();
+        //todo source line pointing to caller line
+        $source = new Source($phpt, '');
+        $parser = new Parser();
+        $node = $parser->parse($source);                       
                 
-                //$path = $this->parser->parse($this->document);
-               
-                //$this->parser->parseFile($name, $config = null);
-                //try {
-                    //$process = new Process($rfilepath, $this->configs);
-                    //(new Root($process, null, $rfilepath))->rootContext();
-                    //$this->document->setContent($process->getResult());
-                    //$path = $this->document->save();
-                //} catch(Exception $e) {
-             //       throw new Exception($e->getMessage());
-                //}
-                //$this->parser->parseNode($node, $config, $context);
+                // parse it
+                //$name = $document->getInputFile();
+                $factory = new EntityFactory($cache, $this->configHolder, $this->eventHolder);
+                $entity = $factory->make($node, new StartupEntity($this->configHolder->get(), $rfilepath));
+                $entity->parse();
+                
+                $cache->write($rfilepath);
+                
             }
             
-            $result = $document->save();
+            $repository = new TemplateRepository($cache, $this->eventHolder);
+            $result = $repository->get($rfilepath);
             
-            // check shared
-            //$context = new Context($data);
+            return $result
+            ->with($data)
+            ->withShared($this->sharedData)
+            ->withComposers($this->composers)
+            ->setSlots($slots);
+    }
+
+    public function make(string $rfilepath, array $data = [], $slots = [])
+    {
+        $cache = $this->getCache();
+            //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
+            // init the document with custom settings as src_path, aliases
+            // paths will fallback on default Config in case of file not found or setting not found
+            //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
+            if (!$cache->load($rfilepath)) 
+            {
+                // parse it
+                //$name = $document->getInputFile();
+                $factory = new EntityFactory($cache, $this->configHolder, $this->eventHolder);
+                $entity = $factory->make(new DomNode('template', ['is' => $rfilepath]), new StartupEntity($this->configHolder->get()));
+                $entity->parse();
+                
+                $cache->write($rfilepath);
+                
+            }
+            
+            $repository = new TemplateRepository($cache, $this->eventHolder);
+            $result = $repository->get($rfilepath);
             
             return $result
             ->with($data)
@@ -110,6 +133,17 @@ class ViewFactory
     public function getParser(): ViewParser
     {
         return $this->parser;
+    }
+    
+    public function getCache() 
+    {
+        if ($this->outputFolder) {
+            $cache = new FileSystemCache($this->outputFolder);
+        } else {
+            $cache = new NullCache();
+        }  
+        
+        return $cache;
     }
    
    // todo remove 

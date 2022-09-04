@@ -4,7 +4,11 @@ phpt laravelserviceprovider
 
 solve all todos
 check for any static methods
-document with no dest file
+suffix entities with suffix
+rename: Template devine anonymousentity
+comp devine tpl
+doc add tpl prim arg e filepath
+rename methods like composer data etc
 
 init like this:
 Config $cfg (alias, src)
@@ -29,3 +33,7 @@ check all abstract fn
 un mecanism care sa faca teste doar mixed automated
 
 domnodeattribute single instance care primeste intr un foreach wrappere de nodeattr la fel, cu test, dar dupa ce executat dorectivele
+
+config subconfig, parent e default
+
+move source

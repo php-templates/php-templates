@@ -6,7 +6,7 @@ use PhpTemplates\Helper;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\ViewParser;
 use PhpTemplates\Config;
-use PhpTemplates\Document;
+use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNode;
@@ -139,7 +139,7 @@ return;
         throw new InvalidNodeException('Invalid slot location (slot in block not allowed)', $this->node->parentNode);
     }
     
-    public function resolve(Document $document, EventHolder $eventHolder) 
+    public function resolve(CacheInterface $cache, EventHolder $eventHolder) 
     {
         $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }

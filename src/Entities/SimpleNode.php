@@ -3,10 +3,11 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Helper;
+use PhpTemplates\Closure;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\DomNodeAttr;
-use IvoPetkov\HTML5DOMDocument;
 use PhpTemplates\Dom\PhpSlotAssignNode;
 
 class SimpleNode extends AbstractEntity
@@ -47,7 +48,7 @@ class SimpleNode extends AbstractEntity
     public function componentContext()
     {
         $this->attrs['slot'] = 'default';
-        $scopeData = $this->context->getAttrs()['p-scope'];
+        $scopeData = $this->context->getAttr('p-scope');
         //$this->attrs['_index'] = 0;
         $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
         $this->node->parentNode->insertBefore($slotAssignNode, $this->node);
@@ -111,5 +112,16 @@ class SimpleNode extends AbstractEntity
             $this->parser->parseNode($slot, $this->config, $this);
         }
         $this->fillNode($this->node, $data);
+    }
+    
+    public function startupEntityContext() {
+        
+        $this->simpleNodeContext();
+
+        $fnSrc = $this->buildTemplateFunction($this->node);
+        //d($fnSrc);
+        $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
+      //dd($fn);
+        $this->cache->set($this->context->getName(), $fn, new Source($fnSrc, ''));
     }
 }

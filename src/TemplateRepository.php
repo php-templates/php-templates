@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use Closure;
+use PhpTemplates\Cache\CacheInterface;
 
 class TemplateRepository
 {
@@ -11,8 +12,9 @@ class TemplateRepository
     protected $sharedData = [];
     protected $dataComposers = [];
     
-    public function __construct(EventHolder $eventHolder) 
+    public function __construct(CacheInterface $cache, EventHolder $eventHolder) 
     {
+        $this->cache = $cache;
         $this->eventHolder = $eventHolder;
         $this->hgyvgygtemplates['***block'] = function($data) {
             extract($data);
@@ -68,10 +70,10 @@ class TemplateRepository
         $this->templates[$name] = $fn;
     }
     
-    public function get(string $name, Context $context) 
+    public function get(string $name, Context $context = null) 
     {
         //$data = array_merge((array)$this->sharedData, $data);
-        return new Template($this, $name, $this->templates[$name], $context);
+        return new Template($this, $name, $this->cache->get($name), $context);
     }
     
     public function getEventHolder() 

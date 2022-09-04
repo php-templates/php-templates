@@ -41,8 +41,9 @@ class Document
         file_put_contents($outFile, $this->getResult());
         $this->dependenciesMap->save();
         $eventHolder = $this->eventHolder;
-
-        return require($outFile);
+d(finfo_file($outFile));
+        $return = require($outFile);
+        dd($tr);
     }
     
     public function getResult()
