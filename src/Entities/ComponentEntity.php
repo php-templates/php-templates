@@ -82,7 +82,7 @@ class ComponentEntity extends AbstractEntity
         $this->simpleNodeContext();
     }
 
-    public function templateContext() 
+    public function anonymousContext() 
     {
         $this->simpleNodeContext();
     }

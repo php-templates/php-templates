@@ -24,7 +24,7 @@ class VerbatimEntity implements EntityInterface
     public function componentContext() {}
     public function slotContext() {}
     public function simpleNodeContext() {}
-    public function templateContext() {}
+    public function anonymousContext() {}
     
     public function getConfig() {
         return null;

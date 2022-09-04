@@ -10,7 +10,7 @@ use PhpTemplates\Dom\DomNode;
 /**
  * is actually component, but used in different contexts, even on root
 */
-class TemplateEntity extends AbstractEntity
+class AnonymousEntity extends AbstractEntity
 {
     const WEIGHT = 90;
     
@@ -47,7 +47,7 @@ class TemplateEntity extends AbstractEntity
         $this->simpleNodeContext();
     }
 
-    public function templateContext() {
+    public function anonymousContext() {
         $this->simpleNodeContext();
     }
 }

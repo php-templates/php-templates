@@ -20,7 +20,7 @@ class SimpleNodeEntity extends AbstractEntity
         return true;
     }
 
-    public function templateContext()
+    public function anonymousContext()
     {
         return $this->simpleNodeContext();
     }

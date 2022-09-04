@@ -83,7 +83,7 @@ class SlotEntity extends AbstractEntity
         $this->factory->make($wrapper, $this->context)->parse();
     }
     
-    public function templateContext() {
+    public function anonymousContext() {
         $this->simpleNodeContext();
     }
 

@@ -81,7 +81,7 @@ abstract class AbstractEntity implements EntityInterface
     abstract public function componentContext(); 
     abstract public function slotContext(); 
     abstract public function simpleNodeContext(); 
-    abstract public function templateContext(); 
+    abstract public function anonymousContext(); 
     
     /**
      * Wrap node inside control structures and returns the aggregated node datas as array (like :class and class under 1 single key named :class)
