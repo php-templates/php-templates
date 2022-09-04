@@ -55,18 +55,6 @@ class DomNode
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
     }
     
-    public static function frdhdhdhomFile(string $srcFile, $options = []): self
-    {
-        $parser = new Parser();
-        if (isset($options['preservePatterns'])) {
-            foreach ($options['preservePatterns'] as $p) {
-                $parser->addPreservePattern($p);
-            }
-        }
-        
-        return $parser->parseFile($srcFile);
-    }
-    
     public static function fromString(string $str, $options = []): self
     {
         $bt = debug_backtrace(5);

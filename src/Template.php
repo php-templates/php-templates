@@ -57,20 +57,6 @@ class Template
      * @var array numeric indexes representing depth level
      */
     public $block = [];
-    /*
-    public static function template($name, $context = [])
-    {
-        return new self($name, self::$templates[$name], $context);
-    }*/
-    
-    /*
-    public static function raw($name, \Closure $fn, $context = [])
-    {
-        if (!$name) {
-            $name = uniqid();
-        }
-        return new self($name, $fn, $context);
-    }*/
     
     public function __construct(TemplateRepository $repository, $name, callable $fn, Context $context = null)
     {

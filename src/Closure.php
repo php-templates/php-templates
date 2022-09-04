@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use Closure as BaseClosure;
+use Exception;
 use PhpTemplates\Dom\Source;
 
 class Closure

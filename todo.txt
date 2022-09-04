@@ -4,10 +4,7 @@ phpt laravelserviceprovider
 
 solve all todos
 check for any static methods
-suffix entities with suffix
-rename: Template devine anonymousentity
-comp devine tpl
-doc add tpl prim arg e filepath
+
 rename methods like composer data etc
 
 init like this:
