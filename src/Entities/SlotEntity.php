@@ -12,7 +12,7 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\InvalidNodeException;
 
-class Slot extends AbstractEntity
+class SlotEntity extends AbstractEntity
 {
     const WEIGHT = 80;
     
@@ -43,15 +43,8 @@ class Slot extends AbstractEntity
             $this->node->appendChild($wrapperDefault);
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
             $wrapperDefault->setAttribute('p-if', $if);
-            //$slotDefault = new PhpNode('if', $if);
+
             $this->factory->make($wrapperDefault, $this->context)->parse();
-            //foreach ($this->node->childNodes as $cn) {
-                // wrap cn into an empty node to not lose its condition structures on parsing process
-                //$wrapper = new DomNode('#wrapper');
-                //$wrapper->appendChild($cn->detach());
-                //$slotDefault->appendChild($wrapper);
-            //}
-            //$this->node->appendChild($slotDefault);
         }
         
         $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $slot');
@@ -88,57 +81,12 @@ class Slot extends AbstractEntity
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
 
         $this->factory->make($wrapper, $this->context)->parse();
-return;
-        $this->node->changeNode('#slot');
-        if ($this->hasSlotDefault) {
-            $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
-            $this->node->setAttribute('p-if', $if);
-            //$slotDefault = new PhpNode('if', $if);
-            //$this->node->parentNode->insertBefore($slotDefault, $this->node);
-            //$slotDefault->appendChild($this->node->detach());
-            
-            $this->parser->parseNode($this->node, $this->config, $this);
-            
-            foreach ($this->node->childNodes as $cn) {
-                $this->parser->parseNode($cn, $this->config, $this);
-            }
-            
-            $node = new DomNode('#root');
-            foreach ($this->node->childNodes as $cn) {
-                $node->appendChild($cn->detach());
-                
-                $this->parser->parseNode($cn, $this->config, $this);
-                //(new Root($this->process, $node, $name, $this->context))->rootContext();
-                
-                $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)); ?>', 
-                    $this->id, $this->context->getId(), $this->attrs['slot'], $name, '[]'
-                );
-                $cn->changeNode('#php', $r);
-                $cn->empty();
-                $slotDefault->appendChild($cn->detach());
-            }
-            $this->node->appendChild($slotDefault);
-        }
-        
-        $append = new PhpNode('foreach', '$this->slots("'.$this->attrs['name'].'") as $_slot');
-        $r = sprintf('<?php $this->comp[%d]->addSlot("%s", $_slot); ?>',
-            $this->context->getId(), $this->attrs['slot']
-        );
-        
-        $append->appendChild(new DomNode('#php', $r));
-        $this->node->appendChild($append);
     }
     
-    public function rootContext() {
-        return $this->simpleNodeContext();
-    }
     public function templateContext() {
         $this->simpleNodeContext();
     }
-    public function blockContext() {
-        throw new InvalidNodeException('Invalid slot location (slot in block not allowed)', $this->node->parentNode);
-    }
-    
+
     public function resolve(CacheInterface $cache, EventHolder $eventHolder) 
     {
         $this->hasSlotDefault = count($this->node->childNodes) > 0;

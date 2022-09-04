@@ -10,7 +10,7 @@ use PhpTemplates\Dom\DomNode;
 /**
  * is actually component, but used in different contexts, even on root
 */
-class Template extends AbstractEntity
+class TemplateEntity extends AbstractEntity
 {
     const WEIGHT = 90;
     
@@ -41,34 +41,12 @@ class Template extends AbstractEntity
         $wrapper->appendChild($this->node->detach());
         
         $this->factory->make($wrapper, $this->context)->parse();
-        return;
-        
-        //$data = $this->depleteNode($this->node);
-        //$this->fillNode($this->node, $data);
-
-        $name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
-        $node = new DomNode('#root');
-        foreach ($this->node->childNodes as $cn) {
-            $node->appendChild($cn->detach());
-        }
-        
-        (new Root($this->process, $node, $name, $this->context))->rootContext();
-        $dataString = Helper::arrayToEval($this->fillNode(null, $this->attrs));
-        $r = sprintf('<?php $this->comp[%d] = $this->comp[%d]->addSlot("%s", $this->template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
-            $this->depth, $this->context->depth, $this->attrs['slot'], $name, $dataString
-        );
-        $this->node->changeNode('#pho', $r);
     }
     
-    public function rootContext() {
-        $this->simpleNodeContext();
-    }
     public function slotContext() {
         $this->simpleNodeContext();
     }
-    public function blockContext() {
-        throw new InvalidNodeException('Template tag is not allowed as block child', $this->node->parentNode);
-    }
+
     public function templateContext() {
         $this->simpleNodeContext();
     }

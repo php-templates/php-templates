@@ -14,7 +14,7 @@ use PhpTemplates\Dom\Parser;
 use PhpTemplates\Context;
 use PhpTemplates\Closure;
 
-class Component extends AbstractEntity
+class ComponentEntity extends AbstractEntity
 {
     const WEIGHT = 100;
     
@@ -39,10 +39,6 @@ class Component extends AbstractEntity
     }
 
     public function simpleNodeContext() {
-        $this->rootContext();
-    }
-
-    public function rootContext() {
         $data = $this->depleteNode($this->node);
         $dataString = $this->fillNode(null, $data);
 
@@ -65,63 +61,34 @@ class Component extends AbstractEntity
     /**
     * When a component is passed as slot to another component
     */
-    public function componentContext() {
-        //dd('nu va mai ajunge aici');
+    public function componentContext() 
+    {
         $this->attrs['slot'] = 'default';
 
         $wrapper = new DomNode('#slot');
         $this->node->parentNode->insertBefore($wrapper, $this->node);
         $wrapper->appendChild($this->node->detach());
 
-        //$data = $this->depleteNode($this->node);
-        //$data = $this->fillNode(null, $data);
-        //$dataString = Helper::arrayToEval($data);
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
-        //dd($this->id);
+
         $this->factory->make($wrapper, $this->context)->parse();
-        return;
-        //if (!$this->process->hasTemplateFunction($this->name)) {
-        //(new Root($this->process, null, $this->name, $this->context))->rootContext();
-        //}
-
-        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", new Context(%s))); ?>',
-            $this->id, $this->context->getId(), $this->attrs['slot'], $this->name, $dataString
-        );
-        $this->node->changeNode('#php', $r);
-
-        foreach ($this->node->childNodes as $slot) {
-            $this->parseNode($slot);
-        }
-    }
-
-    /**
-    * When component is passed as block default
-    */
-    public function blockContext() {
-        $this->node->setAttribute('slot', $this->context->name);
-        $this->componentContext();
     }
 
     /**
     * When a component is passed as slot default
     */
-    public function slotContext() {
-        $this->rootContext();
-    }
-
-    public function templateContext() {
+    public function slotContext() 
+    {
         $this->simpleNodeContext();
     }
 
-    private function registhgfcvder() {
-        $node = $this->load($name, $config);
-        $this->parseNode($node, $config);
-        $tplfn = $this->nodeToTemplateFunction($node);
-
-        $this->document->addTemplate($name, $tplfn);
+    public function templateContext() 
+    {
+        $this->simpleNodeContext();
     }
     
-    public function startupEntityContext() {
+    public function startupContext() 
+    {
         return $this->simpleNodeContext();
     }
     
@@ -151,11 +118,9 @@ class Component extends AbstractEntity
             return;
         }
         
-       // d($this->name, $config->getName());
         
         $srcFile = $this->resolvePath($rfilepath, $config);
         // add file as dependency to template for creating hash of states
-        //$this->process->addDependencyFile($srcFile);
         ob_start();
         $cb = require($srcFile);
         $source = ob_get_contents();
@@ -179,9 +144,9 @@ class Component extends AbstractEntity
         $eventHolder->event('parsed', $this->name, $wrapper);
         
         $fnSrc = $this->buildTemplateFunction($node);
-        //d($fnSrc);
+
         $fn = Closure::fromSource(new Source($fnSrc, $srcFile), 'namespace PhpTemplates;');
-      //dd($fn);
+
         $cache->set($this->name, $fn, new Source($fnSrc, $srcFile));
     }
     

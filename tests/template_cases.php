@@ -21,7 +21,7 @@ $cfg = new Config('default', __DIR__);
 $cfgHolder = new ConfigHolder($cfg);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/results', $cfgHolder, $eventHolder);
+$viewFactory = new ViewFactory(/* __DIR__.'/results' */null, $cfgHolder, $eventHolder);
 $cfgHolder = $viewFactory->getConfigHolder();
 $cfg = $cfgHolder->get();
 

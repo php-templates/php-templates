@@ -11,7 +11,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     
     public function __construct($laravel)
     {
-        $this->template = new PhpTemplate(config('view.paths.0'), config('view.compiled'));
+        $this->template = new PhpTempte(config('view.paths.0'), config('view.compiled'));
         $this->template->replacePath('errors', 'eee');
     }
     

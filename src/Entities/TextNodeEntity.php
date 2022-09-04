@@ -5,7 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
 
-class TextNode extends SimpleNode
+class TextNodeEntity extends SimpleNodeEntity
 {
     const WEIGHT = 70;
     
@@ -14,16 +14,10 @@ class TextNode extends SimpleNode
         return $node->nodeName == '#text';
     }
     
-    public function rootContext()
-    {
-        $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
-        parent::rootContext();
-    }
-    
     public function simpleNodeContext() 
     {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
-        parent::rootContext();
+        parent::simpleNodeContext();
     }
     
     public function componentContext()

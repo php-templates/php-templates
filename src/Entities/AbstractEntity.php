@@ -2,18 +2,10 @@
 
 namespace PhpTemplates\Entities;
 
-use DOMAttr;
 use PhpTemplates\Config;
-use PhpTemplates\ViewParser;
-use PhpTemplates\Helper;
-use PhpTemplates\Directive;
-use PhpTemplates\InvalidNodeException;
 use PhpTemplates\Process;
-use PhpTemplates\Traits\CanParseNodes;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodeValAttr;
-use PhpTemplates\Dom\DomNodeBindAttr;
-use PhpTemplates\Dom\DomNodeRawAttr;
 use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
@@ -86,15 +78,10 @@ abstract class AbstractEntity implements EntityInterface
         $this->id = uniqid();
     }
     
-    //abstract public function rootContext();
     abstract public function componentContext(); 
     abstract public function slotContext(); 
     abstract public function simpleNodeContext(); 
-    //abstract public function blockContext();
     abstract public function templateContext(); 
-    //abstract public static function test(DomNode $node, AbstractEntity $context); 
-    
-    
     
     /**
      * Wrap node inside control structures and returns the aggregated node datas as array (like :class and class under 1 single key named :class)
@@ -123,9 +110,6 @@ abstract class AbstractEntity implements EntityInterface
                     $directive($node, $a->nodeValue);
                     /*if (empty($result)) {// todo throw error if no directive
                         throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
-                    }
-                    foreach ($result as $k => $val) {//TODO vezi daca e folosit 
-                        $extracted_attributes[] = new DomNodeAttr($k, $val);
                     }*/
                     // directive unpacked his data, next attr!!!
                     continue;
@@ -235,82 +219,7 @@ abstract class AbstractEntity implements EntityInterface
 
         foreach ($data as $attr) {
             $node->addAttribute($attr);
-            continue;
-            
-            
-            
-            if ($k[0] === ':') {
-                $k = substr($k, 1);
-                $val = "<?php echo $val; ?>";
-            }
-            elseif ($k === 'p-bind') {
-                //$rid = '__r'.uniqid();
-                $k = '<?php foreach('.$val.' as $k=>$v) echo "$k=\"$v\" "; ?>';
-                $k = $this->addContext($val, true);
-                $val = '';
-            }
-            elseif ($k === 'p-raw') {
-                //$rid = '__r'.uniqid();
-                $val = $this->addContext($val);
-                $k = "<?php echo $val; ?>";
-                $val = '';
-            }
-            
         }
-    }
-    
-    protected function addContvggext(string $string, $loop = false)
-    {
-        // replace any \\ withneutral chars only to find unescaped quotes positions
-        $tmp = str_replace('\\', '__', $string);
-        preg_match_all('/(?<!\\\\)[`\'"]/', $tmp, $m, PREG_OFFSET_CAPTURE);
-        $stringRanges = [];
-        $stringRange = null;
-        $last = array_key_last($m[0]);
-        foreach ($m[0] ?? [] as $k => $m) {
-            if ($stringRange && $stringRange['char'] == $m[0]) {
-                $stringRange['end'] = $m[1];
-                $stringRanges[] = $stringRange;
-                $stringRange = null;
-            }
-            elseif (!$stringRange) {
-                $stringRange['char'] = $m[0];
-                $stringRange['start'] = $m[1];
-            }
-            elseif ($stringRange && $k == $last) {
-                // todo throw error unclosed string
-            }
-        }
-        
-        $stringRange = null;
-        // match all $ not inside of a string declaration, considering escapes
-        $count = null;
-        $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function($m) use (&$stringRange, &$stringRanges) {
-            if (empty($m[1][0]) || $m[1][0] == 'this') {
-                return '$' . $m[1][0];
-            }
-            $var = $m[1][0];
-            $pos = $m[0][0];
-            
-            if ($stringRange && ($stringRange['start'] > $pos || $pos > $stringRange['end'])) {
-                $stringRange = null;
-            }
-            if (!$stringRange && $stringRanges && $stringRanges[0]['start'] < $pos && $pos < $stringRanges[0]['end']) {
-                $stringRange = array_shift($stringRanges);
-            }
-            
-            // check if is interpolation
-            if (!$stringRange || $stringRange['char'] != "'") {
-                if ($loop) {
-                    return '$context->loop()->'.$var;
-                }
-                return '$context->'.$var;
-            } 
-            return '$' . $var;
-        }, $string, -1, $count, PREG_OFFSET_CAPTURE);
-        
-        return $string;
-        //dd($string);
     }
     
     public function getId()
@@ -328,42 +237,12 @@ abstract class AbstractEntity implements EntityInterface
         return $this->attrs[$key] ?? null;
     }
     
-    protected function isCompghftonent(DomNode $node)
-    {
-        if (!$node->nodeName) {
-            return null;
-        }
-        $config = $this->context->config;
-        if ($node->nodeName == 'template') {
-            $rfilepath = $node->getAttribute('is');
-        } else {
-            $rfilepath = $config->getAliased($node->nodeName);
-        }
-        //strpos($rfilepath, 'fg2-1') && dd($rfilepath);
-        if (!$rfilepath) {
-            return null;
-        }
-        
-        if (strpos($rfilepath, ':')) {
-            list($cfgKey, $rfilepath) = explode(':', $rfilepath);
-            $config = $this->viewParser->configHolder->get($cfgKey);
-        } else {
-        }
-        
-        if (!$config->isDefault()) {
-           
-            $rfilepath = $confg->getName() . ':' . $rfilepath;
-        }
-        
-        return new Component($this->viewParser, todo);
-    }
-    
     public function parse() 
     {
         if ($this->context) {
             $fn = explode('\\', get_class($this->context));
             $fn = end($fn);
-            $fn = lcfirst($fn).'Context';
+            $fn = str_replace('Entity', 'Context', lcfirst($fn));
         } 
         else {
             $fn = 'simpleNodeContext';
@@ -381,17 +260,8 @@ abstract class AbstractEntity implements EntityInterface
     
     public function resolve(CacheInterface $document, EventHolder $eventHolder) {}
 
-
-
-
-    public function __gggfget($prop)
-    {
-        return $this->$prop;
-    }
-    
     protected function sanitizeTemplate(string $string) 
     {
-        //d($string);
         $preserve = [
             //'$this->' => '__r-' . uniqid(),
             //'Context $context' => '__r-' . uniqid(),
@@ -420,7 +290,6 @@ abstract class AbstractEntity implements EntityInterface
     
     private function _bindVariablesToContext(string $string) 
     {
-        //d($string);
         // replace any \\ withneutral chars only to find unescaped quotes positions
         $tmp = str_replace('\\', '__', $string);
         preg_match_all('/(?<!\\\\)[`\'"]/', $tmp, $m, PREG_OFFSET_CAPTURE);
@@ -470,24 +339,19 @@ abstract class AbstractEntity implements EntityInterface
                 }
             }
             }
-            //d('range is',$stringRange??'null');
-            // check if is interpolation
+
             if (!$stringRange || $stringRange['char'] != "'") {
                 return '$context->'.$var;
             } 
             return '$' . $var;
         }, $string, -1, $count, PREG_OFFSET_CAPTURE);
-        //d($string);
+
         return $string;
     }    
     
     protected function buildTemplateFunction(DomNode $node) 
     {
-        // todo: add context here
-        
         $fnDeclaration = 'function (Context $context) {' . PHP_EOL
-        //. '$data["_attrs"] = isset($data["_attrs"]) ? $data["_attrs"] : [];' . PHP_EOL
-        //. 'extract($data);' . PHP_EOL
         . '?> '. $node .' <?php' . PHP_EOL
         . '}';
         

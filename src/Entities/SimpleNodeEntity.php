@@ -10,7 +10,7 @@ use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\DomNodeAttr;
 use PhpTemplates\Dom\PhpSlotAssignNode;
 
-class SimpleNode extends AbstractEntity
+class SimpleNodeEntity extends AbstractEntity
 {
     //protected $isHtml = true;
     protected $attrs = [];
@@ -20,17 +20,12 @@ class SimpleNode extends AbstractEntity
         return true;
     }
 
-    public function simpleNodeContext()
-    {
-        $this->rootContext();
-    }
-
     public function templateContext()
     {
-        return $this->rootContext();
+        return $this->simpleNodeContext();
     }
 
-    public function rootContext()
+    public function simpleNodeContext()
     {
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
@@ -49,55 +44,25 @@ class SimpleNode extends AbstractEntity
     {
         $this->attrs['slot'] = 'default';
         $scopeData = $this->context->getAttr('p-scope');
-        //$this->attrs['_index'] = 0;
+
         $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
         $this->node->parentNode->insertBefore($slotAssignNode, $this->node);
         $slotAssignNode->appendChild($this->node->detach());
-//$this->node->parentNode->parentNode->dd();
+
         $data = $this->depleteNode($this->node);
         $this->fillNode($this->node, $data);
         //$name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
         foreach ($this->node->childNodes as $cn) {
             $this->factory->make($cn, $this)->parse();
-        }//$slotAssignNode->dd();
-        //dd($root->parentNode->dd());
-        // $fn = $this->parser->nodeToTemplateFunction($root, true);
-        //(new Root($this->process, $this->node, $name))->rootContext();,
+        }
+        
         $attrs = [];
         foreach ($this->attrs as $k => $val) {
             $attrs[] = new DomNodeAttr($k, $val);//todo, vezi daca e necesar
         }
         $dataString = $this->fillNode(null, $attrs);
 //TODO: findout what to do with data
-
-        
-
-        // $slot = sprintf('<?php $this->comp["%s"]->addSlot("%s", %s); ?', 
-        //     $this->context->getId(), $this->attrs['slot'], $fn
-        // );
-        
-        // $root->changeNode('#slot', $slot);
-        // $root->empty();
-    }
-    
-    public function blockContext()
-    {
-        $this->attrs['_index'] = 0;
-
-        $data = $this->depleteNode($this->node);
-        $this->fillNode($this->node, $data);
-
-        $dataString = Helper::arrayToEval($this->attrs);
-        $name = $this->context->name .'?slot='.Helper::uniqid();
-
-        (new Root($this->process, $this->node, $name))->rootContext();
-
-        $r = sprintf('<?php $this->comp["%s"] = $this->comp["%s"]->addSlot("%s", $this->template("%s", %s)->withData($this->scopeData)->setSlots($this->slots)); ?>', 
-            $this->id, $this->context->getId(), $this->context->name, $name, $dataString
-        );
-        $this->node->changeNode('#php', $r);
-        $this->node->empty();
     }
 
     /**
@@ -105,7 +70,7 @@ class SimpleNode extends AbstractEntity
      */
     public function slotContext()
     {
-        $this->rootContext();
+        $this->simpleNodeContext();
         return;
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
@@ -114,14 +79,14 @@ class SimpleNode extends AbstractEntity
         $this->fillNode($this->node, $data);
     }
     
-    public function startupEntityContext() {
+    public function startupContext() {
         
         $this->simpleNodeContext();
 
         $fnSrc = $this->buildTemplateFunction($this->node);
-        //d($fnSrc);
+
         $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
-      //dd($fn);
+
         $this->cache->set($this->context->getName(), $fn, new Source($fnSrc, ''));
     }
 }

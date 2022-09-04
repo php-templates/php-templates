@@ -2,17 +2,11 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Helper;
-use PhpTemplates\TemplateFunction;
-use PhpTemplates\ViewParser;
-use PhpTemplates\Config;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\Source;
-use PhpTemplates\Dom\Parser;
 
-class Extend extends Component
+class ExtendEntity extends ComponentEntity
 {
     const WEIGHT = 101;
     
@@ -27,17 +21,16 @@ class Extend extends Component
         return $node->nodeName == 'template' && $node->hasAttribute('extends');
     }
 
-    public function rootContext() {
+    public function simpleNodeContext() 
+    {
         $data = $this->depleteNode($this->node);
         $dataString = $this->fillNode(null, $data);
-
-        //$dataString = Helper::arrayToEval($data);
 
         $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", $context); ?>',
             $this->id, $this->name
         );
         $this->node->changeNode('#php', $nodeValue);
-        //dd($nodeValue);
+
         foreach ($this->node->childNodes as $slot) {
             //todo: grupam dupa slots o fn ceva?
             $this->factory->make($slot, $this)->parse();

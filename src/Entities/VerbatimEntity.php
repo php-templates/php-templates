@@ -12,7 +12,7 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\Source;
 use PhpTemplates\Dom\Parser;
 
-class Verbatim implements EntityInterface
+class VerbatimEntity implements EntityInterface
 {
     const WEIGHT = 1000;
     
