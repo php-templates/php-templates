@@ -78,7 +78,7 @@ abstract class AbstractEntity implements EntityInterface
         $this->id = uniqid();
     }
     
-    abstract public function componentContext(); 
+    abstract public function templateContext(); 
     abstract public function slotContext(); 
     abstract public function simpleNodeContext(); 
     abstract public function anonymousContext(); 

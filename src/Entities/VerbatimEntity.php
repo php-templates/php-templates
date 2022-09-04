@@ -21,7 +21,7 @@ class VerbatimEntity implements EntityInterface
         return $node->hasAttribute('verbatim');
     }
     
-    public function componentContext() {}
+    public function templateContext() {}
     public function slotContext() {}
     public function simpleNodeContext() {}
     public function anonymousContext() {}

@@ -6,7 +6,7 @@ use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 
-class ExtendEntity extends ComponentEntity
+class ExtendEntity extends TemplateEntity
 {
     const WEIGHT = 101;
     

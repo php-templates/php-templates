@@ -31,7 +31,7 @@ class AnonymousEntity extends AbstractEntity
         $this->fillNode($this->node, $data);
     }
 
-    public function componentContext()
+    public function templateContext()
     {
         $this->attrs['slot'] = 'default';
         

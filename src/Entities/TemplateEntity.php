@@ -14,7 +14,7 @@ use PhpTemplates\Dom\Parser;
 use PhpTemplates\Context;
 use PhpTemplates\Closure;
 
-class ComponentEntity extends AbstractEntity
+class TemplateEntity extends AbstractEntity
 {
     const WEIGHT = 100;
     
@@ -61,7 +61,7 @@ class ComponentEntity extends AbstractEntity
     /**
     * When a component is passed as slot to another component
     */
-    public function componentContext() 
+    public function templateContext() 
     {
         $this->attrs['slot'] = 'default';
 

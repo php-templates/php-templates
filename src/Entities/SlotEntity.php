@@ -64,7 +64,7 @@ class SlotEntity extends AbstractEntity
      * <myComp><slot name="mytitle" slot="title"></slot></myComp>
      *
      */
-    public function componentContext()
+    public function templateContext()
     {
         $this->attrs['slot'] = 'default';
         $this->attrs['name'] = 'default';

@@ -37,10 +37,10 @@ class SimpleNodeEntity extends AbstractEntity
     }
     
     public function extendContext() {
-        $this->componentContext();
+        $this->templateContext();
     }
 
-    public function componentContext()
+    public function templateContext()
     {
         $this->attrs['slot'] = 'default';
         $scopeData = $this->context->getAttr('p-scope');

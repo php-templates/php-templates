@@ -20,10 +20,10 @@ class TextNodeEntity extends SimpleNodeEntity
         parent::simpleNodeContext();
     }
     
-    public function componentContext()
+    public function templateContext()
     {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
-        parent::componentContext();
+        parent::templateContext();
     }
     
     private function replaceSpecialTags(string $html)
