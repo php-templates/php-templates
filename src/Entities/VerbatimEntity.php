@@ -9,7 +9,7 @@ use PhpTemplates\Config;
 use PhpTemplates\Document;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 use PhpTemplates\Dom\Parser;
 
 class VerbatimEntity implements EntityInterface

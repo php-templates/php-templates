@@ -2,6 +2,8 @@
 
 namespace PhpTemplates\Dom;
 
+use PhpTemplates\Source;
+
 class DomNode
 {
     private static $last_id = 0;

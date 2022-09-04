@@ -3,7 +3,7 @@
 namespace PhpTemplates\Cache;
 
 use PhpTemplates\Template;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 use Closure;
 
 interface CacheInterface

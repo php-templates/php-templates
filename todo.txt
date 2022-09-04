@@ -3,9 +3,6 @@ throw error daca o directiva nu exista
 phpt laravelserviceprovider
 
 solve all todos
-check for any static methods
-
-rename methods like composer data etc
 
 init like this:
 Config $cfg (alias, src)
@@ -25,12 +22,10 @@ $e->setSourceContext($source);
 
 domnodeattribute implements domnoneattrinterface
 playground bootstrap
-check all abstract fn
+check all abstract fn of interface
 
 un mecanism care sa faca teste doar mixed automated
 
 domnodeattribute single instance care primeste intr un foreach wrappere de nodeattr la fel, cu test, dar dupa ce executat dorectivele
 
 config subconfig, parent e default
-
-move source

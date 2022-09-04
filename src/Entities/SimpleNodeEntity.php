@@ -6,7 +6,7 @@ use PhpTemplates\Helper;
 use PhpTemplates\Closure;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 use PhpTemplates\Dom\DomNodeAttr;
 use PhpTemplates\Dom\PhpSlotAssignNode;
 

@@ -4,7 +4,7 @@ namespace PhpTemplates\Cache;
 
 use PhpTemplates\Template;
 use PhpTemplates\EventHolder;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 
 class NullCache implements CacheInterface
 {

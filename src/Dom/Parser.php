@@ -4,6 +4,7 @@ namespace PhpTemplates\Dom;
 
 use Closure;
 use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Source;
 
 class Parser
 { 

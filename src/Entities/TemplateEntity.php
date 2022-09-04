@@ -9,7 +9,7 @@ use PhpTemplates\Config;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Context;
 use PhpTemplates\Closure;

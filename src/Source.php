@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpTemplates\Dom;
+namespace PhpTemplates;
 
 class Source
 {

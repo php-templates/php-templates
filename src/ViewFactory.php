@@ -5,7 +5,7 @@ namespace PhpTemplates;
 use Exception;
 use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\Source;
+use PhpTemplates\Source;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Cache\FileSystemCache;
