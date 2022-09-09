@@ -30,7 +30,9 @@ The following:
 ```
     <h1>{{ $h1 }}</h1>
 ```
-```$viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();```
+```
+    $viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
+    ```
 will result:
  ```
     <h1>Hello Php Templates</h1>
@@ -42,7 +44,9 @@ The following syntax won't work:
 ```
     <input type="text" value="{{ $value }}">
 ```
-```$viewFactory->make('examples/hello', ["value" => "No value"])->render();```
+```
+    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+    ```
 will result:
  ```
 <input type="text" value="{{ $value }}">
@@ -53,7 +57,9 @@ In order to bind values to node attributes, just write your attributes prefixed 
 ```
     <input type="text" :value="$value">
 ```
-```$viewFactory->make('examples/hello', ["value" => "No value"])->render();```
+```
+    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+    ```
 will result:
  ```
 <input value="No value" type="text">
@@ -63,7 +69,9 @@ will result:
 ```
     <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
 ```
-```$viewFactory->make('examples/hello', ["value" => "No value"])->render();```
+```
+    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+    ```
 will result:
  ```
 <input value="value given" type="text">
@@ -77,7 +85,9 @@ In order to cover other features and to avoid any ambiguosity, template files ar
     <input type="text" :value="$text">
     <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
     <input value="Lorem ipsum" type="text">
@@ -97,7 +107,9 @@ You can use them to conditionally render a node. Just add them as attribute on t
     <input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
     <textarea p-else>{{ $value }}</textarea>
 ```
-```$viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();```
+```
+    $viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();
+    ```
 will result:
  ```
     <textarea>Lorem</textarea>
@@ -111,7 +123,9 @@ Here is a foreach example:
        <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
    </select>
 ```
-```$viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();```
+```
+    $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
+    ```
 will result:
  ```
    Do you like Php Templates?
@@ -130,7 +144,9 @@ In Php Templates, inspired by Twig, loops are scoped, meaning that anything decl
    </select>
    {{ $lbl . $val }}
 ```
-```$viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();```
+```
+    $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
+    ```
 will result:
  ```
    <select>
@@ -152,7 +168,9 @@ Directives are parsing time commands and are usefull when you need to declare co
 ```
     <div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
 ```
-```$viewFactory->make('examples/hello', ["condition" => true])->render();```
+```
+    $viewFactory->make('examples/hello', ["condition" => true])->render();
+    ```
 will result:
  ```
 <div class="card" style="width: 18rem;"></div>
@@ -164,7 +182,9 @@ will result:
 ```
     <input p-bind="$attrs">
 ```
-```$viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();```
+```
+    $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();
+    ```
 will result:
  ```
 <input type="text" name="name" disabled>
@@ -178,7 +198,9 @@ will result:
     <input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
     <input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
 ```
-```$viewFactory->make('examples/hello', ["theradio" => 1])->render();```
+```
+    $viewFactory->make('examples/hello', ["theradio" => 1])->render();
+    ```
 will result:
  ```
 <input name="thecheckbox" type="checkbox" value="1" >
@@ -194,7 +216,9 @@ will result:
         <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
     </select>
 ```
-```$viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();```
+```
+    $viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();
+    ```
 will result:
  ```
 <select name="fruits">
@@ -209,7 +233,9 @@ will result:
 ```
     <input type="text" p-disabled="3 > 2">
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
 <input type="text" disabled>
@@ -238,7 +264,9 @@ Now, the following:
     <div p-auth>Auth</div>
     <div p-active="3 < 4"></div>
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
     <div p-guest>Guest</div><div p-auth>Auth</div>
@@ -279,7 +307,9 @@ and use it like this:
 ```
     <template is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
-```$viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();```
+```
+    $viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();
+    ```
 will result:
  ```
   <div class="form-group ">
@@ -346,7 +376,9 @@ Now, we can use it like this:
     <input type="number" slot="default" class="form-control"> -->
 </x-form-group>
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
   <div class="form-group ">
@@ -391,7 +423,8 @@ Now, we can use the component like this:
     </div>
 </x-data-table>
 ```
-```$viewFactory->make('examples/hello', [
+```
+    $viewFactory->make('examples/hello', [
 'headings' => [
     'id' => 'ID',
     'name' => 'Name'
@@ -399,7 +432,8 @@ Now, we can use the component like this:
 'data' => [
     ['id' => 67, 'name' => 'Mango'],
     ['id' => 32, 'name' => 'Potatos'],
-]])->render();```
+]])->render();
+    ```
 will result:
  ```
   <div class="table-wrapper">
@@ -445,7 +479,9 @@ Now, we can have all our templates extending it, like this:
     <div class="card">… {{ $var }}</div>
 </template>
 ```
-```$viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();```
+```
+    $viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();
+    ```
 will result:
  ```
   <htm><head>… </head><body>
@@ -464,7 +500,9 @@ $viewFactory->share('shared', 'I share because I care');
 ```
 <div class="card">… {{ $shared }}</div>
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
 <div class="card">… I share because I care</div>
@@ -501,7 +539,9 @@ now, calling our component like this:
 <!-- or like this -->
 <template is="components/filtered-list" sort="DESC" />
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
   <ul>
@@ -577,7 +617,9 @@ and the call:
 ```
 <template is="components/filtered-list" sort="ASC" />
 ```
-```$viewFactory->make('examples/hello', [])->render();```
+```
+    $viewFactory->make('examples/hello', [])->render();
+    ```
 will result:
  ```
   <ul>
