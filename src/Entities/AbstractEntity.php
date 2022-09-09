@@ -141,7 +141,7 @@ abstract class AbstractEntity implements EntityInterface
             elseif ($k[0] == ':') {
                 $binds[substr($k, 1)] = new PhpNodeValAttr($k, $a->nodeValue);
             }
-            elseif ($k[0] == '@') {
+            elseif ($k[0] == '@' && strpos($k, '@php') !== 0) {
                 $attrs[$k] = new PhpNodeValAttr($k, $a->nodeValue);
             }
             else {
@@ -216,7 +216,6 @@ abstract class AbstractEntity implements EntityInterface
             
             return $data;
         }
-
         foreach ($data as $attr) {
             $node->addAttribute($attr);
         }

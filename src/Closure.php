@@ -21,7 +21,8 @@ class Closure
     {
         try {
             return call_user_func($this->closure, $args);
-        } catch(Exception $e) {dd(123);
+        } catch(\Throwable $e) {
+            dd($e);
             $e->setMessage($e->getMessage() . "\n" . $this->source);
             throw($e);
         }
@@ -29,7 +30,15 @@ class Closure
     
     public static function fromSource(Source $fnsrc, string $header = '') 
     {
-        eval("$header \$fn = $fnsrc;");
+        //d('=>=>'.$fnsrc);
+        //register_shutdown_function(function() use ($fnsrc) {
+           // echo $fnsrc;
+        //});
+        try {
+            eval("$header \$fn = $fnsrc;");
+        } catch(\Throwable $e) {
+            dd($e->getMessage()."\n".$fnsrc);
+        }
         return new self($fn, $fnsrc);
     }
     

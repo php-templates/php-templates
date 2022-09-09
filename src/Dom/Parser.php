@@ -151,14 +151,14 @@ class Parser
             throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
         }
 
+//dd($hierarchyQueue[0]->childNodes[0]->debug());
         if (isset($hierarchyQueue[0])) {
             return $hierarchyQueue[0];
         }
-
         return null;
     }
 
-    public function beforeCallback(Closure $cb)
+    public function beggfforeCallback(Closure $cb)
     {
         $this->beforeCallback = $cb;
     }
@@ -177,6 +177,11 @@ class Parser
         }
         $attrs = [];
         $originalStr = $str;
+        $noises = [
+            '\\"' => '&quot_;', 
+            '\\\'' => '&#039_;',
+        ];
+        $str = str_replace(array_keys($noises), $noises, $str);
         $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/s', function($m) use (&$attrs, $str) {
             $attrs[] = [
                 $m[1],
@@ -194,9 +199,14 @@ class Parser
             $html5attrs = [];
         }
         
+        $noises = [
+            '&quot_;' => '"', 
+            '&#039_;' => '\'',
+        ];        
         $attrs = array_merge($attrs, $html5attrs);
         $_attrs = [];
-        foreach ($attrs as $attr) {
+        foreach ($attrs as &$attr) {
+            $attr[1] = str_replace(array_keys($noises), $noises, $attr[1]);
             $k = strpos($originalStr, ' '.$attr[0]);
             if (!isset($_attrs[$k])) {
                 $_attrs[$k] = $attr;
@@ -249,7 +259,7 @@ class Parser
                 continue;
             }
             $str = $push . $str;
-           
+            
             $hasTagStart = preg_match('/^<\w+/', $str);
             if (!$push && !$hasTagStart) {
                 // text node
@@ -277,7 +287,7 @@ class Parser
     }
     
     protected function isCompleteTag($str) {
-        $x = $str;
+        $str = str_replace(['\\"', '\\\''], '', $str);
         $str = preg_replace('/="(((?!").)*)"/s', '', $str);
         $str = preg_replace("/='(((?!').)*)'/s", '', $str);
         $isComplete = strpos($str, '"') === false && strpos($str, "'") === false;

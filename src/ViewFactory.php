@@ -42,14 +42,14 @@ class ViewFactory
     public function render(string $rfilepath, array $data = [], $slots = [])
     {
         $start_time = microtime(true);
-        $template = $this->make($rfilepath, [], $slots);
-        $template->render($data);
+        $template = $this->make($rfilepath, $data, $slots);
+        $template->render();
        // print_r('<br>'.(microtime(true) - $start_time));
     }
     
-    public function rawMake(string $phpt, $data = [], $slots = []) 
+    public function makeRaw(string $phpt, $data = [], $slots = []) 
     {
-        $cache = $this->getCache();
+        $this->cache = $this->getCache();
         $rfilepath = md5($phpt);
  
         
@@ -57,7 +57,7 @@ class ViewFactory
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
             //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
-            if (!$cache->load($rfilepath)) 
+            if (!$this->cache->load($rfilepath)) 
             {
         //todo source line pointing to caller line
         $source = new Source($phpt, '');
@@ -66,56 +66,62 @@ class ViewFactory
                 
                 // parse it
                 //$name = $document->getInputFile();
-                $factory = new EntityFactory($cache, $this->configHolder, $this->eventHolder);
+                $factory = new EntityFactory($this->cache, $this->configHolder, $this->eventHolder);
                 $entity = $factory->make($node, new StartupEntity($this->configHolder->get(), $rfilepath));
                 $entity->parse();
                 
-                $cache->write($rfilepath);
+                $this->cache->write($rfilepath);
                 
             }
             
-            $repository = new TemplateRepository($cache, $this->eventHolder);
-            $result = $repository->get($rfilepath);
+            //$repository = new TemplateRepository($cache, $this->eventHolder);
+            $result = $this->get($rfilepath, new Context($data));
             
             return $result
-            ->with($data)
-            ->withShared($this->shared)
-            ->withComposers($this->composers)
+            //->withData($data)
+            //->withShared($this->shared)
+            //->withComposers($this->composers)
             ->setSlots($slots);
     }
 
     public function make(string $rfilepath, array $data = [], $slots = [])
     {
-        $cache = $this->getCache();
+        $this->cache = $this->getCache();
             //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
             // paths will fallback on default Config in case of file not found or setting not found
             //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
-            if (!$cache->load($rfilepath)) 
+            if (!$this->cache->load($rfilepath)) 
             {
                 // parse it
                 //$name = $document->getInputFile();
-                $factory = new EntityFactory($cache, $this->configHolder, $this->eventHolder);
+                $factory = new EntityFactory($this->cache, $this->configHolder, $this->eventHolder);
                 $entity = $factory->make(new DomNode('template', ['is' => $rfilepath]), new StartupEntity($this->configHolder->get()));
                 $entity->parse();
                 
-                $cache->write($rfilepath);
+                $this->cache->write($rfilepath);
                 
             }
             
-            $repository = new TemplateRepository($cache, $this->eventHolder);
-            $result = $repository->get($rfilepath);
+            //$repository = new TemplateRepository($cache, $this->eventHolder);
+            $result = $this->get($rfilepath, new Context($data));
             
             return $result
-            ->with($data)
-            ->withShared($this->shared)
-            ->withComposers($this->composers)
+            //->withShared($this->shared)
+            //->withComposers($this->composers)
             ->setSlots($slots);
         
     }
     
-    public function share(array $data) 
+    public function share($key, $value = null) 
     {
+        if (is_array($key)) {
+            $data = $key;
+        }
+        else {
+            $data[$key] = $value;
+        }
+        
         $this->shared = array_merge($this->shared, $data);
     }
     
@@ -130,12 +136,12 @@ class ViewFactory
         return Template::raw(null, $cb, $data);
     }
     
-    public function getParser(): ViewParser
+    public function getggfParser(): ViewParser
     {
         return $this->parser;
     }
     
-    public function getCache() 
+    private function getCache() 
     {
         if ($this->outputFolder) {
             $cache = new FileSystemCache($this->outputFolder);
@@ -177,9 +183,65 @@ class ViewFactory
         return $this->configHolder;
     }
     
-    public function getEventHolder(): ConfigHolder
+    public function getEventHttfolder(): ConfigHolder
     {
         return $this->eventHolder;
     }
     
+    // added
+    public function sharbvge(array $data) 
+    {
+        $this->shared = array_merge($this->shared, $data);
+    }
+    
+    public function compoggfffsers(array $data) 
+    {
+        $this->composers = array_merge($this->composers, $data);
+    }
+    
+    public function getShggfchhared() 
+    {
+        return $this->shared;
+    }
+    
+    public function compose(string $name, $attrs = []) 
+    {
+        if (empty($this->composers[$name])) {
+            return [];
+        } 
+        
+        //$data = [];
+        foreach ($this->composers[$name] as $cb) {
+            $cb($attrs);
+        }
+        
+      //  $this->composed = $data;
+        
+        //return $data;
+    }
+    
+    public function add(string $name, Closure $fn) 
+    {
+        $this->templates[$name] = $fn;
+    }
+    
+    public function get(string $name, Context $context) 
+    {
+        $context->merge($context->all(), $this->shared);
+        $this->compose($name, $context);
+        //$data = array_merge((array)$this->shared, $data);
+        return (new Template($this, $name, $this->cache->get($name), $context));
+        //->with($this->shared)
+        //->with($this->compose($name, $context));
+    }
+    
+    public function getEventHolder() 
+    {
+        return $this->eventHolder;
+    }
+    
+    public function on($ev, $name, $cb, $weight = 0)
+    {
+        $this->eventHolder->on($ev, $name, $cb, $weight);
+    }
 }

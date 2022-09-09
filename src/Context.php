@@ -10,7 +10,7 @@ class Context
     public $parent;
     public $loopContext;
     private $loopDepth = 0;
-    public $data;// scope getable as obj
+    private $data;// scope getable as obj
     
     public function __construct(array $data = [], self $parent = null) 
     {//d($data);
@@ -23,6 +23,9 @@ class Context
     
     public function &__get($prop) 
     {
+        if ($prop == '_attrs' && empty($this->data['_attrs'])) {
+            $this->data['_attrs'] = [];
+        }
         //d($this->id.'get'.$prop);
         //d($this);
         if (isset($this->loopContext) && $this->loopContext->has($prop)) {
@@ -30,9 +33,8 @@ class Context
             return $this->loopContext->$prop;
         }
         
-        if (array_key_exists($prop, $this->data)) {
-            //!$this->data[$prop] && dd($this-> );
-            return $this->data[$prop];
+        if (!empty($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {
+            return $this->data['_attrs'][$prop];
         }
         
         //d($this->data);
@@ -65,12 +67,13 @@ class Context
     
     public function __isset($prop) 
     {
-        return array_key_exists($prop, $this->data) || isset($this->parent->$prop);
+        return array_key_exists($prop, $this->data) || (!empty($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) || isset($this->parent->$prop);
     }
     
-    public function merge(array $data = []) 
+    public function merge(array ...$data) 
     {
-        $this->data = array_merge($this->data, $data);
+        array_unshift($data, $this->data);
+        $this->data = call_user_func_array('array_merge', $data);//array_merge($this->data, $data);
     }
     
     public function subcontext(array $data = []) 
@@ -97,5 +100,9 @@ class Context
     
     public function has(string $prop) {
         return array_key_exists($prop, $this->data);
+    }
+    
+    public function all() {
+        return $this->data;
     }
 }

@@ -46,7 +46,11 @@ function bind(...$attrs)
     }
     $output = [];
     foreach ($_attrs as $name => $value) {
-        $output[] = $name . '="' . $value .'"';
+        if (is_numeric($name)) {
+            $output[] = $value;
+        } else {
+            $output[] = $name . '="' . $value .'"';
+        }
     }
     echo implode(' ', $output);
 }

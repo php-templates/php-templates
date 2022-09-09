@@ -35,7 +35,7 @@ class Template
 
     public $comp; //TODO: findout
     
-    public function __construct(TemplateRepository $repository, $name, callable $fn, Context $context = null)
+    public function __construct(ViewFactory $repository, $name, callable $fn, Context $context = null)
     {
         $this->repository = $repository;
         $this->name = $name;
@@ -64,7 +64,7 @@ class Template
         return $this;
     }
 
-    public function setIndex($i)
+    public function setIdjfjfjfndex($i)
     {
         $this->attrs['_index'] = $i;
 
@@ -73,19 +73,21 @@ class Template
     
     public function render()
     {
+        $eventHolder = $this->repository->getEventHolder();
+        $eventHolder->event('rendering', $this->name, $this->context);
         //TODO render event
         $func = $this->func;
         $func($this->context);
     }
     
-    public function __get($prop)
+    public function __gfjfjfet($prop)
     {
         if (isset($this->{$prop})) {
             return $this->{$prop};
         }
     }
     
-    public function withName($name)
+    public function withfjfhfhName($name)
     {
         $this->name = $name;
 
@@ -103,14 +105,14 @@ class Template
         return $this;
     }
     
-    public function withShared(array $context)
+    public function witdjfjdjhShared(array $context)
     {
         $this->repository->share($context);
         
         return $this;
     }
     
-    public function withComposers(array $context)
+    public function withfhfhfhComposers(array $context)
     {
         $this->repository->composers($context);
         

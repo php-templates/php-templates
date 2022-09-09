@@ -11,9 +11,9 @@ class PhpNodeValAttr extends DomNodeAttr
         $name = ltrim($this->nodeName, ':@');
         if (!$this->merged) {
             if (!$name) {
-                return '<?php e(' . $this->nodeValue . '); ?>';
+                return '<?php echo (' .$this->nodeValue . '); ?>';
             }
-            return $name .'="<?php e(' . $this->nodeValue . '); ?>"';
+            return $name .'="<?php echo (' . $this->nodeValue . '); ?>"';
         }
         $val = [];
         foreach ($this->merged as $attr) {

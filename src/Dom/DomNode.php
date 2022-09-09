@@ -84,7 +84,7 @@ class DomNode
         return $node;
     }
     
-    public function addAttribute(DomNodeAttr $nodeName)
+    public function addAttribute($nodeName, $nodeValue = null)
     {//todo
         if ($nodeName instanceof DomNodeAttr) {
             $attr = $nodeName;
@@ -208,6 +208,9 @@ class DomNode
         $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId, 'file' => $this->srcFile, 'line' => $this->lineNumber];
         if ($this->nodeName == '#text') {
             $x['text'] = $this->nodeValue;
+        }
+        foreach($this->attrs as $a) {
+            $x['attrs'][$a->nodeName] = $a->nodeValue;
         }
         foreach($this->childNodes as $cn) {
             $x['childs'][] = $cn->debug();

@@ -3,9 +3,9 @@
         <label class="form-label">{{ $label }}</label>
     </slot>
     <slot>
-        <input p-if="$type === 'text'" type="text" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
-        <input p-elseif="$type === 'number'" type="number" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
-        <input p-elseif="$type === 'email'" type="email" class="form-control" :value="$value" :placeholder="$placeholder ?? $label">
+        <input p-if="$type === 'text'" type="text" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">
+        <input p-elseif="$type === 'number'" type="number" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">
+        <input p-elseif="$type === 'email'" type="email" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">
         <label p-elseif="$type === 'checkbox'" p-foreach="$options as $name => $label">
             <input type="checkbox" p-raw="in_array($name, $values) ? 'checked' : ''" value="1">
             {{ $label }}

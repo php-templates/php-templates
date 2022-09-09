@@ -29,3 +29,15 @@ un mecanism care sa faca teste doar mixed automated
 domnodeattribute single instance care primeste intr un foreach wrappere de nodeattr la fel, cu test, dar dupa ce executat dorectivele
 
 config subconfig, parent e default
+
+provider
+https://github.com/ytake/Laravel.Smarty/blob/main/src/SmartyServiceProvider.php
+
+throw error if not closing @php @endphp
+throw error on reserved directives override
+
+better node parser
+iscompletenode or str end
+throw parse error, line unexpected " or ' or
+error on @atrr p nod normal
+missinf clos tag nu arata file

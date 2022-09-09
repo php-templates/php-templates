@@ -83,7 +83,7 @@ class ConfigHolder
         });
         
         $cfg->addDirective('selected', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "selected=\"selected\" : ""'));
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "selected=\"selected\"" : ""'));
         });
         
         $cfg->addDirective('disabled', function(DomNode $node, string $val) {
