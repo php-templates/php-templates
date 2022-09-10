@@ -31,53 +31,53 @@ The following:
 ```
     <h1>{{ $h1 }}</h1>
 ```
+
 ```
     $viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
 ```
 will result:
+
 ```
-    <h1>Hello Php Templates</h1>
-```
- 
+<h1>Hello Php Templates</h1> ```
 Unlike other template engines, interpolation is resumed only on text nodes.
 The following syntax won't work:
 // examples/hello.t.php
 ```
     <input type="text" value="{{ $value }}">
 ```
+
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
+
 ```
-<input type="text" value="{{ $value }}">
-```
- 
+<input type="text" value="{{ $value }}"> ```
 In order to bind values to node attributes, just write your attributes prefixed by ':'.
 // examples/hello.t.php
 ```
     <input type="text" :value="$value">
 ```
+
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
+
 ```
-<input value="No value" type="text">
-```
- In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
+<input value="No value" type="text"> ```In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
 // examples/hello.t.php
 ```
     <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
 ```
+
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
+
 ```
-<input value="value given" type="text">
-```
- 
+<input value="value given" type="text"> ```
 ## Php syntax
 In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
 // examples/hello.t.php
@@ -86,15 +86,15 @@ In order to cover other features and to avoid any ambiguosity, template files ar
     <input type="text" :value="$text">
     <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
-    <input value="Lorem ipsum" type="text">
-<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
-```
- 
+<input value="Lorem ipsum" type="text">
+<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp> ```
 If you wonder how then conditionally rendering attributes is possible, take a look at 'Directives' section. First, we have to cover control structures.
 
 ## Control structures
@@ -108,14 +108,15 @@ You can use them to conditionally render a node. Just add them as attribute on t
     <input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
     <textarea p-else>{{ $value }}</textarea>
 ```
+
 ```
     $viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();
 ```
 will result:
+
 ```
-    <textarea>Lorem</textarea>
+<textarea>Lorem</textarea>
 ```
- 
 Here is a foreach example:
 // examples/hello.t.php
 ```
@@ -124,18 +125,18 @@ Here is a foreach example:
        <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
    </select>
 ```
+
 ```
     $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
 ```
 will result:
+
 ```
-   Do you like Php Templates?
+Do you like Php Templates?
 <select>
   <option value="1">Yes</option>
   <option value="0">No</option>
-  </select>
-```
- 
+  </select> ```
 In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
 // examples/hello.t.php
 ```
@@ -145,12 +146,14 @@ In Php Templates, inspired by Twig, loops are scoped, meaning that anything decl
    </select>
    {{ $lbl . $val }}
 ```
+
 ```
     $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
 ```
 will result:
+
 ```
-   <select>
+<select>
   <option value="1"><br />
 <b>Warning</b>:  Undefined property: PhpTemplates\Context::$lbl in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/src/Context.php</b> on line <b>43</b><br />
 </option>
@@ -159,7 +162,6 @@ will result:
 </option>
   </select>
    I will survive!!!```
- 
 ## Directives
 Directives are parsing time commands and are usefull when you need to declare complex logic under a small alias. They are DOMNode attributes prefixed with 'p-', like control structures.
 
@@ -169,28 +171,28 @@ Directives are parsing time commands and are usefull when you need to declare co
 ```
     <div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
 ```
+
 ```
     $viewFactory->make('examples/hello', ["condition" => true])->render();
 ```
 will result:
+
 ```
-<div class="card" style="width: 18rem;"></div>
-```
- Please note that is IMPORTANT to escape nested quotes using backslash.
+<div class="card" style="width: 18rem;"></div> ```Please note that is IMPORTANT to escape nested quotes using backslash.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
 // examples/hello.t.php
 ```
     <input p-bind="$attrs">
 ```
+
 ```
     $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();
 ```
 will result:
+
 ```
-<input type="text" name="name" disabled>
-```
- 
+<input type="text" name="name" disabled> ```
 `checked` - used on input type radio / checkbox
 // examples/hello.t.php
 ```
@@ -199,16 +201,16 @@ will result:
     <input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
     <input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
 ```
+
 ```
     $viewFactory->make('examples/hello', ["theradio" => 1])->render();
 ```
 will result:
+
 ```
 <input name="thecheckbox" type="checkbox" value="1" >
 <input name="theradio" type="radio" value="1" checked>
-<input name="theradio" type="radio" value >
-```
- 
+<input name="theradio" type="radio" value > ```
 `selected` - used on select input
 
 // examples/hello.t.php
@@ -217,31 +219,31 @@ will result:
         <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
     </select>
 ```
+
 ```
     $viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();
 ```
 will result:
+
 ```
 <select name="fruits">
   <option value="a" >avocado</option>
   <option value="b" selected="selected">banana</option>
   <option value="c" >cherry</option>
-  </select>
-```
- 
+  </select> ```
 `disabled` - used to apply attribute `disabled`
 // examples/hello.t.php
 ```
     <input type="text" p-disabled="3 > 2">
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
-<input type="text" disabled>
-```
- 
+<input type="text" disabled> ```
 
 ### Custom directives
 
@@ -265,15 +267,15 @@ Now, the following:
     <div p-auth>Auth</div>
     <div p-active="3 < 4"></div>
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
-    <div p-guest>Guest</div><div p-auth>Auth</div>
-<div p-active="3 < 4"></div>
-```
- 
+<div p-guest>Guest</div><div p-auth>Auth</div>
+<div p-active="3 < 4"></div> ```
 Note that `$val` param passed to callback function is the string value of the directive attribute, in our case `3 < 4`.
 You can learn more about DomNode manipulation at Working with DOM section.
 
@@ -308,16 +310,17 @@ and use it like this:
 ```
     <template is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
+
 ```
     $viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();
 ```
 will result:
+
 ```
   <div class="form-group ">
                   <label class="form-label">The Label</label>
                       <input placeholder="The Label" type="text" class="form-control" value="The Value">
-              </div> ```
- You can pass values to componenent context in 3 ways:
+              </div> ```You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
 - bind syntax: php syntax accepted, ex.: :value="$value", or :value="'The value'"
 - bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
@@ -377,10 +380,12 @@ Now, we can use it like this:
     <input type="number" slot="default" class="form-control"> -->
 </x-form-group>
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
   <div class="form-group ">
         <span>Custom label
@@ -390,7 +395,6 @@ will result:
       <input type="number" class="form-control">
    -->
     </div> ```
- 
 No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. Multiple nodes can fill the same slot name.
 
 #### Scoped Slots Data
@@ -424,6 +428,7 @@ Now, we can use the component like this:
     </div>
 </x-data-table>
 ```
+
 ```
     $viewFactory->make('examples/hello', [
 'headings' => [
@@ -436,6 +441,7 @@ Now, we can use the component like this:
 ]])->render();
 ```
 will result:
+
 ```
   <div class="table-wrapper">
     <table>
@@ -460,7 +466,6 @@ will result:
               </tbody>
     </table>
   </div> ```
- 
 ## Extends
 Consider we have a main layout:
 // layouts/app.t.php
@@ -480,16 +485,17 @@ Now, we can have all our templates extending it, like this:
     <div class="card">… {{ $var }}</div>
 </template>
 ```
+
 ```
     $viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();
 ```
 will result:
+
 ```
   <htm><head>… </head><body>
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
-  </htm> ```
- As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
+  </htm> ```As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
 
 ## Global Shared data
 You can use the following method on TemplateFactory instance to share a value across all templates (nested, extended, components or not) built by it:
@@ -501,14 +507,14 @@ $viewFactory->share('shared', 'I share because I care');
 ```
 <div class="card">… {{ $shared }}</div>
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
-<div class="card">… I share because I care</div>
-```
- Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
+<div class="card">… I share because I care</div> ```Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
 
 ## Composing data
 You may have pieces of UI in your app which may repeat on different pages and you may feel tired of building the data for each one.
@@ -540,10 +546,12 @@ now, calling our component like this:
 <!-- or like this -->
 <template is="components/filtered-list" sort="DESC" />
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
   <ul>
     <li>avocado</li>
@@ -557,7 +565,6 @@ will result:
     <li>banana</li>
     <li>avocado</li>
       </ul> ```
- 
 ## Events
 Each template is transformed into a virtual DOM then semantically parsed from top to bottom, entering in each child node. This empowers Php Templates with ability to intervents in parsing process and manipulate DOM in a close to JavaScript flexibility (add, remove, edit node).
 There are three ways of doing this:
@@ -618,10 +625,12 @@ and the call:
 ```
 <template is="components/filtered-list" sort="ASC" />
 ```
+
 ```
     $viewFactory->make('examples/hello', [])->render();
 ```
 will result:
+
 ```
   <ul>
     <li>avocado</li>
@@ -629,8 +638,7 @@ will result:
     <li>berry</li>
     <li>cherry</li>
     <li>added</li>
-      </ul> ```
- pretty usefull if you want to add data on fly
+      </ul> ```pretty usefull if you want to add data on fly
 
 ### Self events
 When you declare a template which will suppose to be a component, you may return a php function which will be called as callback before template parse.
