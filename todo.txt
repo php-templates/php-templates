@@ -41,3 +41,4 @@ iscompletenode or str end
 throw parse error, line unexpected " or ' or
 error on @atrr p nod normal
 missinf clos tag nu arata file
+indent nu merge ok

@@ -27,6 +27,7 @@ $view->render();
 ## Data interpolation
 Like in most template engines, data is escaped against html entities and displayed using `{{ $var }}` syntax. You can use `{!! $var !!}` syntax in order to display raw, unescaped data.
 The following:
+
 // examples/hello.t.php
 ```
     <h1>{{ $h1 }}</h1>
@@ -43,6 +44,7 @@ will result:
 
 Unlike other template engines, interpolation is resumed only on text nodes.
 The following syntax won't work:
+
 // examples/hello.t.php
 ```
     <input type="text" value="{{ $value }}">
@@ -58,6 +60,7 @@ will result:
 ```
 
 In order to bind values to node attributes, just write your attributes prefixed by ':'.
+
 // examples/hello.t.php
 ```
     <input type="text" :value="$value">
@@ -72,6 +75,7 @@ will result:
 <input value="No value" type="text"> 
 ```
 In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
+
 // examples/hello.t.php
 ```
     <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
@@ -88,6 +92,7 @@ will result:
 
 ## Php syntax
 In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
+
 // examples/hello.t.php
 ```
     @php $text = 'Lorem ipsum'; @endphp
@@ -111,6 +116,7 @@ If you wonder how then conditionally rendering attributes is possible, take a lo
 Allowed control structures are:
 `if, elseif, else, for, foreach`
 You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
+
 // examples/hello.t.php
 ```
     @php $inp = ['text', 'number', 'email']; @endphp
@@ -130,6 +136,7 @@ will result:
 ```
 
 Here is a foreach example:
+
 // examples/hello.t.php
 ```
    Do you like Php Templates?
@@ -152,6 +159,7 @@ will result:
 ```
 
 In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
+
 // examples/hello.t.php
 ```
    @php $lbl = 'I will survive!!!'; @endphp
@@ -183,6 +191,7 @@ Directives are parsing time commands and are usefull when you need to declare co
 
 ### Built-in directives
 `raw` - usefull when you need to conditionally render content on a tag declaration:
+
 // examples/hello.t.php
 ```
     <div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
@@ -199,6 +208,7 @@ will result:
 Please note that is IMPORTANT to escape nested quotes using backslash.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
+
 // examples/hello.t.php
 ```
     <input p-bind="$attrs">
@@ -214,6 +224,7 @@ will result:
 ```
 
 `checked` - used on input type radio / checkbox
+
 // examples/hello.t.php
 ```
     <input name="thecheckbox" type="checkbox" value="1" p-checked="!empty($thecheckbox)">
@@ -234,6 +245,7 @@ will result:
 ```
 
 `selected` - used on select input
+
 
 // examples/hello.t.php
 ```
@@ -256,6 +268,7 @@ will result:
 ```
 
 `disabled` - used to apply attribute `disabled`
+
 // examples/hello.t.php
 ```
     <input type="text" p-disabled="3 > 2">
@@ -287,6 +300,7 @@ $cfg->addDirective('active', function($node, $val) {
 });
 ```
 Now, the following:
+
 // examples/hello.t.php
 ```
     <div p-guest>Guest</div>
@@ -334,6 +348,7 @@ You can reuse parts of design by making them components. Just put the html code 
 ```
 
 and use it like this:
+
 // examples/hello.t.php
 ```
     <template is="components/form-group" type="text" :label="$label" @value="$value" />
@@ -402,6 +417,7 @@ components/form-group.t.php
 </div>
 ```
 Now, we can use it like this:
+
 // examples/hello.t.php
 ```
 <x-form-group type="number" @min="1">
@@ -452,6 +468,7 @@ Two things here:
 - we checked if any slot passed by calling $this->slots($slotName)
 - we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this 'p-scope="$slot"' (whatever var name you preffer)
 Now, we can use the component like this:
+
 // examples/hello.t.php
 ```
 <x-data-table :headings="$headings" :data="$data" p-scope="$slot">
@@ -513,6 +530,7 @@ Consider we have a main layout:
 </htm>
 ```
 Now, we can have all our templates extending it, like this:
+
 // examples/hello.t.php
 ```
 <template extends="layouts/app">
@@ -539,6 +557,7 @@ You can use the following method on TemplateFactory instance to share a value ac
 <\?php 
 $viewFactory->share('shared', 'I share because I care');
 ```
+
 // examples/hello.t.php
 ```
 <div class="card">… {{ $shared }}</div>
@@ -578,6 +597,7 @@ then we register a composer:
 });
 ```
 now, calling our component like this:
+
 // examples/hello.t.php
 ```
 <template is="components/filtered-list" sort="ASC" />
@@ -661,6 +681,7 @@ $viewFactory->on('rendering', 'components/filtered-list', function($context) {
 });
 ```
 and the call:
+
 // examples/hello.t.php
 ```
 <template is="components/filtered-list" sort="ASC" />
