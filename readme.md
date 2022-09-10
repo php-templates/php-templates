@@ -40,6 +40,7 @@ will result:
 ```
 <h1>Hello Php Templates</h1> 
 ```
+
 Unlike other template engines, interpolation is resumed only on text nodes.
 The following syntax won't work:
 // examples/hello.t.php
@@ -55,6 +56,7 @@ will result:
 ```
 <input type="text" value="{{ $value }}"> 
 ```
+
 In order to bind values to node attributes, just write your attributes prefixed by ':'.
 // examples/hello.t.php
 ```
@@ -68,7 +70,8 @@ will result:
 
 ```
 <input value="No value" type="text"> 
-```In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
+```
+In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
 // examples/hello.t.php
 ```
     <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
@@ -82,6 +85,7 @@ will result:
 ```
 <input value="value given" type="text"> 
 ```
+
 ## Php syntax
 In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
 // examples/hello.t.php
@@ -100,6 +104,7 @@ will result:
 <input value="Lorem ipsum" type="text">
 <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp> 
 ```
+
 If you wonder how then conditionally rendering attributes is possible, take a look at 'Directives' section. First, we have to cover control structures.
 
 ## Control structures
@@ -123,6 +128,7 @@ will result:
 <textarea>Lorem</textarea>
 
 ```
+
 Here is a foreach example:
 // examples/hello.t.php
 ```
@@ -144,6 +150,7 @@ will result:
   <option value="0">No</option>
   </select> 
 ```
+
 In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
 // examples/hello.t.php
 ```
@@ -170,6 +177,7 @@ will result:
   </select>
    I will survive!!!
 ```
+
 ## Directives
 Directives are parsing time commands and are usefull when you need to declare complex logic under a small alias. They are DOMNode attributes prefixed with 'p-', like control structures.
 
@@ -187,7 +195,8 @@ will result:
 
 ```
 <div class="card" style="width: 18rem;"></div> 
-```Please note that is IMPORTANT to escape nested quotes using backslash.
+```
+Please note that is IMPORTANT to escape nested quotes using backslash.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
 // examples/hello.t.php
@@ -203,6 +212,7 @@ will result:
 ```
 <input type="text" name="name" disabled> 
 ```
+
 `checked` - used on input type radio / checkbox
 // examples/hello.t.php
 ```
@@ -222,6 +232,7 @@ will result:
 <input name="theradio" type="radio" value="1" checked>
 <input name="theradio" type="radio" value > 
 ```
+
 `selected` - used on select input
 
 // examples/hello.t.php
@@ -243,6 +254,7 @@ will result:
   <option value="c" >cherry</option>
   </select> 
 ```
+
 `disabled` - used to apply attribute `disabled`
 // examples/hello.t.php
 ```
@@ -257,6 +269,7 @@ will result:
 ```
 <input type="text" disabled> 
 ```
+
 
 ### Custom directives
 
@@ -290,6 +303,7 @@ will result:
 <div p-guest>Guest</div><div p-auth>Auth</div>
 <div p-active="3 < 4"></div> 
 ```
+
 Note that `$val` param passed to callback function is the string value of the directive attribute, in our case `3 < 4`.
 You can learn more about DomNode manipulation at Working with DOM section.
 
@@ -335,7 +349,8 @@ will result:
                   <label class="form-label">The Label</label>
                       <input placeholder="The Label" type="text" class="form-control" value="The Value">
               </div> 
-```You can pass values to componenent context in 3 ways:
+```
+You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
 - bind syntax: php syntax accepted, ex.: :value="$value", or :value="'The value'"
 - bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
@@ -411,6 +426,7 @@ will result:
    -->
     </div> 
 ```
+
 No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. Multiple nodes can fill the same slot name.
 
 #### Scoped Slots Data
@@ -483,6 +499,7 @@ will result:
     </table>
   </div> 
 ```
+
 ## Extends
 Consider we have a main layout:
 // layouts/app.t.php
@@ -513,7 +530,8 @@ will result:
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
   </htm> 
-```As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
+```
+As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
 
 ## Global Shared data
 You can use the following method on TemplateFactory instance to share a value across all templates (nested, extended, components or not) built by it:
@@ -533,7 +551,8 @@ will result:
 
 ```
 <div class="card">… I share because I care</div> 
-```Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
+```
+Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
 
 ## Composing data
 You may have pieces of UI in your app which may repeat on different pages and you may feel tired of building the data for each one.
@@ -585,6 +604,7 @@ will result:
     <li>avocado</li>
       </ul> 
 ```
+
 ## Events
 Each template is transformed into a virtual DOM then semantically parsed from top to bottom, entering in each child node. This empowers Php Templates with ability to intervents in parsing process and manipulate DOM in a close to JavaScript flexibility (add, remove, edit node).
 There are three ways of doing this:
@@ -659,7 +679,8 @@ will result:
     <li>cherry</li>
     <li>added</li>
       </ul> 
-```pretty usefull if you want to add data on fly
+```
+pretty usefull if you want to add data on fly
 
 ### Self events
 When you declare a template which will suppose to be a component, you may return a php function which will be called as callback before template parse.
