@@ -21,7 +21,8 @@ $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Te
 $view->render();
 ```
 ```
-<h1>Hello Php Templates</h1> ```
+<h1>Hello Php Templates</h1> 
+```
 
 ## Data interpolation
 Like in most template engines, data is escaped against html entities and displayed using `{{ $var }}` syntax. You can use `{!! $var !!}` syntax in order to display raw, unescaped data.
@@ -32,9 +33,9 @@ The following:
 ```
 ```
     $viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
-    ```
+```
 will result:
- ```
+```
     <h1>Hello Php Templates</h1>
 ```
  
@@ -46,9 +47,9 @@ The following syntax won't work:
 ```
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
-    ```
+```
 will result:
- ```
+```
 <input type="text" value="{{ $value }}">
 ```
  
@@ -59,9 +60,9 @@ In order to bind values to node attributes, just write your attributes prefixed 
 ```
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
-    ```
+```
 will result:
- ```
+```
 <input value="No value" type="text">
 ```
  In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
@@ -71,9 +72,9 @@ will result:
 ```
 ```
     $viewFactory->make('examples/hello', ["value" => "No value"])->render();
-    ```
+```
 will result:
- ```
+```
 <input value="value given" type="text">
 ```
  
@@ -87,9 +88,9 @@ In order to cover other features and to avoid any ambiguosity, template files ar
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
     <input value="Lorem ipsum" type="text">
 <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
@@ -98,7 +99,7 @@ If you wonder how then conditionally rendering attributes is possible, take a lo
 
 ## Control structures
 Allowed control structures are:
-```if, elseif, else, for, foreach```
+`if, elseif, else, for, foreach`
 You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
 // examples/hello.t.php
 ```
@@ -109,9 +110,9 @@ You can use them to conditionally render a node. Just add them as attribute on t
 ```
 ```
     $viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();
-    ```
+```
 will result:
- ```
+```
     <textarea>Lorem</textarea>
 ```
  
@@ -125,9 +126,9 @@ Here is a foreach example:
 ```
 ```
     $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
-    ```
+```
 will result:
- ```
+```
    Do you like Php Templates?
 <select>
   <option value="1">Yes</option>
@@ -146,9 +147,9 @@ In Php Templates, inspired by Twig, loops are scoped, meaning that anything decl
 ```
 ```
     $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
-    ```
+```
 will result:
- ```
+```
    <select>
   <option value="1"><br />
 <b>Warning</b>:  Undefined property: PhpTemplates\Context::$lbl in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/src/Context.php</b> on line <b>43</b><br />
@@ -170,9 +171,9 @@ Directives are parsing time commands and are usefull when you need to declare co
 ```
 ```
     $viewFactory->make('examples/hello', ["condition" => true])->render();
-    ```
+```
 will result:
- ```
+```
 <div class="card" style="width: 18rem;"></div>
 ```
  Please note that is IMPORTANT to escape nested quotes using backslash.
@@ -184,9 +185,9 @@ will result:
 ```
 ```
     $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();
-    ```
+```
 will result:
- ```
+```
 <input type="text" name="name" disabled>
 ```
  
@@ -200,9 +201,9 @@ will result:
 ```
 ```
     $viewFactory->make('examples/hello', ["theradio" => 1])->render();
-    ```
+```
 will result:
- ```
+```
 <input name="thecheckbox" type="checkbox" value="1" >
 <input name="theradio" type="radio" value="1" checked>
 <input name="theradio" type="radio" value >
@@ -218,9 +219,9 @@ will result:
 ```
 ```
     $viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();
-    ```
+```
 will result:
- ```
+```
 <select name="fruits">
   <option value="a" >avocado</option>
   <option value="b" selected="selected">banana</option>
@@ -235,9 +236,9 @@ will result:
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
 <input type="text" disabled>
 ```
  
@@ -266,9 +267,9 @@ Now, the following:
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
     <div p-guest>Guest</div><div p-auth>Auth</div>
 <div p-active="3 < 4"></div>
 ```
@@ -309,9 +310,9 @@ and use it like this:
 ```
 ```
     $viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();
-    ```
+```
 will result:
- ```
+```
   <div class="form-group ">
                   <label class="form-label">The Label</label>
                       <input placeholder="The Label" type="text" class="form-control" value="The Value">
@@ -378,9 +379,9 @@ Now, we can use it like this:
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
   <div class="form-group ">
         <span>Custom label
       <i class="fa fa-download"></i></span>
@@ -433,9 +434,9 @@ Now, we can use the component like this:
     ['id' => 67, 'name' => 'Mango'],
     ['id' => 32, 'name' => 'Potatos'],
 ]])->render();
-    ```
+```
 will result:
- ```
+```
   <div class="table-wrapper">
     <table>
       <thead>
@@ -481,9 +482,9 @@ Now, we can have all our templates extending it, like this:
 ```
 ```
     $viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();
-    ```
+```
 will result:
- ```
+```
   <htm><head>… </head><body>
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
@@ -502,9 +503,9 @@ $viewFactory->share('shared', 'I share because I care');
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
 <div class="card">… I share because I care</div>
 ```
  Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
@@ -541,9 +542,9 @@ now, calling our component like this:
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
   <ul>
     <li>avocado</li>
     <li>banana</li>
@@ -619,9 +620,9 @@ and the call:
 ```
 ```
     $viewFactory->make('examples/hello', [])->render();
-    ```
+```
 will result:
- ```
+```
   <ul>
     <li>avocado</li>
     <li>banana</li>
