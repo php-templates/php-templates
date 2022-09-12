@@ -6,29 +6,43 @@ use PhpTemplates\Template;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Source;
 
-class NullCache implements CacheInterface
+class NullCache extends FileSystemCache implements CacheInterface
 {
-    protected $store = [];
+    public function __construct() {}
     
     public function load(string $key): bool
     {
-        return false;
+        $this->store = $this->source = $this->dependencies = [];
+        
+        $file = $this->getFilePath($key);
+        
+        if (!file_exists($file)) {
+            return false;
+        }
+        
+        $cache = $this;
+        if (($loaded = require($file)) === false) {
+            return false;
+        }
+       
+        return true;
     }
     
-    public function has(string $key): bool
+    public function write(string $key) 
     {
-        return isset($this->store[$key]);
+        parent::write($key);
+        
+        $file = $this->getFilePath($key);
+        if (file_exists($file)) {
+            unlink($file);
+        }
     }
     
-    public function set(string $key, callable $fn, Source $source = null): void
+    protected function getFilePath(string $key)
     {
-        $this->store[$key] = $fn;
+        $pf = rtrim(sys_get_temp_dir(), '/ ').'/';
+        $name = trim(str_replace(['/', ':'], '_', $key), '/ ');//todo hash with name
+        
+        return $pf . $name . '.php';
     }
-    
-    public function get(string $key): callable
-    {
-        return $this->store[$key] ?? null;
-    }
-    
-    public function write(string $key) {}
 }

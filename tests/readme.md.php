@@ -3,7 +3,6 @@
 require('../autoload.php');
 
 use PhpTemplates\Config;
-use PhpTemplates\ConfigHolder;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewFactory;
 use PhpTemplates\Template;
@@ -12,12 +11,9 @@ use PhpTemplates\Dom\DomNodeAttr;
 //header("Content-Type: text/plain");
 
 $cfg = new Config('default', __DIR__);
-$cfgHolder = new ConfigHolder($cfg);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(/* __DIR__.'/results' */ null, $cfgHolder, $eventHolder);
-$cfgHolder = $viewFactory->getConfigHolder();
-$cfg = $cfgHolder->get();
+$viewFactory = new ViewFactory(/* __DIR__.'/results' */ null, $cfg, $eventHolder);
 
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',
@@ -28,7 +24,7 @@ $cfg->addAlias([
     'x-tabs' => 'components/tabs',
 ]);
 
-$cfg = new Config('cases2', __DIR__.'/cases2/');
+$cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
 $cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
 $cfg->addDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
@@ -42,8 +38,6 @@ $cfg->addDirective('auth', function($node, $val) {
 $cfg->addDirective('active', function($node, $val) {
     $node->addAttribute(':class', "$val ? 'active' : ''");
 });
-
-$cfgHolder->add($cfg);
 
 function tstart()
 {
@@ -65,11 +59,19 @@ function tresult($file, $data = '[]')
     global $viewFactory;
     $tpl = ob_get_contents();
     ob_end_clean();
-    echo "// $file.t.php\n$tpl";
+    echo "
+// $file.t.php\n$tpl";
     eval('$_data = '.$data.';');
-    echo "```\$viewFactory->make('$file', $data)->render();```";
-    echo "\nwill result:\n";
-    $viewFactory->makeRaw($tpl, $_data)->render();
+    echo "
+```
+    \$viewFactory->make('$file', $data)->render();
+```";
+    echo "\nwill result:\n
+```
+";
+$viewFactory->makeRaw("\n".trim(str_replace('```', '', $tpl), "\n")."\n", $_data)->render();
+echo "\n```
+";
     return $tpl;
 }
 
@@ -83,14 +85,12 @@ Template files will have the `.t.php` extension and be placed in configured sour
 ```
 <\?php
 use PhpTemplates\Config;
-use PhpTemplates\ConfigHolder;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewFactory;
 
 $cfg = new Config('default', __DIR__);
-$cfgHolder = new ConfigHolder($cfg);
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/cached', $cfgHolder, $eventHolder);
+$viewFactory = new ViewFactory(__DIR__.'/cached', $cfg, $eventHolder);
 
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
@@ -100,6 +100,7 @@ $view->render();
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
 ?>
+
 ```
 
 ## Data interpolation
@@ -155,7 +156,7 @@ If you wonder how then conditionally rendering attributes is possible, take a lo
 
 ## Control structures
 Allowed control structures are:
-```if, elseif, else, for, foreach```
+`if, elseif, else, for, foreach`
 You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
 <?php tstart(); ?>
 ```

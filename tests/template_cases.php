@@ -18,12 +18,10 @@ use PhpTemplates\Dom\DomNodeAttr;
 //header("Content-Type: text/plain");
 
 $cfg = new Config('default', __DIR__);
-$cfgHolder = new ConfigHolder($cfg);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/results', $cfgHolder, $eventHolder);
-$cfgHolder = $viewFactory->getConfigHolder();
-$cfg = $cfgHolder->get();
+$viewFactory = new ViewFactory(__DIR__.'/results', $cfg, $eventHolder);
+//$cfgHolder = $viewFactory->getConfig();
 
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',
@@ -32,13 +30,13 @@ $cfg->addAlias([
     'x-helper' => 'components/helper'
 ]);
 
-$cfg = new Config('cases2', __DIR__.'/cases2/');
+$cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
 $cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
 $cfg->addDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
 });
 
-$cfgHolder->add($cfg);
+//$cfg->getRoot()->find('cases2'); die('66');
 
 $files = array_diff(scandir('./results'), array('.', '..'));
 foreach($files as $file){ // iterate files

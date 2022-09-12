@@ -104,9 +104,9 @@ class TemplateEntity extends AbstractEntity
         
         if (strpos($rfilepath, ':')) {
             list($cfgKey, $rfilepath) = explode(':', $rfilepath);
-            $config = $config->getHolder()->get($cfgKey);
+            $config = $config->getRoot()->find($cfgKey);
         }
-        
+   
         if (!$config->isDefault()) {
             $this->name = $config->getName() . ':' . $rfilepath;
         }

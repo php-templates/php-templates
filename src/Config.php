@@ -2,13 +2,20 @@
 
 namespace PhpTemplates;
 
+use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\PhpNodeValAttr;
+use PhpTemplates\Dom\PhpNodeBindAttr;
+
 class Config
 {
+    private $parent;
+    private $childs = [];
+    
     private $name;
 
     private $srcPath;
-    private $aliased = [];
-    private $directives = [];
+    public $aliased = [];
+    public $directives = [];
 
     const allowedControlStructures = [
         'if', 'elseif', 'else', 'for', 'foreach'
@@ -20,23 +27,38 @@ class Config
     
     private $prefix = 'p-';
    
-    public function __construct($name, $srcPath) {
+    public function __construct($name, $srcPath, self $parent = null) {
+        $this->parent = $parent;
         $this->name = $name;
         $this->srcPath = (array) $srcPath;
+        if (!$this->parent) {
+            $this->addDefaultDirectives();
+        }
     }
     
-    public function configHolder(ConfigHolder $holder): self
+    public function subconfig($name, $srcPath) 
     {
-        $this->configHolder = $holder;
+        $cfg = new Config($name, $srcPath, $this);
+        $this->childs[] = $cfg;
+  
         return $this;
     }
     
-    public function getHolder() {
-        return $this->configHolder;
+    public function getParent() {
+        return $this->parent;
     }
-
+    
+    public function getRoot() {
+        $cfg = $this;
+        while ($this->getParent()) {
+            $cfg = $this->getParent();
+        }
+        
+        return $cfg;
+    }
+// set = may replace, add = push
     public function addDirective(string $key, \Closure $callable): void
-    {
+    {//$key == 'guest' && d('$$$$$');
         $this->directives[$key] = $callable;
     }
     
@@ -85,37 +107,86 @@ class Config
     
     public function getAliased(string $name) 
     {
-        return $this->aliased[$name] ?? null;
+        $cfg = $this;
+        do {
+            if (isset($cfg->aliased[$name])) {
+                return $cfg->aliased[$name];
+            }
+        }
+        while ($cfg = $cfg->getParent());
     }
-    public function hasAlias(string $name) 
+    
+    public function dydydhasAlias(string $name) 
     {
         return isset($this->aliased[$name]);
     }
-    public function getAliases() 
+    
+    public function djdjdjgetAliases() 
     {
         return $this->aliased;
     }
     
     public function getDirective(string $name) 
     {
-        return $this->directives[$name] ?? null;
+        $cfg = $this;
+        do {
+            if (isset($cfg->directives[$name])) {
+                return $cfg->directives[$name];
+            }
+        }
+        while ($cfg = $cfg->getParent());
     }
-    public function hasDirective(string $name) 
+    public function hadjfjfjsDirective(string $name) 
     {
         return isset($this->directives[$name]);
     }
     
-    public function getDirectives() 
+    public function dhfhfhgetDirectives() 
     {
         return $this->directives;
     }
     
     public function isDefault() 
     {
-        return $this->configHolder->get() === $this;
+        return !$this->parent;
     }
     
-    public function __get($prop)
+    public function find(string $cfgkey) {
+        if ($this->name == $cfgkey) {
+            return $this;
+        }
+        foreach ($this->childs as $child) {
+            if ($cfg = $child->find($cfgkey)) {
+                return $cfg;
+            }
+        }//die('3');
+    }
+    
+    private function addDefaultDirectives() 
+    {
+        $cfg = $this;
+        $cfg->addDirective('raw', function(DomNode $node, string $val) {
+            $node->addAttribute(new PhpNodeValAttr('', $val));
+        });
+        
+        $cfg->addDirective('bind', function(DomNode $node, string $val) {
+            $node->addAttribute(new PhpNodeBindAttr('', $val));
+        });
+        
+        $cfg->addDirective('checked', function(DomNode $node, string $val) {
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "checked" : ""'));
+        });
+        
+        $cfg->addDirective('selected', function(DomNode $node, string $val) {
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "selected=\"selected\"" : ""'));
+        });
+        
+        $cfg->addDirective('disabled', function(DomNode $node, string $val) {
+            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "disabled" : ""'));
+        });
+    }
+    
+    public function __dhdhdget($prop)
     {
         return isset($this->{$prop}) ? $this->{$prop} : null;
     }

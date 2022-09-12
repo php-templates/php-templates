@@ -6,21 +6,21 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\EntityInterface;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
-use PhpTemplates\ConfigHolder;
+use PhpTemplates\Config;
 
 //TODO: RENAME INTO NODEPARSER
 class EntityFactory
 {
     private $document;
-    private $configHolder;
+    private $config;
     private $eventHolder;
     
     private $entities = [];
     
-    public function __construct(CacheInterface $document, ConfigHolder $configHolder, EventHolder $eventHolder) 
+    public function __construct(CacheInterface $document, Config $config, EventHolder $eventHolder) 
     {
         $this->document = $document;
-        $this->configHolder = $configHolder;
+        $this->config = $config;
         $this->eventHolder = $eventHolder;
         
         $this->globEntities();

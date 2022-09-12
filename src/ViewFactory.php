@@ -6,6 +6,7 @@ use Exception;
 use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Source;
+use PhpTemplates\Config;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Cache\FileSystemCache;
@@ -25,15 +26,15 @@ class ViewFactory
     private $shared = [];
     private $outputFolder;
    // private $dependenciesMap;
-    private $configHolder;
+    private $config;
     private $eventHolder;
     
-    public function __construct(?string $outputFolder, ConfigHolder $configHolder, EventHolder $eventHolder) {
+    public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder) {
     //public function __construct(string $srcPath, string $destPath) {
         $this->outputFolder = $outputFolder;
         // $this->viewParser = $viewParser;
         //$this->dependenciesMap = $dependenciesMap;
-        $this->configHolder = $configHolder;
+        $this->config = $config;
         $this->eventHolder = $eventHolder;
         //$this->configs['default'] = new Config('default', $srcPath);
         // TODO
@@ -66,8 +67,8 @@ class ViewFactory
                 
                 // parse it
                 //$name = $document->getInputFile();
-                $factory = new EntityFactory($this->cache, $this->configHolder, $this->eventHolder);
-                $entity = $factory->make($node, new StartupEntity($this->configHolder->get(), $rfilepath));
+                $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
+                $entity = $factory->make($node, new StartupEntity($this->config, $rfilepath));
                 $entity->parse();
                 
                 $this->cache->write($rfilepath);
@@ -95,8 +96,8 @@ class ViewFactory
             {
                 // parse it
                 //$name = $document->getInputFile();
-                $factory = new EntityFactory($this->cache, $this->configHolder, $this->eventHolder);
-                $entity = $factory->make(new DomNode('template', ['is' => $rfilepath]), new StartupEntity($this->configHolder->get()));
+                $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
+                $entity = $factory->make(new DomNode('template', ['is' => $rfilepath]), new StartupEntity($this->config));
                 $entity->parse();
                 
                 $this->cache->write($rfilepath);
@@ -178,12 +179,12 @@ class ViewFactory
         $this->destPath = $dest;
     }
     
-    public function getConfigHolder(): ConfigHolder
+    public function getConfig(): Config
     {
-        return $this->configHolder;
+        return $this->config;
     }
     
-    public function getEventHttfolder(): ConfigHolder
+    public function getEventHttfolder(): Config
     {
         return $this->eventHolder;
     }

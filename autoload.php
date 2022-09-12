@@ -30,6 +30,10 @@ function d(...$data) {
     }
 }
 
+//file_put_contents(sys_get_temp_dir().'/foo.php', '');
+//require(sys_get_temp_dir().'/foo.php');
+//dd(glob(sys_get_temp_dir().'/*'));
+
 function xd($data) {
     $x = debug_backtrace();
     //print_r($x[0]['file'].'->'.$x[0]['line']);

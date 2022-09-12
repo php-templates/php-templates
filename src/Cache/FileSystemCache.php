@@ -40,7 +40,7 @@ class FileSystemCache implements CacheInterface
         return isset($this->store[$key]);
     }
     
-    public function set(string $key, callable $fn, Source $source = null): void
+    public function set(string $key, callable $fn = null, Source $source = null): void
     {
         $this->store[$key] = $fn;
         if ($source) {
@@ -85,9 +85,11 @@ class FileSystemCache implements CacheInterface
         }
         //dd($path);
         file_put_contents($path, $tpl);
+        
+        $this->load($key);
     }
     
-    private function getFilePath(string $key)
+    protected function getFilePath(string $key)
     {
         $pf = rtrim($this->storePath, '/ ').'/';
         $name = trim(str_replace(['/', ':'], '_', $key), '/ ');//todo hash with name

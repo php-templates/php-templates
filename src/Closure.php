@@ -22,7 +22,7 @@ class Closure
         try {
             return call_user_func($this->closure, $args);
         } catch(\Throwable $e) {
-            dd($e);
+            dd(''.$this->source, $e);
             $e->setMessage($e->getMessage() . "\n" . $this->source);
             throw($e);
         }
@@ -37,7 +37,8 @@ class Closure
         try {
             eval("$header \$fn = $fnsrc;");
         } catch(\Throwable $e) {
-            dd($e->getMessage()."\n".$fnsrc);
+            d(''.$fnsrc);
+            dd($e->getMessage());
         }
         return new self($fn, $fnsrc);
     }
