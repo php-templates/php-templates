@@ -3,6 +3,7 @@
 namespace PhpTemplates;
 
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\Dom\PhpNodeValAttr;
 use PhpTemplates\Dom\PhpNodeBindAttr;
 
@@ -160,7 +161,7 @@ class Config
         $controlStructures = ['if', 'elseif', 'else', 'for', 'foreach'];
         
         foreach ($controlStructures as $statement) {
-            $cfg->addDirective($statement, function(DomNode $node, string $val) use ($statement) {
+            $cfg->addDirective($statement, function(DomNode $node, string $args) use ($statement) {
                 $phpnode = new PhpNode($statement, $args);
                 $node->parentNode->insertBefore($phpnode, $node);
                 $phpnode->appendChild($node->detach());

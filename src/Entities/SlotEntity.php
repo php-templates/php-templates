@@ -31,7 +31,7 @@ class SlotEntity extends AbstractEntity
         $wrapper->appendChild($this->node->detach());
         
         $data = $this->depleteNode($this->node);
-        $dataString = $this->fillNode(null, $data);
+        $dataString = $data->toArrayString();
         //$dataString = Helper::arrayToEval($data);
 
         $this->node->changeNode('#slot');

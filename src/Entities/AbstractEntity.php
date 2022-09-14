@@ -4,7 +4,7 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Config;
 use PhpTemplates\Process;
-use PhpTemplates\Attributes\AttributeManager;
+use PhpTemplates\Attributes\AttributePack;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodeValAttr;
 use PhpTemplates\Dom\PhpNode;
@@ -91,9 +91,9 @@ abstract class AbstractEntity implements EntityInterface
      * @param callable $cb
      * @return array
      */
-    protected function depleteNode($node): array
+    protected function depleteNode($node): AttributePack
     {
-        $attributeManager = new AttributeManager();
+        $attributePack = new AttributePack();
         // dispatch any existing directive
     while ($node->attributes->count()) {
             $attrs = $node->attributes;
@@ -101,6 +101,11 @@ abstract class AbstractEntity implements EntityInterface
         
         foreach ($attrs as $a) {
             $k = $a->nodeName;
+            if (array_key_exists($k, $this->attrs)) {
+                $this->attrs[$k] = $a->nodeValue;
+                continue;
+            }
+            
             if (strpos($k, $this->pf) === 0) 
             {
                 // check if is a directive and unpack its result as attributes
@@ -115,10 +120,11 @@ abstract class AbstractEntity implements EntityInterface
                     continue;
                 }
             }
-            $attributeManager->add($a);
+            
+            $attributePack->add($a);
         }
         }
-        return $attributeManager;
+        return $attributePack;
         // remove all node attrs
 // todo remove below code
         

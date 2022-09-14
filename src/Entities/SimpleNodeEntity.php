@@ -26,14 +26,15 @@ class SimpleNodeEntity extends AbstractEntity
     }
 
     public function simpleNodeContext()
-    {
+    {//dd($this->node->debug());
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
             $this->factory->make($slot, $this)->parse();
         }
 
-        $this->fillNode($this->node, $data);
+        $this->node->addAttribute($data);
+        //$this->fillNode($this->node, $data);
     }
     
     public function extendContext() {
@@ -50,7 +51,8 @@ class SimpleNodeEntity extends AbstractEntity
         $slotAssignNode->appendChild($this->node->detach());
 
         $data = $this->depleteNode($this->node);
-        $this->fillNode($this->node, $data);
+        $this->node->addAttribute($data);
+        //$this->fillNode($this->node, $data);
         //$name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
         foreach ($this->node->childNodes as $cn) {
@@ -61,7 +63,7 @@ class SimpleNodeEntity extends AbstractEntity
         foreach ($this->attrs as $k => $val) {
             $attrs[] = new DomNodeAttr($k, $val);//todo, vezi daca e necesar
         }
-        $dataString = $this->fillNode(null, $attrs);
+        //$dataString = $this->fillNode(null, $attrs);
 //TODO: findout what to do with data
     }
 

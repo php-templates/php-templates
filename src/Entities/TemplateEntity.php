@@ -40,7 +40,7 @@ class TemplateEntity extends AbstractEntity
 
     public function simpleNodeContext() {
         $data = $this->depleteNode($this->node);
-        $dataString = $this->fillNode(null, $data);
+        $dataString = $data->toArrayString();
 
         //$dataString = Helper::arrayToEval($data);
 
