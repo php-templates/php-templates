@@ -23,7 +23,7 @@ class DomNodeAttr
         }
         return $this->nodeName . '="' . $this->nodeValue . '"';
     }
-    
+    // todo remove below
     public function toArrayString()
     {
         return "'" . addslashes($this->nodeName) . "' => '" . addslashes($this->nodeValue) . "'";

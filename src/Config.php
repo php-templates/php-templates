@@ -16,14 +16,6 @@ class Config
     private $srcPath;
     public $aliased = [];
     public $directives = [];
-
-    const allowedControlStructures = [
-        'if', 'elseif', 'else', 'for', 'foreach'
-    ];
-    
-    const attrCumulative = [
-        'class', 'id'
-    ];
     
     private $prefix = 'p-';
    
@@ -165,6 +157,16 @@ class Config
     private function addDefaultDirectives() 
     {
         $cfg = $this;
+        $controlStructures = ['if', 'elseif', 'else', 'for', 'foreach'];
+        
+        foreach ($controlStructures as $statement) {
+            $cfg->addDirective($statement, function(DomNode $node, string $val) use ($statement) {
+                $phpnode = new PhpNode($statement, $args);
+                $node->parentNode->insertBefore($phpnode, $node);
+                $phpnode->appendChild($node->detach());
+            });
+        }
+        
         $cfg->addDirective('raw', function(DomNode $node, string $val) {
             $node->addAttribute(new PhpNodeValAttr('', $val));
         });

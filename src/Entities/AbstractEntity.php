@@ -4,6 +4,7 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Config;
 use PhpTemplates\Process;
+use PhpTemplates\Attributes\AttributeManager;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodeValAttr;
 use PhpTemplates\Dom\PhpNode;
@@ -92,9 +93,9 @@ abstract class AbstractEntity implements EntityInterface
      */
     protected function depleteNode($node): array
     {
-        $extracted_attributes = [];
+        $attributeManager = new AttributeManager();
         // dispatch any existing directive
-        while ($node->attributes->count()) {
+    while ($node->attributes->count()) {
             $attrs = $node->attributes;
             $node->removeAttributes();
         
@@ -102,9 +103,8 @@ abstract class AbstractEntity implements EntityInterface
             $k = $a->nodeName;
             if (strpos($k, $this->pf) === 0) 
             {
-                // check if is a custom directive and unpack its result as attributes
+                // check if is a directive and unpack its result as attributes
                 // todo don t allow directive with cstruct name
-                // todo pass node to directive
                 if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
                     //dd($directive);
                     $directive($node, $a->nodeValue);
@@ -115,10 +115,12 @@ abstract class AbstractEntity implements EntityInterface
                     continue;
                 }
             }
-            $extracted_attributes[] = $a;
+            $attributeManager->add($a);
         }
         }
+        return $attributeManager;
         // remove all node attrs
+// todo remove below code
         
         // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
         $c_structs = [];
@@ -193,7 +195,7 @@ abstract class AbstractEntity implements EntityInterface
      * @param array $data
      * @return mixed
      */
-    protected function fillNode($node, array $data)
+    protected function fillNodjdhfhde($node, array $data)
     {
         if (is_null($node)) {
             if (isset($data['_attrs'])) {
