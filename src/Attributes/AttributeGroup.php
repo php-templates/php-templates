@@ -21,14 +21,28 @@ class AttributeGroup
     
     public function toString() 
     {
-        $values = [];
+        $arr = [];
+
+        // @attr1, @attr2 => foo="bar" bam="baz"
+        // :attr1, attr1 => attr
         foreach ($this->attrs as $attr) {
-            
+            $arr[] = $attr->toString();
         }
+
+        return implode(' ', $arr);
     }
     
     public function toArrayString() 
     {
-        
+        $arr = [];
+
+        // @attr1, @attr2 => _attrs => [foo:bar, bam:baz]
+        foreach ($this->attrs as $attr) {
+            $arr[] = $attr->toArrayString(); //'foo', bar
+        }
+
+        $k = $this->getNodeName();
+
+        return "'$k' => [" . implode(', ', $arr) . "]";
     }
 }
