@@ -23,34 +23,11 @@ class Context
     
     public function &__get($prop) 
     {
-        
-        
-        if ($prop == '_attrs' && empty($this->data['_attrs'])) {
-            $this->data['_attrs'] = [];
-        }
-        //d($this->id.'get'.$prop);
-        //d($this);
-        if (isset($this->loopContext) && $this->loopContext->has($prop)) {
-            //$prop == 'name' && dd($this->loopContext->parent->name);
-            return $this->loopContext->$prop;
+        if ($this->loopContext) {
+            return $this->loopContext->get($prop);
         }
         
-        if (!empty($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {
-            return $this->data['_attrs'][$prop];
-        }
-        
-        //d($this->data);
-        if (isset($this->parent->$prop)) {//d('->'.$this->parent->$prop);
-            // import from parent
-            $this->data[$prop] = $this->parent->$prop;
-        }
-        if (!array_key_exists($prop, $this->data)) {
-            $this->data[$prop] = null;
-        }
-        
-        //empty($this->data[$prop]) && dd($this->parent);
-        //$prop == 'slot' && !$this->data[$prop] && dd($this->parent->$prop);
-        return $this->data[$prop];
+        return $this->get($prop);
     }
     
     public function __set($prop, $val) 
@@ -69,7 +46,7 @@ class Context
     
     public function __isset($prop) 
     {
-        return array_key_exists($prop, $this->data) || (!empty($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) || isset($this->parent->$prop);
+        return !is_null($this->get($prop));
     }
     
     public function merge(array ...$data) 
@@ -102,6 +79,26 @@ class Context
     
     public function has(string $prop) {
         return array_key_exists($prop, $this->data);
+    }
+    
+    public function &get($prop) 
+    {
+        if (array_key_exists($prop, $this->data)) {
+            return $this->data[$prop];
+        }
+        elseif (isset($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {
+            return $this->data['_attrs'][$prop];
+        }
+        elseif ($this->parent) {
+            return $this->parent->get($prop);
+        }
+        
+        $this->data[$prop] = null;
+        if ($prop == '_attrs') {
+            $this->data['_attrs'] = [];
+        }
+        
+        return $this->data[$prop];
     }
     
     public function all() {

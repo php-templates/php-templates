@@ -177,15 +177,15 @@ class Config
         //});
         
         $cfg->addDirective('checked', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "checked" : ""'));
+            $node->addAttribute('p-raw', $val . ' ? "checked" : ""');
         });
         
         $cfg->addDirective('selected', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "selected=\"selected\"" : ""'));
+            $node->addAttribute('p-raw', $val . ' ? "selected=\"selected\"" : ""');
         });
         
         $cfg->addDirective('disabled', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "disabled" : ""'));
+            $node->addAttribute('p-raw', $val . ' ? "disabled" : ""');
         });
     }
     

@@ -24,7 +24,7 @@ class ExtendEntity extends TemplateEntity
     public function simpleNodeContext() 
     {
         $data = $this->depleteNode($this->node);
-        $dataString = $this->fillNode(null, $data);
+        $dataString = $data->toArrayString();
 
         $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", $context); ?>',
             $this->id, $this->name
