@@ -10,7 +10,7 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
     
     public static function test(DomNodeAttr $attr): bool 
     {
-        return $attr->nodeName && $attr->nodeName[0] == '@';
+        return $attr->nodeName && $attr->nodeName[0] == '@' && strpos($attr->nodeName, '@php') !== 0;
     }
 
     public function getNodeName(): string
