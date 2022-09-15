@@ -8,7 +8,9 @@ use PhpTemplates\Source;
 
 class NullCache extends FileSystemCache implements CacheInterface
 {
-    public function __construct() {}
+    public function __construct() {
+        $this->storePath = sys_get_temp_dir();
+    }
     
     public function load(string $key): bool
     {

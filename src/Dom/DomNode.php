@@ -240,7 +240,8 @@ class DomNode
         $indentNL = $this->shouldIndent() ? $this->getIndent() : '';
         $return = $indentNL;
         if ($this->nodeName[0] != '#' && $this->nodeName) {
-            $attrs = $this->attrs ? (' '.implode(' ', $this->attrs)) : '';
+            $attrs = implode(' ', $this->attrs);
+            $attrs = $attrs ? ' '.$attrs : '';
             $return .= '<'.$this->nodeName.$attrs.($this->shortClose ? '/>' : '>');
         }
         //$this->nodeName == 'x' && d($return);
