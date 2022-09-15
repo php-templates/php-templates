@@ -4,40 +4,30 @@ namespace PhpTemplates\Attributes;
 
 use PhpTemplates\Dom\DomNodeAttr;
 
-class SimpleAttributeGroup extends AbstractAttributeGroup
+class RawAttributeGroup extends AbstractAttributeGroup
 {
+    const WEIGHT = 2;
+    
+    public static function test(DomNodeAttr $attr): bool 
+    {
+        return $attr->nodeName == 'p-raw';
+    }
+    
     public function getNodeName(): string
     {
-        return ltrim($this->attrs[0]->nodeName, ': ');
+        return '';
     }
     
     // todo documentat array class :class="[x => true]"
     public function toString(): string
     {
-        $k = $this->getNodeName();
-        $arr = [];
-        foreach ($this->attrs as $attr) {
-            if ($attr->nodeName[0] == ':') {
-                if (strpos(trim($attr->nodeValue), '[') === 0) {
-                    $arr[] = "<?php attr({$attr->nodeValue}); ?>";
-                } else {
-                    $arr[] = "<?php echo {$attr->nodeValue}; ?>";
-                }
-            }
-            else {
-                $arr[] = $attr->nodeValue;
-            }
-        }
-        $val = implode(' ', $arr);
-        if (empty($val)) {
-            return $k;
-        }
+        $attr = $this->attrs[0];
         
-        return "$k=\"$val\"";        
+        return "<?php echo {$attr->nodeValue}; ?>";
     }
 
     public function toArrayString(): string
-    {
+    {dd('todo rawattrgroup');
         $k = $this->getNodeName();
         $arr = [];
         foreach ($this->attrs as $attr) {

@@ -24,5 +24,13 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
 
     public function toArrayString(): string
     {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $k = ltrim($attr->nodeName, ' @');
+            $arr[] = "'$k' => " . $attr->nodeValue;
+        }
+        $val = "'_attrs' => [" . implode(', ', $arr) . ']';
+        
+        return $val;
     }
 }

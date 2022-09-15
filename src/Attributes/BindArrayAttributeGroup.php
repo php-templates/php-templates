@@ -20,6 +20,18 @@ class BindArrayAttributeGroup extends AbstractAttributeGroup
     
     public function toString(): string
     {
+        if (count($this->attrs) === 1) {
+            $attr = $this->attrs[0];
+            return "<?php bind({$attr->nodeValue}); ?>";
+        }
+        
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] = $attr->nodeValue;
+        }
+        $val = '<?php bind(array_merge(' . implode(', ', $arr) . ')); ?>';
+     
+        return $val;              
     }
 
     public function toArrayString(): string

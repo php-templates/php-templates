@@ -168,13 +168,13 @@ class Config
             });
         }
         
-        $cfg->addDirective('raw', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeValAttr('', $val));
-        });
+        //$cfg->addDirective('raw', function(DomNode $node, string $val) {
+        //    $node->addAttribute(new PhpNodeValAttr('', $val));
+        //});
         
-        $cfg->addDirective('bind', function(DomNode $node, string $val) {
-            $node->addAttribute(new PhpNodeBindAttr('', $val));
-        });
+        //$cfg->addDirective('bind', function(DomNode $node, string $val) {
+        //    $node->addAttribute(new DomNodeAttt('p-bind', $val));
+        //});
         
         $cfg->addDirective('checked', function(DomNode $node, string $val) {
             $node->addAttribute(new PhpNodeValAttr('', $val . ' ? "checked" : ""'));

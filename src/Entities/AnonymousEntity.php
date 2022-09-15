@@ -28,7 +28,8 @@ class AnonymousEntity extends AbstractEntity
         foreach ($this->node->childNodes as $cn) {
             $this->factory->make($cn, $this)->parse();
         }
-        $this->fillNode($this->node, $data);
+        $this->node->addAttribute($data);
+        //$this->fillNode($this->node, $data);
     }
 
     public function templateContext()

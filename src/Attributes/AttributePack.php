@@ -27,12 +27,16 @@ class AttributePack extends DomNodeAttr
             $group = new $candidate();
             $group->add($attr);
             $k = $group->getNodeName();
-            if (isset($this->groups[$k])) {
+            if (!$k) {// solo group
+                $this->groups[] = $group;
+            }
+            elseif (isset($this->groups[$k])) {
                 $this->groups[$k]->add($attr);
             } 
             else {
                 $this->groups[$k] = $group;
-            }    
+            }
+            break;
         }
     }
     
@@ -65,11 +69,7 @@ class AttributePack extends DomNodeAttr
             $arr[] = $group->toString();
         }
         
-        if (!$arr) {
-            return '';
-        }
-        
-        return ' '.implode(' ', $arr);
+        return implode(' ', $arr);
     }
 
     public function toArrayString()

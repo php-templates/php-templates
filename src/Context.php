@@ -13,7 +13,7 @@ class Context
     private $data;// scope getable as obj
     
     public function __construct(array $data = [], self $parent = null) 
-    {//d($data);
+    {
         $this->data = $data ?? [];
         $this->parent = $parent;
         
@@ -23,6 +23,8 @@ class Context
     
     public function &__get($prop) 
     {
+        
+        
         if ($prop == '_attrs' && empty($this->data['_attrs'])) {
             $this->data['_attrs'] = [];
         }
