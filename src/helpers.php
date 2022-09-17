@@ -58,20 +58,22 @@ function attr_merge(...$arrays) {
 // supported syntaxes: attr_filter(['foo', '', 'foo' => true])
 // returns string concat
 function attr_filter(array $attrs)
-{
+{//d($attrs);
     $arr = [];
     foreach ($attrs as $attr) {
         if (is_array($attr)) {
             foreach ($attr as $k => $val) {
-                if (is_string($k) && $val) {
+                if (is_string($k)) {
                     // case :class="[foo => true]"
-                    $arr[] = $k;
+                    if ($val) {
+                        $arr[] = $k;
+                    }
                 }
                 elseif (!is_string($val)) {
-                    $attr[] = json_encode($val);
+                    $arr[] = json_encode($val);
                 }
                 elseif ($val !== '') { // case class="[true ? bar : '']"
-                    $attr[] = $val;
+                    $arr[] = $val;
                 }
             }
         }

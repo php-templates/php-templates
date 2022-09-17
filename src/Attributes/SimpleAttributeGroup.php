@@ -14,14 +14,13 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     // todo documentat array class :class="[x => true]"
     public function toString(): string
     {
-        $k = $this->getNodeName();
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
-                $val = $this->toFullArrayString();
-                return "$k=\"<?php echo attr_filter($val); ?>\"";
+                return $this->toString2();
             }
         }
         
+        $k = $this->getNodeName();
         $arr = [];
         foreach ($this->attrs as $attr) {
             $arr[] = $attr->nodeValue;
@@ -37,6 +36,42 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     public function toArrayString(): string
     {
         $k = $this->getNodeName();
+        
+        $arr = [];
+        $binds = false;
+        $normal = false;
+        foreach ($this->attrs as $attr) {
+            if ($attr->nodeName[0] == ':') {
+                $binds = true;
+                $arr[] = "{$attr->nodeValue}";
+            }
+            else {
+                $normal = true;
+                $arr[] = "'{$attr->nodeValue}'";
+            }
+        }
+        
+        if (empty($arr)) {
+            $val = "''";
+        } elseif ($binds && $normal) {
+            $val = '[' . implode(', ', $arr) . ']';
+            $val = "attr_filter($val)";
+        }
+        else {
+            $val = implode(' ', $arr);
+        }
+        
+        return "'$k' => $val";
+    }
+    
+    public function toFullArrayString(): string
+    {
+        return '[' . $this->toArrayString() . ']';
+    }
+    
+    private function toString2()
+    {
+        $k = $this->getNodeName();
         $arr = [];
         $attr_filter = false;
         foreach ($this->attrs as $attr) {
@@ -50,19 +85,11 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         }
         
         if (empty($arr)) {
-            $val = "''";
-        } elseif ($attr_filter) {
-            $val = '[' . implode(', ', $arr) . ']';
-            $val = "attr_filter($val)";
+            $val = '[]';
         } else {
-            $val = implode(' ', $arr);
+            $val = '[' . implode(', ', $arr) . ']';
         }
         
-        return "'$k' => $val";
-    }
-    
-    public function toFullArrayString(): string
-    {
-        return '[' . $this->toArrayString() . ']';
+        return "$k=\"<?php echo attr_filter($val); ?>\"";     
     }
 }

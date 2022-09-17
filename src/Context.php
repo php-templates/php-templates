@@ -23,6 +23,7 @@ class Context
     
     public function &__get($prop) 
     {
+        //$prop == 's' && dd($this->data['s']);
         if ($this->loopContext) {
             return $this->loopContext->get($prop);
         }
