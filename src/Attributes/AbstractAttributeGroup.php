@@ -21,5 +21,6 @@ abstract class AbstractAttributeGroup
     
     abstract public function toString(): string;
     abstract public function toArrayString(): string;
+    abstract public function toFullArrayString(): string;
     abstract public function getNodeName(): string;
 }

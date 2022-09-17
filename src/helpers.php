@@ -19,7 +19,7 @@ function e($string)
  * @param mixed $data
  * @return void
  */
-function attr(...$data)
+function attr(...$data): string
 {
     $class = [];
     foreach ($data as $data) {
@@ -30,22 +30,85 @@ function attr(...$data)
             $class[] = $data;
         }
     }
-    echo implode(' ', $class);
+    return implode(' ', $class);
+}
+
+function attr_merge(...$arrays) {
+    $result = array_shift($arrays);
+   
+    foreach ($arrays as $arr) {
+        foreach ($arr as $k => $val) {
+            if (isset($result[$k])) {
+                if (!is_string($result[$k]) || !is_string($val)) {
+                    $result[$k] = array_merge($result[$k], $val);
+                }
+                else {
+                    $result[$k] .= ' ' . $val;
+                }
+            } else {
+                $result[$k] = $val;
+            }
+        }
+    }
+    
+    return $result;
+}
+
+// accepts an array with attributes from a group, returns concated strings of it evaluated
+// supported syntaxes: attr_filter(['foo', '', 'foo' => true])
+// returns string concat
+function attr_filter(array $attrs)
+{
+    $arr = [];
+    foreach ($attrs as $attr) {
+        if (is_array($attr)) {
+            foreach ($attr as $k => $val) {
+                if (is_string($k) && $val) {
+                    // case :class="[foo => true]"
+                    $arr[] = $k;
+                }
+                elseif (!is_string($val)) {
+                    $attr[] = json_encode($val);
+                }
+                elseif ($val !== '') { // case class="[true ? bar : '']"
+                    $attr[] = $val;
+                }
+            }
+        }
+        elseif (!is_string($attr)) {
+            $arr[] = json_encode($attr);
+        }
+        elseif ($attr !== '') {
+            $arr[] = $attr;
+        }
+    }
+    
+    return implode(' ', $arr);
 }
 
 function bind(...$attrs) 
 {
-    $_attrs = [];
-    if (count($attrs) > 1) {
-        foreach ($attrs as $attr) {
-            $_attrs = array_merge($_attrs, $attr);
+    $result = [];
+    foreach ($attrs as $attr) {
+        foreach ($attr as $k => $val) {
+            if (!is_string($val)) {
+                $val = json_encode($val);
+            }
+            
+            if (is_numeric($k)) {
+                $result[] = $val;
+            }
+            elseif (isset($result[$k])) {
+                $result[$k] .= ' ' . $val;
+            }            
+            else {
+                $result[$k] = $val;
+            }
         }
     }
-    else {
-        $_attrs = $attrs[0];
-    }
+    
     $output = [];
-    foreach ($_attrs as $name => $value) {
+    foreach ($result as $name => $value) {
         if (is_numeric($name)) {
             $output[] = $value;
         } else {

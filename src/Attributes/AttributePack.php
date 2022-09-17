@@ -64,6 +64,16 @@ class AttributePack extends DomNodeAttr
     
     public function __toString() 
     {
+        foreach ($this->groups as $group) {
+            if ($group instanceof BindArrayAttributeGroup) {
+                $arr = [];
+                foreach ($this->groups as $group) {
+                    $arr[] = $group->toFullArrayString();
+                }
+                return '<?php echo bind(' . implode(', ', $arr) . '); ?>';
+            }
+        }
+        
         $arr = [];
         foreach ($this->groups as $group) {
             $arr[] = $group->toString();
@@ -78,7 +88,6 @@ class AttributePack extends DomNodeAttr
         foreach ($this->groups as $group) {
             $arr[] = $group->toArrayString();
         }
-        //$arr && dd($arr);
         
         return '[' . implode(', ', $arr) . ']';
     }

@@ -15,18 +15,16 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     public function toString(): string
     {
         $k = $this->getNodeName();
-        $arr = [];
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
-                if (strpos(trim($attr->nodeValue), '[') === 0) {
-                    $arr[] = "<?php attr({$attr->nodeValue}); ?>";
-                } else {
-                    $arr[] = "<?php echo {$attr->nodeValue}; ?>";
-                }
+                $val = $this->toFullArrayString();
+                return "$k=\"<?php echo attr_filter($val); ?>\"";
             }
-            else {
-                $arr[] = $attr->nodeValue;
-            }
+        }
+        
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] = $attr->nodeValue;
         }
         $val = implode(' ', $arr);
         if (empty($val)) {
@@ -40,19 +38,31 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     {
         $k = $this->getNodeName();
         $arr = [];
+        $attr_filter = false;
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
-                $arr[] = "({$attr->nodeValue})";
+                $attr_filter = true;
+                $arr[] = "{$attr->nodeValue}";
             }
             else {
                 $arr[] = "'{$attr->nodeValue}'";
             }
         }
-        $val = implode(".' '.", $arr);
-        if (empty($val)) {
+        
+        if (empty($arr)) {
             $val = "''";
+        } elseif ($attr_filter) {
+            $val = '[' . implode(', ', $arr) . ']';
+            $val = "attr_filter($val)";
+        } else {
+            $val = implode(' ', $arr);
         }
         
         return "'$k' => $val";
+    }
+    
+    public function toFullArrayString(): string
+    {
+        return '[' . $this->toArrayString() . ']';
     }
 }

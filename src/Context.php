@@ -57,6 +57,9 @@ class Context
     
     public function subcontext(array $data = []) 
     {
+        if ($this->loopContext) {
+            return new Context($data, $this->loopContext);
+        }
         //empty($data['name']) && !d($this->parent) && debug_print_backtrace(2);
         return new Context($data, $this);
     }

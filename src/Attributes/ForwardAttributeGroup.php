@@ -20,6 +20,14 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
     
     public function toString(): string
     {
+        $arr = [];
+        
+        foreach ($this->attrs as $attr) {
+            $k = ltrim($attr->nodeName, ' @');
+            $arr[] = $k . '="<?php echo ' . $attr->nodeValue . '; ?>"';
+        }
+        
+        return implode(' ', $arr);
     }
 
     public function toArrayString(): string
@@ -30,6 +38,18 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
         $val = "'_attrs' => [" . implode(', ', $arr) . ']';
+        
+        return $val;
+    }
+    
+    public function toFullArrayString(): string
+    {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $k = ltrim($attr->nodeName, ' @');
+            $arr[] = "'$k' => " . $attr->nodeValue;
+        }
+        $val = '[' . implode(', ', $arr) . ']';
         
         return $val;
     }

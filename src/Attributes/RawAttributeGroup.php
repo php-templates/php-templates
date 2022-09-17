@@ -45,4 +45,9 @@ class RawAttributeGroup extends AbstractAttributeGroup
         
         return "'$k' => $val";
     }
+    
+    public function toFullArrayString(): string
+    {
+        return '';
+    }
 }
