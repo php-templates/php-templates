@@ -42,3 +42,7 @@ throw parse error, line unexpected " or ' or
 error on @atrr p nod normal
 missinf clos tag nu arata file
 indent nu merge ok
+discard any raw on conmpnent -> documentation
+checkdependencies on raw parse?? '' => false
+phpt should not indent
+indent va prezerva doar daca exista new lines 

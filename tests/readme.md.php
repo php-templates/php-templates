@@ -13,7 +13,7 @@ use PhpTemplates\Dom\DomNodeAttr;
 $cfg = new Config('default', __DIR__);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(/* __DIR__.'/results' */ null, $cfg, $eventHolder);
+$viewFactory = new ViewFactory( __DIR__.'/results' , $cfg, $eventHolder);
 
 $cfg->addAlias([
     'x-form-group' => 'components/form-group',
