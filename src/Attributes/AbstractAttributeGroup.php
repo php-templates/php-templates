@@ -19,8 +19,8 @@ abstract class AbstractAttributeGroup
         $this->attrs[] = $attr;
     }
     
-    abstract public function toString(): string;
-    abstract public function toArrayString(): string;
-    abstract public function toFullArrayString(): string;
-    abstract public function getNodeName(): string;
+    abstract public function bindArrayToNode(): string;
+    abstract public function bindToNodeAttr(): string;
+    abstract public function bindArrayToTemplate(): string;
+    abstract public function bindToTemplateAttr(): string;
 }

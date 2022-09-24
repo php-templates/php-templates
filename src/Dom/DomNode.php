@@ -238,7 +238,7 @@ class DomNode
         // NODE START
         // don t indent texts
         $indentNL = $this->shouldIndent() ? $this->getIndent() : '';
-        $return = $indentNL;
+        $return = '';// $indentNL;
         if ($this->nodeName[0] != '#' && $this->nodeName) {
             $attrs = implode(' ', $this->attrs);
             $attrs = $attrs ? ' '.$attrs : '';
@@ -263,7 +263,7 @@ class DomNode
             if (!$this->childNodes) {
                 $indentNL = '';
             }
-            $return .= $indentNL . "</{$this->nodeName}>";
+            $return .= "</{$this->nodeName}>";
         }
         
         return $return;

@@ -12,11 +12,11 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     }
     
     // todo documentat array class :class="[x => true]"
-    public function toString(): string
+    public function bindToNodeAttr(): string
     {
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
-                return $this->toString2();
+                return $this->bindAttrFilterToNodeAttr();
             }
         }
         
@@ -32,8 +32,8 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         
         return "$k=\"$val\"";        
     }
-
-    public function toArrayString(): string
+    
+    public function bindToTemplateAttr(): string
     {
         $k = $this->getNodeName();
         
@@ -64,19 +64,40 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         return "'$k' => $val";
     }
     
+    public function bindArrayToNode(): string
+    {
+        return '[' . $this->bindToTemplateAttr() . ']';
+    }
+    
+    public function bindArrayToTemplate(): string
+    {
+        $k = $this->getNodeName();
+        
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            if ($attr->nodeName[0] == ':') {
+                $arr[] = "{$attr->nodeValue}";
+            }
+            else {
+                $arr[] = "'{$attr->nodeValue}'";
+            }
+        }
+        $val = end($arr);
+        
+        return "['$k' => $val]";
+    }
+    
     public function toFullArrayString(): string
     {
         return '[' . $this->toArrayString() . ']';
     }
     
-    private function toString2()
+    private function bindAttrFilterToNodeAttr()
     {
         $k = $this->getNodeName();
         $arr = [];
-        $attr_filter = false;
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
-                $attr_filter = true;
                 $arr[] = "{$attr->nodeValue}";
             }
             else {

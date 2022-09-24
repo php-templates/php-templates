@@ -19,14 +19,17 @@ class RawAttributeGroup extends AbstractAttributeGroup
     }
     
     // todo documentat array class :class="[x => true]"
-    public function toString(): string
+    public function bindToNodeAttr(): string
     {
-        $attr = $this->attrs[0];
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] =  "<?php echo {$attr->nodeValue}; ?>";
+        }
         
-        return "<?php echo {$attr->nodeValue}; ?>";
+        return implode(' ', $arr);
     }
 
-    public function toArrayString(): string
+    public function bindToTemplateAttr(): string
     {dd('todo rawattrgroup');
         $k = $this->getNodeName();
         $arr = [];
@@ -46,8 +49,18 @@ class RawAttributeGroup extends AbstractAttributeGroup
         return "'$k' => $val";
     }
     
-    public function toFullArrayString(): string
+    public function bindArrayToNode(): string
     {
-        return '';
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] =  $attr->nodeValue;
+        }
+        
+        return '[' . implode(', ', $arr) . ']';
+    }
+    
+    public function bindArrayToTemplate(): string
+    {
+        return '[]';
     }
 }

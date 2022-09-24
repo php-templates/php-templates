@@ -66,17 +66,15 @@ class AttributePack extends DomNodeAttr
     {
         foreach ($this->groups as $group) {
             if ($group instanceof BindArrayAttributeGroup) {
-                $arr = [];
-                foreach ($this->groups as $group) {
-                    $arr[] = $group->toFullArrayString();
-                }
-                return '<?php echo bind(' . implode(', ', $arr) . '); ?>';
+                return $this->bindArrayToNode();
             }
         }
         
+        return $this->bindToNodeAttr();
+        
         $arr = [];
         foreach ($this->groups as $group) {
-            $arr[] = $group->toString();
+            $arr[] = $group->stringContext();
         }
         
         return implode(' ', $arr);
@@ -84,6 +82,14 @@ class AttributePack extends DomNodeAttr
 
     public function toArrayString()
     {
+        foreach ($this->groups as $group) {
+            if ($group instanceof BindArrayAttributeGroup) {
+                return $this->bindArrayToTemplate();
+            }
+        }
+        
+        return $this->bindToTemplateAttr();
+        
         $arr = [];
         foreach ($this->groups as $group) {
             $arr[] = $group->toArrayString();
@@ -91,4 +97,46 @@ class AttributePack extends DomNodeAttr
         
         return '[' . implode(', ', $arr) . ']';
     }
+    
+    private function bindToTemplateAttr() 
+    {
+        $arr = [];
+        foreach ($this->groups as $group) {
+            $arr[] = $group->bindToTemplateAttr();
+        }
+        
+        return '[' . implode(', ', $arr) . ']';
+    }
+    
+    private function bindToNodeAttr() 
+    {
+        $arr = [];
+        foreach ($this->groups as $group) {
+            $arr[] = $group->bindToNodeAttr();
+        }
+        
+        return implode(' ', $arr);        
+    }
+    
+    private function bindArrayToNode() 
+    {
+        $arr = [];
+        foreach ($this->groups as $group) {
+            $arr[] = $group->bindArrayToNode();
+        }
+        //d($arr);
+        return '<?php bind(attr_merge(' . implode(', ', $arr) . ')); ?>';  
+    }
+    
+    private function bindArrayToTemplate() 
+    {
+        $arr = [];
+        foreach ($this->groups as $group) {
+            $arr[] = $group->bindArrayToTemplate();
+        }
+        //d($arr);
+        return 'array_merge(' . implode(', ', $arr) . ')';  
+    }
+    
+    
 }

@@ -18,7 +18,7 @@ class BindArrayAttributeGroup extends AbstractAttributeGroup
         return 'p-bind';
     }
     
-    public function toString(): string
+    public function bindToNodeAttr(): string
     {
         if (count($this->attrs) === 1) {
             $attr = $this->attrs[0];
@@ -34,7 +34,7 @@ class BindArrayAttributeGroup extends AbstractAttributeGroup
         return $val;              
     }
 
-    public function toArrayString(): string
+    public function bindToTemplateAttr(): string
     {
         if (count($this->attrs) === 1) {
             $attr = $this->attrs[0];
@@ -48,6 +48,28 @@ class BindArrayAttributeGroup extends AbstractAttributeGroup
         $val = 'attr_merge(' . implode(', ', $arr) . ')';
      
         return $val;        
+    }
+    
+    public function bindArrayToNode(): string
+    {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] = $attr->nodeValue;
+        }
+        $val = 'attr_merge(' . implode(', ', $arr) . ')';
+     
+        return $val;
+    }
+    
+    public function bindArrayToTemplate(): string
+    {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $arr[] = $attr->nodeValue;
+        }
+        $val = implode(', ', $arr);
+     
+        return $val;
     }
     
     public function toFullArrayString(): string

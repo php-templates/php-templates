@@ -18,7 +18,7 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
         return '_attrs';
     }
     
-    public function toString(): string
+    public function bindToNodeAttr(): string
     {
         $arr = [];
         
@@ -30,7 +30,7 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
         return implode(' ', $arr);
     }
 
-    public function toArrayString(): string
+    public function bindToTemplateAttr(): string
     {
         $arr = [];
         foreach ($this->attrs as $attr) {
@@ -38,6 +38,29 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
         $val = "'_attrs' => [" . implode(', ', $arr) . ']';
+        
+        return $val;
+    }
+    
+    public function bindArrayToNode(): string
+    {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $k = ltrim($attr->nodeName, ' @');
+            $arr[] = "'$k' => " . $attr->nodeValue;
+        }
+        
+        return '[' . implode(', ', $arr) . ']';
+    }
+    
+    public function bindArrayToTemplate(): string
+    {
+        $arr = [];
+        foreach ($this->attrs as $attr) {
+            $k = ltrim($attr->nodeName, ' @');
+            $arr[] = "'$k' => " . $attr->nodeValue;
+        }
+        $val = "['_attrs' => [" . implode(', ', $arr) . ']]';
         
         return $val;
     }

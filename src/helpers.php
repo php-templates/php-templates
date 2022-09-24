@@ -34,21 +34,18 @@ function attr(...$data): string
 }
 
 function attr_merge(...$arrays) {
-    $result = array_shift($arrays);
-   
+    $result = [];
     foreach ($arrays as $arr) {
         foreach ($arr as $k => $val) {
-            if (isset($result[$k])) {
-                if (!is_string($result[$k]) || !is_string($val)) {
-                    $result[$k] = array_merge($result[$k], $val);
-                }
-                else {
-                    $result[$k] .= ' ' . $val;
-                }
-            } else {
-                $result[$k] = $val;
+            if (!is_string($val)) {
+                $val = json_encode($val);
             }
+            $result[$k][] = $val;
         }
+    }
+    
+    foreach ($result as $k => $val) {
+        $result[$k] = implode(' ', array_unique($val));
     }
     
     return $result;
@@ -85,7 +82,7 @@ function attr_filter(array $attrs)
         }
     }
     
-    return implode(' ', $arr);
+    return implode(' ', array_unique($arr));
 }
 
 function bind(...$attrs) 
@@ -98,7 +95,9 @@ function bind(...$attrs)
             }
             
             if (is_numeric($k)) {
-                $result[] = $val;
+                if ($val) {
+                    $result[] = $val;
+                }
             }
             elseif (isset($result[$k])) {
                 $result[$k] .= ' ' . $val;

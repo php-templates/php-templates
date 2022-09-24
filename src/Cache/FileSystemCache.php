@@ -5,6 +5,8 @@ namespace PhpTemplates\Cache;
 use PhpTemplates\Template;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Source;
+use PhpTemplates\Dom\Beautify;
+use PhpTemplates\Dom\FormatHtml;
 
 class FileSystemCache implements CacheInterface
 {
@@ -83,9 +85,11 @@ class FileSystemCache implements CacheInterface
         foreach ($this->source as $name => $fn) {
             $tpl .= PHP_EOL."\$cache->set('$name', new Closure($fn));";
         }
-        //dd($path);
+d($tpl);    
+$format = new FormatHtml();
+$tpl = $format->fix($tpl, true, 2);
+dd($tpl);     
         file_put_contents($path, $tpl);
-        
         $this->load($key);
     }
     
