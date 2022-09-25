@@ -1,12 +1,12 @@
 
-<template is="comp/cns">
+<tpl is="comp/cns">
     <span class="x" slot="sn" p-for="$i=0;$i<2;$i++"></span>
     <span class="y" slot="sn1"></span>
     <p slot="sn3">3</p>
-    <template is="comp/simple" slot="sn5"></template>
+    <tpl is="comp/simple" slot="sn5"></tpl>
     <span slot="sn8">8</span>
     <p slot="sn9">9</p>
-</template>
+</tpl>
 =====
 <div class="sdefsdef">
     <span>

@@ -1,6 +1,6 @@
-<template is="comp/01">
+<tpl is="comp/01">
     <span class="x" slot="sn" p-for="$i=0;$i<2;$i++"></span>
-</template>
+</tpl>
 =====
 <div class="sdefsdef">
     <span>

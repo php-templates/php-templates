@@ -289,13 +289,13 @@ will result:
 Directives are dispatched before any node attribute be parsed. So, basically, they are populating the DomNode with attributes which become parsed. You can declare your own custom directives like this:
 
 ```
-$cfg->addDirective('guest', function($node, $val) {
-    $node->setAttribute('p-if', 'empty($user)');
+$cfg->setDirective('guest', function($node, $val) {
+    $node->addAttribute('p-if', 'empty($user)');
 });
-$cfg->addDirective('auth', function($node, $val) {
-    $node->setAttribute('p-if', '!empty($user)');
+$cfg->setDirective('auth', function($node, $val) {
+    $node->addAttribute('p-if', '!empty($user)');
 });
-$cfg->addDirective('active', function($node, $val) {
+$cfg->setDirective('active', function($node, $val) {
     $node->addAttribute(':class', "$val ? 'active' : ''");
 });
 ```
@@ -351,7 +351,7 @@ and use it like this:
 
 // examples/hello.t.php
 ```
-    <template is="components/form-group" type="text" :label="$label" @value="$value" />
+    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
 
 ```
@@ -374,14 +374,14 @@ You can also have control structures on components nodes.
 #### Components aliasing
 You can alias components into custom tags like this:
 ```
-$cfg->addAlias([
+$cfg->setAlias([
     'x-form-group' => 'components/form-group',
 ]);
 ```
 Now, we can use our component:
 ```
     instead of this
-    <template is="components/form-group" type="text" :label="$label" @value="$value" />
+    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
     like this
     <x-form-group type="text" :label="$label" @value="$value" />
 ```
@@ -533,9 +533,9 @@ Now, we can have all our templates extending it, like this:
 
 // examples/hello.t.php
 ```
-<template extends="layouts/app">
+<tpl extends="layouts/app">
     <div class="card">… {{ $var }}</div>
-</template>
+</tpl>
 ```
 
 ```
@@ -600,9 +600,9 @@ now, calling our component like this:
 
 // examples/hello.t.php
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 <!-- or like this -->
-<template is="components/filtered-list" sort="DESC" />
+<tpl is="components/filtered-list" sort="DESC" />
 ```
 
 ```
@@ -672,7 +672,7 @@ $viewFactory->render('form', []);
 Let it be our last sorted list:
 
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 ```
 add event
 ```
@@ -684,7 +684,7 @@ and the call:
 
 // examples/hello.t.php
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 ```
 
 ```

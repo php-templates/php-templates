@@ -19,7 +19,7 @@ $false = false;
 -----
 
 <div class="x" p-foreach="$array as $a">
-    <template is="comp/simple"></template>
+    <tpl is="comp/simple"></tpl>
 </div>
 =====
 <div class="x">
@@ -36,7 +36,7 @@ $false = false;
 -----
 
 <div class="x">
-    <template is="comp/simple" p-foreach="$array as $a"></template>
+    <tpl is="comp/simple" p-foreach="$array as $a"></tpl>
 </div>
 =====
 <div class="x">
@@ -50,9 +50,9 @@ $false = false;
 
 -----
 
-<template is="comp/simple" p-foreach="$array as $a">
+<tpl is="comp/simple" p-foreach="$array as $a">
     comp/simple
-</template>
+</tpl>
 =====
 <div class="comp/simple">
     comp/simple
@@ -64,7 +64,7 @@ $false = false;
 -----
 
 <!-- composed component, lvl1 -->
-<template is="comp/c"></template>
+<tpl is="comp/c"></tpl>
 =====
 <div class="comp/simple">
     comp/simple
@@ -103,13 +103,13 @@ $false = false;
 
 -----
 
-<template is="comp/csf">x2</template>
+<tpl is="comp/csf">x2</tpl>
 =====
 <div class="comp_slot">x2x2</div>
 
 -----
 
-<template is="comp/csf"><p>1</p></template>
+<tpl is="comp/csf"><p>1</p></tpl>
 =====
 <div class="comp_slot"><p>1</p><p>1</p></div>
 
@@ -123,7 +123,7 @@ $false = false;
 
 -----
 
-<template is="comp/simple" p-if="$false"></template>
+<tpl is="comp/simple" p-if="$false"></tpl>
 <elseif p-elseif="$true"></elseif>
 =====
 <elseif></elseif>

@@ -1,6 +1,6 @@
 <!-- pass data to extended template -->
 @php $bind_me = 'bound'; @endphp
-<template is="extends/b" :bind_me="$bind_me"></template>
+<tpl is="extends/b" :bind_me="$bind_me"></tpl>
 =====
 <parent2>
     bound

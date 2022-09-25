@@ -1,6 +1,6 @@
 <div>
     <slot name="slot2">
-        <template is="comp/comp_slot" p-foreach="[1,2] as $a"></template>
+        <tpl is="comp/comp_slot" p-foreach="[1,2] as $a"></tpl>
     </slot>
 </div>
 =====

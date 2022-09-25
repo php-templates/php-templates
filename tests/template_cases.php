@@ -23,7 +23,7 @@ $eventHolder = new EventHolder();
 $viewFactory = new ViewFactory(__DIR__.'/results', $cfg, $eventHolder);
 //$cfgHolder = $viewFactory->getConfig();
 
-$cfg->addAlias([
+$cfg->setAlias([
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
     'x-card' => 'components/card',
@@ -31,8 +31,8 @@ $cfg->addAlias([
 ]);
 
 $cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
-$cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
-$cfg->addDirective('mydirective', function($node, $val) {
+$cfg->setAlias('x-form-group', 'components/form-group', 'cases2');
+$cfg->setDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
 });
 

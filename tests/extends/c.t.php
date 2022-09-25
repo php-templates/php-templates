@@ -1,3 +1,3 @@
-<template is="extends/parent3" :bind_me="$bind_me">
+<tpl is="extends/parent3" :bind_me="$bind_me">
     <b></b>
-</template>
+</tpl>

@@ -50,7 +50,7 @@ You can reuse parts of design by making them components. Just put the html code 
 
 Now we can use our component like this:
 ```markdown
-<template is="components/form-group" type="text" name="will_be_passed_as_string" $value="$any_valid_php = ['even_array_declaration']" required="required" />
+<tpl is="components/form-group" type="text" name="will_be_passed_as_string" $value="$any_valid_php = ['even_array_declaration']" required="required" />
 ```
 Every component will be mapped on a global object and will be reused in case of second call with the given node attributes as parameters.
 Each attribute will be included in one associative array which will be extracted() in component function scope to be available there.
@@ -106,9 +106,9 @@ Lets have an example:
 ```
 Considering that our form groups are indexed as name => 1, email="2", you can pass a new form group/element at any position as block direct childnode:
 ```markdown
-<template is="our_form">
+<tpl is="our_form">
     <form-group type="number" label="age" value="" _index="{0(-default),1.5(-middle),3(-last)}"></form-group>
-</template>
+</tpl>
 ```
 
 ## Extends
@@ -117,10 +117,10 @@ If you find yourself in a situation where a layout is too repetitive, and only t
 <html>
     <head>...</head>
     <body>
-        <template_header/>
-        <template_column_left/>
+        <tpl_header/>
+        <tpl_column_left/>
         <slot></slot>
-        <template_footer/>
+        <tpl_footer/>
     </body>
 </html>
 ```

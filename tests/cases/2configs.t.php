@@ -1,4 +1,4 @@
-<template is="cases2:cfg2-1"></template>
+<tpl is="cases2:cfg2-1"></tpl>
 <x-form-group type="text" label="x" @value="'y'"></x-form-group>
 =====
 <div mydirective="2">

@@ -50,7 +50,7 @@ class Config
         return $cfg;
     }
 
-    public function addDirective(string $key, \Closure $callable): void
+    public function setDirective(string $key, \Closure $callable): void
     {
         $reserved = ['raw', 'bind'];
         if (in_array($key, $reserved)) {
@@ -60,7 +60,7 @@ class Config
         $this->directives[$key] = $callable;
     }
     
-    public function addAlias($key, string $component = ''): void
+    public function setAlias($key, string $component = ''): void
     {
         if (!is_array($key)) {
             $aliased = [$key => $component];
@@ -166,30 +166,30 @@ class Config
         $controlStructures = ['if', 'elseif', 'else', 'for', 'foreach'];
         
         foreach ($controlStructures as $statement) {
-            $cfg->addDirective($statement, function(DomNode $node, string $args) use ($statement) {
+            $cfg->setDirective($statement, function(DomNode $node, string $args) use ($statement) {
                 $phpnode = new PhpNode($statement, $args);
                 $node->parentNode->insertBefore($phpnode, $node);
                 $phpnode->appendChild($node->detach());
             });
         }
         
-        //$cfg->addDirective('raw', function(DomNode $node, string $val) {
+        //$cfg->setDirective('raw', function(DomNode $node, string $val) {
         //    $node->addAttribute(new PhpNodeValAttr('', $val));
         //});
         
-        //$cfg->addDirective('bind', function(DomNode $node, string $val) {
+        //$cfg->setDirective('bind', function(DomNode $node, string $val) {
         //    $node->addAttribute(new DomNodeAttt('p-bind', $val));
         //});
         
-        $cfg->addDirective('checked', function(DomNode $node, string $val) {
+        $cfg->setDirective('checked', function(DomNode $node, string $val) {
             $node->addAttribute('p-raw', $val . ' ? "checked" : ""');
         });
         
-        $cfg->addDirective('selected', function(DomNode $node, string $val) {
+        $cfg->setDirective('selected', function(DomNode $node, string $val) {
             $node->addAttribute('p-raw', $val . ' ? "selected=\"selected\"" : ""');
         });
         
-        $cfg->addDirective('disabled', function(DomNode $node, string $val) {
+        $cfg->setDirective('disabled', function(DomNode $node, string $val) {
             $node->addAttribute('p-raw', $val . ' ? "disabled" : ""');
         });
     }

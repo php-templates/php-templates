@@ -8,7 +8,7 @@ $false = 0;
 
 <!-- bindings in component -->
 yoy
-<template is="props/b" :true="$true" @false="'$false'" @foo="'$foo'"></template>
+<tpl is="props/b" :true="$true" @false="'$false'" @foo="'$foo'"></tpl>
 =====
 yoy
 <b true="1"><bind false="$false" foo="$foo"></bind></b>
@@ -22,18 +22,18 @@ yoy
 -----
 
 <!-- component with extra props -->
-<template is="props/a" foo="$foo" :bar="$bar" :true="$true"></template>
+<tpl is="props/a" foo="$foo" :bar="$bar" :true="$true"></tpl>
 =====
 <a true="1"></a>
 
 -----
 
 <!-- bind from slot to surface -->
-<template is="props/c" p-scope="$s">
-    <template>
+<tpl is="props/c" p-scope="$s">
+    <tpl>
         <div p-foreach="$s->val as $v">{{ $s->name.$v }}</div>
-    </template>
-</template>
+    </tpl>
+</tpl>
 =====
 <c>
     <div>myname1</div>

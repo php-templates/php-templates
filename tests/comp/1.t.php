@@ -1,2 +1,2 @@
 <div>{{ $var }}</div>
-<template is="comp/2"></template>
+<tpl is="comp/2"></tpl>

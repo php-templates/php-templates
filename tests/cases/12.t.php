@@ -5,7 +5,7 @@ $true = true;
 $false = false;
 @endphp
 
-<template is="comp/simple" p-if="$true"></template>
+<tpl is="comp/simple" p-if="$true"></tpl>
 <elseif p-elseif="$true"></elseif>
 =====
 <div class="comp/simple">

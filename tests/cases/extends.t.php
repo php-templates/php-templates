@@ -1,5 +1,5 @@
 <!-- multi-extends -->
-<template is="extends/c" :bind_me="'bound'"></template>
+<tpl is="extends/c" :bind_me="'bound'"></tpl>
 =====
 <parent4>
     parent4
@@ -13,9 +13,9 @@
 
 -----
 @php $bind_me = 'bound'; @endphp
-<template extends="extends/parent2">
+<tpl extends="extends/parent2">
     <div>123</div>
-</template>
+</tpl>
 =====
 <parent2>
     bound

@@ -29,7 +29,7 @@ class TemplateEntity extends AbstractEntity
             return false;
         }
         
-        if ($node->nodeName == 'template' && $node->hasAttribute('is')) {
+        if ($node->nodeName == 'tpl' && $node->hasAttribute('is')) {
             return true;
         } 
         

@@ -73,11 +73,6 @@ class SlotEntity extends AbstractEntity
         $wrapper = new DomNode('#slot');
         $this->node->parentNode->insertBefore($wrapper, $this->node);
         $wrapper->appendChild($this->node->detach());
-
-        //$data = $this->depleteNode($this->node);
-        //$data = $this->fillNode(null, $data);
-        //$dataString = Helper::arrayToEval($data);
-        //$wrapper->setAttribute('slot', $this->attrs['slot']);
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
 
         $this->factory->make($wrapper, $this->context)->parse();

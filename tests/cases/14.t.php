@@ -1,5 +1,5 @@
 <!-- slot default csdf -->
-<template is="comp/csdf"></template>
+<tpl is="comp/csdf"></tpl>
 =====
 <div class="comp_slot_default">
     <span>

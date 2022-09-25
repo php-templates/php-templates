@@ -1,5 +1,5 @@
 <!-- empty slot -->
-<template is="comp/comp_slot"></template>
+<tpl is="comp/comp_slot"></tpl>
 =====
 <div class="comp_slot">
     <span></span>
@@ -8,7 +8,7 @@
 -----
 
 <!-- slot default -->
-<template is="comp/comp_slot_default"></template>
+<tpl is="comp/comp_slot_default"></tpl>
 =====
 <div class="comp_slot_default">
     <span><p>compslotdefault</p></span>
@@ -34,7 +34,7 @@
 
 -----
 
-<template is="comp/slot_default_in_slot_default"></template>
+<tpl is="comp/slot_default_in_slot_default"></tpl>
 =====
 <div class="sdefsdef">
     <span></span>
@@ -52,14 +52,14 @@
 
 -----
 
-<template is="comp/nested_slot">
+<tpl is="comp/nested_slot">
     <span class="x" slot="sn"></span>
     <span class="y" slot="sn1"></span>
     <p slot="sn3">3</p>
-    <template is="comp/simple" slot="sn5"></template>
+    <tpl is="comp/simple" slot="sn5"></tpl>
     <span slot="sn8">8</span>
     <p slot="sn9">9</p>
-</template>
+</tpl>
 =====
 <div class="sdefsdef">
     <span><span class="x"></span></span>

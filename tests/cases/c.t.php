@@ -1,4 +1,4 @@
-<template is="extends/a"></template>
+<tpl is="extends/a"></tpl>
 =====
 <parent>
     <div>123</div>

@@ -7,5 +7,5 @@
 </div>
 
 <div class="sdefsdef">
-    <slot name="sn3"><span><slot name="sn4"><template is="comp/simple"></template></slot></span></slot>
+    <slot name="sn3"><span><slot name="sn4"><tpl is="comp/simple"></tpl></slot></span></slot>
 </div>

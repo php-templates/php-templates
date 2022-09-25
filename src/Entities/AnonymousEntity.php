@@ -18,7 +18,7 @@ class AnonymousEntity extends AbstractEntity
 
     public static function test(DomNode $node, EntityInterface $context)
     {
-        return $node->nodeName == 'template';
+        return $node->nodeName == 'tpl';
     }
 
     public function simpleNodeContext()

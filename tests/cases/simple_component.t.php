@@ -1,4 +1,4 @@
-<template is="comp/simple"></template>
+<tpl is="comp/simple"></tpl>
 =====
 <div class="comp/simple">
     comp/simple

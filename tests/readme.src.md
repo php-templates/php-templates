@@ -129,7 +129,7 @@ $tpl->shareData($data);
 ```
 ### Composing data for specific components
 ```
-<template is="file-name" foo="123">
+<tpl is="file-name" foo="123">
 
 $tpl->dataComposer('file-name', function($data) {
     // $data is an array containing attributes passed to the file-name invocation tag, in our case ['foo' => 123]
@@ -157,17 +157,17 @@ will produce:
 As you can see, control structures can be combined in many ways, even multiple `foreach` on same node. There is no operator precedence, but order of attributes matters, especially when one loop deppends of variables set by the parent loop.
 
 ## Custom directives
-You may create your own parse rules using `Config::addDirective()`. Directives are functions which returns arrays of `attr -> value` which will be attached to Node before parsing it.
+You may create your own parse rules using `Config::setDirective()`. Directives are functions which returns arrays of `attr -> value` which will be attached to Node before parsing it.
 ```
 $cfg = $tpl->getConfig();
-$cfg->addDirective('checked', function($eval) {
+$cfg->setDirective('checked', function($eval) {
     return [
         'p-raw' => $eval.' ? "checked" : ""' // like <node p-raw="$eval ? 'checked' : ''" />
     ];
     // p-raw is a built in directive which says: print me only value (HTMLT5 attrs like)
 });
 // OR
-$cfg->addDirective('auth', function() {
+$cfg->setDirective('auth', function() {
     return [
         'p-if' => $isAuthCheck // like <node p-if="$isAuthCheck" />
     ];
@@ -195,7 +195,7 @@ You can reuse parts of design by making them components. Just put the html code 
 
 Now we can use our component like this:
 ```
-<template is="components/form-group" type="text" name="string" :value="$value = 'any php expression'" @required="'required'" />
+<tpl is="components/form-group" type="text" name="string" :value="$value = 'any php expression'" @required="'required'" />
 ```
 Every component will be mapped on current rendering process and will be reused in case of second call with the given node attributes as parameters.
 
@@ -207,7 +207,7 @@ You can also have control structures on components nodes.
 If you have an extensivelly used component, you can alias it by calling `Config::set('aliased', $what)`
 ```
 $cfg = $tpl->getConfig();
-$cfg->addAlias('form-group', 'components/form-group'); // array with key value supported too
+$cfg->setAlias('form-group', 'components/form-group'); // array with key value supported too
 
 // Now we can reffer to our component by this:
 <form-group type="text" value="123"/>
@@ -256,19 +256,19 @@ Lets have an example:
 Considering that our form groups are indexed as name => 1, email="2", you can pass a new form group/element at any position as block direct childnode:
 ```
 // as first element
-<template is="our_form">
+<tpl is="our_form">
     <form-group type="number" label="age" value="" _index="0"></form-group>
-</template>
+</tpl>
 
 // between 
-<template is="our_form">
+<tpl is="our_form">
     <form-group type="number" label="age" value="" _index="1.5"></form-group>
-</template>
+</tpl>
 
 // as last element
-<template is="our_form">
+<tpl is="our_form">
     <form-group type="number" label="age" value="" _index="3"></form-group>
-</template>
+</tpl>
 ```
 
 ## Extends
@@ -278,18 +278,18 @@ If you find yourself in a situation where a layout is too repetitive, and only t
 <html>
     <head>...</head>
     <body>
-        <template_header/>
-        <template_column_left/>
+        <tpl_header/>
+        <tpl_column_left/>
         <slot></slot>
-        <template_footer/>
+        <tpl_footer/>
     </body>
 </html>
 ```
 Products, categories and many other pages will use the same structure. This can be simplified by declaring an html node wrapper representing extended template:
 ```
-<template is="layout/app">
+<tpl is="layout/app">
    specific html content of product page 
-</template>
+</tpl>
 ```
 Now we just need to call 
 ```

@@ -1,3 +1,3 @@
 <div p-mydirective>
-    <template is="cfg2-2"></template>
+    <tpl is="cfg2-2"></tpl>
 </div>

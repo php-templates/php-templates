@@ -51,7 +51,7 @@ class DomNode
                 if (is_array($val)) {
                     $val = var_export($val, true);
                 }
-                $this->setAttribute($k, $val);
+                $this->addAttribute($k, $val);
             }
         } else {
             $this->nodeValue = $nodeValue;

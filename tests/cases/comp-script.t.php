@@ -3,7 +3,7 @@
         
     </head>
     <body>
-        <template is="comp/comp-script"></template>
+        <tpl is="comp/comp-script"></tpl>
     </body>
 </html>
 =====

@@ -1,4 +1,4 @@
-<template is="comp/simple"></template>
+<tpl is="comp/simple"></tpl>
 =====
 <div class="comp/simple">
     comp/simple
@@ -7,7 +7,7 @@
 -----
 
 <!-- composed component, lvl1 -->
-<template is="comp/composed"></template>
+<tpl is="comp/composed"></tpl>
 =====
 <div class="comp/simple">
     comp/simple

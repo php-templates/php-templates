@@ -18,7 +18,6 @@ check all abstract fn of interface -> test case foreach of them
 un mecanism care sa faca teste doar mixed automated
 
 astea la un pc:
-set = may replace, add = push
 template tag e pagubos, foloseste <tpl is="" p-for="">
 
 iscompletenode or str end

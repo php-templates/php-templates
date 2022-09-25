@@ -1,10 +1,10 @@
 <!-- bind from slot to surface -->
 
-<template is="props/c" p-scope="$s">
-    <template>
+<tpl is="props/c" p-scope="$s">
+    <tpl>
         <div p-foreach="$s->val as $v">{{ $s->name.$v }}</div>
-    </template>
-</template>
+    </tpl>
+</tpl>
 =====
 <c>
     <div>myname1</div>

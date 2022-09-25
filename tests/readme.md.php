@@ -15,7 +15,7 @@ $cfg = new Config('default', __DIR__);
 $eventHolder = new EventHolder();
 $viewFactory = new ViewFactory( __DIR__.'/results' , $cfg, $eventHolder);
 
-$cfg->addAlias([
+$cfg->setAlias([
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
     'x-data-table' => 'components/data-table',
@@ -25,17 +25,17 @@ $cfg->addAlias([
 ]);
 
 $cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
-$cfg->addAlias('x-form-group', 'components/form-group', 'cases2');
-$cfg->addDirective('mydirective', function($node, $val) {
+$cfg->setAlias('x-form-group', 'components/form-group', 'cases2');
+$cfg->setDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
 });
-$cfg->addDirective('guest', function($node, $val) {
-    $node->setAttribute('p-if', 'empty($user)');
+$cfg->setDirective('guest', function($node, $val) {
+    $node->addAttribute('p-if', 'empty($user)');
 });
-$cfg->addDirective('auth', function($node, $val) {
-    $node->setAttribute('p-if', '!empty($user)');
+$cfg->setDirective('auth', function($node, $val) {
+    $node->addAttribute('p-if', '!empty($user)');
 });
-$cfg->addDirective('active', function($node, $val) {
+$cfg->setDirective('active', function($node, $val) {
     $node->addAttribute(':class', "$val ? 'active' : ''");
 });
 
@@ -253,13 +253,13 @@ Using this directive on a component node will take no effect.
 Directives are dispatched before any node attribute be parsed. So, basically, they are populating the DomNode with attributes which become parsed. You can declare your own custom directives like this:
 
 ```
-$cfg->addDirective('guest', function($node, $val) {
-    $node->setAttribute('p-if', 'empty($user)');
+$cfg->setDirective('guest', function($node, $val) {
+    $node->addAttribute('p-if', 'empty($user)');
 });
-$cfg->addDirective('auth', function($node, $val) {
-    $node->setAttribute('p-if', '!empty($user)');
+$cfg->setDirective('auth', function($node, $val) {
+    $node->addAttribute('p-if', '!empty($user)');
 });
-$cfg->addDirective('active', function($node, $val) {
+$cfg->setDirective('active', function($node, $val) {
     $node->addAttribute(':class', "$val ? 'active' : ''");
 });
 ```
@@ -305,7 +305,7 @@ You can reuse parts of design by making them components. Just put the html code 
 and use it like this:
 <?php tstart(); ?>
 ```
-    <template is="components/form-group" type="text" :label="$label" @value="$value" />
+    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
 <?php tresult(
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
@@ -318,14 +318,14 @@ You can also have control structures on components nodes.
 #### Components aliasing
 You can alias components into custom tags like this:
 ```
-$cfg->addAlias([
+$cfg->setAlias([
     'x-form-group' => 'components/form-group',
 ]);
 ```
 Now, we can use our component:
 ```
     instead of this
-    <template is="components/form-group" type="text" :label="$label" @value="$value" />
+    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
     like this
     <x-form-group type="text" :label="$label" @value="$value" />
 ```
@@ -430,9 +430,9 @@ Consider we have a main layout:
 Now, we can have all our templates extending it, like this:
 <?php tstart(); ?>
 ```
-<template extends="layouts/app">
+<tpl extends="layouts/app">
     <div class="card">… {{ $var }}</div>
-</template>
+</tpl>
 ```
 <?php tresult('examples/hello', "['var' => 'I am shared with my parent']"); ?>
 As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
@@ -488,9 +488,9 @@ then we register a composer:
 now, calling our component like this:
 <?php tstart(); ?>
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 <!-- or like this -->
-<template is="components/filtered-list" sort="DESC" />
+<tpl is="components/filtered-list" sort="DESC" />
 ```
 <?php tresult('examples/hello'); ?>
 
@@ -532,7 +532,7 @@ Because of cache system, parsing events are impossible to be tracked for changes
 Let it be our last sorted list:
 
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 ```
 add event
 ```
@@ -545,7 +545,7 @@ $viewFactory->on('rendering', 'components/filtered-list', function($context) {
 and the call:
 <?php tstart(); ?>
 ```
-<template is="components/filtered-list" sort="ASC" />
+<tpl is="components/filtered-list" sort="ASC" />
 ```
 <?php tresult('examples/hello'); ?>
 pretty usefull if you want to add data on fly
