@@ -26,7 +26,7 @@ class SimpleNodeEntity extends AbstractEntity
     }
 
     public function simpleNodeContext()
-    {//dd($this->node->debug());
+    {
         // TODO: comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
@@ -34,7 +34,6 @@ class SimpleNodeEntity extends AbstractEntity
         }
 
         $this->node->addAttribute($data);
-        //$this->fillNode($this->node, $data);
     }
     
     public function extendContext() {
@@ -52,8 +51,6 @@ class SimpleNodeEntity extends AbstractEntity
 
         $data = $this->depleteNode($this->node);
         $this->node->addAttribute($data);
-        //$this->fillNode($this->node, $data);
-        //$name = $this->context->name .'?slot='.$this->attrs['slot'].'&id='.Helper::uniqid();
 
         foreach ($this->node->childNodes as $cn) {
             $this->factory->make($cn, $this)->parse();
@@ -73,12 +70,6 @@ class SimpleNodeEntity extends AbstractEntity
     public function slotContext()
     {
         $this->simpleNodeContext();
-        return;
-        $data = $this->depleteNode($this->node);
-        foreach ($this->node->childNodes as $slot) {
-            $this->parser->parseNode($slot, $this->config, $this);
-        }
-        $this->fillNode($this->node, $data);
     }
     
     public function startupContext() {
@@ -88,7 +79,9 @@ class SimpleNodeEntity extends AbstractEntity
         $fnSrc = $this->buildTemplateFunction($this->node);
 
         $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
+        /** @var StartupEntity */
+        $context = $this->context;
 
-        $this->cache->set($this->context->getName(), $fn, new Source($fnSrc, ''));
+        $this->cache->set($context->getName(), $fn, new Source($fnSrc, ''));
     }
 }

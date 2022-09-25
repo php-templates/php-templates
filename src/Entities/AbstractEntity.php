@@ -95,103 +95,32 @@ abstract class AbstractEntity implements EntityInterface
     {
         $attributePack = new AttributePack();
         // dispatch any existing directive
-    while ($node->attributes->count()) {
+        while ($node->attributes->count()) {
             $attrs = $node->attributes;
             $node->removeAttributes();
-        
-        foreach ($attrs as $a) {
-            $k = $a->nodeName;
-            if (array_key_exists($k, $this->attrs)) {
-                $this->attrs[$k] = $a->nodeValue;
-                continue;
-            }
-            
-            if (strpos($k, $this->pf) === 0) 
-            {
-                // check if is a directive and unpack its result as attributes
-                // todo don t allow directive with cstruct name
-                if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
-                    //dd($directive);
-                    $directive($node, $a->nodeValue);
-                    /*if (empty($result)) {// todo throw error if no directive
-                        throw new InvalidNodeException('Directive should return an associative array with node => value parsable by PhpTemplates', $node);
-                    }*/
-                    // directive unpacked his data, next attr!!!
+
+            foreach ($attrs as $a) {
+                $k = $a->nodeName;
+                if (array_key_exists($k, $this->attrs)) {
+                    $this->attrs[$k] = $a->nodeValue;
                     continue;
                 }
+
+                if (strpos($k, $this->pf) === 0) {
+                    // check if is a directive and unpack its result as attributes
+                    // todo don t allow directive with cstruct name
+                    if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
+                        $directive($node, $a->nodeValue);
+ 
+                        // directive unpacked his data, next attr!!!
+                        continue;
+                    }
+                }
+
+                $attributePack->add($a);
             }
-            
-            $attributePack->add($a);
-        }
         }
         return $attributePack;
-        // remove all node attrs
-// todo remove below code
-        
-        // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
-        $c_structs = [];
-        $data = [];
-        $binds = [];
-        $attrs = [];
-        foreach ($extracted_attributes as $a) {
-            $k = $a->nodeName;
-            if (!$k) {
-                $data[] = $a;
-            }
-            // reserved attrs, like slot, is
-            elseif (array_key_exists($k, $this->attrs)) {
-                $this->attrs[$k] = $a->nodeValue;
-            } 
-            elseif (in_array(substr($k, strlen($this->pf)), Config::allowedControlStructures)) {
-                $a->nodeName = substr($k, strlen($this->pf));
-                $c_structs[] = $a;
-            }
-            elseif ($k[0] == ':') {
-                $binds[substr($k, 1)] = new PhpNodeValAttr($k, $a->nodeValue);
-            }
-            elseif ($k[0] == '@' && strpos($k, '@php') !== 0) {
-                $attrs[$k] = new PhpNodeValAttr($k, $a->nodeValue);
-            }
-            else {
-                $data[$k] = $a;
-            }
-        }
-
-        // aggregate attributes in bind form with attrs in static form, like :class and class under :class key
-        foreach ($data as $bk => $a) {
-            //$bk = ':' . $k;
-            $bind = isset($binds[$bk]) ? $binds[$bk] : null;
-            if ($bind) {
-                $bind->merge($a);
-            } else {
-                $binds[$bk] = $a;
-            }
-        }
-
-        // now consider the control structures like p-if, p-for, etc
-        $cstruct = null;
-        $condNode = null;
-        foreach ($c_structs as $struct) {
-            list($statement, $args) = [$struct->nodeName, $struct->nodeValue];
-            $phpnode = new PhpNode($statement, $args);
-            if ($cstruct) {
-                $cstruct->appendChild($phpnode);
-            } else {
-                $condNode = $phpnode;
-            }
-            $cstruct = $phpnode;
-        }
-        if ($condNode) {
-            $node->parentNode->insertBefore($condNode, $node);
-            $cstruct->appendChild($node->detach());
-            $node = $condNode;
-        }
-        
-        if ($attrs) {
-            $binds['_attrs'] = $attrs;
-        }
-        
-        return $binds;
     }
 
     /**
