@@ -9,16 +9,10 @@ provider
 https://github.com/ytake/Laravel.Smarty/blob/main/src/SmartyServiceProvider.php
 remove view from integration
 
-on error
-$e->setSourceContext($source);
-
 solve all todos
 check all abstract fn of interface -> test case foreach of them
 
 un mecanism care sa faca teste doar mixed automated
-
-astea la un pc:
-template tag e pagubos, foloseste <tpl is="" p-for="">
 
 iscompletenode or str end
 throw parse error, line unexpected " or ' or
