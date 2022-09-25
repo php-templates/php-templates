@@ -1,48 +1,35 @@
 
-throw error daca o directiva nu exista
-phpt laravelserviceprovider
-
-solve all todos
-
-init like this:
-Config $cfg (alias, src)
-ConfigHolder $cfgh ($defaultcfg, destpath)
-$cfgh->add()  cfg may access ownerConfigholder
-new Document(name, new DependenciesMap(path))
-new ViewFactory(document, new viewParser(document, cfgh, eventholder))
-
 larafacades
 Template::addConfig()
 Template::on()
 Template::getConfig()->directive()
 Template::directive()
 
+provider
+https://github.com/ytake/Laravel.Smarty/blob/main/src/SmartyServiceProvider.php
+remove view from integration
+
 on error
 $e->setSourceContext($source);
 
-domnodeattribute implements domnoneattrinterface
-playground bootstrap
-check all abstract fn of interface
+solve all todos
+check all abstract fn of interface -> test case foreach of them
 
 un mecanism care sa faca teste doar mixed automated
-
-domnodeattribute single instance care primeste intr un foreach wrappere de nodeattr la fel, cu test, dar dupa ce executat dorectivele
-
-config subconfig, parent e default
-
-provider
-https://github.com/ytake/Laravel.Smarty/blob/main/src/SmartyServiceProvider.php
 
 throw error if not closing @php @endphp
 throw error on reserved directives override
 
-better node parser
 iscompletenode or str end
 throw parse error, line unexpected " or ' or
-error on @atrr p nod normal
 missinf clos tag nu arata file
-indent nu merge ok
 discard any raw on conmpnent -> documentation
 checkdependencies on raw parse?? '' => false
-phpt should not indent
-indent va prezerva doar daca exista new lines 
+
+todo: v.1.1
+butter node parser using preg offset
+config throw error if directive not exists
+configure parser to auto close tags without throwing errors
+indent nu merge ok la func, php etc
+loopstart si loopend vor fi un closure: poate se poate
+domnodeattribute implements domnoneattrinterface
