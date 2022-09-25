@@ -85,10 +85,7 @@ class FileSystemCache implements CacheInterface
         foreach ($this->source as $name => $fn) {
             $tpl .= PHP_EOL."\$cache->set('$name', new Closure($fn));";
         }
-d($tpl);    
-$format = new FormatHtml();
-$tpl = $format->fix($tpl, true, 2);
-dd($tpl);     
+
         file_put_contents($path, $tpl);
         $this->load($key);
     }

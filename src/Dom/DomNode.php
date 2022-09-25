@@ -38,6 +38,8 @@ class DomNode
     public $shortClose = false;
     public $lineNumber = 0;
     public $srcFile;
+    public $indentStart = true;
+    public $indentEnd = true;
     
     public function __construct(string $nodeName, $nodeValue = '')
     {
@@ -237,8 +239,7 @@ class DomNode
     {
         // NODE START
         // don t indent texts
-        $indentNL = $this->shouldIndent() ? $this->getIndent() : '';
-        $return = '';// $indentNL;
+        $return = $this->indentStart ? $this->getIndent() : '';
         if ($this->nodeName[0] != '#' && $this->nodeName) {
             $attrs = implode(' ', $this->attrs);
             $attrs = $attrs ? ' '.$attrs : '';
@@ -260,16 +261,14 @@ class DomNode
         
         // NODE END
         if (!$this->shortClose && $this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
-            if (!$this->childNodes) {
-                $indentNL = '';
-            }
+            $return .= $this->indentEnd ? $this->getIndent() : '';
             $return .= "</{$this->nodeName}>";
         }
         
         return $return;
     }
     
-    private function shouldIndent() 
+    private function shouldIxjdjndent() 
     {
         if ($this->nodeName == '#text' && trim($this->nodeValue)) {
             return false;
@@ -295,7 +294,9 @@ class DomNode
         $c = $this;
         while ($c->parentNode) {
             $c = $c->parentNode;
-            $level++;
+            if ($c->nodeName && $c->nodeName[0] != '#') {
+                $level++;
+            }
         }
         $level--;
         if ($level <= 0) {

@@ -61,7 +61,7 @@ class Parser
     }
 
     public function parse(Source $source)
-    {
+    {//d(''.$source);
         $this->noises = [];
         $this->currentLineRange = [$source->getStartLine(), $source->getStartLine()];
         $this->srcFile = $source->getFile();
@@ -101,6 +101,7 @@ class Parser
         $hierarchyQueue[] = $inBuildNode;
         $x = $inBuildNode;
         // iterate over each array chunk and build the virtual dom
+        $prev = '';
         foreach ($chunks as $str) {
             // save node line position for debugging
             $this->currentLineRange[0] = $this->currentLineRange[1];
@@ -110,15 +111,18 @@ class Parser
                 $this->currentLineRange[1] += array_sum($m[1]);
             }
             
+            // end node
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
                 if (end($hierarchyQueue)->nodeName != $m[1]) {
                     throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
                 }
                 $node = array_pop($hierarchyQueue);
+                $node->indentEnd = !trim($prev) && strpos($prev, "\n") !== false;
                 if ($node === $inBuildNode) {
                     $inBuildNode = end($hierarchyQueue);
                 }
             }
+            // start node
             elseif (preg_match('/^<(\w+[-_\w]*)/', $str, $m)) {
                 $node = new DomNode($m[1]);
                 $attrs = $this->getTagAttributes($str);
@@ -127,6 +131,7 @@ class Parser
                 }
                 $node->srcFile = $this->srcFile;
                 $node->lineNumber = $this->currentLineRange[0];
+                $node->indentStart = !trim($prev) && strpos($prev, "\n") !== false;
                 $inBuildNode->appendChild($node);
                 // if is not self closing tag, or short closing tag, don t push to hierarchy queue
                 //d('appending to queue', $node);
@@ -139,11 +144,14 @@ class Parser
                     $node->shortClose = true;
                 }
             } 
+            // text node
             elseif ($this->keepEmptyTextNodes || trim($str)) {
                 $str = str_replace(array_keys($this->noises), $this->noises, $str);
                 $node = new DomNode('#text', $str);
                 $inBuildNode->appendChild($node);
             }
+            
+            $prev = $str;
         }
         
         if (count($hierarchyQueue) > 1) {
