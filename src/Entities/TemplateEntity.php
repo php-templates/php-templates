@@ -95,7 +95,7 @@ class TemplateEntity extends AbstractEntity
     public function resolve(CacheInterface $cache, EventHolder $eventHolder)
     {
         $config = $this->context->getConfig();
-        if ($this->node->nodeName == 'template' && $this->node->hasAttribute('is')) {
+        if ($this->node->nodeName == 'tpl' && $this->node->hasAttribute('is')) {
             $rfilepath = $this->node->getAttribute('is');
         } 
         else {

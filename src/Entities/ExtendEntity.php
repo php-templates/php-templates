@@ -18,7 +18,7 @@ class ExtendEntity extends TemplateEntity
     
     public static function test(DomNode $node, EntityInterface $context)
     {
-        return $node->nodeName == 'template' && $node->hasAttribute('extends');
+        return $node->nodeName == 'tpl' && $node->hasAttribute('extends');
     }
 
     public function simpleNodeContext() 

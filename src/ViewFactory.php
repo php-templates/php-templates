@@ -97,7 +97,7 @@ class ViewFactory
                 // parse it
                 //$name = $document->getInputFile();
                 $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
-                $entity = $factory->make(new DomNode('template', ['is' => $rfilepath]), new StartupEntity($this->config));
+                $entity = $factory->make(new DomNode('tpl', ['is' => $rfilepath]), new StartupEntity($this->config));
                 $entity->parse();
                 
                 $this->cache->write($rfilepath);
