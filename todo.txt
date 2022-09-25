@@ -17,17 +17,17 @@ check all abstract fn of interface -> test case foreach of them
 
 un mecanism care sa faca teste doar mixed automated
 
-throw error if not closing @php @endphp
-throw error on reserved directives override
+astea la un pc:
+set = may replace, add = push
+template tag e pagubos, foloseste <tpl is="" p-for="">
 
 iscompletenode or str end
 throw parse error, line unexpected " or ' or
-missinf clos tag nu arata file
-discard any raw on conmpnent -> documentation
 checkdependencies on raw parse?? '' => false
 
 todo: v.1.1
 butter node parser using preg offset
+throw error if not closing @php @endphp
 config throw error if directive not exists
 configure parser to auto close tags without throwing errors
 indent nu merge ok la func, php etc

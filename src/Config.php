@@ -49,9 +49,14 @@ class Config
         
         return $cfg;
     }
-// set = may replace, add = push
+
     public function addDirective(string $key, \Closure $callable): void
-    {//$key == 'guest' && d('$$$$$');
+    {
+        $reserved = ['raw', 'bind'];
+        if (in_array($key, $reserved)) {
+            throw new \Exception("System directive '$key' cannot be overriden");
+        }
+        
         $this->directives[$key] = $callable;
     }
     

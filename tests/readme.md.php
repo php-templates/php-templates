@@ -204,6 +204,7 @@ Directives are parsing time commands and are usefull when you need to declare co
 'examples/hello',
 '["condition" => true]'); ?>
 Please note that is IMPORTANT to escape nested quotes using backslash.
+Using this directive on a component node will take no effect.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
 <?php tstart(); ?>
