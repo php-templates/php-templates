@@ -8,6 +8,7 @@ foreach entity as entity
  child each entity pe rand
  child each entity cumulativ
  child random sorted entities
+va fi un pool de entities si un increment care zice: ia-le pe rand, cand se depaseste count, ia cumulat cate sunt depasite, cand se depaseste de tot, ia random cate random din fiecare
 
 salveaza undeva fiecare nod creat
  pentru fiecare child de nod, adauga pe rand ca child combinatie incremental de fiecare item in lista
