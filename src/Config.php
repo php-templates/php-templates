@@ -52,7 +52,8 @@ class Config
 
     public function setDirective(string $key, \Closure $callable): void
     {
-        $reserved = ['raw', 'bind'];
+        $reserved = ['raw', 'bind', 'if', 'elseif', 'else', 'for', 'foreach'];
+        
         if (in_array($key, $reserved)) {
             throw new \Exception("System directive '$key' cannot be overriden");
         }
@@ -166,11 +167,19 @@ class Config
         $controlStructures = ['if', 'elseif', 'else', 'for', 'foreach'];
         
         foreach ($controlStructures as $statement) {
-            $cfg->setDirective($statement, function(DomNode $node, string $args) use ($statement) {
+            $this->directives[$statement] = function(DomNode $node, string $args) use ($statement) {
+                if (in_array($statement, ['elseif', 'else'])) {
+                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) {//dd($node->parentNode->debug());
+                        throw new InvalidNodeException("Unespected control structure '$statement'", $node);
+                    }
+                }
                 $phpnode = new PhpNode($statement, $args);
+                $phpnode->indentStart = $node->indentStart;
+                $phpnode->indentEnd = $node->indentEnd;
+   
                 $node->parentNode->insertBefore($phpnode, $node);
                 $phpnode->appendChild($node->detach());
-            });
+            };
         }
         
         //$cfg->setDirective('raw', function(DomNode $node, string $val) {

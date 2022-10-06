@@ -24,7 +24,7 @@ class PhpSlotAssignNode extends DomNode
         $indentNL = $this->getIndent();
         $return = $indentNL;
         
-        $return .= sprintf('<?php $this->comp["%s"]->addSlot("%s", function(array $data = []) use ($context) { ?>', 
+        $return .= sprintf('<?php $this->comp["%s"]->addSlot("%s", function(array $data = []) use ($context) { ?>' . PHP_EOL, 
             $this->targetComp,
             $this->slotPos
         );

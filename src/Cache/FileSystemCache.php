@@ -78,6 +78,7 @@ class FileSystemCache implements CacheInterface
         
         $dependencies = [];
         foreach ($this->store as $source) {
+            if ($source->getFile())
             $dependencies[$source->getFile()] = filemtime($source->getFile());
         }
         $tpl .= PHP_EOL.'if (!check_dependencies('.var_export($dependencies, true).')) { return false; }'.PHP_EOL;

@@ -14,6 +14,89 @@ use PhpTemplates\Document;
 use PhpTemplates\Process;
 use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNodeAttr;
+use PhpTemplates\Dom\DomNode;
+
+$x = [
+    '_template' => new DomNode('tpl', ['is' => 'comp/x']), 
+    '_simplenode' => new DomNode('simplenode'), 
+    '_anonymousentity' => new DomNode('tpl'), 
+    '_textnode' => new DomNode('#text', 'textnode {{ $val }}'), 
+    '_extends' => new DomNode('extends', ['template' => 'comp/x']), 
+    '_slot' => new DomNode('slot')
+];
+$x = [];
+foreach ($x as $y) {
+    $y->appendChild(new DomNode('#text', '{{ $val }}'));
+}
+
+foreach ($x as $file => $node) {
+    $result = [];
+    foreach ($x as $cnode) {
+        $node1 = clone $node;
+        $cnode = clone $cnode;
+        $node1->appendChild($cnode);
+        $result[] = $node1;
+    }
+    $i = 0;
+    $y = [];
+    while (count($z = array_values(array_slice($x, $i, 3))) === 3) {
+        $y[] = $z;
+        $i++;
+    }
+    foreach ($y as $cnodes) {
+        $node1 = clone $node;
+        $cnode = clone $cnodes[0];
+        $cnode->setAttribute('p-if', '1');
+        $cnode->setAttribute('p-foreach', '[1, 2] as $i');
+        $cnode->setAttribute(':class', '$i');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[1];
+        $cnode->setAttribute('p-elseif', '0');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[2];
+        $cnode->setAttribute('p-else');
+        $node1->appendChild($cnode);
+        $result[] = $node1;
+        
+        $node1 = clone $node;
+        $cnode = clone $cnodes[0];
+        $cnode->setAttribute('p-if', '0');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[1];
+        $cnode->setAttribute('p-elseif', '1');
+        $cnode->setAttribute('p-foreach', '[1, 2] as $i');
+        $cnode->setAttribute(':class', '$i');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[2];
+        $cnode->setAttribute('p-else');
+        $node1->appendChild($cnode);
+        $result[] = $node1;
+        
+        $node1 = clone $node;
+        $cnode = clone $cnodes[0];
+        $cnode->setAttribute('p-if', '0');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[1];
+        $cnode->setAttribute('p-elseif', '0');
+        $node1->appendChild($cnode);
+        $cnode = clone $cnodes[2];
+        $cnode->setAttribute('p-else');
+        $cnode->setAttribute('p-foreach', '[1, 2] as $i');
+        $cnode->setAttribute(':class', '$i');
+        $node1->appendChild($cnode);
+        $result[] = $node1;
+    }
+    
+    $result = array_map(function($el) {
+        $node = new DomNode('#root');
+        $node->appendChild(new DomNode('#text', "@php \$val = 'val'; @endphp"));
+        $node->appendChild($el);
+        return $node;
+    }, $result);
+    
+    file_put_contents(__DIR__.'/cases/' . $file .'.t.php', implode("\n\n-----\n", $result));
+}
+//die();
 
 //header("Content-Type: text/plain");
 

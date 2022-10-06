@@ -26,15 +26,16 @@ class SlotEntity extends AbstractEntity
 
     public function simpleNodeContext()
     {
-        $wrapper = new DomNode('#slot');
-        $this->node->parentNode->insertBefore($wrapper, $this->node);
-        $wrapper->appendChild($this->node->detach());
+        //$wrapper = new DomNode('#slot');
+        //$this->node->parentNode->insertBefore($wrapper, $this->node);
+        //$wrapper->appendChild($this->node->detach());
         
-        $data = $this->depleteNode($this->node);
+        $data = $this->depleteNode($this->node); // am pus structuri de if
         $dataString = $data->toArrayString();
+        //d($this->node->parentNode->parentNode->debug());
         //$dataString = Helper::arrayToEval($data);
 
-        $this->node->changeNode('#slot');
+        $this->node->changeNode('#slot'); // prevent rendering tag
         if ($this->hasSlotDefault) {
             $wrapperDefault = new DomNode('#slot');
             foreach ($this->node->childNodes as $cn) {
@@ -52,6 +53,7 @@ class SlotEntity extends AbstractEntity
         $r = '($slot)('.$dataString.')';
         $append->appendChild(new DomNode('#php', '<?php ' . $r . '; ?>'));
         $this->node->appendChild($append);
+        //d($this->node->parentNode->parentNode->debug());
         //$wrapper->dd();
     }
 

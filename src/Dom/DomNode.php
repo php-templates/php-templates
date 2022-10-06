@@ -57,6 +57,9 @@ class DomNode
             $this->nodeValue = $nodeValue;
         }
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
+        if ($this->nodeName == '#text' && strpos($this->nodeValue, "\n") === false) {
+            $this->indentStart = $this->indentEnd = false;
+        }
     }
     
     public static function fromString(string $str, $options = []): self
@@ -86,7 +89,7 @@ class DomNode
         return $node;
     }
     
-    public function addAttribute($nodeName, $nodeValue = null)
+    public function addAttribute($nodeName, string $nodeValue = '')
     {//todo
         if ($nodeName instanceof DomNodeAttr) {
             $attr = $nodeName;
@@ -97,7 +100,7 @@ class DomNode
         $this->attrs[] = $attr;
     }
     
-    public function setAttribute(string $nodeName, string $nodeValue)
+    public function setAttribute(string $nodeName, string $nodeValue = '')
     {
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName == $nodeName) {
@@ -177,7 +180,7 @@ class DomNode
         if ($i >= 0) {
             $this->childNodes[$i]->parentNode && $this->childNodes[$i]->detach();
             unset($this->childNodes[$i]);
-            reset($this->childNodes);
+            $this->childNodes = array_values($this->childNodes);
         }
     }
     
@@ -237,6 +240,15 @@ class DomNode
     
     public function __toString()
     {
+        $indentEnd = $this->indentEnd;
+        if ($indentEnd) {
+        $indentEnd = !!array_filter ($this->childNodes, function ($cn) {
+            // nu face indent daca ultimul child e text
+            return $cn->nodeName != '#text';
+        });
+        }
+        $this->indentEnd = $indentEnd;
+ 
         // NODE START
         // don t indent texts
         $return = $this->indentStart ? $this->getIndent() : '';
@@ -298,7 +310,7 @@ class DomNode
                 $level++;
             }
         }
-        $level--;
+        //$level--;
         if ($level <= 0) {
             return PHP_EOL;
         }
@@ -363,6 +375,22 @@ class DomNode
     {
         $this->nodeName = $nodeName;
         $this->nodeValue = $nodeValue;
+    }
+    
+    public function getPrevSibling()
+    {
+        $i = null; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $j => $cn) {//d($cn->nodeName);
+            if ($cn === $this) {
+                $i = $j;
+                break;
+            }
+        }
+        //dd(array_keys($siblings));
+        if (isset($siblings[$i-1])) {
+            return $siblings[$i-1];
+        }
     }
     
     public function getNextSibling()

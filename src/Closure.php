@@ -8,10 +8,9 @@ use PhpTemplates\Source;
 
 class Closure
 {
-    private $closure;
     private $source;
     
-    public function __construct(BaseClosure $closure, Source $source = null)
+    public function __construct(?BaseClosure $closure, Source $source = null)
     {
         $this->closure = $closure;
         $this->source = $source;
@@ -19,8 +18,8 @@ class Closure
     
     public function __invoke($args) 
     {
-        try {
-            return call_user_func($this->closure, $args);
+        return call_user_func($this->closure, $args);
+        try {//todo
         } catch(\Throwable $e) {
             dd(''.$this->source, $e);
             $e->setMessage($e->getMessage() . "\n" . $this->source);
@@ -28,19 +27,13 @@ class Closure
         }
     }
     
-    public static function fromSource(Source $fnsrc, string $header = '') 
+    public static function fromSource(Source $fnsrc) 
     {
         //d('=>=>'.$fnsrc);
         //register_shutdown_function(function() use ($fnsrc) {
            // echo $fnsrc;
         //});
-        try {
-            eval("$header \$fn = $fnsrc;");
-        } catch(\Throwable $e) {
-            d(''.$fnsrc);
-            dd($e->getMessage());
-        }
-        return new self($fn, $fnsrc);
+        return new self(null, $fnsrc);
     }
     
     public function bindTo($self) 

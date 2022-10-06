@@ -18,7 +18,7 @@ class DomNodeAttr
         if (!$this->nodeName) {
             return $this->nodeValue;
         }
-        elseif (!$this->nodeValue) {
+        elseif (!$this->nodeValue  && $this->nodeValue != '0') {
             return $this->nodeName;
         }
         return $this->nodeName . '="' . $this->nodeValue . '"';
