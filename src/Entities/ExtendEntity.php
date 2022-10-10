@@ -29,15 +29,18 @@ class ExtendEntity extends TemplateEntity
         $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", $context); ?>',
             $this->id, $this->name
         );
-        $this->node->changeNode('#php', $nodeValue);
+        $this->node->changeNode('#php', '');
+        $slots = $this->parseSlots($this->node);
+        $this->node->appendChild(new DomNode('#php', $nodeValue));
 
-        foreach ($this->node->childNodes as $slot) {
-            //todo: grupam dupa slots o fn ceva?
-            $this->factory->make($slot, $this)->parse();
+        foreach ($slots as $slot) {
+            // todo ultimele modificari vor face templatecontext+derivate unreachable pe orice entity
+            $this->node->appendChild($slot);
+            $this->factory->make($slot, new StartupEntity($this->config))->parse();
         }
 
-        $r = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
-        $this->node->appendChild(new DomNode('#php', $r));
+        $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
+        $this->node->appendChild(new DomNode('#php', $nodeValue));
     }
     
     public function resolve(CacheInterface $document, EventHolder $eventHolder)

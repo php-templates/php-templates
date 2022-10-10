@@ -13,6 +13,7 @@ use PhpTemplates\Source;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Context;
 use PhpTemplates\Closure;
+use PhpTemplates\Dom\PhpNodes\SlotAssign;
 
 class TemplateEntity extends AbstractEntity
 {
@@ -20,7 +21,6 @@ class TemplateEntity extends AbstractEntity
     
     protected $attrs = [
         'is' => null,
-        'p-scope' => null
     ];
     
     public static function test(DomNode $node, EntityInterface $context)
@@ -47,22 +47,30 @@ class TemplateEntity extends AbstractEntity
         $nodeValue = sprintf('<?php $this->comp["%s"] = $this->template("%s", new Context(%s)); ?>',
             $this->id, $this->name, $dataString
         );
-        $this->node->changeNode('#php', $nodeValue);
-        //dd($nodeValue);
-        foreach ($this->node->childNodes as $slot) {
-            //todo: grupam dupa slots o fn ceva?
-            $this->factory->make($slot, $this)->parse();
+        $this->node->changeNode('#php', '');
+        $slots = $this->parseSlots($this->node);
+        $this->node->appendChild(new DomNode('#php', $nodeValue));
+        // parsam si nu va mai fi nevoie de extra logica pe simple node sub componenta
+        //$caret = new DomNode('#caret');
+        //$caret->indentStart = $caret->indentEnd = false;
+        //$this->node->parentNode->insertAfter($caret, $this->node);
+        
+        foreach ($slots as $slot) {
+            // todo ultimele modificari vor face templatecontext+derivate unreachable pe orice entity
+            $this->node->appendChild($slot);
+            $this->factory->make($slot, new StartupEntity($this->config))->parse();
         }
 
-        $r = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
-        $this->node->appendChild(new DomNode('#php', $r));
+        $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
+        $this->node->appendChild(new DomNode('#php', $nodeValue));
     }
 
     /**
     * When a component is passed as slot to another component
     */
     public function templateContext() 
-    {
+    {// unreachable
+    dd('unreachable');
         $this->attrs['slot'] = 'default';
 
         $wrapper = new DomNode('#slot');
@@ -72,6 +80,16 @@ class TemplateEntity extends AbstractEntity
         $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
 
         $this->factory->make($wrapper, $this->context)->parse();
+        
+        foreach ($wrapper->childNodes as $cn) {
+            $wrapper->parentNode->insertBefore($cn->detach(), $wrapper);
+        }
+        $wrapper->detach();
+    }
+    
+    public function extendContext() 
+    {
+        $this->templateContext();
     }
 
     /**
@@ -170,5 +188,20 @@ class TemplateEntity extends AbstractEntity
         }        
         
         return $srcFile;
+    }
+    
+    protected function parseSlots(DomNode $node): array
+    {
+        $slots = [];
+        foreach ($node->childNodes as $cn) {
+            $pos = $cn->getAttribute('slot');
+            $cn->removeAttribute('slot');
+            $pos = $pos ? $pos : 'default';
+            if (!isset($slots[$pos])) {
+                $slots[$pos] = new SlotAssign($this->id, $pos);
+            }
+            $slots[$pos]->appendChild($cn->detach());
+        }
+        return array_reverse($slots);
     }
 }

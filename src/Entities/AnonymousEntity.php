@@ -44,6 +44,11 @@ class AnonymousEntity extends AbstractEntity
         $this->factory->make($wrapper, $this->context)->parse();
     }
     
+    public function extendContext() 
+    {
+        $this->templateContext();
+    }
+    
     public function slotContext() {
         $this->simpleNodeContext();
     }

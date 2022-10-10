@@ -1,13 +1,17 @@
 
 @php $val = 'val'; @endphp
-<tpl extends="comp/x">{{ $val }}
+<tpl extends="comp/x">
+  {{ $val }}
   <tpl is="comp/x">{{ $val }}</tpl>
 </tpl>
 =====
 <x>
     val
-    s2-default 1
-    s2-default 2
+    <x>
+      val
+      s2-default 1
+      s2-default 2        
+    </x>
     s2-default 1
     s2-default 2
 </x>
@@ -20,6 +24,7 @@
 </tpl>
 =====
 <x>
+    valp
     <simplenode>valp</simplenode>
     s2-default 1
     s2-default 2
@@ -33,6 +38,7 @@
 </tpl>
 =====
 <x>
+    valp
     valp
     s2-default 1
     s2-default 2
@@ -58,9 +64,8 @@
 =====
 <x>
     valp
-    valp
     <x>
-      val
+      valp
       s2-default 1
       s2-default 2
     </x>
@@ -70,8 +75,8 @@
 
 -----
 
-<tpl extends="comp/x">{{ $val }}
-  <slot>{{ $val }}</slot>
+<tpl extends="comp/x">{{ $var }}
+  <slot>{{ $var }}</slot>
 </tpl>
 =====
 <x>
@@ -85,7 +90,7 @@
 
 @php $val = 'y'; @endphp
 <tpl extends="comp/x">{{ $val }}
-  <tpl is="comp/x" p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
+  <tpl is="comp/x" p-if="2" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
   <simplenode p-elseif="0">{{ $val }}</simplenode>
   <tpl p-else>{{ $val }}</tpl>
 </tpl>
@@ -148,7 +153,7 @@
 </tpl>
 =====
 <x>
-    val
+    vvv
     textnode v
     s2-default 1
     s2-default 2
@@ -163,7 +168,7 @@
 </tpl>
 =====
 <x>
-    val
+    l
     textnode l
     s2-default 1
     s2-default 2

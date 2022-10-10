@@ -2,7 +2,7 @@
 
 namespace PhpTemplates\Dom;
 
-class PhpNodeBindAttr extends DomNodeAttr
+class PhpNodhdhdhdeBindAttr extends DomNodeAttr
 {
     
     public function __toString() 

@@ -169,7 +169,7 @@ class Config
         foreach ($controlStructures as $statement) {
             $this->directives[$statement] = function(DomNode $node, string $args) use ($statement) {
                 if (in_array($statement, ['elseif', 'else'])) {
-                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) {//dd($node->parentNode->debug());
+                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) {//$node->parentNode->parentNode->d();dd($node->parentNode->parentNode->debug());
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
                     }
                 }

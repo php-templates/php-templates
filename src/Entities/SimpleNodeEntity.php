@@ -42,12 +42,12 @@ class SimpleNodeEntity extends AbstractEntity
 
     public function templateContext()
     {
-        $this->attrs['slot'] = 'default';
-        $scopeData = $this->context->getAttr('p-scope');
+        //$this->attrs['slot'] = 'default';
+        //$scopeData = $this->context->getAttr('p-scope');
 
-        $slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
-        $this->node->parentNode->insertBefore($slotAssignNode, $this->node);
-        $slotAssignNode->appendChild($this->node->detach());
+        //$slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
+        //$this->node->parentNode->insertBefore($slotAssignNode, $this->node);
+        //$slotAssignNode->appendChild($this->node->detach());
 
         $data = $this->depleteNode($this->node);
         $this->node->addAttribute($data);
@@ -76,12 +76,14 @@ class SimpleNodeEntity extends AbstractEntity
         
         $this->simpleNodeContext();
 
+        $context = $this->context;
+        if ($name = $context->getName()) {
         $fnSrc = $this->buildTemplateFunction($this->node);
 
         $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
         /** @var StartupEntity */
-        $context = $this->context;
 
-        $this->cache->set($context->getName(), $fn, new Source($fnSrc, ''));
+            $this->cache->set($context->getName(), $fn, new Source($fnSrc, ''));
+        }
     }
 }

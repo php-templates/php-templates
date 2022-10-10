@@ -6,6 +6,12 @@ require('../autoload.php');
 use PhpTemplates\Template;
 use PhpTemplates\TemplateRepository;
 use PhpTemplates\Context;
+
+$context = new Context();
+$context->x = 123;
+$context->x = 12;
+dd($context->x);
+
 $tr = new TemplateRepository();
 $tr->add('default:props/c', function (Context $context) {
    $context->val = [1,2]; $context->name = "myname";   ?>

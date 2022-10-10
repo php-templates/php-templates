@@ -174,6 +174,30 @@ class DomNode
         return $node;
     }
     
+    public function insertAfter($node, self $refNode)
+    {
+        if (is_string($node)) {
+            $node = self::fromString($node); //TODO: si la restul
+        }
+        $this->assertNotContained($this, $node);
+        $node->parent($this);
+        $i = null;//TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        foreach ($this->childNodes as $j => $cn) {
+            if ($cn === $refNode) {
+                $i = $j;
+                break;
+            }
+        }
+        
+        if (!is_null($i)) {
+            array_splice($this->childNodes, $i -1, 0, [$node]);
+        } else {
+            $this->appendChild($node);
+        }
+        
+        return $node;
+    }
+    
     public function removeChild(self $node)
     {
         $i = array_search($node, $this->childNodes, true);
@@ -294,7 +318,7 @@ class DomNode
     public function parent($parentNode)
     {
         if ($this->parentNode) {
-            debug_print_backtrace(2);
+            //debug_print_backtrace(2);
             throw new \Exception("Node already has a parent, detach it first");
         }
         $this->parentNode = $parentNode;
@@ -450,7 +474,7 @@ class DomNode
     {
         echo PHP_EOL;
         echo '<pre>';
-        echo htmlentities((string) $this);
+        echo ((string) $this);
         echo '</pre>';
         echo PHP_EOL;
     }

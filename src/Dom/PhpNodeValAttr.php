@@ -2,7 +2,7 @@
 
 namespace PhpTemplates\Dom;
 
-class PhpNodeValAttr extends DomNodeAttr
+class PhpNoxhddhdeValAttr extends DomNodeAttr
 {
     private $merged = [];
    
