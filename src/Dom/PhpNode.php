@@ -3,7 +3,7 @@
 namespace PhpTemplates\Dom;
 
 use PhpTemplates\Config;
-
+// todo, move this
 class PhpNode extends DomNode
 { 
     public function __toString()

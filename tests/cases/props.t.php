@@ -29,9 +29,9 @@ yoy
 -----
 
 <!-- bind from slot to surface -->
-<tpl is="props/c" p-scope="$s">
+<tpl is="props/c">
     <tpl>
-        <div p-foreach="$s->val as $v">{{ $s->name.$v }}</div>
+        <div p-foreach="$slot->val as $v">{{ $slot->name.$v }}</div>
     </tpl>
 </tpl>
 =====

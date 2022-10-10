@@ -1,34 +1,63 @@
 
-@php $val = 'val'; @endphp
+@php  
+$this->addSlot('default', function() {
+    if (!empty(func_get_arg(0)['y'])) {
+     echo func_get_arg(0)['y'];
+    }
+});
+$val = 'val';
+@endphp
+
 <tpl is="comp/x">{{ $val }}
-  <tpl is="comp/x">{{ $val }}</tpl>
+  <tpl is="comp/x">
+      {{ $val }}
+      <span slot="s2"></span>
+  </tpl>
 </tpl>
+=====
+<x>
+    val
+    <x>
+        val
+        <span></span>
+        <span></span>
+    </x>
+    s2-default 1
+    s2-default 2
+</x>
 
 -----
 
 @php $val = 'val'; @endphp
 <tpl is="comp/x">{{ $val }}
-  <simplenode>{{ $val }}</simplenode>
+  <tpl p-if="1" slot="s2">{{ $slot->i }}</tpl>
+  <span slot="s2"></span>
 </tpl>
+=====
+<x>
+    val
+    1
+    <span></span>
+    2
+    <span></span>
+</x>
 
 -----
 
 @php $val = 'val'; @endphp
 <tpl is="comp/x">{{ $val }}
-  <tpl>{{ $val }}</tpl>
+  <tpl extends="comp/x">{{ $val }}</tpl>
+  <tpl slot="s2"></tpl>
 </tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}textnode {{ $val }}</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <extends template="comp/x">{{ $val }}</extends>
-</tpl>
+=====
+<x>
+    val
+    <x>
+        val
+        s2-default 1
+        s2-default 2
+    </x>
+</x>
 
 -----
 
@@ -36,102 +65,24 @@
 <tpl is="comp/x">{{ $val }}
   <slot>{{ $val }}</slot>
 </tpl>
+=====
+<x>
+    val
+    s2-default 1
+    s2-default 2
+</x>
 
 -----
 
 @php $val = 'val'; @endphp
 <tpl is="comp/x">{{ $val }}
-  <tpl is="comp/x" p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
-  <simplenode p-elseif="0">{{ $val }}</simplenode>
-  <tpl p-else>{{ $val }}</tpl>
+  <tpl p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
+  <tpl extends="comp/x" p-else>{{ $val }}</tpl>
 </tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl is="comp/x" p-if="0">{{ $val }}</tpl>
-  <simplenode p-elseif="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</simplenode>
-  <tpl p-else>{{ $val }}</tpl>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl is="comp/x" p-if="0">{{ $val }}</tpl>
-  <simplenode p-elseif="0">{{ $val }}</simplenode>
-  <tpl p-else p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <simplenode p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</simplenode>
-  <tpl p-elseif="0">{{ $val }}</tpl>textnode {{ $val }}
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <simplenode p-if="0">{{ $val }}</simplenode>
-  <tpl p-elseif="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>textnode {{ $val }}
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <simplenode p-if="0">{{ $val }}</simplenode>
-  <tpl p-elseif="0">{{ $val }}</tpl>textnode {{ $val }}
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>textnode {{ $val }}
-  <extends template="comp/x" p-else>{{ $val }}</extends>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl p-if="0">{{ $val }}</tpl>textnode {{ $val }}
-  <extends template="comp/x" p-else>{{ $val }}</extends>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl p-if="0">{{ $val }}</tpl>textnode {{ $val }}
-  <extends template="comp/x" p-else p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</extends>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}textnode {{ $val }}
-  <extends template="comp/x" p-elseif="0">{{ $val }}</extends>
-  <slot p-else>{{ $val }}</slot>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}textnode {{ $val }}
-  <extends template="comp/x" p-elseif="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</extends>
-  <slot p-else>{{ $val }}</slot>
-</tpl>
-
------
-
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}textnode {{ $val }}
-  <extends template="comp/x" p-elseif="0">{{ $val }}</extends>
-  <slot p-else p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</slot>
-</tpl>
+=====
+<x>
+    val
+    val val
+    s2-default 1
+    s2-default 2
+</x>

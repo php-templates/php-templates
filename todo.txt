@@ -11,9 +11,6 @@ remove view from integration
 
 solve all todos
 check all abstract fn of interface -> test case foreach of them
-iscompletenode or die with unexpected
-elseif else validation check with error throw
-slots should be parsed grouped altfel nu merg if urile
 phptnodes folder, phpnode, slotassign node
 
 scopedata default sub $slot 

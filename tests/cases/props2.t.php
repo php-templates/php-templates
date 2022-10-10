@@ -1,6 +1,7 @@
 <!-- bind data to a component slot -->
-<tpl is="props/c" p-scope="$s">
-    1{{ $s->name }}
+<tpl is="props/c">
+    @php $s = $slot; @endphp
+    1{{ $slot->name }}
     <tpl is="comp/comp_slot">2{{ $s->name }}</tpl>
 </tpl>
 =====

@@ -16,7 +16,7 @@ use PhpTemplates\Closure;
 use PhpTemplates\Dom\PhpNodes\SlotAssign;
 
 class TemplateEntity extends AbstractEntity
-{
+{// de documentat p-scope scos default $slot
     const WEIGHT = 100;
     
     protected $attrs = [
