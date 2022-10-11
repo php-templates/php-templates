@@ -18,7 +18,7 @@ class Config
     public $aliased = [];
     public $directives = [];
     
-    private $prefix = 'p-';
+    private $prefix = 'p-'; // todo: find and remove
    
     public function __construct($name, $srcPath, self $parent = null) {
         $this->parent = $parent;
@@ -70,21 +70,12 @@ class Config
         }
         $this->aliased = array_merge($this->aliased, $aliased);
     }
-
-    public function hashhhDirective(string $key): bool
-    {
-        return isset($this->directives[$key]);
-    }
-    
-    public function hasbbbAlias(string $key): bool
-    {
-        return isset($this->aliased[$key]);
-    }
     
     public function setSrcPath($val)
     {
         $this->srcPath = $val;
     }
+    
     public function setName(string $name)
     {
         $this->name = $name;
@@ -115,16 +106,6 @@ class Config
         while ($cfg = $cfg->getParent());
     }
     
-    public function dydydhasAlias(string $name) 
-    {
-        return isset($this->aliased[$name]);
-    }
-    
-    public function djdjdjgetAliases() 
-    {
-        return $this->aliased;
-    }
-    
     public function getDirective(string $name) 
     {
         $cfg = $this;
@@ -135,15 +116,7 @@ class Config
         }
         while ($cfg = $cfg->getParent());
     }
-    public function hadjfjfjsDirective(string $name) 
-    {
-        return isset($this->directives[$name]);
-    }
     
-    public function dhfhfhgetDirectives() 
-    {
-        return $this->directives;
-    }
     
     public function isDefault() 
     {
@@ -158,7 +131,7 @@ class Config
             if ($cfg = $child->find($cfgkey)) {
                 return $cfg;
             }
-        }//die('3');
+        }
     }
     
     private function addDefaultDirectives() 
@@ -181,14 +154,6 @@ class Config
                 $phpnode->appendChild($node->detach());
             };
         }
-        
-        //$cfg->setDirective('raw', function(DomNode $node, string $val) {
-        //    $node->addAttribute(new PhpNodeValAttr('', $val));
-        //});
-        
-        //$cfg->setDirective('bind', function(DomNode $node, string $val) {
-        //    $node->addAttribute(new DomNodeAttt('p-bind', $val));
-        //});
         
         $cfg->setDirective('checked', function(DomNode $node, string $val) {
             $node->addAttribute('p-raw', $val . ' ? "checked" : ""');

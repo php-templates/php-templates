@@ -12,6 +12,8 @@ remove view from integration
 solve all todos
 check all abstract fn of interface -> test case foreach of them
 phptnodes folder, phpnode, slotassign node
+format all documents
+comment all fnn
 
 scopedata default sub $slot 
 

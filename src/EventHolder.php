@@ -45,9 +45,6 @@ class EventHolder
 
     public function on($ev, $name, $cb, $weight = 0)
     {
-        //d('on ' . $ev . ' ' . $name);
-        //if ($ev != 'parsing') return;
-        //d($cb);
         $k = explode('*', $name)[0];
         self::$events[$ev][$k][] = [
             'name' => $name,

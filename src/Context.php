@@ -4,26 +4,19 @@ namespace PhpTemplates;
 
 class Context
 {
-    //private static $baseid = 1;
-    
-    //private $id;
     public $parent;
     public $loopContext;
     private $loopDepth = 0;
-    private $data;// scope getable as obj
+    private $data;// todo scope getable like _data, as obj, _attrs gettable as obj
     
     public function __construct(array $data = [], self $parent = null) 
     {
         $this->data = $data ?? [];
         $this->parent = $parent;
-        
-        //$this->id = self::$baseid;
-        //self::$baseid++;
     }
     
     public function &__get($prop) 
     {
-        //$prop == 's' && dd($this->data['s']);
         if ($this->loopContext) {
             return $this->loopContext->get($prop);
         }
@@ -39,10 +32,6 @@ class Context
         else {
             $this->data[$prop] = $val;
         }
-        //d($this->id.'set'.$prop.'='.$val);
-        //$prop == 'slot' && !$val && dd(3);
-        //$prop == 'slot' && d($val);
-        //d($this->data);
     }
     
     public function __isset($prop) 
@@ -108,4 +97,5 @@ class Context
     public function all() {
         return $this->data;
     }
+    //todo __empty
 }

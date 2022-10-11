@@ -14,30 +14,16 @@ use PhpTemplates\Cache\NullCache;
 
 class ViewFactory
 {
-    /**
-     * configs keyed by namespace
-     */
-    /*
-    protected $configs = [];
-    protected $destPath;
-    public $trackChanges = false;
-    public $debugMode = true; */
     protected $composers = [];
     private $shared = [];
     private $outputFolder;
-   // private $dependenciesMap;
     private $config;
     private $eventHolder;
     
     public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder) {
-    //public function __construct(string $srcPath, string $destPath) {
         $this->outputFolder = $outputFolder;
-        // $this->viewParser = $viewParser;
-        //$this->dependenciesMap = $dependenciesMap;
         $this->config = $config;
         $this->eventHolder = $eventHolder;
-        //$this->configs['default'] = new Config('default', $srcPath);
-        // TODO
     }
     
     public function render(string $rfilepath, array $data = [], $slots = [])
@@ -52,7 +38,7 @@ class ViewFactory
     {
         $this->cache = $this->getCache();
         $rfilepath = md5($phpt);
- 
+ //todo format
         
             //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
             // init the document with custom settings as src_path, aliases
@@ -131,17 +117,6 @@ class ViewFactory
         $this->composers[$name][] = $cb;
     }
 
-//todo
-    public function delleteeeeraw(\Closure $cb, $data = [])
-    {
-        return Template::raw(null, $cb, $data);
-    }
-    
-    public function getggfParser(): ViewParser
-    {
-        return $this->parser;
-    }
-    
     private function getCache() 
     {
         if ($this->outputFolder) {
@@ -153,31 +128,7 @@ class ViewFactory
         return $cache;
     }
    
-   // todo remove 
-    /**
-     * Add additional parse src path
-     */
-    public function ahhhgddPath($name, $srcPath)
-    {
-        if (isset($this->configs[$name])) {
-            throw new \Exception("Config '$name' already exists");
-        }
-        $this->configs[$name] = new Config($name, $srcPath);
-    }
 
-    public function rehbbbplacePath($name, $srcPath)
-    {
-        if (!isset($this->configs[$name])) {
-            $this->addPath($name, $srcPath);
-        } else {
-            $this->configs[$name]->setSrcPath($srcPath);
-        }
-    }
-    
-    public function setDggvcestPath($dest)
-    {
-        $this->destPath = $dest;
-    }
     
     public function getConfig(): Config
     {

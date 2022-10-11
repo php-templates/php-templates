@@ -12,7 +12,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     public function __construct($laravel)
     {
         $this->template = new PhpTempte(config('view.paths.0'), config('view.compiled'));
-        $this->template->replacePath('errors', 'eee');
+        $this->template->replacePath('errors', 'eee'); // todo findouty
     }
     
     /**
@@ -37,6 +37,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function file($path, $data = [], $mergeData = [])
     {
+        // todo fileget content and parse raw
         dd(11);
     }
 
@@ -95,7 +96,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
      */
     public function creator($views, $callback)
     {
-        //
+        // todo add view rendering event
     }
 
     /**

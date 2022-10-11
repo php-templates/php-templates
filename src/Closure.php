@@ -18,27 +18,19 @@ class Closure
     
     public function __invoke($args) 
     {
+        // todo expect closure not null, eval source in phpt namespace
         return call_user_func($this->closure, $args);
-        try {//todo
-        } catch(\Throwable $e) {
-            dd(''.$this->source, $e);
-            $e->setMessage($e->getMessage() . "\n" . $this->source);
-            throw($e);
-        }
     }
     
     public static function fromSource(Source $fnsrc) 
     {
-        //d('=>=>'.$fnsrc);
-        //register_shutdown_function(function() use ($fnsrc) {
-           // echo $fnsrc;
-        //});
         return new self(null, $fnsrc);
     }
     
     public function bindTo($self) 
     {
         $this->closure = $this->closure->bindTo($self);
+        
         return $this;
     }
     

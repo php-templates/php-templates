@@ -92,7 +92,7 @@ d(finfo_file($outFile));
         $pf = rtrim($this->outputFolder, '/').'/';
         $name = str_replace(['/', ':'], '_', $this->inputFile);// todo more tests, more generalist
         
-        if ($this->trackChanges) {
+        if ($this->trackChanges) {// todo remove legacy line
             $dependencies = $this->dependenciesMap->get($this->inputFile);
             asort($dependencies);
             $hash = [$this->inputFile];
@@ -106,16 +106,6 @@ d(finfo_file($outFile));
         }
 
         return $outFile.'.php';
-    }
-    
-    public function rrjrjrjequireComponent(string $name)
-    {
-        $this->requiredComponents[] = $name;
-    }
-    
-    public function gehrjrjrjtRequiredComponents()
-    {
-        return $this->requiredComponents;
     }
     
     public function hasTemplate(string $name) 
@@ -163,8 +153,7 @@ d(finfo_file($outFile));
     
     private function _bindVariablesToContext(string $string) 
     {
-        //d($string);
-        // replace any \\ withneutral chars only to find unescaped quotes positions
+        // replace any \\ with neutral chars only to find unescaped quotes positions
         $tmp = str_replace('\\', '__', $string);
         preg_match_all('/(?<!\\\\)[`\'"]/', $tmp, $m, PREG_OFFSET_CAPTURE);
         $stringRanges = [];
