@@ -30,23 +30,8 @@ class RawAttributeGroup extends AbstractAttributeGroup
     }
 
     public function bindToTemplateAttr(): string
-    {dd('todo rawattrgroup');
-        $k = $this->getNodeName();
-        $arr = [];
-        foreach ($this->attrs as $attr) {
-            if ($attr->nodeName[0] == ':') {
-                $arr[] = "({$attr->nodeValue})";
-            }
-            else {
-                $arr[] = "'{$attr->nodeValue}'";
-            }
-        }
-        $val = implode(".' '.", $arr);
-        if (empty($val)) {
-            $val = "''";
-        }
-        
-        return "'$k' => $val";
+    {
+        return '[]';
     }
     
     public function bindArrayToNode(): string

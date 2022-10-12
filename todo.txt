@@ -13,7 +13,8 @@ solve all todos
 check all abstract fn of interface -> test case foreach of them
 phptnodes folder, phpnode, slotassign node
 format all documents
-comment all fnn
+comment all fnn for documentation
+documentation for domnode
 
 scopedata default sub $slot 
 
