@@ -10,6 +10,9 @@ https://github.com/ytake/Laravel.Smarty/blob/main/src/SmartyServiceProvider.php
 remove view from integration
 
 solve all todos
+
+// TODO: remove debug fn from autoload, or namespace them if works
+
 format all documents
 comment all fnn for documentation
 documentation for domnode
