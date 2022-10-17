@@ -148,6 +148,6 @@ function check_dependencies(array $files)
         if ($m < filemtime($file)) {
             return false;
         }
-        return true;
     }
+    return true;
 }

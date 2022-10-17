@@ -126,7 +126,7 @@ class ViewFactory
      * @param integer $weight - order - higher weight = exected first
      * @return void
      */
-    public function on(string $ev, string $name, Closure $cb, $weight = 0)
+    public function on(string $ev, string $name, \Closure $cb, $weight = 0)
     {
         $this->eventHolder->on($ev, $name, $cb, $weight);
     }

@@ -49,7 +49,7 @@ class FileSystemCache implements CacheInterface
 
     public function get(string $key): callable
     {
-        return $this->store[$key] ?? null;
+        return $this->store[$key] ?? dd(array_keys($this->store)) && null;
     }
 
     public function write(string $key)

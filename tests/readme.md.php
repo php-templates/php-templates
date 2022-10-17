@@ -394,11 +394,11 @@ Consider you have a component responsable for rendering a table:
 ```
 Two things here:
 - we checked if any slot passed by calling $this->slots($slotName)
-- we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this 'p-scope="$slot"' (whatever var name you preffer)
+- we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this `$slot->varName`
 Now, we can use the component like this:
 <?php tstart(); ?>
 ```
-<x-data-table :headings="$headings" :data="$data" p-scope="$slot">
+<x-data-table :headings="$headings" :data="$data">
     <div slot="action">
         <a :href="'edit-item-'.$slot->id">Edit</a>
     </div>
