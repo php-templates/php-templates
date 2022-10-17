@@ -7,7 +7,12 @@ use PhpTemplates\Source;
 class DomNode
 {
     private static $last_id = 0;
-    
+
+    /**
+     * A list of all self closing tags (used by __toString method in order to know when or not to close a html tag)
+     *
+     * @var array
+     */
     private $selfClosingTags = [
         'area',
         'base',
@@ -25,81 +30,254 @@ class DomNode
         'wbr',
         'command',
         'keygen',
-        'menuitem',    
+        'menuitem',
     ];
-    
+
+    /**
+     * node unique id, used for debugging
+     *
+     * @var string
+     */
     protected $nodeId;
+
+    /**
+     * DomNodeElement name, like input, textarea, div, etc.
+     * Nodes without rendering tags (like textnodes) will start with '#' and they will output only their 'nodeValue'
+     *
+     * @var string
+     */
     protected $nodeName;
+
+    /**
+     * Node value outputed only by textnodes, prefixed with # in nodeName
+     *
+     * @var [type]
+     */
     protected $nodeValue;
+
+    /**
+     * Array of node attributes
+     *
+     * @var array
+     */
     protected $attrs = [];
+
+    /**
+     * Parent node, null if rootnode
+     *
+     * @var self|null
+     */
     protected $parentNode;
+
+    /**
+     * Array of childNodes
+     *
+     * @var array
+     */
     protected $childNodes = [];
-    
+
+    /**
+     * Used for rendering, it says if parsed syntax was like: <div/>, or in case of false: <div></div>
+     *
+     * @var boolean
+     */
     public $shortClose = false;
+
+    /**
+     * For debugging, we keep the line number where node was found in source input string
+     *
+     * @var integer
+     */
     public $lineNumber = 0;
+
+    /**
+     * For debugging, we keep the file path of the source input string
+     *
+     * @var string
+     */
     public $srcFile;
+
+    /**
+     * Used by __toString to determine if should insert "PHP_EOL . $indent_level" after &lt;open-tag&gt;
+     *
+     * @var boolean
+     */
     public $indentStart = true;
+
+    /**
+     * Used by __toString to determine if should insert "PHP_EOL . $indent_level" before &lt;/close-tag&gt;
+     *
+     * @var boolean
+     */
     public $indentEnd = true;
-    
+
+    /**
+     * @param string $nodeName - div, span, etc. In case of textnode, prefix it with '#' and name it as you wish
+     * @param mixed $nodeValue - if textnode, it should be string. If domNode, it can be a key => value array containing attributes.
+     * ex: ['class' => 'foo bar']
+     */
     public function __construct(string $nodeName, $nodeValue = '')
     {
         self::$last_id++;
         $this->nodeId = self::$last_id;
+
         $this->nodeName = trim($nodeName);
-        if (is_array($nodeValue)) {
+
+        // short node declaration syntax
+        if (is_array($nodeValue))
+        {
             foreach ($nodeValue as $k => $val) {
                 if (is_array($val)) {
                     $val = var_export($val, true);
                 }
                 $this->addAttribute($k, $val);
             }
-        } else {
+        }
+        else {
             $this->nodeValue = $nodeValue;
         }
+
         $this->nodeName = $this->nodeName ? $this->nodeName : '#text';
         if ($this->nodeName == '#text' && strpos($this->nodeValue, "\n") === false) {
             $this->indentStart = $this->indentEnd = false;
         }
     }
-    
-    public static function fromString(string $str, $options = []): self
+
+    /**
+     * Actual print process
+     *
+     * @return string
+     */
+    public function __toString()
     {
+        $indentEnd = $this->indentEnd;
+        if ($indentEnd) {
+            $indentEnd = !!array_filter($this->childNodes, function ($cn) {
+                // nu face indent daca ultimul child e text
+                return $cn->nodeName != '#text';
+            });
+        }
+        $this->indentEnd = $indentEnd;
+
+        // NODE START
+        // don t indent texts
+        $return = $this->indentStart ? $this->getIndent() : '';
+        if ($this->nodeName[0] != '#' && $this->nodeName) {
+            $attrs = implode(' ', $this->attrs);
+            $attrs = $attrs ? ' ' . $attrs : '';
+            $return .= '<' . $this->nodeName . $attrs . ($this->shortClose ? '/>' : '>');
+        }
+        //$this->nodeName == 'x' && d($return);
+        if ($this->nodeName == '#text' || !$this->nodeName) {
+            $return .= $this->nodeValue;
+            return $return;
+        } elseif ($this->nodeName[0] == '#' && trim($this->nodeValue)) {
+            $return .= $this->nodeValue;
+        }
+
+        // NODE CONTENT
+        foreach ($this->childNodes as $cn) {
+            $return .= $cn;
+        }
+
+        // NODE END
+        if (!$this->shortClose && $this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
+            $return .= $this->indentEnd ? $this->getIndent() : '';
+            $return .= "</{$this->nodeName}>";
+        }
+
+        return $return;
+    }
+
+    /**
+     * Create a new dom structure from a given string.
+     * This fn will try to capture its call location in order to give relevant data for debugging
+     *
+     * @param string $str
+     * @return self
+     */
+    public static function fromString(string $str): self
+    {
+        // for debug
         $bt = debug_backtrace(5);
         while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
             array_shift($bt);
         }
-        
+
         $srcFile = $bt[0]['file'];
         $startLine = $bt[0]['line'];
         $source = new Source($str, $srcFile, $startLine);
         $parser = new Parser();
-        
+
         return $parser->parse($source);
     }
-    
-    public static function fromArray($arr)
+
+    /**
+     * Create a new dom structure from a given array.
+     * The array should be in the given format: ['nodeName' => '...', 'nodeValue' => ('string'|array of attributes), 'childNodes' => __recursion]
+     * This fn will try to capture its call location in order to give relevant data for debugging
+     *
+     * @param array $arr
+     * @return self
+     */
+    public static function fromArray(array $arr): self
     {
+        // for debug
+        $bt = debug_backtrace(5);
+        while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
+            array_shift($bt);
+        }
+        $srcFile = $bt[0]['file'];
+
         $node = new DomNode($arr['nodeName'], $arr['nodeValue']);
+        $node->srcFile = $srcFile;
         foreach ($arr['attrs'] as $attr) {
             $node->addAttribute($attr['nodeName'], $attr['nodeValue']);
         }
+
         foreach ($arr['childNodes'] as $cn) {
-            $node->appendChild(self::fromArray($cn));
+            $cn = self::fromArray($cn);
+            $cn->srcFile = $srcFile;
+            $node->appendChild($cn);
         }
+
         return $node;
     }
-    
+
+    /**
+     * Add an attribute to node. If an already existing attribute will be found by given name,
+     * it will be treat like this: $existingAttr->nodeValue .= ' ' . $nodeValue;
+     *
+     * @param string|DomNodeAttr $nodeName
+     * @param string $nodeValue
+     * @return void
+     */
     public function addAttribute($nodeName, string $nodeValue = '')
-    {//todo
+    {
         if ($nodeName instanceof DomNodeAttr) {
-            $attr = $nodeName;
-        } else {
+            $incoming = $nodeName;
+
+            foreach ($this->attrs as $attr) {
+                if ($attr->nodeName == $incoming->nodeName) {
+                    $attr->nodeValue .= ' ' . $incoming->nodeValue;
+                    return;
+                }
+            }
+        }
+        else {
             $attr = new DomNodeAttr($nodeName, $nodeValue);
         }
-        
+
         $this->attrs[] = $attr;
     }
-    
+
+    /**
+     * Add an attribute to node. If an already existing attribute will be found by given name, its value will be overriden
+     *
+     * @param string $nodeName
+     * @param string $nodeValue
+     * @return void
+     */
     public function setAttribute(string $nodeName, string $nodeValue = '')
     {
         foreach ($this->attrs as $attr) {
@@ -108,10 +286,16 @@ class DomNode
                 return;
             }
         }
-        
+
         $this->addAttribute(new DomNodeAttr($nodeName, $nodeValue));
     }
-    
+
+    /**
+     * Get node attribute value by attribute name, null if no attribute found
+     *
+     * @param string $name
+     * @return mixed
+     */
     public function getAttribute(string $name)
     {
         foreach ($this->attrs as $attr) {
@@ -119,10 +303,17 @@ class DomNode
                 return $attr->nodeValue;
             }
         }
+
         return null;
     }
-    
-    public function hasAttribute(string $name)
+
+    /**
+     * Determine if an attribute exists on current node, by its name
+     *
+     * @param string $name
+     * @return boolean
+     */
+    public function hasAttribute(string $name): bool
     {
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName == $name) {
@@ -131,73 +322,131 @@ class DomNode
         }
         return false;
     }
-    
+
+    /**
+     * Remove node attribute, return node instance
+     *
+     * @param string $name
+     * @return self
+     */
+    public function removeAttribute(string $name): self
+    {
+        foreach ($this->attrs as $i => $attr) {
+            if ($attr->nodeName == $name) {
+                unset($this->attrs[$i]);
+                return $this;
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Remove all node attributes
+     *
+     * @return void
+     */
     public function removeAttributes()
     {
         $this->attrs = [];
     }
-    
-    public function appendChild($node) 
+
+    /**
+     * Append a new child node to current node and returns appended child instance.
+     * If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+     *
+     * @param self|string $node - when string, we will call self::fromString to obtain a virtual node
+     * @return self
+     */
+    public function appendChild($node)
     {
         if (is_string($node)) {
-            $node = self::fromString($node); //TODO: si la restul
+            $node = self::fromString($node);
         }
-        $this->assertNotContained($this, $node);
+        else {
+            $this->assertNotContained($this, $node);
+        }
+
         // set parent node first
         $node->parent($this);
         $this->childNodes[] = $node;
-        
+
         return $node;
     }
-    
+
+    /**
+     * Insert a child node before another given childnode
+     * If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+     *
+     * @param self|string $node - when string, we will call self::fromString to obtain a virtual node
+     * @return self
+     */
     public function insertBefore($node, self $refNode)
     {
         if (is_string($node)) {
-            $node = self::fromString($node); //TODO: si la restul
+            $node = self::fromString($node);
         }
-        $this->assertNotContained($this, $node);
+        else {
+            $this->assertNotContained($this, $node);
+        }
+
         $node->parent($this);
-        $i = null;//TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        $i = null;
         foreach ($this->childNodes as $j => $cn) {
             if ($cn === $refNode) {
                 $i = $j;
                 break;
             }
         }
-        
+
         if (!is_null($i)) {
             array_splice($this->childNodes, $i, 0, [$node]);
         } else {
             $this->appendChild($node);
         }
-        
+
         return $node;
     }
-    
+
+    /**
+     * Insert a child node after another given childnode
+     * If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+     *
+     * @param self|string $node - when string, we will call self::fromString to obtain a virtual node
+     * @return self
+     */
     public function insertAfter($node, self $refNode)
     {
         if (is_string($node)) {
-            $node = self::fromString($node); //TODO: si la restul
+            $node = self::fromString($node);
         }
-        $this->assertNotContained($this, $node);
+        else {
+            $this->assertNotContained($this, $node);
+        }
+
         $node->parent($this);
-        $i = null;//TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
+        $i = null;
         foreach ($this->childNodes as $j => $cn) {
             if ($cn === $refNode) {
                 $i = $j;
                 break;
             }
         }
-        
+
         if (!is_null($i)) {
-            array_splice($this->childNodes, $i -1, 0, [$node]);
+            array_splice($this->childNodes, $i - 1, 0, [$node]);
         } else {
             $this->appendChild($node);
         }
-        
+
         return $node;
     }
-    
+
+    /**
+     * Remove given childnode
+     *
+     * @param self $node
+     * @return void
+     */
     public function removeChild(self $node)
     {
         $i = array_search($node, $this->childNodes, true);
@@ -207,12 +456,22 @@ class DomNode
             $this->childNodes = array_values($this->childNodes);
         }
     }
-    
+
+    /**
+     * Remove all childnode
+     *
+     * @return void
+     */
     public function empty()
     {
         $this->childNodes = [];
     }
-    
+
+    /**
+     * Remove childnode from its parent and returns it available to be attached (insert,append) elsewhere
+     *
+     * @return void
+     */
     public function detach()
     {
         if ($this->parentNode) {
@@ -222,7 +481,12 @@ class DomNode
         }
         return $this;
     }
-    
+
+    /**
+     * Returns an exact node clone, excluding its parent
+     *
+     * @return void
+     */
     public function cloneNode()
     {
         $arr = $this->__toArray();
@@ -231,23 +495,105 @@ class DomNode
         $clone->lineNumber = $this->lineNumber;
         return $clone;
     }
-    
+
+    public function getPrevSibling()
+    {
+        $i = null;
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $j => $cn) { //d($cn->nodeName);
+            if ($cn === $this) {
+                $i = $j;
+                break;
+            }
+        }
+
+        if (isset($siblings[$i - 1])) {
+            return $siblings[$i - 1];
+        }
+    }
+
+    public function getNextSibling()
+    {
+        $i = null;
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $j => $cn) {
+            if ($cn === $this) {
+                $i = $j;
+                break;
+            }
+        }
+
+        if (isset($siblings[$i + 1])) {
+            return $siblings[$i + 1];
+        }
+    }
+
+    public function getNextSiblings()
+    {
+        $result = [];
+        $i = false;
+        $siblings = $this->parentNode->childNodes;
+        foreach ($siblings as $cn) {
+            if ($cn === $this) {
+                $i = true;
+                continue;
+            }
+            if ($i) {
+                $result[] = $cn;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * non complex css selectors supported
+     *
+     * @param string $selector
+     * @return self|null - returns first childNodes matching the given selector. May return null in case of nothing found
+     */
+    public function querySelector(string $selector)
+    {
+        return (new QuerySelector($this))->find($selector, false);
+    }
+
+    /**
+     * non complex css selectors supported
+     *
+     * @param string $selector
+     * @return array - returns an array of childNodes matching the given selector
+     */
+    public function querySelectorAll(string $selector)
+    {
+        return (new QuerySelector($this))->find($selector);
+    }
+
+    /**
+     * returns an array representation of dom structure
+     *
+     * @return void
+     */
     public function debug()
     {
         $x = ['tag' => $this->nodeName, 'node_id' => $this->nodeId, 'file' => $this->srcFile, 'line' => $this->lineNumber];
         if ($this->nodeName == '#text') {
             $x['text'] = $this->nodeValue;
         }
-        foreach($this->attrs as $a) {
+        foreach ($this->attrs as $a) {
             $x['attrs'][$a->nodeName] = $a->nodeValue;
         }
-        foreach($this->childNodes as $cn) {
+        foreach ($this->childNodes as $cn) {
             $x['childs'][] = $cn->debug();
         }
         return $x;
     }
-    
-    public function __toArray()
+
+    /**
+     * returns an array representation of node
+     *
+     * @return array
+     */
+    public function __toArray(): array
     {
         $arr = [
             'nodeName' => $this->nodeName,
@@ -258,63 +604,16 @@ class DomNode
         foreach ($this->childNodes as $cn) {
             $arr['childNodes'][] = $cn->__toArray();
         }
-        
+
         return $arr;
     }
-    
-    public function __toString()
-    {
-        $indentEnd = $this->indentEnd;
-        if ($indentEnd) {
-        $indentEnd = !!array_filter ($this->childNodes, function ($cn) {
-            // nu face indent daca ultimul child e text
-            return $cn->nodeName != '#text';
-        });
-        }
-        $this->indentEnd = $indentEnd;
- 
-        // NODE START
-        // don t indent texts
-        $return = $this->indentStart ? $this->getIndent() : '';
-        if ($this->nodeName[0] != '#' && $this->nodeName) {
-            $attrs = implode(' ', $this->attrs);
-            $attrs = $attrs ? ' '.$attrs : '';
-            $return .= '<'.$this->nodeName.$attrs.($this->shortClose ? '/>' : '>');
-        }
-        //$this->nodeName == 'x' && d($return);
-        if ($this->nodeName == '#text' || !$this->nodeName) {
-            $return .= $this->nodeValue;
-            return $return;
-        }
-        elseif ($this->nodeName[0] == '#' && trim($this->nodeValue)) {
-            $return .= $this->nodeValue;
-        }
-        
-        // NODE CONTENT
-        foreach ($this->childNodes as $cn) {
-            $return .= $cn;
-        }
-        
-        // NODE END
-        if (!$this->shortClose && $this->nodeName[0] != '#' && $this->nodeName && !$this->isSelfClosingTag()) {
-            $return .= $this->indentEnd ? $this->getIndent() : '';
-            $return .= "</{$this->nodeName}>";
-        }
-        
-        return $return;
-    }
-    
-    private function shouldIxjdjndent() 
-    {
-        if ($this->nodeName == '#text' && trim($this->nodeValue)) {
-            return false;
-        }
-        if (isset($this->childNodes[0]) && $this->childNodes[0]->nodeName == '#text' && trim($this->childNodes[0]->nodeValue)) {
-            return false;
-        }
-        return true;
-    }
-    
+
+    /**
+     * Set node parent, if node already has a parent, an error will be thrown
+     *
+     * @param [type] $parentNode
+     * @return void
+     */
     public function parent($parentNode)
     {
         if ($this->parentNode) {
@@ -323,7 +622,12 @@ class DomNode
         }
         $this->parentNode = $parentNode;
     }
-    
+
+    /**
+     * Get indent leveled by node depth
+     *
+     * @return void
+     */
     public function getIndent()
     {
         $level = 0;
@@ -338,129 +642,33 @@ class DomNode
         if ($level <= 0) {
             return PHP_EOL;
         }
-        return PHP_EOL.str_repeat('  ', $level);
+        return PHP_EOL . str_repeat('  ', $level);
     }
-    
-    /* GETTERS */
-    public function __get($prop) 
-    {
-        if (method_exists($this, 'get'.ucfirst($prop))) {
-            return $this->{'get'.ucfirst($prop)}();
-        }
-        return $this->{$prop};
-    }
-    
-    public function getNodeName()
-    {
-        return $this->nodeName;
-    }
-    
-    public function getParentNode()
-    {
-        return $this->parentNode;
-    }
-    
-    public function getAttributes()
-    {
-        return new DomNodeAttrList($this->attrs);
-    }
-    
-    public function getRoot()
-    {
-        if (!$this->parentNode) {
-            return null;
-        }
-        
-        $node = $this;
-        while ($node->parentNode) {
-            $node = $node->parentNode;
-        }
-        
-        return $node;
-    }
-    
-    public function removeAttribute($name)
-    {
-        foreach ($this->attrs as $i => $attr) {
-            if ($attr->nodeName == $name) {
-                unset($this->attrs[$i]);
-                return $this;
-            }
-        }
-        return $this;
-    }
-    
-    public function isSelfClosingTag()
+
+    /**
+     * Determine if is self closing tag
+     *
+     * @return boolean
+     */
+    public function isSelfClosingTag(): bool
     {
         return in_array($this->nodeName, $this->selfClosingTags);
     }
-    
-    public function changeNode($nodeName, $nodeValue = '')
+
+    /**
+     * Change node name and value
+     *
+     * @param string $nodeName
+     * @param string $nodeValue
+     * @return void
+     */
+    public function changeNode(string $nodeName, string $nodeValue = '')
     {
         $this->nodeName = $nodeName;
         $this->nodeValue = $nodeValue;
     }
-    
-    public function getPrevSibling()
-    {
-        $i = null; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
-        $siblings = $this->parentNode->childNodes;
-        foreach ($siblings as $j => $cn) {//d($cn->nodeName);
-            if ($cn === $this) {
-                $i = $j;
-                break;
-            }
-        }
-        //dd(array_keys($siblings));
-        if (isset($siblings[$i-1])) {
-            return $siblings[$i-1];
-        }
-    }
-    
-    public function getNextSibling()
-    {
-        $i = null; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
-        $siblings = $this->parentNode->childNodes;
-        foreach ($siblings as $j => $cn) {
-            if ($cn === $this) {
-                $i = $j;
-                break;
-            }
-        }
-        
-        if (isset($siblings[$i+1])) {
-            return $siblings[$i+1];
-        }
-    }
-    
-    public function getNextSiblings()
-    {
-        $result = [];
-        $i = false; //TODO: array search da rateuri??? array_search($node, $this->childNodes, true);
-        $siblings = $this->parentNode->childNodes;
-        foreach ($siblings as $cn) {
-            if ($cn === $this) {
-                $i = true;
-                continue;
-            }
-            if ($i) {
-                $result[] = $cn;
-            }
-        }
-        
-        return $result;
-    }
-    
-    public function getSrcFile() 
-    {
-        $root = $this;
-        while (!$root->srcFile && $root->nodeName != '#root') {
-            $root = $this->parentNode;
-        }
-        return $root->srcFile;
-    }
-    
-    private function assertNotContained($parent, $append) 
+
+    private function assertNotContained($parent, $append)
     {
         if ($parent === $append) {
             throw new \Exception('Parent Node is contained by appended Node. This will cause recursivity');
@@ -469,7 +677,7 @@ class DomNode
             $this->assertNotContained($parent, $cn);
         }
     }
-    
+
     public function d()
     {
         echo PHP_EOL;
@@ -478,27 +686,59 @@ class DomNode
         echo '</pre>';
         echo PHP_EOL;
     }
-    
-    public function dd() 
+
+    public function dd()
     {
         $this->d();
         die();
     }
-    
-    public function querySelector($selector = '')
+
+    // =================================================== //
+    // ===================== GETTERS ===================== //
+    // =================================================== //
+    public function __get($prop)
     {
-        return (new QuerySelector($this))->find($selector, false);
-    }
-    
-    public function querySelectorAll($selector = '')
-    {
-        return (new QuerySelector($this))->find($selector);
-    }
-    
-    public function patch(Closure $fn) 
-    {
-        if (!$description) {
-            throw new Exception('A patch description must be given in order to ensure hashing');
+        if (method_exists($this, 'get' . ucfirst($prop))) {
+            return $this->{'get' . ucfirst($prop)}();
         }
+        return $this->{$prop};
+    }
+
+    public function getSrcFile()
+    {
+        $root = $this;
+        while (!$root->srcFile && $root->nodeName != '#root') {
+            $root = $this->parentNode;
+        }
+        return $root->srcFile;
+    }
+
+    public function getNodeName()
+    {
+        return $this->nodeName;
+    }
+
+    public function getParentNode()
+    {
+        return $this->parentNode;
+    }
+
+    public function getAttributes(): DomNodeAttrList
+    {
+        return new DomNodeAttrList($this->attrs);
+    }
+
+    public function getRoot()
+    {
+        if (!$this->parentNode) {
+            return null;
+        }
+
+        $node = $this;
+        while ($node->parentNode) {
+            $node = $node->parentNode;
+        }
+
+        return $node;
     }
 }
