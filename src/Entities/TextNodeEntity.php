@@ -3,35 +3,46 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Entities\AbstractEntity;
 
 class TextNodeEntity extends SimpleNodeEntity
 {
     const WEIGHT = 70;
-    
-    public static function test(DomNode $node, EntityInterface $context)
+
+    public static function test(DomNode $node, EntityInterface $context): BOOL
     {
         return $node->nodeName == '#text';
     }
-    
-    public function simpleNodeContext() 
+
+    /**
+     * <div>abc</div>
+     */
+    public function simpleNodeContext()
     {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
         parent::simpleNodeContext();
     }
-    
+
+    /**
+     * <tpl is="comp/x">abc</tpl>
+     */
     public function templateContext()
     {
         $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
         parent::templateContext();
     }
-    
-    private function replaceSpecialTags(string $html)
+
+    /**
+     * Replace php echo, open and close tags
+     *
+     * @param string $html
+     * @return string
+     */
+    private function replaceSpecialTags(string $html): string
     {
         $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
             return '<?php ' . $m[1] . ' ?>';
         }, $html);
-        
+
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 $eval = $eval;
@@ -39,7 +50,7 @@ class TextNodeEntity extends SimpleNodeEntity
             }
             return '';
         }, $html);
-        
+
         $html = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
             if ($eval = trim($m[1])) {
                 $eval = $eval;
@@ -47,7 +58,7 @@ class TextNodeEntity extends SimpleNodeEntity
             }
             return '';
         }, $html);
-        
+
         return $html;
     }
 }

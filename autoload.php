@@ -5,9 +5,12 @@ error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
 
+// TODO: remove this
+
 if (!function_exists('dd')) {
     function dd(...$data) {
-        //debug_print_backtrace(2);die();
+        $x = debug_backtrace();
+        print_r($x[0]['file'].':'.$x[0]['line'].PHP_EOL);
         foreach ($data as $d) {
             //var_dump($d);
             echo '<pre>';
@@ -20,7 +23,7 @@ if (!function_exists('dd')) {
 
 function d(...$data) {
     $x = debug_backtrace();
-    //print_r($x[0]['file'].'->'.$x[0]['line']);
+    print_r($x[0]['file'].':'.$x[0]['line'].PHP_EOL);
     foreach ($data as $d) {
         //var_dump($d);
         //echo '<pre>';

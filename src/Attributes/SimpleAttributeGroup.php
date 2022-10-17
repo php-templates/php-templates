@@ -10,7 +10,7 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
     {
         return ltrim($this->attrs[0]->nodeName, ': ');
     }
-    
+
     // todo documentat array class :class="[x => true]"
     public function bindToNodeAttr(): string
     {
@@ -19,7 +19,7 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
                 return $this->bindAttrFilterToNodeAttr();
             }
         }
-        
+
         $k = $this->getNodeName();
         $arr = [];
         foreach ($this->attrs as $attr) {
@@ -29,14 +29,14 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         if (empty($val)) {
             return $k;
         }
-        
-        return "$k=\"$val\"";        
+
+        return "$k=\"$val\"";
     }
-    
+
     public function bindToTemplateAttr(): string
     {
         $k = $this->getNodeName();
-        
+
         $arr = [];
         $binds = false;
         $normal = false;
@@ -50,7 +50,7 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
                 $arr[] = "'{$attr->nodeValue}'";
             }
         }
-        
+
         if (empty($arr)) {
             $val = "''";
         } elseif ($binds && $normal) {
@@ -60,19 +60,19 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         else {
             $val = implode(' ', $arr);
         }
-        
+
         return "'$k' => $val";
     }
-    
+
     public function bindArrayToNode(): string
     {
         return '[' . $this->bindToTemplateAttr() . ']';
     }
-    
+
     public function bindArrayToTemplate(): string
     {
         $k = $this->getNodeName();
-        
+
         $arr = [];
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
@@ -83,15 +83,15 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
             }
         }
         $val = end($arr);
-        
+
         return "['$k' => $val]";
     }
-    
+
     public function toFullArrayString(): string
     {
         return '[' . $this->toArrayString() . ']';
     }
-    
+
     private function bindAttrFilterToNodeAttr()
     {
         $k = $this->getNodeName();
@@ -104,13 +104,13 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
                 $arr[] = "'{$attr->nodeValue}'";
             }
         }
-        
+
         if (empty($arr)) {
             $val = '[]';
         } else {
             $val = '[' . implode(', ', $arr) . ']';
         }
-        
-        return "$k=\"<?php echo attr_filter($val); ?>\"";     
+
+        return "$k=\"<?php echo attr_filter($val); ?>\"";
     }
 }

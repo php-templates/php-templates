@@ -2,32 +2,35 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Helper;
 use PhpTemplates\Closure;
-use PhpTemplates\TemplateFunction;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Source;
 use PhpTemplates\Dom\DomNodeAttr;
-use PhpTemplates\Dom\PhpSlotAssignNode;
 
 class SimpleNodeEntity extends AbstractEntity
 {
     //protected $isHtml = true;
     protected $attrs = [];
 
-    public static function test(DomNode $node, EntityInterface $context)
+    public static function test(DomNode $node, EntityInterface $context): bool
     {
         return true;
     }
 
+    /**
+     * <tpl><div></div></tpl>
+     */
     public function anonymousContext()
     {
         return $this->simpleNodeContext();
     }
 
+    /**
+     * <div><div></div></div>
+     */
     public function simpleNodeContext()
     {
-        // TODO: comp as simple text
+        // TODO: test comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
             $this->factory->make($slot, $this)->parse();
@@ -35,55 +38,71 @@ class SimpleNodeEntity extends AbstractEntity
 
         $this->node->addAttribute($data);
     }
-    
-    public function extendContext() {
+
+    /**
+     * <tpl extends="comp/x"><div></div></tpl>
+     */
+    public function extendContext()
+    {
         $this->templateContext();
     }
 
+    /**
+     * <tpl is="comp/x"><div></div></tpl>
+     */
     public function templateContext()
     {
-        //$this->attrs['slot'] = 'default';
-        //$scopeData = $this->context->getAttr('p-scope');
-
-        //$slotAssignNode = new PhpSlotAssignNode($this->context->getId(), $this->node->getAttribute('slot') ?? 'default', $scopeData);
-        //$this->node->parentNode->insertBefore($slotAssignNode, $this->node);
-        //$slotAssignNode->appendChild($this->node->detach());
-
         $data = $this->depleteNode($this->node);
         $this->node->addAttribute($data);
 
         foreach ($this->node->childNodes as $cn) {
             $this->factory->make($cn, $this)->parse();
         }
-        
+
         $attrs = [];
         foreach ($this->attrs as $k => $val) {
-            $attrs[] = new DomNodeAttr($k, $val);//todo, vezi daca e necesar
+            $attrs[] = new DomNodeAttr($k, $val); //todo, vezi daca e necesar
         }
         //$dataString = $this->fillNode(null, $attrs);
-//TODO: findout what to do with data
+        //TODO: findout what to do with data
     }
 
     /**
-     * as slot default
+     * <slot><div></div></slot>
      */
     public function slotContext()
     {
         $this->simpleNodeContext();
     }
-    
-    public function startupContext() {
-        
+
+    /**
+     * <div></div> -> when we call template->makeRaw('<div></div>');
+     */
+    public function startupContext()
+    {
+
         $this->simpleNodeContext();
 
+        /** @var StartupEntity */
         $context = $this->context;
         if ($name = $context->getName()) {
-        $fnSrc = $this->buildTemplateFunction($this->node);
+            $fnSrc = (string)$this->buildTemplateFunction($this->node);
 
-        $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
-        /** @var StartupEntity */
+            $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
 
             $this->cache->set($context->getName(), $fn, new Source($fnSrc, ''));
         }
     }
+
+    /**
+     * Never reached
+     */
+    public function textNodeContext()
+    {}
+
+    /**
+     * Never reached
+     */
+    public function verbatimContext()
+    {}
 }

@@ -6,8 +6,6 @@ use PhpTemplates\Config;
 use PhpTemplates\Process;
 use PhpTemplates\Attributes\AttributePack;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\PhpNodeValAttr;
-use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\EntityFactory;
@@ -15,23 +13,51 @@ use PhpTemplates\EntityFactory;
 abstract class AbstractEntity implements EntityInterface
 {
     const WEIGHT = 0;
-    
+
+    /**
+     * class used to instantiate entities in nodes recursion
+     *
+     * @var EntityFactory
+     */
     protected $factory;
+
+    /**
+     * The Config holding directives, paths and aliases
+     *
+     * @var Config
+     */
     protected $config;
+
+    /**
+     * The pack of events to each template action
+     *
+     * @var EventHolder
+     */
     protected $eventHolder;
+
+    /**
+     * The cache system used to store the parse result
+     *
+     * @var CacheInterface
+     */
     protected $cache;
-   
+
+    /**
+     * Unique id -> used to parent-child comunication like: this->comp[id]->addSlot(...)
+     *
+     * @var string
+     */
     protected $id;
 
     /**
-     * recursive parent context
+     * Recursive parent context
      *
      * @var AbstractEntity $context
      */
     protected $context;
 
     /**
-     * current DomNode
+     * Current inparse DomNode
      *
      * @var DomNode $node
      */
@@ -42,31 +68,24 @@ abstract class AbstractEntity implements EntityInterface
      *
      * @var array $attrs
      */
-
     protected $attrs = [];
-    
-    /**
-     * Used to not override above variables in case of multi-level nest, eg:
-     * var1 = comp1
-     * var2 = var1->addSlot(x);
-     *
-     * @var integer
-     */
-    protected $depth = 0;
-    
+
     /**
      * prefix for special php blocks (p-if, p-for)
      *
      * @var string
      */
     protected $pf = 'p-';
-    
+
     /**
-     * Creating a new instance by giving the main process as param, the node and the context
+     * Creating a new instance by giving the main process as param, the node and the contex
      *
-     * @param Process $process
-     * @param string|DomNode $node string when is component, DomNode when is simple node
-     * @param AbstractEntity $context
+     * @param DomNode $node
+     * @param Config $config
+     * @param EntityInterface $context
+     * @param CacheInterface $cache
+     * @param EntityFactory $factory
+     * @param EventHolder $eventHolder
      */
     public function __construct(DomNode $node, Config $config, EntityInterface $context, CacheInterface $cache, EntityFactory $factory, EventHolder $eventHolder)
     {
@@ -78,20 +97,23 @@ abstract class AbstractEntity implements EntityInterface
         $this->eventHolder = $eventHolder;
         $this->id = uniqid();
     }
-    
-    abstract public function templateContext(); 
-    abstract public function slotContext(); 
-    abstract public function simpleNodeContext(); 
-    abstract public function anonymousContext(); 
-    
+
+    abstract public function templateContext();
+    abstract public function slotContext();
+    abstract public function simpleNodeContext();
+    abstract public function anonymousContext();
+    abstract public function extendContext();
+    abstract public function textNodeContext();
+    abstract public function verbatimContext();
+
+
     /**
      * Wrap node inside control structures and returns the aggregated node datas as array (like :class and class under 1 single key named :class)
      *
-     * @param [type] $node
-     * @param callable $cb
-     * @return array
+     * @param DomNode $node
+     * @return AttributePack
      */
-    protected function depleteNode($node): AttributePack
+    protected function depleteNode(DomNode $node): AttributePack
     {
         $attributePack = new AttributePack();
         // dispatch any existing directive
@@ -111,7 +133,7 @@ abstract class AbstractEntity implements EntityInterface
                     // todo don t allow directive with cstruct name
                     if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
                         $directive($node, $a->nodeValue);
- 
+
                         // directive unpacked his data, next attr!!!
                         continue;
                     }
@@ -120,83 +142,46 @@ abstract class AbstractEntity implements EntityInterface
                 $attributePack->add($a);
             }
         }
+
         return $attributePack;
     }
 
     /**
-     * After the node has been depleted and has 0 attributes, proceed to populate it with parsed attributes
-     *
-     * @param DomNode|null $node when null, return the data attrs as array => case component($data=[])
-     * @param array $data
-     * @return mixed
+     * Call recursive parse process
      */
-    protected function fillNodjdhfhde($node, array $data)
-    {
-        if (is_null($node)) {
-            if (isset($data['_attrs'])) {
-                $attrs = array_map(function($a) {
-                    return $a->toArrayString();
-                }, $data['_attrs']);
-                unset($data['_attrs']);
-                $attrs = "'_attrs' => [" . implode(', ', $attrs) . ']';
-            } else {
-                $attrs = '';
-            }
-            
-            $data = array_map(function($a) {
-                return $a->toArrayString();
-            }, $data);
-            if ($attrs) {
-                $data[] = $attrs;
-            }
-            $data = '[' . implode(', ', $data) . ']';
-            
-            return $data;
-        }
-        foreach ($data as $attr) {
-            $node->addAttribute($attr);
-        }
-    }
-    
-    public function getId()
-    {
-        return $this->id;
-    }
-    
-    public function getAttrs() 
-    {
-        return $this->attrs;
-    }
-    
-    public function getAttr(string $key) 
-    {
-        return $this->attrs[$key] ?? null;
-    }
-    
-    public function parse() 
+    public function parse()
     {
         if ($this->context) {
             $fn = explode('\\', get_class($this->context));
             $fn = end($fn);
             $fn = str_replace('Entity', 'Context', lcfirst($fn));
-        } 
-        else {
+        } else {
             $fn = 'simpleNodeContext';
         }
-        
+
         $this->resolve($this->cache, $this->eventHolder);
-        
+
         return $this->{$fn}();
     }
-    
-    public function getConfig() 
-    {
-        return $this->config;
-    }
-    
-    public function resolve(CacheInterface $document, EventHolder $eventHolder) {}
 
-    protected function sanitizeTemplate(string $string) 
+    /**
+     * Automatically called before each parse process
+     *
+     * @param CacheInterface $document
+     * @param EventHolder $eventHolder
+     * @return void
+     */
+    public function resolve(CacheInterface $document, EventHolder $eventHolder)
+    {
+    }
+
+    /**
+     * Gain parse result function as input and transform each variable access into context->variable access
+     *
+     * @param string $string
+     * @return void
+     */
+    protected function sanitizeTemplate(string $string): string
     {
         $preserve = [
             //'$this->' => '__r-' . uniqid(),
@@ -205,26 +190,26 @@ abstract class AbstractEntity implements EntityInterface
             'array $data' => '__r-' . uniqid(),
             '$context = $context->subcontext' => '__r-' . uniqid(),
         ];
-        
+
         $string = str_replace(array_keys($preserve), $preserve, $string);
         $preserve = array_flip($preserve);
-        
-        $string = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function($m) {
+
+        $string = preg_replace_callback('/(?<!<)<\?php(.*?)\?>/s', function ($m) {
             return '<?php ' . $this->_bindVariablesToContext($m[1]) . ' ?>';
-        }, $string);        
-     
+        }, $string);
+
         $string = str_replace(array_keys($preserve), $preserve, $string);
 
-        $string = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function($m) {
+        $string = preg_replace_callback('/\?>([ \t\n\r]*)<\?php/', function ($m) {
             return $m[1];
         }, $string);
-        
+
         $string = preg_replace('/[\n ]+ *\n+/', "\n", $string);
-        
+
         return $string;
     }
-    
-    private function _bindVariablesToContext(string $string) 
+
+    private function _bindVariablesToContext(string $string): string
     {
         // replace any \\ withneutral chars only to find unescaped quotes positions
         $tmp = str_replace('\\', '__', $string);
@@ -237,63 +222,89 @@ abstract class AbstractEntity implements EntityInterface
                 $stringRange['end'] = $m[1];
                 $stringRanges[] = $stringRange;
                 $stringRange = null;
-            }
-            elseif (!$stringRange) {
+            } elseif (!$stringRange) {
                 $stringRange['char'] = $m[0];
                 $stringRange['start'] = $m[1];
-            }
-            elseif ($stringRange && $k == $last) {
+            } elseif ($stringRange && $k == $last) {
                 // todo throw error unclosed string
             }
         }
-        
+
         $stringRange = null;
         // match all $ not inside of a string declaration, considering escapes
-        $count = null;//d($stringRanges);
-        $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function($m) use (&$stringRange, &$stringRanges) {//d($m);
+        $count = null; //d($stringRanges);
+        $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function ($m) use (&$stringRange, &$stringRanges) { //d($m);
             if (empty($m[1][0]) || $m[1][0] == 'this' || $m[1][0] == 'context') {
                 return '$' . $m[1][0];
             }
             $var = $m[1][0];
             $pos = $m[0][1];
-            
+
             if ($stringRange && ($stringRange['start'] > $pos || $pos > $stringRange['end'])) {
                 $stringRange = null;
             }
             if (!$stringRange) {
-            while ($stringRanges) {
-                if ($pos > $stringRanges[0]['end']) {
-                    array_shift($stringRanges);
+                while ($stringRanges) {
+                    if ($pos > $stringRanges[0]['end']) {
+                        array_shift($stringRanges);
+                    } elseif ($stringRanges[0]['start'] < $pos && $pos < $stringRanges[0]['end']) {
+                        $stringRange = array_shift($stringRanges);
+                        break;
+                    } else {
+                        // not yet your time
+                        break;
+                    }
                 }
-                elseif ($stringRanges[0]['start'] < $pos && $pos < $stringRanges[0]['end']) {
-                    $stringRange = array_shift($stringRanges);
-                    break;
-                }
-                else {
-                    // not yet your time
-                    break;
-                }
-            }
             }
 
             if (!$stringRange || $stringRange['char'] != "'") {
-                return '$context->'.$var;
-            } 
+                return '$context->' . $var;
+            }
             return '$' . $var;
         }, $string, -1, $count, PREG_OFFSET_CAPTURE);
 
         return $string;
-    }    
-    
-    protected function buildTemplateFunction(DomNode $node) 
+    }
+
+    /**
+     * Returns template function string for a given DomNode
+     *
+     * @param DomNode $node
+     * @return void
+     */
+    protected function buildTemplateFunction(DomNode $node): string
     {
         $fnDeclaration = 'function (Context $context) {' . PHP_EOL
-        . '?> '. $node .' <?php' . PHP_EOL
-        . '}';
-        
-        $fnDeclaration = $this->sanitizeTemplate($fnDeclaration);
-        
+            . '?> ' . $node . ' <?php' . PHP_EOL
+            . '}';
+
+        $fnDeclaration = (string)$this->sanitizeTemplate($fnDeclaration);
+
         return $fnDeclaration;
-    }    
-    
+    }
+
+    // =================================================== //
+    // ===================== GETTERS ===================== //
+    // =================================================== //
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getAttrs(): array
+    {
+        return $this->attrs;
+    }
+
+    public function getAttr(string $key)
+    {
+        return $this->attrs[$key] ?? null;
+    }
+
+    public function getConfig(): Config
+    {
+        return $this->config;
+    }
 }
+
