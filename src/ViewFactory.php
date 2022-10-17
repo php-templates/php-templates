@@ -12,8 +12,10 @@ use PhpTemplates\Entities\SimpleNode;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\Cache\NullCache;
 
+// todo: rename into template
 class ViewFactory
 {
+    //todo forward usefull m calls to eventholder and config
     protected $composers = [];
     private $shared = [];
     private $outputFolder;
@@ -27,7 +29,7 @@ class ViewFactory
     }
     
     public function render(string $rfilepath, array $data = [], $slots = [])
-    {
+    {// todo add support for src obj
         $start_time = microtime(true);
         $template = $this->make($rfilepath, $data, $slots);
         $template->render();
@@ -70,6 +72,7 @@ class ViewFactory
             //->withComposers($this->composers)
             ->setSlots($slots);
     }
+
 
     public function make(string $rfilepath, array $data = [], $slots = [])
     {

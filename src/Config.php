@@ -30,7 +30,7 @@ class Config
     }
     
     public function subconfig($name, $srcPath) 
-    {
+    {// todo: ensure existing is taken
         $cfg = new Config($name, $srcPath, $this);
         $this->childs[] = $cfg;
   

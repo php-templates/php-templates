@@ -5,6 +5,7 @@ namespace PhpTemplates;
 use Closure;
 use PhpTemplates\Cache\CacheInterface;
 
+// todo rename into ViewFactory
 class TemplateRepository
 {
     protected $templates;

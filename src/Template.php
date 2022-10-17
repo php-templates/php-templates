@@ -5,7 +5,7 @@ namespace PhpTemplates;
 use Closure;
 use PhpTemplates\Cache\CacheInterface;
 
-// aka parsed template
+// todo rename into view
 class Template
 {
     /**
