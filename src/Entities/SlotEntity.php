@@ -5,8 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\PhpNode;
-
+use PhpTemplates\Dom\PhpNodes\PhpNode;
 
 class SlotEntity extends AbstractEntity
 {

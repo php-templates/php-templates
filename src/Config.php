@@ -105,6 +105,8 @@ class Config
                 return $cfg;
             }
         }
+
+        return null;
     }
 
     private function addDefaultDirectives()

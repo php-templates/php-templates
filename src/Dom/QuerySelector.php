@@ -20,11 +20,12 @@ element1~element2	p ~ ul	Selects every <ul> element that is preceded by a <p> el
 class QuerySelector
 {
     private $node;
-    
-    public function __construct($node) {
+
+    public function __construct($node)
+    {
         $this->node = $node;
     }
-    
+
     public function find(string $selector, $many = true)
     {
         $modes = [
@@ -33,7 +34,7 @@ class QuerySelector
             '~',
         ];
         $selectors = array_filter(explode(' ', $selector));
-        
+
         $nodes = [$this->node];
         while ($selectors && $nodes) {
             $s = array_shift($selectors);
@@ -56,14 +57,14 @@ class QuerySelector
             }
             $nodes = $_nodes;
         }
-        
+
         if (!$nodes && !$many) {
             return null;
         }
-        
+
         return $nodes;
     }
-    
+
     private function whatIsThis($selector)
     {
         // preg match dupa node selectors
@@ -71,32 +72,30 @@ class QuerySelector
         // preg match dupa class selectors
         // preg match dupa  selectors
         $is = [];
-        $selector = preg_replace_callback('/\[([\w\d\-\$:@]+)=(((?!\]).)*)\]/', function($m) use (&$is) {
+        $selector = preg_replace_callback('/\[([\w\d\-\$:@]+)=(((?!\]).)*)\]/', function ($m) use (&$is) {
             $is[$m[1]][] = trim($m[2], '"\'');
             return '';
         }, $selector);
-        preg_replace_callback('/([\.\#]*)(((?![\.#]).)*)/', function($m) use (&$is) {
+        preg_replace_callback('/([\.\#]*)(((?![\.#]).)*)/', function ($m) use (&$is) {
             if ($m[1] == '.') {
                 $is['class'][] = $m[2];
-            }
-            elseif ($m[1] == '#') {
+            } elseif ($m[1] == '#') {
                 $is['id'][] = $m[2];
-            }
-            elseif ($m[2]) {
+            } elseif ($m[2]) {
                 $is['nodeName'] = $m[2];
             }
         }, $selector);
-      
+
         return $is;
     }
-    
+
     private function searchForNodes($node, $selector, $mode)
     {
         //no mode, search recursive in node, childNodes and collect matches
         //mode > it means that node was retrieved in a prev selector, test against node childnodes only
         //mode + test only against node next nextSibling
         // ~ test only against node siblings
-        
+
         $found = [];
         if ($node->nodeName && $node->nodeName[0] == '#') {
             foreach ($node->childNodes as $cn) {
@@ -105,7 +104,7 @@ class QuerySelector
             }
             return $found;
         }
-    
+
         if (!$mode) {
             if ($this->nodeIsMatched($node, $selector)) {
                 $found[] = $node;
@@ -114,33 +113,30 @@ class QuerySelector
                 $_found = $this->searchForNodes($cn, $selector, $mode);
                 $found = array_merge($found, $_found);
             }
-            
+
             return $found;
-        }
-        elseif ($mode == '>') {
+        } elseif ($mode == '>') {
             foreach ($node->childNodes as $cn) {
                 if ($this->nodeIsMatched($cn, $selector)) {
                     $found[] = $cn;
                 }
             }
-        }
-        elseif ($mode == '+') {
+        } elseif ($mode == '+') {
             $next = $node->nextSibling;
             if ($next && $this->nodeIsMatched($next, $selector)) {
                 $found[] = $next;
             }
-        }
-        elseif ($mode == '~') {
+        } elseif ($mode == '~') {
             foreach ($node->nextSiblings as $sn) {
                 if ($this->nodeIsMatched($sn, $selector)) {
                     $found[] = $sn;
                 }
             }
         }
-        
+
         return $found;
     }
-    
+
     private function nodeIsMatched($node, $selector)
     {
         if (isset($selector['nodeName']) && $selector['nodeName'] != '*' && $node->nodeName != $selector['nodeName']) {
@@ -161,10 +157,10 @@ class QuerySelector
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     public function __get($prop)
     {
         return $this->{$prop};

@@ -7,8 +7,8 @@ use PhpTemplates\Dom\DomNodeAttr;
 class ForwardAttributeGroup extends AbstractAttributeGroup
 {
     const WEIGHT = 1;
-    
-    public static function test(DomNodeAttr $attr): bool 
+
+    public static function test(DomNodeAttr $attr): bool
     {
         return $attr->nodeName && $attr->nodeName[0] == '@' && strpos($attr->nodeName, '@php') !== 0;
     }
@@ -17,16 +17,16 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
     {
         return '_attrs';
     }
-    
+
     public function bindToNodeAttr(): string
     {
         $arr = [];
-        
+
         foreach ($this->attrs as $attr) {
             $k = ltrim($attr->nodeName, ' @');
             $arr[] = $k . '="<?php echo ' . $attr->nodeValue . '; ?>"';
         }
-        
+
         return implode(' ', $arr);
     }
 
@@ -38,10 +38,10 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
         $val = "'_attrs' => [" . implode(', ', $arr) . ']';
-        
+
         return $val;
     }
-    
+
     public function bindArrayToNode(): string
     {
         $arr = [];
@@ -49,10 +49,10 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $k = ltrim($attr->nodeName, ' @');
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
-        
+
         return '[' . implode(', ', $arr) . ']';
     }
-    
+
     public function bindArrayToTemplate(): string
     {
         $arr = [];
@@ -61,10 +61,10 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
         $val = "['_attrs' => [" . implode(', ', $arr) . ']]';
-        
+
         return $val;
     }
-    
+
     public function toFullArrayString(): string
     {
         $arr = [];
@@ -73,7 +73,7 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
             $arr[] = "'$k' => " . $attr->nodeValue;
         }
         $val = '[' . implode(', ', $arr) . ']';
-        
+
         return $val;
     }
 }

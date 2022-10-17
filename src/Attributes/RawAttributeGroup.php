@@ -7,17 +7,17 @@ use PhpTemplates\Dom\DomNodeAttr;
 class RawAttributeGroup extends AbstractAttributeGroup
 {
     const WEIGHT = 2;
-    
-    public static function test(DomNodeAttr $attr): bool 
+
+    public static function test(DomNodeAttr $attr): bool
     {
         return $attr->nodeName == 'p-raw';
     }
-    
+
     public function getNodeName(): string
     {
         return '';
     }
-    
+
     // todo documentat array class :class="[x => true]"
     public function bindToNodeAttr(): string
     {
@@ -25,7 +25,7 @@ class RawAttributeGroup extends AbstractAttributeGroup
         foreach ($this->attrs as $attr) {
             $arr[] =  "<?php echo {$attr->nodeValue}; ?>";
         }
-        
+
         return implode(' ', $arr);
     }
 
@@ -33,17 +33,17 @@ class RawAttributeGroup extends AbstractAttributeGroup
     {
         return '[]';
     }
-    
+
     public function bindArrayToNode(): string
     {
         $arr = [];
         foreach ($this->attrs as $attr) {
             $arr[] =  $attr->nodeValue;
         }
-        
+
         return '[' . implode(', ', $arr) . ']';
     }
-    
+
     public function bindArrayToTemplate(): string
     {
         return '[]';

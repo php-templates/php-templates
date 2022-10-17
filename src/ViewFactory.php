@@ -28,6 +28,14 @@ class ViewFactory
         $this->eventHolder = $eventHolder;
     }
 
+    /**
+     * Render/echo the given template
+     *
+     * @param string $rfilepath - template name
+     * @param array $data - array of key => value data to be bassed to view
+     * @param array $slots - array of closures keyed by slot position
+     * @return void
+     */
     public function render(string $rfilepath, array $data = [], $slots = [])
     { // todo add support for src obj
         $start_time = microtime(true);
@@ -42,10 +50,7 @@ class ViewFactory
         $rfilepath = md5($phpt);
         //todo format
 
-        //$requestName = preg_replace('(\.template|\.php)', '', $rfilepath);
-        // init the document with custom settings as src_path, aliases
         // paths will fallback on default Config in case of file not found or setting not found
-        //$doc = new Document($this->destPath, $requestName, '', $this->trackChanges && !$this->debugMode);
         if (!$this->cache->load($rfilepath)) {
             //todo source line pointing to caller line
             $source = new Source($phpt, '');
@@ -53,7 +58,6 @@ class ViewFactory
             $node = $parser->parse($source);
 
             // parse it
-            //$name = $document->getInputFile();
             $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
             $entity = $factory->make($node, new StartupEntity($this->config, $rfilepath));
             $entity->parse();
@@ -61,17 +65,20 @@ class ViewFactory
             $this->cache->write($rfilepath);
         }
 
-        //$repository = new TemplateRepository($cache, $this->eventHolder);
         $result = $this->get($rfilepath, new Context($data));
 
         return $result
-            //->withData($data)
-            //->withShared($this->shared)
-            //->withComposers($this->composers)
             ->setSlots($slots);
     }
 
-
+    /**
+     * Obtain an instance of template to be manipulated
+     *
+     * @param string $rfilepath - template name
+     * @param array $data - array of key => value data to be bassed to view
+     * @param array $slots - array of closures keyed by slot position
+     * @return void
+     */
     public function make(string $rfilepath, array $data = [], $slots = [])
     {
         $this->cache = $this->getCache();
@@ -86,15 +93,19 @@ class ViewFactory
             $this->cache->write($rfilepath);
         }
 
-        //$repository = new TemplateRepository($cache, $this->eventHolder);
         $result = $this->get($rfilepath, new Context($data));
 
         return $result
-            //->withShared($this->shared)
-            //->withComposers($this->composers)
             ->setSlots($slots);
     }
 
+    /**
+     * Share global data to all views
+     *
+     * @param string|array $key - can be an associative array
+     * @param mixed $value
+     * @return void
+     */
     public function share($key, $value = null)
     {
         if (is_array($key)) {
@@ -106,12 +117,59 @@ class ViewFactory
         $this->shared = array_merge($this->shared, $data);
     }
 
+    /**
+     * Add event listener for given action
+     *
+     * @param string $ev - parsing, parsed or rendering
+     * @param string $name - template name
+     * @param Closure $cb - action, gaining node as param
+     * @param integer $weight - order - higher weight = exected first
+     * @return void
+     */
+    public function on(string $ev, string $name, Closure $cb, $weight = 0)
+    {
+        $this->eventHolder->on($ev, $name, $cb, $weight);
+    }
+
+    /**
+     * Define data builders for given template. When template gonna be rendered, thid callback will be called
+     * The callback gains as argument a list of template node attributes
+     *
+     * @param string $name
+     * @param \Closure $cb
+     * @return void
+     */
     public function composer(string $name, \Closure $cb)
     {
         $this->composers[$name][] = $cb;
     }
 
-    private function getCache()
+    public function getConfig(): Config
+    {
+        return $this->config;
+    }
+
+    /**
+     * Called from Template, should not be called by user, use make() instead
+     *
+     * @param string $name
+     * @param Context $context
+     * @return void
+     */
+    public function get(string $name, Context $context): Template
+    {
+        $context->merge($context->all(), $this->shared);
+        $this->compose($name, $context);
+
+        return (new Template($this, $name, $this->cache->get($name), $context));
+    }
+
+    public function getEventHolder()
+    {
+        return $this->eventHolder;
+    }
+
+    protected function getCache()
     {
         if ($this->outputFolder) {
             $cache = new FileSystemCache($this->outputFolder);
@@ -122,72 +180,14 @@ class ViewFactory
         return $cache;
     }
 
-
-
-    public function getConfig(): Config
-    {
-        return $this->config;
-    }
-
-    public function getEventHttfolder(): Config
-    {
-        return $this->eventHolder;
-    }
-
-    // added
-    public function sharbvge(array $data)
-    {
-        $this->shared = array_merge($this->shared, $data);
-    }
-
-    public function compoggfffsers(array $data)
-    {
-        $this->composers = array_merge($this->composers, $data);
-    }
-
-    public function getShggfchhared()
-    {
-        return $this->shared;
-    }
-
-    public function compose(string $name, $attrs = [])
+    protected function compose(string $name, $attrs = [])
     {
         if (empty($this->composers[$name])) {
             return [];
         }
 
-        //$data = [];
         foreach ($this->composers[$name] as $cb) {
             $cb($attrs);
         }
-
-        //  $this->composed = $data;
-
-        //return $data;
-    }
-
-    public function add(string $name, Closure $fn)
-    {
-        $this->templates[$name] = $fn;
-    }
-
-    public function get(string $name, Context $context)
-    {
-        $context->merge($context->all(), $this->shared);
-        $this->compose($name, $context);
-        //$data = array_merge((array)$this->shared, $data);
-        return (new Template($this, $name, $this->cache->get($name), $context));
-        //->with($this->shared)
-        //->with($this->compose($name, $context));
-    }
-
-    public function getEventHolder()
-    {
-        return $this->eventHolder;
-    }
-
-    public function on($ev, $name, $cb, $weight = 0)
-    {
-        $this->eventHolder->on($ev, $name, $cb, $weight);
     }
 }

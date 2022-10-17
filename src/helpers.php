@@ -8,7 +8,7 @@ namespace PhpTemplates;
  * @param string $string
  * @return void
  */
-function e($string) 
+function e($string)
 {
     echo htmlspecialchars((string)$string);
 }
@@ -25,7 +25,7 @@ function attr(...$data): string
     foreach ($data as $data) {
         if (is_array($data)) {
             $class[] = implode(' ', array_keys(array_filter($data)));
-        } 
+        }
         elseif(is_string($data)) {
             $class[] = $data;
         }
@@ -33,6 +33,12 @@ function attr(...$data): string
     return implode(' ', $class);
 }
 
+/**
+ * Gain array of arrays of key => value attrs, or flat arrays and returns one dimmension array of k->val
+ *
+ * @param array ...$arrays
+ * @return void
+ */
 function attr_merge(...$arrays) {
     $result = [];
     foreach ($arrays as $arr) {
@@ -43,19 +49,24 @@ function attr_merge(...$arrays) {
             $result[$k][] = $val;
         }
     }
-    
+
     foreach ($result as $k => $val) {
         $result[$k] = implode(' ', array_unique($val));
     }
-    
+
     return $result;
 }
 
-// accepts an array with attributes from a group, returns concated strings of it evaluated
-// supported syntaxes: attr_filter(['foo', '', 'foo' => true])
-// returns string concat
+/**
+ * accepts an array with attributes from a group, returns concated strings of it evaluated
+ * supported syntaxes: attr_filter(['foo', '', 'foo' => true])
+ * returns string concat
+ *
+ * @param array $attrs
+ * @return void
+ */
 function attr_filter(array $attrs)
-{//d($attrs);
+{
     $arr = [];
     foreach ($attrs as $attr) {
         if (is_array($attr)) {
@@ -81,11 +92,17 @@ function attr_filter(array $attrs)
             $arr[] = $attr;
         }
     }
-    
+
     return implode(' ', array_unique($arr));
 }
 
-function bind(...$attrs) 
+/**
+ * gain an array of k => val attributes and echo them as valid html dom node attr string
+ *
+ * @param array ...$attrs
+ * @return void
+ */
+function bind(...$attrs)
 {
     $result = [];
     foreach ($attrs as $attr) {
@@ -93,7 +110,7 @@ function bind(...$attrs)
             if (!is_string($val)) {
                 $val = json_encode($val);
             }
-            
+
             if (is_numeric($k)) {
                 if ($val) {
                     $result[] = $val;
@@ -101,13 +118,13 @@ function bind(...$attrs)
             }
             elseif (isset($result[$k])) {
                 $result[$k] .= ' ' . $val;
-            }            
+            }
             else {
                 $result[$k] = $val;
             }
         }
     }
-    
+
     $output = [];
     foreach ($result as $name => $value) {
         if (is_numeric($name)) {
@@ -119,6 +136,12 @@ function bind(...$attrs)
     echo implode(' ', $output);
 }
 
+/**
+ * Check dependencies foreach file => filemtime and returns false in case of modification
+ *
+ * @param array $files
+ * @return void
+ */
 function check_dependencies(array $files)
 {
     foreach ($files as $file => $m) {

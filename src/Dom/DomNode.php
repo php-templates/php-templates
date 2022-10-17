@@ -245,8 +245,7 @@ class DomNode
     }
 
     /**
-     * Add an attribute to node. If an already existing attribute will be found by given name,
-     * it will be treat like this: $existingAttr->nodeValue .= ' ' . $nodeValue;
+     * Add an attribute to node
      *
      * @param string|DomNodeAttr $nodeName
      * @param string $nodeValue
@@ -256,19 +255,12 @@ class DomNode
     {
         if ($nodeName instanceof DomNodeAttr) {
             $incoming = $nodeName;
-
-            foreach ($this->attrs as $attr) {
-                if ($attr->nodeName == $incoming->nodeName) {
-                    $attr->nodeValue .= ' ' . $incoming->nodeValue;
-                    return;
-                }
-            }
         }
         else {
-            $attr = new DomNodeAttr($nodeName, $nodeValue);
+            $incoming = new DomNodeAttr($nodeName, $nodeValue);
         }
 
-        $this->attrs[] = $attr;
+        $this->attrs[] = $incoming;
     }
 
     /**

@@ -3,13 +3,13 @@
 namespace PhpTemplates;
 
 use Closure;
-use PhpTemplates\Cache\CacheInterface;
+use PhpTemplates\Closure as PhpTemplatesClosure;
 
 // todo rename into view
 class Template
 {
     /**
-     * called template function name
+     * Called template function name
      * @var string
      */
     protected $name;
@@ -26,51 +26,29 @@ class Template
      * @var Closure
      */
     protected $func;
-    
+
     /**
-     * Array of Template entities keyed by slot position
+     * Array of closures keyed by slot position
      * @var array
      */
     public $slots = [];
 
     public $comp; //TODO: findout
-    
-    public function __construct(ViewFactory $repository, $name, callable $fn, Context $context = null)
+
+    public function __construct(ViewFactory $repository, $name, PhpTemplatesClosure $fn, Context $context = null)
     {
         $this->repository = $repository;
         $this->name = $name;
         $this->context = $context;
-        
+
         $this->func = $fn->bindTo($this);
     }
-    
-    public function slots($pos)
-    {
-        if (isset($this->slots[$pos])) {
-            return $this->slots[$pos];
-        }
-        return [];
-    }
-    
-    public function addSlot($pos, Closure $renderable)
-    {
-        $this->slots[$pos][] = $renderable;
-    }
-    
-    public function setSlots($slots)
-    {
-        $this->slots = $slots;
 
-        return $this;
-    }
-
-    public function setIdjfjfjfndex($i)
-    {
-        $this->attrs['_index'] = $i;
-
-        return $this;
-    }
-    
+    /**
+     * Render the template
+     *
+     * @return void
+     */
     public function render()
     {
         $eventHolder = $this->repository->getEventHolder();
@@ -79,47 +57,73 @@ class Template
         $func = $this->func;
         $func($this->context);
     }
-    
-    public function __gfjfjfet($prop)
-    {
-        if (isset($this->{$prop})) {
-            return $this->{$prop};
-        }
-    }
-    
-    public function withfjfhfhName($name)
-    {
-        $this->name = $name;
 
-        return $this;
-    }
-    
-    public function with(array $data = [])
+    /**
+     * Set data to template
+     *
+     * @param array $data
+     * @return self
+     */
+    public function with(array $data = []): self
     {
         if (!$this->context) {
             $this->context = new Context($data);
         } else {
             $this->context->merge($data);
         }
-        
+
         return $this;
     }
-    
-    public function witdjfjdjhShared(array $context)
+
+    /**
+     * Add slot closure to given position
+     *
+     * @param string $pos
+     * @param Closure $renderable
+     * @return self
+     */
+    public function addSlot(string $pos, Closure $renderable): self
     {
-        $this->repository->share($context);
-        
+        $this->slots[$pos][] = $renderable;
+
         return $this;
     }
-    
-    public function withfhfhfhComposers(array $context)
+
+    /**
+     * Returns closures array for slot located at given position
+     *
+     * @param  $pos
+     * @return array
+     */
+    public function slots($pos): array
     {
-        $this->repository->composers($context);
-        
+        if (isset($this->slots[$pos])) {
+            return $this->slots[$pos];
+        }
+        return [];
+    }
+
+    /**
+     * Absolutely set all slots array overriding any existing slot
+     *
+     * @param array $slots
+     * @return self
+     */
+    public function setSlots(array $slots): self
+    {
+        $this->slots = $slots;
+
         return $this;
     }
-    
-    public function template(string $name, Context $context = null) 
+
+    /**
+     * Instantiate a new template from cache, within given context
+     *
+     * @param string $name
+     * @param Context|null $context
+     * @return self
+     */
+    public function template(string $name, Context $context = null): self
     {
         return $this->repository->get($name, $context);
     }
