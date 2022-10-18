@@ -17,8 +17,7 @@ class RawAttributeGroup extends AbstractAttributeGroup
     {
         return '';
     }
-
-    // todo documentat array class :class="[x => true]"
+    
     public function bindToNodeAttr(): string
     {
         $arr = [];

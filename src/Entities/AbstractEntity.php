@@ -130,7 +130,6 @@ abstract class AbstractEntity implements EntityInterface
 
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
-                    // todo don t allow directive with cstruct name
                     if ($directive = $this->config->getDirective(substr($k, strlen($this->pf)))) {
                         $directive($node, $a->nodeValue);
 
@@ -226,7 +225,7 @@ abstract class AbstractEntity implements EntityInterface
                 $stringRange['char'] = $m[0];
                 $stringRange['start'] = $m[1];
             } elseif ($stringRange && $k == $last) {
-                // todo throw error unclosed string
+                // throw new Exception("Unclosed string found");
             }
         }
 

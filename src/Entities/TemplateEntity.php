@@ -53,7 +53,6 @@ class TemplateEntity extends AbstractEntity
         $this->node->appendChild(new DomNode('#php', $nodeValue));
 
         foreach ($slots as $slot) {
-            // todo ultimele modificari vor face templatecontext+derivate unreachable pe orice entity
             $this->node->appendChild($slot);
             $this->factory->make($slot, new StartupEntity($this->config))->parse();
         }

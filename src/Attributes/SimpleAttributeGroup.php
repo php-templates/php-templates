@@ -11,7 +11,6 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         return ltrim($this->attrs[0]->nodeName, ': ');
     }
 
-    // todo documentat array class :class="[x => true]"
     public function bindToNodeAttr(): string
     {
         foreach ($this->attrs as $attr) {

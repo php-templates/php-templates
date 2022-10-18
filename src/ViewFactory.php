@@ -14,7 +14,7 @@ use PhpTemplates\Cache\NullCache;
 // todo: rename into template
 class ViewFactory
 {
-    //todo forward usefull m calls to eventholder and config
+    // todo doc this members
     protected $composers = [];
     private $shared = [];
     private $outputFolder;
@@ -37,23 +37,32 @@ class ViewFactory
      * @return void
      */
     public function render(string $rfilepath, array $data = [], $slots = [])
-    { // todo add support for src obj
+    {
         $start_time = microtime(true);
         $template = $this->make($rfilepath, $data, $slots);
         $template->render();
         // print_r('<br>'.(microtime(true) - $start_time));
     }
 
-    public function makeRaw(string $phpt, $data = [], $slots = [])
+    // todo documentam this, src object or string
+    public function makeRaw($phpt, $data = [], $slots = [])
     {
+        if (is_string($phpt)) {
+            $source = new Source($phpt, '');
+            $rfilepath = md5($phpt);
+        }
+        elseif ($phpt instanceof Source) {
+            $source = $phpt;
+            $rfilepath = md5($phpt->getFile());
+        }
+        else {
+            throw new Exception("Invalid argument supplied");
+        }
+        
         $this->cache = $this->getCache();
-        $rfilepath = md5($phpt);
-        //todo format
 
         // paths will fallback on default Config in case of file not found or setting not found
         if (!$this->cache->load($rfilepath)) {
-            //todo source line pointing to caller line
-            $source = new Source($phpt, '');
             $parser = new Parser();
             $node = $parser->parse($source);
 
@@ -144,9 +153,38 @@ class ViewFactory
         $this->composers[$name][] = $cb;
     }
 
-    public function getConfig(): Config
+    // todo doc this, 
+    public function getConfig(string $key = null): ?Config
     {
+        if ($key) {
+            return $this->config->find($key);
+        }
+        
         return $this->config;
+    }
+    
+    /**
+     * Create a subconfig derived from actual config, meaning it will fallback on this parent if template, directive, alias not found
+     *
+     * @param string $name
+     * @param string $srcPath
+     * @return Config
+     */
+    public function subconfig(string $name, string $srcPath): Config
+    {
+        return $this->config->subconfig($name, $srcPath);
+    }
+    
+    // todo doc this here and in Config
+    public function setDirective(string $key, \Closure $callable): void
+    {
+        $this->config->setDirective($key, $callable);
+    }
+
+    // todo doc this here and in Config
+    public function setAlias($key, string $component = ''): void
+    {
+        $this->config->setAlias($key, $component);
     }
 
     /**

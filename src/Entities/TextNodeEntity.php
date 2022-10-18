@@ -27,8 +27,7 @@ class TextNodeEntity extends SimpleNodeEntity
      */
     public function templateContext()
     {
-        $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
-        parent::templateContext();
+        // unreachable because of Template::simpleNodeContext dom manipulation
     }
 
     /**

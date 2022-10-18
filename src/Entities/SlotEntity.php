@@ -58,16 +58,7 @@ class SlotEntity extends AbstractEntity
      */
     public function templateContext()
     {
-        $this->attrs['slot'] = 'default';
-        $this->attrs['name'] = 'default';
-
-        // mime like we have a simple node as component slot containing a slot node too
-        $wrapper = new DomNode('#slot');
-        $this->node->parentNode->insertBefore($wrapper, $this->node);
-        $wrapper->appendChild($this->node->detach());
-        $wrapper->setAttribute('slot', $this->node->getAttribute('slot') ?? 'default');
-
-        $this->factory->make($wrapper, $this->context)->parse();
+        // unreachable because of Template::simpleNodeContext dom manipulation
     }
 
     /**
@@ -75,7 +66,7 @@ class SlotEntity extends AbstractEntity
      */
     public function extendContext()
     {
-        $this->templateContext();
+        // unreachable because of Template::simpleNodeContext dom manipulation
     }
 
     /**

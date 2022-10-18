@@ -124,7 +124,7 @@ The following syntax won't work:
 'examples/hello',
 '["value" => "No value"]'); ?>
 
-In order to bind values to node attributes, just write your attributes prefixed by ':'.
+In order to bind values to node attributes, just write your attributes prefixed by ':'. We will further refer this syntax as 'bind'.
 <?php tstart(); ?>
 ```
     <input type="text" :value="$value">
@@ -140,6 +140,10 @@ In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"'
 <?php tresult(
 'examples/hello',
 '["value" => "No value"]'); ?>
+
+Arrays are accepted too. You can:
+- give an array of values, ex: `:class="['class1', true ? 'class2' : '']"` and expect as result `class="class1 class2"`
+- give an associative array where keys are attribute values and values are filter criteria, ex: `:class="['class3' => 1, 'class4' => 0]"` will result `class="class3"`;
 
 ## Php syntax
 In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
@@ -311,7 +315,7 @@ and use it like this:
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
 You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
-- bind syntax: php syntax accepted, ex.: :value="$value", or :value="'The value'"
+- bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
 - bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
 You can also have control structures on components nodes.
 

@@ -43,7 +43,8 @@ class NullCache extends FileSystemCache implements CacheInterface
     protected function getFilePath(string $key)
     {
         $pf = rtrim(sys_get_temp_dir(), '/ ').'/';
-        $name = trim(str_replace(['/', ':'], '_', $key), '/ ');//todo hash with name
+        $hash = substr(base_convert(md5($key), 16, 32), 0, 12);
+        $name = trim(str_replace(['/', ':'], '_', $key), '/ ') . '_' . $hash;
 
         return $pf . $name . '.php';
     }
