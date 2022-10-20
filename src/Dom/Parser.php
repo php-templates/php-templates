@@ -20,33 +20,6 @@ class Parser
     protected $currentLineRange = [0, 0];
     protected $srcFile;
 
-    /**
-     * Parse file into dom nodes
-     *
-     * @param string $srcFile
-     * @return DomNode
-     */
-    public function padhdhdhdrseFile(string $srcFile)
-    {
-        // geting file content (php function can be returned and executed in actual context)
-        ob_start();
-        $cb = require($srcFile);
-        $html = ob_get_contents();
-        ob_end_clean();
-
-        $html = $this->removeHtmlComments($html);
-
-        $this->srcFile = $srcFile;
-
-        $node = $this->parse($html);
-        //TODO: wrapper
-
-        return (object) [
-            'node' => $node,
-            'callback' => $cb
-        ];
-    }
-
     public function parse(Source $source)
     {
         $this->noises = [];

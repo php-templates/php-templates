@@ -22,9 +22,11 @@ scopedata default sub $slot -> de documentat
 
 todo: v.1.1
 butter node parser using preg offset
+events as classes path support, no, better .. event * 
 throw parse error, line unexpected " or ' or
 each file returns a new class extends x
 registry
+file loader with exists method
 support for view->make() in rendering event
 throw error if not closing @php @endphp
 config throw error if directive not exists

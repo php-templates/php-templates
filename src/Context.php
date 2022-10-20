@@ -7,12 +7,15 @@ class Context
     public $parent;
     public $loopContext;
     private $loopDepth = 0;
-    private $data; // todo scope getable like _data, as obj, _attrs gettable as obj
-
+    private $data;
+   
     public function __construct(array $data = [], self $parent = null)
     {
         $this->data = $data ?? [];
         $this->parent = $parent;
+        if (!isset($this->data['_attrs'])) {
+            $this->data['_attrs'] = [];
+        }
     }
 
     public function &__get($prop)
@@ -42,6 +45,11 @@ class Context
     {
         array_unshift($data, $this->data);
         $this->data = call_user_func_array('array_merge', $data);
+    }
+    
+    public function leaseMerge(array $data)
+    {
+        $this->data = array_merge($data, $this->data);
     }
 
     public function subcontext(array $data = [])
@@ -73,9 +81,17 @@ class Context
     {
         return array_key_exists($prop, $this->data);
     }
+    // todo doc scope getable _data and attrs
 
     public function &get($prop)
     {
+        if ($prop == '_attrs') {
+            return $this->data['_attrs'];
+        }
+        if ($prop == '_data') {
+            return $this->data;
+        }
+        
         if (array_key_exists($prop, $this->data)) {
             return $this->data[$prop];
         } elseif (isset($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {
@@ -96,5 +112,4 @@ class Context
     {
         return $this->data;
     }
-    //todo __empty
 }

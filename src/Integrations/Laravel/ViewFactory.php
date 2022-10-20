@@ -12,7 +12,6 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
     public function __construct($laravel)
     {
         $this->template = new PhpTempte(config('view.paths.0'), config('view.compiled'));
-        $this->template->replacePath('errors', 'eee'); // todo findouty
     }
     
     /**
@@ -128,13 +127,5 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
             $hints[1] = __DIR__ . '/views';
         }
         $this->template->replacePath($namespace, $hints);
-    }
-    
-    public function __call($m, $args)
-    {
-        if (method_exists($this->template, $m)) {
-            return call_user_func_array([$this->template, $m], $args);
-        }//flushFinderCache
-        //TODO:THROW ERROR ELSE
     }
 }

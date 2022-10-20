@@ -6,7 +6,7 @@ class EventHolder
 {
     private static $events = [];
     private static $cache = [];
-//todo stdclass, non static
+//todo doc this functions, 
     public function event($ev, $name, $template)
     {
         //d('event ' . $ev . ' ' . $name);

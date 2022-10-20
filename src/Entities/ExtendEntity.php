@@ -27,7 +27,7 @@ class ExtendEntity extends TemplateEntity
     public function simpleNodeContext()
     {
         $data = $this->depleteNode($this->node);
-        $dataString = $data->toArrayString(); // todo: find what to do with data
+        // $dataString = $data->toArrayString(); -> can t bind explicit data to extends, because it shares same context, use tpl instead
 
         $nodeValue = sprintf(
             '<?php $this->comp["%s"] = $this->template("%s", $context); ?>',
@@ -39,7 +39,6 @@ class ExtendEntity extends TemplateEntity
         $this->node->appendChild(new DomNode('#php', $nodeValue));
 
         foreach ($slots as $slot) {
-            // todo ultimele modificari vor face templatecontext+derivate unreachable pe orice entity
             $this->node->appendChild($slot);
             $this->factory->make($slot, new StartupEntity($this->config))->parse();
         }

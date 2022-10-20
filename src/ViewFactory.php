@@ -196,7 +196,7 @@ class ViewFactory
      */
     public function get(string $name, Context $context): Template
     {
-        $context->merge($context->all(), $this->shared);
+        $context->merge($this->shared);
         $this->compose($name, $context);
 
         return (new Template($this, $name, $this->cache->get($name), $context));

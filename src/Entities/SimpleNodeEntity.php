@@ -9,7 +9,6 @@ use PhpTemplates\Dom\DomNodeAttr;
 
 class SimpleNodeEntity extends AbstractEntity
 {
-    //protected $isHtml = true;
     protected $attrs = [];
 
     public static function test(DomNode $node, EntityInterface $context): bool
@@ -30,7 +29,6 @@ class SimpleNodeEntity extends AbstractEntity
      */
     public function simpleNodeContext()
     {
-        // TODO: test comp as simple text
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
             $this->factory->make($slot, $this)->parse();
@@ -58,13 +56,6 @@ class SimpleNodeEntity extends AbstractEntity
         foreach ($this->node->childNodes as $cn) {
             $this->factory->make($cn, $this)->parse();
         }
-
-        $attrs = [];
-        foreach ($this->attrs as $k => $val) {
-            $attrs[] = new DomNodeAttr($k, $val); //todo, vezi daca e necesar
-        }
-        //$dataString = $this->fillNode(null, $attrs);
-        //TODO: findout what to do with data
     }
 
     /**

@@ -64,16 +64,12 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
 
         return $val;
     }
-
-    public function toFullArrayString(): string
+    
+    public function add(DomNodeAttr $attr)
     {
-        $arr = [];
-        foreach ($this->attrs as $attr) {
-            $k = ltrim($attr->nodeName, ' @');
-            $arr[] = "'$k' => " . $attr->nodeValue;
+        if (is_null($attr->nodeValue) || trim($attr->nodeValue) === '') {
+            $attr->nodeValue = "''";
         }
-        $val = '[' . implode(', ', $arr) . ']';
-
-        return $val;
+        $this->attrs[] = $attr;
     }
 }
