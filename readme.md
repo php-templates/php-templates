@@ -1,5 +1,3 @@
-
-
 ***Php-Templates*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
 ## Setting up
@@ -8,14 +6,12 @@ Template files will have the `.t.php` extension and be placed in configured sour
 ```
 <\?php
 use PhpTemplates\Config;
-use PhpTemplates\ConfigHolder;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewFactory;
 
 $cfg = new Config('default', __DIR__);
-$cfgHolder = new ConfigHolder($cfg);
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/cached', $cfgHolder, $eventHolder);
+$viewFactory = new ViewFactory(__DIR__.'/cached', $cfg, $eventHolder);
 
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
@@ -30,11 +26,11 @@ The following:
 
 // examples/hello.t.php
 ```
-    <h1>{{ $h1 }}</h1>
+<h1>{{ $h1 }}</h1>
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
+$viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
 ```
 will result:
 
@@ -47,11 +43,11 @@ The following syntax won't work:
 
 // examples/hello.t.php
 ```
-    <input type="text" value="{{ $value }}">
+<input type="text" value="{{ $value }}">
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+$viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
 
@@ -59,54 +55,59 @@ will result:
 <input type="text" value="{{ $value }}"> 
 ```
 
-In order to bind values to node attributes, just write your attributes prefixed by ':'.
+In order to bind values to node attributes, just write your attributes prefixed by ':'. We will further refer this syntax as 'bind'.
 
 // examples/hello.t.php
 ```
-    <input type="text" :value="$value">
+<input type="text" :value="$value">
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+$viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
 
 ```
-<input value="No value" type="text"> 
+<input type="text" value="No value"> 
 ```
 In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
 
 // examples/hello.t.php
 ```
-    <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
+<input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["value" => "No value"])->render();
+$viewFactory->make('examples/hello', ["value" => "No value"])->render();
 ```
 will result:
 
 ```
-<input value="value given" type="text"> 
+<input type="text" value="value given"> 
 ```
 
+Arrays are accepted too. You can:
+- give an array of values, ex: `:class="['class1', true ? 'class2' : '']"` and expect as result `class="class1 class2"`
+- give an associative array where keys are attribute values and values are filter criteria, ex: `:class="['class3' => 1, 'class4' => 0]"` will result `class="class3"`;
+
 ## Php syntax
-In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
+In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `@php ... @endphp` tags, or single line tags `{% ... %}`
 
 // examples/hello.t.php
 ```
-    @php $text = 'Lorem ipsum'; @endphp
-    <input type="text" :value="$text">
-    <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
+@php $text = 'Lorem ipsum'; @endphp
+{% $name = 'fname'; %}
+<input type="text" :value="$text" :name="$name">
+<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
 ```
-<input value="Lorem ipsum" type="text">
+<input type="text" value="Lorem ipsum" name="fname">
 <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp> 
 ```
 
@@ -119,19 +120,19 @@ You can use them to conditionally render a node. Just add them as attribute on t
 
 // examples/hello.t.php
 ```
-    @php $inp = ['text', 'number', 'email']; @endphp
-    <input p-if="in_array($type, $inp)" :type="$type" :value="$value">
-    <input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
-    <textarea p-else>{{ $value }}</textarea>
+@php $inp = ['text', 'number', 'email']; @endphp
+<input p-if="in_array($type, $inp)" :type="$type" :value="$value">
+<input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
+<textarea p-else>{{ $value }}</textarea>
 ```
 
 ```
-    $viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();
+$viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])->render();
 ```
 will result:
 
 ```
-<textarea>Lorem</textarea>
+  <textarea>Lorem</textarea>
 
 ```
 
@@ -139,22 +140,22 @@ Here is a foreach example:
 
 // examples/hello.t.php
 ```
-   Do you like Php Templates?
-   <select>
-       <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
-   </select>
+Do you like Php Templates?
+<select>
+   <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
+</select>
 ```
 
 ```
-    $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
+$viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
 ```
 will result:
 
 ```
-   Do you like Php Templates?
+Do you like Php Templates?
 <select>
-  <option value="1">Yes</option>
-  <option value="0">No</option>
+      <option value="1">Yes</option>
+      <option value="0">No</option>
   </select> 
 ```
 
@@ -162,28 +163,24 @@ In Php Templates, inspired by Twig, loops are scoped, meaning that anything decl
 
 // examples/hello.t.php
 ```
-   @php $lbl = 'I will survive!!!'; @endphp
-   <select>
-       <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
-   </select>
-   {{ $lbl . $val }}
+@php $lbl = 'I will survive!!!'; @endphp
+<select>
+   <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
+</select>
+{{ $lbl . $val }}
 ```
 
 ```
-    $viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
+$viewFactory->make('examples/hello', ['options' => ['1' => 'Yes', '0' => 'No']])->render();
 ```
 will result:
 
 ```
 <select>
-  <option value="1"><br />
-<b>Warning</b>:  Undefined property: PhpTemplates\Context::$lbl in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/src/Context.php</b> on line <b>43</b><br />
-</option>
-  <option value="0"><br />
-<b>Warning</b>:  Undefined property: PhpTemplates\Context::$lbl in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/src/Context.php</b> on line <b>43</b><br />
-</option>
+      <option value="1">Yes</option>
+      <option value="0">No</option>
   </select>
-   I will survive!!!
+I will survive!!!
 ```
 
 ## Directives
@@ -194,11 +191,11 @@ Directives are parsing time commands and are usefull when you need to declare co
 
 // examples/hello.t.php
 ```
-    <div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
+<div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["condition" => true])->render();
+$viewFactory->make('examples/hello', ["condition" => true])->render();
 ```
 will result:
 
@@ -206,16 +203,17 @@ will result:
 <div class="card" style="width: 18rem;"></div> 
 ```
 Please note that is IMPORTANT to escape nested quotes using backslash.
+Using this directive on a component node will take no effect.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
 
 // examples/hello.t.php
 ```
-    <input p-bind="$attrs">
+<input p-bind="$attrs">
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();
+$viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "name", "disabled"] ])->render();
 ```
 will result:
 
@@ -227,14 +225,13 @@ will result:
 
 // examples/hello.t.php
 ```
-    <input name="thecheckbox" type="checkbox" value="1" p-checked="!empty($thecheckbox)">
-    
-    <input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
-    <input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
+<input name="thecheckbox" type="checkbox" value="1" p-checked="!empty($thecheckbox)">
+<input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
+<input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["theradio" => 1])->render();
+$viewFactory->make('examples/hello', ["theradio" => 1])->render();
 ```
 will result:
 
@@ -249,21 +246,21 @@ will result:
 
 // examples/hello.t.php
 ```
-    <select name="fruits">
-        <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
-    </select>
+<select name="fruits">
+    <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
+</select>
 ```
 
 ```
-    $viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();
+$viewFactory->make('examples/hello', ["options" => ["a" => "avocado", "b" => "banana", "c" => "cherry"], "value" => "b"])->render();
 ```
 will result:
 
 ```
 <select name="fruits">
-  <option value="a" >avocado</option>
-  <option value="b" selected="selected">banana</option>
-  <option value="c" >cherry</option>
+      <option value="a" >avocado</option>
+      <option value="b" selected="selected">banana</option>
+      <option value="c" >cherry</option>
   </select> 
 ```
 
@@ -271,11 +268,11 @@ will result:
 
 // examples/hello.t.php
 ```
-    <input type="text" p-disabled="3 > 2">
+<input type="text" p-disabled="3 > 2">
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
@@ -303,19 +300,19 @@ Now, the following:
 
 // examples/hello.t.php
 ```
-    <div p-guest>Guest</div>
-    <div p-auth>Auth</div>
-    <div p-active="3 < 4"></div>
+<div p-guest>Guest</div>
+<div p-auth>Auth</div>
+<div p-active="3 < 4"></div>
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
 ```
-<div p-guest>Guest</div><div p-auth>Auth</div>
-<div p-active="3 < 4"></div> 
+  <div>Guest</div>
+<div class="active"></div> 
 ```
 
 Note that `$val` param passed to callback function is the string value of the directive attribute, in our case `3 < 4`.
@@ -351,23 +348,23 @@ and use it like this:
 
 // examples/hello.t.php
 ```
-    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
 
 ```
-    $viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();
+$viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The Value" ])->render();
 ```
 will result:
 
 ```
-  <div class="form-group ">
-                  <label class="form-label">The Label</label>
-                      <input placeholder="The Label" type="text" class="form-control" value="The Value">
-              </div> 
+<div class="form-group">
+      <label class="form-label">The Label</label>
+        <input type="text" class="form-control" value="The Value" placeholder="The Label">
+    </div> 
 ```
 You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
-- bind syntax: php syntax accepted, ex.: :value="$value", or :value="'The value'"
+- bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
 - bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
 You can also have control structures on components nodes.
 
@@ -380,10 +377,10 @@ $cfg->setAlias([
 ```
 Now, we can use our component:
 ```
-    instead of this
-    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
-    like this
-    <x-form-group type="text" :label="$label" @value="$value" />
+instead of this
+<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+like this
+<x-form-group type="text" :label="$label" @value="$value" />
 ```
 !!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
@@ -428,19 +425,17 @@ Now, we can use it like this:
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
 ```
-  <div class="form-group ">
-        <span>Custom label
-      <i class="fa fa-download"></i></span>
-      <input type="number" class="form-control">
-  <!-- same as
-      <input type="number" class="form-control">
-   -->
-    </div> 
+<div class="form-group">
+  <span>Custom label <i class="fa fa-download"></i></span>
+<input type="number" class="form-control">
+<!-- same as
+    <input type="number" class="form-control"> -->
+</div> 
 ```
 
 No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. Multiple nodes can fill the same slot name.
@@ -449,29 +444,29 @@ No slot is required to be passed. Empty slots will render nothing and slots with
 Consider you have a component responsable for rendering a table:
 //components/data-table.t.php
 ```
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <th p-foreach="$headings as $heading">{{ $heading }}</th>
-                <th p-if="$this->slots('action')">Action</th>
-            </thead>
-            <tbody>
-                <tr p-foreach="$data as $i => $_data">
-                    <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
-                    <slot name="action" :id="$_data['id']" :i="$i"></slot>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <th p-foreach="$headings as $heading">{{ $heading }}</th>
+            <th p-if="$this->slots('action')">Action</th>
+        </thead>
+        <tbody>
+            <tr p-foreach="$data as $i => $_data">
+                <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
+                <slot name="action" :id="$_data['id']" :i="$i"></slot>
+            </tr>
+        </tbody>
+    </table>
+</div>
 ```
 Two things here:
 - we checked if any slot passed by calling $this->slots($slotName)
-- we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this 'p-scope="$slot"' (whatever var name you preffer)
+- we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this `$slot->varName`
 Now, we can use the component like this:
 
 // examples/hello.t.php
 ```
-<x-data-table :headings="$headings" :data="$data" p-scope="$slot">
+<x-data-table :headings="$headings" :data="$data">
     <div slot="action">
         <a :href="'edit-item-'.$slot->id">Edit</a>
     </div>
@@ -479,7 +474,7 @@ Now, we can use the component like this:
 ```
 
 ```
-    $viewFactory->make('examples/hello', [
+$viewFactory->make('examples/hello', [
 'headings' => [
     'id' => 'ID',
     'name' => 'Name'
@@ -492,29 +487,43 @@ Now, we can use the component like this:
 will result:
 
 ```
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Action</th>
-              </thead>
-      <tbody>
-                  <tr>
-            <td>67</td>
-            <td>Mango</td>
-                <div><a href="edit-item-67">Edit</a>
-    </div>
-            </tr>
-                  <tr>
-            <td>32</td>
-            <td>Potatos</td>
-                <div><a href="edit-item-32">Edit</a>
-    </div>
-            </tr>
-              </tbody>
-    </table>
-  </div> 
+<div class="table-wrapper">
+  <table>
+    <thead>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Action</th>
+          </thead>
+    <tbody>
+              <tr>
+                      <td><br />
+<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+</td>
+                      <td><br />
+<b>Warning</b>:  Undefined array key "name" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+</td>
+          <br />
+<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>30</b><br />
+<div>
+  <a href="edit-item-">Edit</a>
+</div>
+        </tr>
+              <tr>
+                      <td><br />
+<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+</td>
+                      <td><br />
+<b>Warning</b>:  Undefined array key "name" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+</td>
+          <br />
+<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>30</b><br />
+<div>
+  <a href="edit-item-">Edit</a>
+</div>
+        </tr>
+          </tbody>
+  </table>
+</div> 
 ```
 
 ## Extends
@@ -539,15 +548,17 @@ Now, we can have all our templates extending it, like this:
 ```
 
 ```
-    $viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();
+$viewFactory->make('examples/hello', ['var' => 'I am shared with my parent'])->render();
 ```
 will result:
 
 ```
-  <htm><head>… </head><body>
+<htm>
+  <head>… </head>
+  <body>
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
-  </htm> 
+</htm> 
 ```
 As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
 
@@ -564,7 +575,7 @@ $viewFactory->share('shared', 'I share because I care');
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
@@ -606,23 +617,23 @@ now, calling our component like this:
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
 ```
-  <ul>
-    <li>avocado</li>
-    <li>banana</li>
-    <li>berry</li>
-    <li>cherry</li>
-      </ul> <!-- or like this -->
-  <ul>
-    <li>cherry</li>
-    <li>berry</li>
-    <li>banana</li>
-    <li>avocado</li>
-      </ul> 
+<ul>
+      <li>avocado</li>
+      <li>banana</li>
+      <li>berry</li>
+      <li>cherry</li>
+  </ul> <!-- or like this -->
+<ul>
+      <li>cherry</li>
+      <li>berry</li>
+      <li>banana</li>
+      <li>avocado</li>
+  </ul> 
 ```
 
 ## Events
@@ -653,20 +664,20 @@ $viewFactory->on('parsing', 'form', function($node) {
 ```
 and when we call our template (direct, or nested):
 $viewFactory->render('form', []);
-  <form action="action">
-      <div class="form-group ">
-                  <label class="form-label">Firstname</label>
-                      <input placeholder="Firstname" type="text" class="form-control" >
-              </div>   <div class="form-group ">
-                  <label class="form-label">Lastname</label>
-                      <input placeholder="Lastname" type="text" class="form-control" >
-              </div>   <div class="form-group ">
-                  <label class="form-label">Age</label>
-                      <input placeholder="Age" type="number" class="form-control" >
-              </div>   <div class="form-group ">
-                  <label class="form-label">Zipcode</label>
-                      <input placeholder="Zipcode" type="text" class="form-control" >
-              </div>   </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on ViewFactory instancing. This will parse templates on each request without caching them (do this only during development).
+<form action="action">
+  <div class="form-group">
+      <label class="form-label">Firstname</label>
+        <input type="text" class="form-control" placeholder="Firstname">
+    </div> <div class="form-group">
+      <label class="form-label">Lastname</label>
+        <input type="text" class="form-control" placeholder="Lastname">
+    </div> <div class="form-group">
+      <label class="form-label">Age</label>
+        <input type="number" class="form-control" placeholder="Age">
+    </div> <div class="form-group">
+      <label class="form-label">Zipcode</label>
+        <input type="text" class="form-control" placeholder="Zipcode">
+    </div> </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on ViewFactory instancing. This will parse templates on each request without caching them (do this only during development).
 
 ### On Rendering time
 Let it be our last sorted list:
@@ -688,18 +699,18 @@ and the call:
 ```
 
 ```
-    $viewFactory->make('examples/hello', [])->render();
+$viewFactory->make('examples/hello', [])->render();
 ```
 will result:
 
 ```
-  <ul>
-    <li>avocado</li>
-    <li>banana</li>
-    <li>berry</li>
-    <li>cherry</li>
-    <li>added</li>
-      </ul> 
+<ul>
+      <li>avocado</li>
+      <li>banana</li>
+      <li>berry</li>
+      <li>cherry</li>
+      <li>added</li>
+  </ul> 
 ```
 pretty usefull if you want to add data on fly
 
@@ -742,3 +753,13 @@ Parsed event is executed after a template is fully parsed.
 Events may be declared eliptic in name using *, (meaning anything except '/'). 
 Events declaration may accept a weight as 4'th argument which will define listener execution order (high to low).
 In the above example, we needed to detach the $script and keep a reference of it, because in event callback would be too late because the component would be already transformed to template function at that point and any change made would take no effect. Also, layout rendering event was triggered before this point.
+
+# DomNode and Dom manipulation
+PhpTemplates parses every template into a virtual dom, then reccursively traverse each node to handle semantic syntaxes/nodes. At the end, the dom is saved into a valid tpl format. This makes PhpTemplates different from other template engines. You can hook anywhere in the dom and insert whatever element you want, modify or delete dom elements.
+Each node is a DomNode object class. We will list below the class methods you can use.
+
+`__construct(string $nodeName, $nodeValue = '')`
+
+Constructs a DomNode instance, like div, span, etc. 
+$nodeName - tag name. In case of textnode, prefix `$nodeName` with '#' and name it as you wish
+$nodeValue - if textnode, it should be string. If domNode, it can be a key => value array containing attributes (ex: ['class' => 'foo bar'])

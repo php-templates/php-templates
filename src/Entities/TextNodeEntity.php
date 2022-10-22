@@ -38,9 +38,8 @@ class TextNodeEntity extends SimpleNodeEntity
      */
     private function replaceSpecialTags(string $html): string
     {
-        $html = preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function($m) {
-            return '<?php ' . $m[1] . ' ?>';
-        }, $html);
+        $html = preg_replace('/(?<!@)@php(.*?)@endphp/s', '<?php $1 ?>', $html);
+        $html = preg_replace('/{%(((?!{%).)*)%}/', '<?php $1 ?>', $html);
 
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {

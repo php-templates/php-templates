@@ -10,6 +10,8 @@ use PhpTemplates\Dom\DomNodeAttr;
 
 //header("Content-Type: text/plain");
 
+ob_start();
+
 $cfg = new Config('default', __DIR__);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
@@ -64,7 +66,7 @@ function tresult($file, $data = '[]')
     eval('$_data = '.$data.';');
     echo "
 ```
-    \$viewFactory->make('$file', $data)->render();
+\$viewFactory->make('$file', $data)->render();
 ```";
     echo "\nwill result:\n
 ```
@@ -108,7 +110,7 @@ Like in most template engines, data is escaped against html entities and display
 The following:
 <?php tstart(); ?>
 ```
-    <h1>{{ $h1 }}</h1>
+<h1>{{ $h1 }}</h1>
 ```
 <?php tresult(
 'examples/hello',
@@ -118,7 +120,7 @@ Unlike other template engines, interpolation is resumed only on text nodes.
 The following syntax won't work:
 <?php tstart(); ?>
 ```
-    <input type="text" value="{{ $value }}">
+<input type="text" value="{{ $value }}">
 ```
 <?php tresult(
 'examples/hello',
@@ -127,7 +129,7 @@ The following syntax won't work:
 In order to bind values to node attributes, just write your attributes prefixed by ':'. We will further refer this syntax as 'bind'.
 <?php tstart(); ?>
 ```
-    <input type="text" :value="$value">
+<input type="text" :value="$value">
 ```
 <?php tresult(
 'examples/hello',
@@ -135,7 +137,7 @@ In order to bind values to node attributes, just write your attributes prefixed 
 In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
 <?php tstart(); ?>
 ```
-    <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
+<input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
 ```
 <?php tresult(
 'examples/hello',
@@ -146,12 +148,13 @@ Arrays are accepted too. You can:
 - give an associative array where keys are attribute values and values are filter criteria, ex: `:class="['class3' => 1, 'class4' => 0]"` will result `class="class3"`;
 
 ## Php syntax
-In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use @php ... @endphp tags.
+In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `@php ... @endphp` tags, or single line tags `{% ... %}`
 <?php tstart(); ?>
 ```
-    @php $text = 'Lorem ipsum'; @endphp
-    <input type="text" :value="$text">
-    <input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
+@php $text = 'Lorem ipsum'; @endphp
+{% $name = 'fname'; %}
+<input type="text" :value="$text" :name="$name">
+<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
 <?php tresult(
 'examples/hello'); ?>
@@ -164,10 +167,10 @@ Allowed control structures are:
 You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
 <?php tstart(); ?>
 ```
-    @php $inp = ['text', 'number', 'email']; @endphp
-    <input p-if="in_array($type, $inp)" :type="$type" :value="$value">
-    <input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
-    <textarea p-else>{{ $value }}</textarea>
+@php $inp = ['text', 'number', 'email']; @endphp
+<input p-if="in_array($type, $inp)" :type="$type" :value="$value">
+<input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
+<textarea p-else>{{ $value }}</textarea>
 ```
 <?php tresult(
 'examples/hello', "['type' => 'textarea', 'value' => 'Lorem']"); ?>
@@ -175,10 +178,10 @@ You can use them to conditionally render a node. Just add them as attribute on t
 Here is a foreach example:
 <?php tstart(); ?>
 ```
-   Do you like Php Templates?
-   <select>
-       <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
-   </select>
+Do you like Php Templates?
+<select>
+   <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
+</select>
 ```
 <?php tresult(
 'examples/hello', "['options' => ['1' => 'Yes', '0' => 'No']]"); ?>
@@ -186,11 +189,11 @@ Here is a foreach example:
 In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
 <?php tstart(); ?>
 ```
-   @php $lbl = 'I will survive!!!'; @endphp
-   <select>
-       <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
-   </select>
-   {{ $lbl . $val }}
+@php $lbl = 'I will survive!!!'; @endphp
+<select>
+   <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
+</select>
+{{ $lbl . $val }}
 ```
 <?php tresult(
 'examples/hello', "['options' => ['1' => 'Yes', '0' => 'No']]"); ?>
@@ -202,7 +205,7 @@ Directives are parsing time commands and are usefull when you need to declare co
 `raw` - usefull when you need to conditionally render content on a tag declaration:
 <?php tstart(); ?>
 ```
-    <div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
+<div class="card" p-raw="$condition ? 'style=\"width: 18rem;\"' : ''"></div>
 ```
 <?php tresult(
 'examples/hello',
@@ -213,7 +216,7 @@ Using this directive on a component node will take no effect.
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
 <?php tstart(); ?>
 ```
-    <input p-bind="$attrs">
+<input p-bind="$attrs">
 ```
 <?php tresult(
 'examples/hello',
@@ -222,10 +225,9 @@ Using this directive on a component node will take no effect.
 `checked` - used on input type radio / checkbox
 <?php tstart(); ?>
 ```
-    <input name="thecheckbox" type="checkbox" value="1" p-checked="!empty($thecheckbox)">
-    
-    <input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
-    <input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
+<input name="thecheckbox" type="checkbox" value="1" p-checked="!empty($thecheckbox)">
+<input name="theradio" type="radio" value="1" p-checked="$theradio === 1">
+<input name="theradio" type="radio" value="0" p-checked="$theradio === 0">
 ```
 <?php tresult(
 'examples/hello',
@@ -235,9 +237,9 @@ Using this directive on a component node will take no effect.
 
 <?php tstart(); ?>
 ```
-    <select name="fruits">
-        <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
-    </select>
+<select name="fruits">
+    <option p-foreach="$options as $val => $label" :value="$val" p-selected="$val == $value">{{ $label }}</option>
+</select>
 ```
 <?php tresult(
 'examples/hello',
@@ -246,7 +248,7 @@ Using this directive on a component node will take no effect.
 `disabled` - used to apply attribute `disabled`
 <?php tstart(); ?>
 ```
-    <input type="text" p-disabled="3 > 2">
+<input type="text" p-disabled="3 > 2">
 ```
 <?php tresult(
 'examples/hello'); ?>
@@ -270,9 +272,9 @@ $cfg->setDirective('active', function($node, $val) {
 Now, the following:
 <?php tstart(); ?>
 ```
-    <div p-guest>Guest</div>
-    <div p-auth>Auth</div>
-    <div p-active="3 < 4"></div>
+<div p-guest>Guest</div>
+<div p-auth>Auth</div>
+<div p-active="3 < 4"></div>
 ```
 <?php tresult(
 'examples/hello'); ?>
@@ -309,7 +311,7 @@ You can reuse parts of design by making them components. Just put the html code 
 and use it like this:
 <?php tstart(); ?>
 ```
-    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
 ```
 <?php tresult(
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
@@ -328,10 +330,10 @@ $cfg->setAlias([
 ```
 Now, we can use our component:
 ```
-    instead of this
-    <tpl is="components/form-group" type="text" :label="$label" @value="$value" />
-    like this
-    <x-form-group type="text" :label="$label" @value="$value" />
+instead of this
+<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+like this
+<x-form-group type="text" :label="$label" @value="$value" />
 ```
 !!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
@@ -381,20 +383,20 @@ No slot is required to be passed. Empty slots will render nothing and slots with
 Consider you have a component responsable for rendering a table:
 //components/data-table.t.php
 ```
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <th p-foreach="$headings as $heading">{{ $heading }}</th>
-                <th p-if="$this->slots('action')">Action</th>
-            </thead>
-            <tbody>
-                <tr p-foreach="$data as $i => $_data">
-                    <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
-                    <slot name="action" :id="$_data['id']" :i="$i"></slot>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<div class="table-wrapper">
+    <table>
+        <thead>
+            <th p-foreach="$headings as $heading">{{ $heading }}</th>
+            <th p-if="$this->slots('action')">Action</th>
+        </thead>
+        <tbody>
+            <tr p-foreach="$data as $i => $_data">
+                <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
+                <slot name="action" :id="$_data['id']" :i="$i"></slot>
+            </tr>
+        </tbody>
+    </table>
+</div>
 ```
 Two things here:
 - we checked if any slot passed by calling $this->slots($slotName)
@@ -593,3 +595,34 @@ Parsed event is executed after a template is fully parsed.
 Events may be declared eliptic in name using *, (meaning anything except '/'). 
 Events declaration may accept a weight as 4'th argument which will define listener execution order (high to low).
 In the above example, we needed to detach the $script and keep a reference of it, because in event callback would be too late because the component would be already transformed to template function at that point and any change made would take no effect. Also, layout rendering event was triggered before this point.
+
+# DomNode and Dom manipulation
+PhpTemplates parses every template into a virtual dom, then reccursively traverse each node to handle semantic syntaxes/nodes. At the end, the dom is saved into a valid tpl format. This makes PhpTemplates different from other template engines. You can hook anywhere in the dom and insert whatever element you want, modify or delete dom elements.
+Each node is a DomNode object class. We will list below the class methods you can use.
+
+### `__construct(string $nodeName, $nodeValue = '')`
+Constructs a DomNode instance, like div, span, etc. 
+$nodeName - tag name. In case of textnode, prefix `$nodeName` with '#' and name it as you wish
+$nodeValue - if textnode, it should be string. If domNode, it can be a key => value array containing attributes (ex: ['class' => 'foo bar'])
+
+### static `fromString(string $str)`
+Create a new DOM structure from a given string, ex: `<div><span>Hello</span> World</div>`
+This fn will try to capture its call location in order to give relevant data for debugging
+ 
+### `addAttribute($nodeName, string $nodeValue = '')`
+Add an attribute to node in append mode (if an attribute class exists on node and you call `addAttribute('class', 'class2')`, it will add this class too)
+$nodeName - string|DomNodeAttr 
+$nodeValue - string
+
+
+### `setAttribute(string $nodeName, string $nodeValue = '')`
+Add an attribute to node. If an already existing attribute will be found by given name, its value will be overriden
+
+### `getAttribute(string $name)`
+Returns node attribute value by attribute name, null if no attribute found
+
+
+<?php 
+$md = ob_get_contents();
+file_put_contents(__DIR__ . '/../readme.md', trim($md));
+?>
