@@ -57,7 +57,7 @@ class SlotEntity extends AbstractEntity
      */
     public function templateContext()
     {
-        // unreachable because of Template::simpleNodeContext dom manipulation
+        // unreachable because of View::simpleNodeContext dom manipulation
     }
 
     /**
@@ -65,7 +65,7 @@ class SlotEntity extends AbstractEntity
      */
     public function extendContext()
     {
-        // unreachable because of Template::simpleNodeContext dom manipulation
+        // unreachable because of View::simpleNodeContext dom manipulation
     }
 
     /**

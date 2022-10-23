@@ -199,7 +199,7 @@ class TemplateEntity extends AbstractEntity
         // file not found in any2 config
         if (!$srcFile) {
             $message = implode(' or ', $tried);
-            throw new \Exception("Template file $message not found");
+            throw new \Exception("View file $message not found");
         }
 
         return $srcFile;

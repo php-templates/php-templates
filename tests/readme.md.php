@@ -5,7 +5,7 @@ require('../autoload.php');
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewFactory;
-use PhpTemplates\Template;
+use PhpTemplates\View;
 use PhpTemplates\Dom\DomNodeAttr;
 
 //header("Content-Type: text/plain");
@@ -86,7 +86,7 @@ echo "\n```
 ***Php-Templates*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
 ## Setting up
-Template files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
+View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
 
 ```
 <\?php

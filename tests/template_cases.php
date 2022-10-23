@@ -8,7 +8,7 @@ use PhpTemplates\DependenciesMap;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewParser;
 use PhpTemplates\ViewFactory;
-use PhpTemplates\Template;
+use PhpTemplates\View;
 use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
 use PhpTemplates\Process;
@@ -71,7 +71,7 @@ foreach($files as $f) {
     $file = str_replace('cases/', 'temp/', $file);
     file_put_contents($file, $test);
     $rfilepath = str_replace(['.t.php', './'], '', $file);
-    
+
     ob_start();
     $data = [];
     try {

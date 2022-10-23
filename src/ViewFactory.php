@@ -240,18 +240,18 @@ class ViewFactory
     }
 
     /**
-     * Called from Template, should not be called by user, use make() instead
+     * Called from View, should not be called by user, use make() instead
      *
      * @param string $name
      * @param Context $context
      * @return void
      */
-    public function get(string $name, Context $context): Template
+    public function get(string $name, Context $context): View
     {
         $context->merge($this->shared);
         $this->compose($name, $context);
 
-        return (new Template($this, $name, $this->cache->get($name), $context));
+        return (new View($this, $name, $this->cache->get($name), $context));
     }
 
     public function getEventHolder()

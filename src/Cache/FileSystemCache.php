@@ -49,7 +49,7 @@ class FileSystemCache implements CacheInterface
 
     public function get(string $key): callable
     {
-        return $this->store[$key] ?? dd(array_keys($this->store)) && null;
+        return $this->store[$key];
     }
 
     public function write(string $key)
@@ -64,7 +64,7 @@ class FileSystemCache implements CacheInterface
 
         $tpl = '<?php ';
         $tpl .= PHP_EOL . "namespace PhpTemplates;";
-        $tpl .= PHP_EOL . "use PhpTemplates\Template;";
+        $tpl .= PHP_EOL . "use PhpTemplates\View;";
         $tpl .= PHP_EOL . "use PhpTemplates\Cache\FileSystemCache;";
         $tpl .= PHP_EOL . "use PhpTemplates\Context;";
         $tpl .= PHP_EOL;

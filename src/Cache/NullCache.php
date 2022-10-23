@@ -2,7 +2,7 @@
 
 namespace PhpTemplates\Cache;
 
-use PhpTemplates\Template;
+use PhpTemplates\View;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Source;
 

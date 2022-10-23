@@ -3,7 +3,7 @@
 namespace PhpTemplates;
 require('../autoload.php');
 
-use PhpTemplates\Template;
+use PhpTemplates\View;
 use PhpTemplates\TemplateRepository;
 use PhpTemplates\Context;
 
@@ -31,7 +31,7 @@ $tr->add('default:comp/comp_slot', function (Context $context) {
     </span>
   </div> <?php
 });
-$x = new Template($tr, 'default:./temp/props2', function () {
+$x = new View($tr, 'default:./temp/props2', function () {
     $context = new Context;
     $this->comp["62f3e2389c8b8"] = $this->template("default:props/c", new Context([]));
       $this->comp["62f3e2389c8b8"]->addSlot("default", function(array $data = []) use ($context) {
