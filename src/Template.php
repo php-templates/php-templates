@@ -11,7 +11,8 @@ use PhpTemplates\Dom\Parser;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\Cache\NullCache;
 
-// todo: rename into template
+require_once(__DIR__.'/helpers.php');
+
 class Template
 {
     /**

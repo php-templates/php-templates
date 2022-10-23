@@ -31,7 +31,6 @@ function d(...$data) {
     }
 } */
 
-require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');
     $path = 'PhpTemplates\\';
