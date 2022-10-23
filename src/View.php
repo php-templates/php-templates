@@ -5,7 +5,6 @@ namespace PhpTemplates;
 use Closure;
 use PhpTemplates\Closure as PhpTemplatesClosure;
 
-// todo rename into view
 class View
 {
     /**
@@ -36,7 +35,7 @@ class View
     public $slot; // used in loops to not poluate variables, like this: foreach this->slots as this->slot
     public $comp; // used in component build in order to not poluate variables, like this: this->comp[id] =
 
-    public function __construct(ViewFactory $repository, $name, PhpTemplatesClosure $fn, Context $context = null)
+    public function __construct(Template $repository, $name, PhpTemplatesClosure $fn, Context $context = null)
     {
         $this->repository = $repository;
         $this->name = $name;

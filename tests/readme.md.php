@@ -4,7 +4,7 @@ require('../autoload.php');
 
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
-use PhpTemplates\ViewFactory;
+use PhpTemplates\Template;
 use PhpTemplates\View;
 use PhpTemplates\Dom\DomNodeAttr;
 
@@ -15,7 +15,7 @@ ob_start();
 $cfg = new Config('default', __DIR__);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory( __DIR__.'/results' , $cfg, $eventHolder);
+$viewFactory = new Template( __DIR__.'/results' , $cfg, $eventHolder);
 
 $cfg->setAlias([
     'x-form-group' => 'components/form-group',
@@ -92,11 +92,11 @@ View files will have the `.t.php` extension and be placed in configured source p
 <\?php
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
-use PhpTemplates\ViewFactory;
+use PhpTemplates\Template;
 
 $cfg = new Config('default', __DIR__);
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/cached', $cfg, $eventHolder);
+$viewFactory = new Template(__DIR__.'/cached', $cfg, $eventHolder);
 
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
@@ -536,7 +536,7 @@ and when we call our template (direct, or nested):
 <?php tstart(); ?>
 $viewFactory->render('form', []);
 <?php teval(); ?>
-Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on ViewFactory instancing. This will parse templates on each request without caching them (do this only during development).
+Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on Template instancing. This will parse templates on each request without caching them (do this only during development).
 
 ### On Rendering time
 Let it be our last sorted list:

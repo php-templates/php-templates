@@ -12,7 +12,7 @@ use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\Cache\NullCache;
 
 // todo: rename into template
-class ViewFactory
+class Template
 {
     /**
      * User declared data composers for given template

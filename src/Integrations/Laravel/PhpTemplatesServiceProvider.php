@@ -9,7 +9,7 @@ class PhpTemplatesServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('view', function($app) {
-            return new ViewFactory($app);
+            return new Template($app);
         });
     }
 }

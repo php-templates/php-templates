@@ -4,16 +4,16 @@ namespace PhpTemplates\Integrations\Laravel;
 
 use PhpTemplates\PhpTemplate;
 
-class ViewFactory implements \Illuminate\Contracts\View\Factory
+class Template implements \Illuminate\Contracts\View\Factory
 {
     private $shared = [];
     private $template;
-    
+
     public function __construct($laravel)
     {
         $this->template = new PhpTempte(config('view.paths.0'), config('view.compiled'));
     }
-    
+
     /**
      * Determine if a given view exists.
      *
@@ -110,7 +110,7 @@ class ViewFactory implements \Illuminate\Contracts\View\Factory
         if (in_array($namespace, ['errors'])) {
             $hints[1] = __DIR__ . '/views';
         }
- 
+
         $this->template->addPath($namespace, $hints);
     }
 

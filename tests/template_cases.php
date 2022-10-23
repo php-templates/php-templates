@@ -7,7 +7,7 @@ use PhpTemplates\ConfigHolder;
 use PhpTemplates\DependenciesMap;
 use PhpTemplates\EventHolder;
 use PhpTemplates\ViewParser;
-use PhpTemplates\ViewFactory;
+use PhpTemplates\Template;
 use PhpTemplates\View;
 use PhpTemplates\PhpTemplate;
 use PhpTemplates\Document;
@@ -21,7 +21,7 @@ use PhpTemplates\Dom\DomNode;
 $cfg = new Config('default', __DIR__);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/results', $cfg, $eventHolder);
+$viewFactory = new Template(__DIR__.'/results', $cfg, $eventHolder);
 //$cfgHolder = $viewFactory->getConfig();
 
 $cfg->setAlias([

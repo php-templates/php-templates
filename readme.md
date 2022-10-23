@@ -1,17 +1,17 @@
 ***Php-Templates*** is a template engine which syntax is inspired from Vue.js. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code (functional templating) and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
 ## Setting up
-Template files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
+View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
 
 ```
 <\?php
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
-use PhpTemplates\ViewFactory;
+use PhpTemplates\Template;
 
 $cfg = new Config('default', __DIR__);
 $eventHolder = new EventHolder();
-$viewFactory = new ViewFactory(__DIR__.'/cached', $cfg, $eventHolder);
+$viewFactory = new Template(__DIR__.'/cached', $cfg, $eventHolder);
 
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
@@ -698,7 +698,7 @@ $viewFactory->render('form', []);
       
     <label class="form-label">Zipcode</label>
         <input type="text" class="form-control" placeholder="Zipcode">
-    </div> </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on ViewFactory instancing. This will parse templates on each request without caching them (do this only during development).
+    </div> </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on Template instancing. This will parse templates on each request without caching them (do this only during development).
 
 ### On Rendering time
 Let it be our last sorted list:
