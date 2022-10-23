@@ -5,9 +5,7 @@ error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
 
-// TODO: remove this
-
-if (!function_exists('dd')) {
+/* if (!function_exists('dd')) {
     function dd(...$data) {
         $x = debug_backtrace();
         print_r($x[0]['file'].':'.$x[0]['line'].PHP_EOL);
@@ -31,25 +29,7 @@ function d(...$data) {
         //echo '</pre>';
         echo PHP_EOL;
     }
-}
-
-//file_put_contents(sys_get_temp_dir().'/foo.php', '');
-//require(sys_get_temp_dir().'/foo.php');
-//dd(glob(sys_get_temp_dir().'/*'));
-
-function xd($data) {
-    $x = debug_backtrace();
-    //print_r($x[0]['file'].'->'.$x[0]['line']);
-    //foreach ($data as $d) {
-    //var_dump($d);
-    //echo '<pre>';
-    print_r('--' . ($data ?? 'null'));
-    //echo '</pre>';
-    echo PHP_EOL;
-    return $data;
-    //}
-}
-
+} */
 
 require_once(__DIR__.'/src/helpers.php');
 spl_autoload_register(function ($class) {

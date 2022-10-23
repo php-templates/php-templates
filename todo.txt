@@ -1,16 +1,12 @@
 solve all todos
 
-// TODO: remove debug fn from autoload, or namespace them if works
-
-documentation for domnode
-
 solve indent
 
 {% short php syntax %} replace @php @endphp with this
 
 todo: v.1.1
 butter node parser using preg offset
-events as classes path support, no, better .. event * 
+events as classes path support, no, better .. event *
 throw parse error, line unexpected " or ' or
 each file returns a new class extends x
 registry

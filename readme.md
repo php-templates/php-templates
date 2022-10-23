@@ -17,6 +17,7 @@ $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Te
 $view->render();
 ```
 ```
+ 
 <h1>Hello Php Templates</h1> 
 ```
 
@@ -35,7 +36,7 @@ $viewFactory->make('examples/hello', ["h1" => "Hello Php Templates"])->render();
 will result:
 
 ```
-<h1>Hello Php Templates</h1> 
+<h1>Hello Php Templates</h1>
 ```
 
 Unlike other template engines, interpolation is resumed only on text nodes.
@@ -52,7 +53,7 @@ $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 will result:
 
 ```
-<input type="text" value="{{ $value }}"> 
+<input type="text" value="{{ $value }}">
 ```
 
 In order to bind values to node attributes, just write your attributes prefixed by ':'. We will further refer this syntax as 'bind'.
@@ -68,7 +69,7 @@ $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 will result:
 
 ```
-<input type="text" value="No value"> 
+<input type="text" value="No value">
 ```
 In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
 
@@ -83,7 +84,7 @@ $viewFactory->make('examples/hello', ["value" => "No value"])->render();
 will result:
 
 ```
-<input type="text" value="value given"> 
+<input type="text" value="value given">
 ```
 
 Arrays are accepted too. You can:
@@ -108,7 +109,7 @@ will result:
 
 ```
 <input type="text" value="Lorem ipsum" name="fname">
-<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp> 
+<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
 ```
 
 If you wonder how then conditionally rendering attributes is possible, take a look at 'Directives' section. First, we have to cover control structures.
@@ -132,8 +133,7 @@ $viewFactory->make('examples/hello', ['type' => 'textarea', 'value' => 'Lorem'])
 will result:
 
 ```
-  <textarea>Lorem</textarea>
-
+<textarea>Lorem</textarea>
 ```
 
 Here is a foreach example:
@@ -156,7 +156,7 @@ Do you like Php Templates?
 <select>
       <option value="1">Yes</option>
       <option value="0">No</option>
-  </select> 
+  </select>
 ```
 
 In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
@@ -180,6 +180,7 @@ will result:
       <option value="1">Yes</option>
       <option value="0">No</option>
   </select>
+
 I will survive!!!
 ```
 
@@ -200,7 +201,7 @@ $viewFactory->make('examples/hello', ["condition" => true])->render();
 will result:
 
 ```
-<div class="card" style="width: 18rem;"></div> 
+<div class="card" style="width: 18rem;"></div>
 ```
 Please note that is IMPORTANT to escape nested quotes using backslash.
 Using this directive on a component node will take no effect.
@@ -218,7 +219,7 @@ $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "
 will result:
 
 ```
-<input type="text" name="name" disabled> 
+<input type="text" name="name" disabled>
 ```
 
 `checked` - used on input type radio / checkbox
@@ -238,7 +239,7 @@ will result:
 ```
 <input name="thecheckbox" type="checkbox" value="1" >
 <input name="theradio" type="radio" value="1" checked>
-<input name="theradio" type="radio" value > 
+<input name="theradio" type="radio" value >
 ```
 
 `selected` - used on select input
@@ -261,7 +262,7 @@ will result:
       <option value="a" >avocado</option>
       <option value="b" selected="selected">banana</option>
       <option value="c" >cherry</option>
-  </select> 
+  </select>
 ```
 
 `disabled` - used to apply attribute `disabled`
@@ -277,7 +278,7 @@ $viewFactory->make('examples/hello', [])->render();
 will result:
 
 ```
-<input type="text" disabled> 
+<input type="text" disabled>
 ```
 
 
@@ -311,8 +312,8 @@ $viewFactory->make('examples/hello', [])->render();
 will result:
 
 ```
-  <div>Guest</div>
-<div class="active"></div> 
+<div>Guest</div>
+<div class="active"></div>
 ```
 
 Note that `$val` param passed to callback function is the string value of the directive attribute, in our case `3 < 4`.
@@ -358,9 +359,11 @@ will result:
 
 ```
 <div class="form-group">
-      <label class="form-label">The Label</label>
+  
+      
+    <label class="form-label">The Label</label>
         <input type="text" class="form-control" value="The Value" placeholder="The Label">
-    </div> 
+    </div>
 ```
 You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
@@ -419,7 +422,7 @@ Now, we can use it like this:
 ```
 <x-form-group type="number" @min="1">
     <span slot="label">Custom label <i class="fa fa-download"></i></span>
-    <input type="number" class="form-control"><!-- same as 
+    <input type="number" class="form-control"><!-- same as
     <input type="number" slot="default" class="form-control"> -->
 </x-form-group>
 ```
@@ -431,11 +434,12 @@ will result:
 
 ```
 <div class="form-group">
+  
   <span>Custom label <i class="fa fa-download"></i></span>
 <input type="number" class="form-control">
 <!-- same as
     <input type="number" class="form-control"> -->
-</div> 
+</div>
 ```
 
 No slot is required to be passed. Empty slots will render nothing and slots with default values (declared between `<slot></slot>` tag) will evaluate that value. Multiple nodes can fill the same slot name.
@@ -478,7 +482,7 @@ $viewFactory->make('examples/hello', [
 'headings' => [
     'id' => 'ID',
     'name' => 'Name'
-], 
+],
 'data' => [
     ['id' => 67, 'name' => 'Mango'],
     ['id' => 32, 'name' => 'Potatos'],
@@ -497,33 +501,33 @@ will result:
     <tbody>
               <tr>
                       <td><br />
-<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
 </td>
                       <td><br />
-<b>Warning</b>:  Undefined array key "name" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+<b>Notice</b>:  Undefined index: name in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
 </td>
           <br />
-<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>30</b><br />
+<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>31</b><br />
 <div>
   <a href="edit-item-">Edit</a>
 </div>
         </tr>
               <tr>
                       <td><br />
-<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
 </td>
                       <td><br />
-<b>Warning</b>:  Undefined array key "name" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>27</b><br />
+<b>Notice</b>:  Undefined index: name in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
 </td>
           <br />
-<b>Warning</b>:  Undefined array key "id" in <b>/storage/emulated/0/dev/exegeza/vendor/florin-botea/php-templates/tests/results/f8a8c1928032de66ca79b9a4b4687940_4ruqhunhl410.php</b> on line <b>30</b><br />
+<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>31</b><br />
 <div>
   <a href="edit-item-">Edit</a>
 </div>
         </tr>
           </tbody>
   </table>
-</div> 
+</div>
 ```
 
 ## Extends
@@ -556,16 +560,17 @@ will result:
 <htm>
   <head>… </head>
   <body>
+    
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
-</htm> 
+</htm>
 ```
 As you can see, extended template shares the same context with the child, means it can have access to child variables/child automatically binds variables to parent.
 
 ## Global Shared data
 You can use the following method on TemplateFactory instance to share a value across all templates (nested, extended, components or not) built by it:
 ```
-<\?php 
+<\?php
 $viewFactory->share('shared', 'I share because I care');
 ```
 
@@ -580,7 +585,7 @@ $viewFactory->make('examples/hello', [])->render();
 will result:
 
 ```
-<div class="card">… I share because I care</div> 
+<div class="card">… I share because I care</div>
 ```
 Shared data have low precedence, meaning they are there, only if they are not overriden by another value with the same label (variable name).
 
@@ -628,12 +633,14 @@ will result:
       <li>berry</li>
       <li>cherry</li>
   </ul> <!-- or like this -->
+
+ 
 <ul>
       <li>cherry</li>
       <li>berry</li>
       <li>banana</li>
       <li>avocado</li>
-  </ul> 
+  </ul>
 ```
 
 ## Events
@@ -664,18 +671,32 @@ $viewFactory->on('parsing', 'form', function($node) {
 ```
 and when we call our template (direct, or nested):
 $viewFactory->render('form', []);
+ 
 <form action="action">
-  <div class="form-group">
-      <label class="form-label">Firstname</label>
+  
+   
+<div class="form-group">
+  
+      
+    <label class="form-label">Firstname</label>
         <input type="text" class="form-control" placeholder="Firstname">
-    </div> <div class="form-group">
-      <label class="form-label">Lastname</label>
+    </div>  
+<div class="form-group">
+  
+      
+    <label class="form-label">Lastname</label>
         <input type="text" class="form-control" placeholder="Lastname">
-    </div> <div class="form-group">
-      <label class="form-label">Age</label>
+    </div>  
+<div class="form-group">
+  
+      
+    <label class="form-label">Age</label>
         <input type="number" class="form-control" placeholder="Age">
-    </div> <div class="form-group">
-      <label class="form-label">Zipcode</label>
+    </div>  
+<div class="form-group">
+  
+      
+    <label class="form-label">Zipcode</label>
         <input type="text" class="form-control" placeholder="Zipcode">
     </div> </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on ViewFactory instancing. This will parse templates on each request without caching them (do this only during development).
 
@@ -710,7 +731,7 @@ will result:
       <li>berry</li>
       <li>cherry</li>
       <li>added</li>
-  </ul> 
+  </ul>
 ```
 pretty usefull if you want to add data on fly
 
@@ -749,8 +770,8 @@ $(document).on("change", 'input[type="file"].preview', function() {
     });
 } ?\>
 ```
-Parsed event is executed after a template is fully parsed. 
-Events may be declared eliptic in name using *, (meaning anything except '/'). 
+Parsed event is executed after a template is fully parsed.
+Events may be declared eliptic in name using *, (meaning anything except '/').
 Events declaration may accept a weight as 4'th argument which will define listener execution order (high to low).
 In the above example, we needed to detach the $script and keep a reference of it, because in event callback would be too late because the component would be already transformed to template function at that point and any change made would take no effect. Also, layout rendering event was triggered before this point.
 
@@ -758,8 +779,81 @@ In the above example, we needed to detach the $script and keep a reference of it
 PhpTemplates parses every template into a virtual dom, then reccursively traverse each node to handle semantic syntaxes/nodes. At the end, the dom is saved into a valid tpl format. This makes PhpTemplates different from other template engines. You can hook anywhere in the dom and insert whatever element you want, modify or delete dom elements.
 Each node is a DomNode object class. We will list below the class methods you can use.
 
-`__construct(string $nodeName, $nodeValue = '')`
-
-Constructs a DomNode instance, like div, span, etc. 
+### `__construct(string $nodeName, $nodeValue = '')`
+Constructs a DomNode instance, like div, span, etc.
 $nodeName - tag name. In case of textnode, prefix `$nodeName` with '#' and name it as you wish
 $nodeValue - if textnode, it should be string. If domNode, it can be a key => value array containing attributes (ex: ['class' => 'foo bar'])
+
+### static `fromString(string $str)`
+Create a new DOM structure from a given string, ex: `<div><span>Hello</span> World</div>`
+This fn will try to capture its call location in order to give relevant data for debugging
+
+### `addAttribute($nodeName, string $nodeValue = '')`
+Add an attribute to node in append mode (if an attribute class exists on node and you call `addAttribute('class', 'class2')`, it will add this class too)
+$nodeName - string|DomNodeAttr
+$nodeValue - string
+
+
+### `setAttribute(string $nodeName, string $nodeValue = '')`
+Add an attribute to node. If an already existing attribute will be found by given name, its value will be overriden
+
+### `getAttribute(string $name)`
+Returns node attribute value by attribute name, null if no attribute found
+
+### `hasAttribute(string $name)`
+Determine if an attribute exists on current node, by its name
+
+### `removeAttribute(string $name): self`
+Remove node attribute, return node instance
+
+### `removeAttributes()`
+Remove all node attributes
+
+### `appendChild($node)`
+Append a new child node to current node and returns appended child instance.
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+### `insertBefore($node, self $refNode)`
+Insert a child node before another given childnode
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+### `insertAfter($node, self $refNode)`
+Insert a child node after another given childnode
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+
+### `removeChild(self $node)`
+Remove given childnode
+
+### `empty()`
+Remove all childnode
+
+### `detach()`
+Remove childnode from its parent and returns it available to be attached (insert,append) elsewhere
+
+### `cloneNode()`
+Returns an exact node clone, excluding its parent
+
+### `getPrevSibling()`
+Returns previous sibling
+
+### `getNextSibling()`
+Returns next sibling
+
+### `querySelector(string $selector)`
+Non complex css selectors supported
+Supported selectors are:
+.class	(ex: .intro)	- Selects all elements with class="intro"
+.class1.class2 (ex: .name1.name2) - Selects all elements with both name1 and name2 set within its class attribute
+.class1 .class2	(ex: .name1 .name2)	- Selects all elements with name2 that is a descendant of an element with name1
+#id	(ex: #firstname) - Selects the element with id="firstname"
+element	(ex: p) - Selects all &lt;p&gt; elements
+element.class (ex: p.intro) - Selects all &lt;p&gt; elements with class="intro"
+element element	(ex: div p) - Selects all &lt;p&gt; elements inside &lt;div&gt; elements
+element>element	(ex: div > p) - Selects all &lt;p&gt; elements where the parent is a &lt;div&gt; element
+element+element	(ex: div + p) - Selects the first &lt;p&gt; element that is placed immediately after &lt;div&gt; elements
+element1~element2 (ex: p ~ ul) - Selects every &lt;ul&gt; element that is preceded by a &lt;p&gt; element
+[attribute]	(ex: [target="value"]) - Selects all elements with a target attribute having value 'value'
+
+### `querySelectorAll(string $selector)`
+Non complex css selectors supported

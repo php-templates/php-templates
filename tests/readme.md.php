@@ -71,7 +71,11 @@ function tresult($file, $data = '[]')
     echo "\nwill result:\n
 ```
 ";
+ob_start();
 $viewFactory->makeRaw("\n".trim(str_replace('```', '', $tpl), "\n")."\n", $_data)->render();
+$tpl = ob_get_contents();
+ob_end_clean();
+echo trim($tpl);
 echo "\n```
 ";
     return $tpl;
@@ -98,7 +102,7 @@ $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Te
 $view->render();
 ```
 ```
-<?php 
+<?php
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
 ?>
@@ -371,7 +375,7 @@ Now, we can use it like this:
 ```
 <x-form-group type="number" @min="1">
     <span slot="label">Custom label <i class="fa fa-download"></i></span>
-    <input type="number" class="form-control"><!-- same as 
+    <input type="number" class="form-control"><!-- same as
     <input type="number" slot="default" class="form-control"> -->
 </x-form-group>
 ```
@@ -415,7 +419,7 @@ Now, we can use the component like this:
 'headings' => [
     'id' => 'ID',
     'name' => 'Name'
-], 
+],
 'data' => [
     ['id' => 67, 'name' => 'Mango'],
     ['id' => 32, 'name' => 'Potatos'],
@@ -447,7 +451,7 @@ As you can see, extended template shares the same context with the child, means 
 You can use the following method on TemplateFactory instance to share a value across all templates (nested, extended, components or not) built by it:
 <?php $viewFactory->share('shared', 'I share because I care'); ?>
 ```
-<\?php 
+<\?php
 $viewFactory->share('shared', 'I share because I care');
 ```
 <?php tstart(); ?>
@@ -591,8 +595,8 @@ $(document).on("change", 'input[type="file"].preview', function() {
     });
 } ?\>
 ```
-Parsed event is executed after a template is fully parsed. 
-Events may be declared eliptic in name using *, (meaning anything except '/'). 
+Parsed event is executed after a template is fully parsed.
+Events may be declared eliptic in name using *, (meaning anything except '/').
 Events declaration may accept a weight as 4'th argument which will define listener execution order (high to low).
 In the above example, we needed to detach the $script and keep a reference of it, because in event callback would be too late because the component would be already transformed to template function at that point and any change made would take no effect. Also, layout rendering event was triggered before this point.
 
@@ -601,17 +605,17 @@ PhpTemplates parses every template into a virtual dom, then reccursively travers
 Each node is a DomNode object class. We will list below the class methods you can use.
 
 ### `__construct(string $nodeName, $nodeValue = '')`
-Constructs a DomNode instance, like div, span, etc. 
+Constructs a DomNode instance, like div, span, etc.
 $nodeName - tag name. In case of textnode, prefix `$nodeName` with '#' and name it as you wish
 $nodeValue - if textnode, it should be string. If domNode, it can be a key => value array containing attributes (ex: ['class' => 'foo bar'])
 
 ### static `fromString(string $str)`
 Create a new DOM structure from a given string, ex: `<div><span>Hello</span> World</div>`
 This fn will try to capture its call location in order to give relevant data for debugging
- 
+
 ### `addAttribute($nodeName, string $nodeValue = '')`
 Add an attribute to node in append mode (if an attribute class exists on node and you call `addAttribute('class', 'class2')`, it will add this class too)
-$nodeName - string|DomNodeAttr 
+$nodeName - string|DomNodeAttr
 $nodeValue - string
 
 
@@ -621,8 +625,65 @@ Add an attribute to node. If an already existing attribute will be found by give
 ### `getAttribute(string $name)`
 Returns node attribute value by attribute name, null if no attribute found
 
+### `hasAttribute(string $name)`
+Determine if an attribute exists on current node, by its name
 
-<?php 
+### `removeAttribute(string $name): self`
+Remove node attribute, return node instance
+
+### `removeAttributes()`
+Remove all node attributes
+
+### `appendChild($node)`
+Append a new child node to current node and returns appended child instance.
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+### `insertBefore($node, self $refNode)`
+Insert a child node before another given childnode
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+### `insertAfter($node, self $refNode)`
+Insert a child node after another given childnode
+If appended node already exists in this node flow, it will throw an error to prevent infinite recursion
+
+
+### `removeChild(self $node)`
+Remove given childnode
+
+### `empty()`
+Remove all childnode
+
+### `detach()`
+Remove childnode from its parent and returns it available to be attached (insert,append) elsewhere
+
+### `cloneNode()`
+Returns an exact node clone, excluding its parent
+
+### `getPrevSibling()`
+Returns previous sibling
+
+### `getNextSibling()`
+Returns next sibling
+
+### `querySelector(string $selector)`
+Non complex css selectors supported
+Supported selectors are:
+.class	(ex: .intro)	- Selects all elements with class="intro"
+.class1.class2 (ex: .name1.name2) - Selects all elements with both name1 and name2 set within its class attribute
+.class1 .class2	(ex: .name1 .name2)	- Selects all elements with name2 that is a descendant of an element with name1
+#id	(ex: #firstname) - Selects the element with id="firstname"
+element	(ex: p) - Selects all &lt;p&gt; elements
+element.class (ex: p.intro) - Selects all &lt;p&gt; elements with class="intro"
+element element	(ex: div p) - Selects all &lt;p&gt; elements inside &lt;div&gt; elements
+element>element	(ex: div > p) - Selects all &lt;p&gt; elements where the parent is a &lt;div&gt; element
+element+element	(ex: div + p) - Selects the first &lt;p&gt; element that is placed immediately after &lt;div&gt; elements
+element1~element2 (ex: p ~ ul) - Selects every &lt;ul&gt; element that is preceded by a &lt;p&gt; element
+[attribute]	(ex: [target="value"]) - Selects all elements with a target attribute having value 'value'
+
+### `querySelectorAll(string $selector)`
+Non complex css selectors supported
+
+<?php
 $md = ob_get_contents();
 file_put_contents(__DIR__ . '/../readme.md', trim($md));
 ?>

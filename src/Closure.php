@@ -9,32 +9,31 @@ use PhpTemplates\Source;
 class Closure
 {
     private $source;
-    
+
     public function __construct(?BaseClosure $closure, Source $source = null)
     {
         $this->closure = $closure;
         $this->source = $source;
     }
-    
-    public function __invoke($args) 
+
+    public function __invoke($args)
     {
-        // todo expect closure not null, eval source in phpt namespace
         return call_user_func($this->closure, $args);
     }
-    
-    public static function fromSource(Source $fnsrc) 
+
+    public static function fromSource(Source $fnsrc)
     {
         return new self(null, $fnsrc);
     }
-    
-    public function bindTo($self) 
+
+    public function bindTo($self)
     {
         $this->closure = $this->closure->bindTo($self);
-        
+
         return $this;
     }
-    
-    public function getFile() 
+
+    public function getFile()
     {
         return $this->source->getFile();
     }

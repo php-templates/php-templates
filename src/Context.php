@@ -8,7 +8,7 @@ class Context
     public $loopContext;
     private $loopDepth = 0;
     private $data;
-   
+
     public function __construct(array $data = [], self $parent = null)
     {
         $this->data = $data ?? [];
@@ -46,7 +46,7 @@ class Context
         array_unshift($data, $this->data);
         $this->data = call_user_func_array('array_merge', $data);
     }
-    
+
     public function leaseMerge(array $data)
     {
         $this->data = array_merge($data, $this->data);
@@ -81,7 +81,6 @@ class Context
     {
         return array_key_exists($prop, $this->data);
     }
-    // todo doc scope getable _data and attrs
 
     public function &get($prop)
     {
@@ -91,7 +90,7 @@ class Context
         if ($prop == '_data') {
             return $this->data;
         }
-        
+
         if (array_key_exists($prop, $this->data)) {
             return $this->data[$prop];
         } elseif (isset($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {

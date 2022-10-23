@@ -201,6 +201,13 @@ class Config
     // ===================== GETTERS ===================== //
     // =================================================== //
 
+    /**
+     * Register a directive - a way how a given syntax should be parsed
+     *
+     * @param string $key
+     * @param \Closure $callable
+     * @return void
+     */
     public function setDirective(string $key, \Closure $callable): void
     {
         $reserved = ['raw', 'bind', 'if', 'elseif', 'else', 'for', 'foreach'];
@@ -212,6 +219,13 @@ class Config
         $this->directives[$key] = $callable;
     }
 
+    /**
+     * Register an alaias to a template to easily refer it in other templates. An key => value array is supported
+     *
+     * @param array|string $key
+     * @param string $component
+     * @return void
+     */
     public function setAlias($key, string $component = ''): void
     {
         if (!is_array($key)) {

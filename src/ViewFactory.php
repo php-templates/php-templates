@@ -14,11 +14,39 @@ use PhpTemplates\Cache\NullCache;
 // todo: rename into template
 class ViewFactory
 {
-    // todo doc this members
+    /**
+     * User declared data composers for given template
+     *
+     * @var array
+     */
     protected $composers = [];
+
+    /**
+     * Shared data across all templates
+     *
+     * @var array
+     */
     private $shared = [];
+
+    /**
+     * Output cache destination path. If null, NullCache will be used
+     *
+     * @var string
+     */
     private $outputFolder;
+
+    /**
+     * Parsing Config - default config
+     *
+     * @var Config
+     */
     private $config;
+
+    /**
+     * Events manager
+     *
+     * @var EventHolder
+     */
     private $eventHolder;
 
     public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder)
@@ -38,14 +66,21 @@ class ViewFactory
      */
     public function render(string $rfilepath, array $data = [], $slots = [])
     {
-        $start_time = microtime(true);
+        // $start_time = microtime(true);
         $template = $this->make($rfilepath, $data, $slots);
         $template->render();
         // print_r('<br>'.(microtime(true) - $start_time));
     }
 
-    // todo documentam this, src object or string
-    public function makeRaw($phpt, $data = [], $slots = [])
+    /**
+     * Make a template object from raw string, or Source object
+     *
+     * @param string|Source $phpt
+     * @param array $data
+     * @param array $slots
+     * @return void
+     */
+    public function makeRaw($phpt, array $data = [], array $slots = [])
     {
         if (is_string($phpt)) {
             $source = new Source($phpt, '');
@@ -58,7 +93,7 @@ class ViewFactory
         else {
             throw new Exception("Invalid argument supplied");
         }
-        
+
         $this->cache = $this->getCache();
 
         // paths will fallback on default Config in case of file not found or setting not found
@@ -153,16 +188,21 @@ class ViewFactory
         $this->composers[$name][] = $cb;
     }
 
-    // todo doc this, 
+    /**
+     * Return Config by key, or null. If no key given, default config is returned
+     *
+     * @param string|null $key
+     * @return Config|null
+     */
     public function getConfig(string $key = null): ?Config
     {
         if ($key) {
             return $this->config->find($key);
         }
-        
+
         return $this->config;
     }
-    
+
     /**
      * Create a subconfig derived from actual config, meaning it will fallback on this parent if template, directive, alias not found
      *
@@ -174,14 +214,26 @@ class ViewFactory
     {
         return $this->config->subconfig($name, $srcPath);
     }
-    
-    // todo doc this here and in Config
+
+    /**
+     * Register a directive - a way how a given syntax should be parsed
+     *
+     * @param string $key
+     * @param \Closure $callable
+     * @return void
+     */
     public function setDirective(string $key, \Closure $callable): void
     {
         $this->config->setDirective($key, $callable);
     }
 
-    // todo doc this here and in Config
+    /**
+     * Register an alaias to a template to easily refer it in other templates. An key => value array is supported
+     *
+     * @param array|string $key
+     * @param string $component
+     * @return void
+     */
     public function setAlias($key, string $component = ''): void
     {
         $this->config->setAlias($key, $component);
