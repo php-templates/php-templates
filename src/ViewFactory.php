@@ -102,7 +102,7 @@ class ViewFactory
             $node = $parser->parse($source);
 
             // parse it
-            $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
+            $factory = new NodeParser($this->cache, $this->config, $this->eventHolder);
             $entity = $factory->make($node, new StartupEntity($this->config, $rfilepath));
             $entity->parse();
 
@@ -130,7 +130,7 @@ class ViewFactory
         // paths will fallback on default Config in case of file not found or setting not found
         if (!$this->cache->load($rfilepath)) {
             // parse it
-            $factory = new EntityFactory($this->cache, $this->config, $this->eventHolder);
+            $factory = new NodeParser($this->cache, $this->config, $this->eventHolder);
             $entity = $factory->make(new DomNode('tpl', ['is' => $rfilepath]), new StartupEntity($this->config));
             $entity->parse();
 

@@ -8,7 +8,7 @@ use PhpTemplates\Attributes\AttributePack;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
-use PhpTemplates\EntityFactory;
+use PhpTemplates\NodeParser;
 
 abstract class AbstractEntity implements EntityInterface
 {
@@ -17,7 +17,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * class used to instantiate entities in nodes recursion
      *
-     * @var EntityFactory
+     * @var NodeParser
      */
     protected $factory;
 
@@ -84,10 +84,10 @@ abstract class AbstractEntity implements EntityInterface
      * @param Config $config
      * @param EntityInterface $context
      * @param CacheInterface $cache
-     * @param EntityFactory $factory
+     * @param NodeParser $factory
      * @param EventHolder $eventHolder
      */
-    public function __construct(DomNode $node, Config $config, EntityInterface $context, CacheInterface $cache, EntityFactory $factory, EventHolder $eventHolder)
+    public function __construct(DomNode $node, Config $config, EntityInterface $context, CacheInterface $cache, NodeParser $factory, EventHolder $eventHolder)
     {
         $this->node = $node;
         $this->config = $config;

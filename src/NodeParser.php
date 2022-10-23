@@ -8,6 +8,7 @@ use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Config;
 
+//TODO: RENAME INTO NODEPARSER
 class NodeParser
 {
     private $document;
