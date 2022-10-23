@@ -1,5 +1,5 @@
 {
-    "name": "florin-botea/php-templates",
+    "name": "php-templates/php-templates",
     "license": "MIT",
     "description": "Php templating engine",
     "keywords": ["php", "templates"],
@@ -7,7 +7,7 @@
     "authors": [
         {
             "name": "Florin Botea",
-            "homepage": "https://github.com/florin-botea",
+            "homepage": "https://github.com/php-templates",
             "role": "Developer"
         }
     ],
