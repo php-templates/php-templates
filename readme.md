@@ -1,5 +1,9 @@
 ***Php-Templates*** is a template engine which goal is to bring full modularity to 'view' part of an app. It also has a nice to read and write syntax. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
+## Install
+`composer require php-templates/php-templates`
+or simply download project and include `autoload.php` file
+
 ## Setting up
 View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
 
