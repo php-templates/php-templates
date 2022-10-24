@@ -18,3 +18,5 @@ configure parser to auto close tags without throwing errors
 indent nu merge ok la func, php etc
 loopstart si loopend vor fi un closure: poate se poate
 domnodeattribute implements domnoneattrinterface
+
+d
