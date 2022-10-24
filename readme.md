@@ -5,6 +5,9 @@ View files will have the `.t.php` extension and be placed in configured source p
 
 ```
 <\?php
+
+require __DIR__ . '/vendor/autoload.php';
+
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Template;
