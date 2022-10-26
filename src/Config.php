@@ -117,7 +117,7 @@ class Config
         foreach ($controlStructures as $statement) {
             $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
                 if (in_array($statement, ['elseif', 'else'])) {
-                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) { //$node->parentNode->parentNode->d();dd($node->parentNode->parentNode->debug());
+                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) {
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
                     }
                 }
@@ -150,6 +150,51 @@ class Config
     public function getParent()
     {
         return $this->parent;
+    }
+    
+    public function getChilds()
+    {
+        return $this->childs;
+    }
+    
+    private function flatten(array &$payload, $config)
+    {
+        $payload[] = $config;
+        foreach ($this->getChilds() as $child) {
+            $this->flatten($payload, $child);
+        }
+    }
+    
+    public function getConfigFromPath(string $absolutePath): self
+    {
+        $configs = [];
+        $this->flatten($configs, $this);
+        $absolutePath = str_replace('\\', '/', $absolutePath);
+        
+        $result = null;
+        $matchPath = null;
+        foreach ($configs as $c) {
+            $match = array_filter($c->getPath(), function($path) use ($absolutePath) {
+                return strpos($absolutePath, str_replace('\\', '/', $path)) !== false;
+            });
+            if (!$match) {
+                continue;
+            }
+            
+            usort($match, function($a, $b) {
+                return strlen($b) - strlen($a);
+            });
+            
+            if (strlen(reset($match)) > strlen($matchPath)) {
+                $result = $c;
+            }
+        }
+        
+        if (!$result) {
+            return $configs[0];
+        }
+        
+        return $result;
     }
 
     public function getRoot()

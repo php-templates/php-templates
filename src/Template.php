@@ -83,13 +83,15 @@ class Template
      */
     public function makeRaw($phpt, array $data = [], array $slots = [])
     {
+        $config = $this->config;
         if (is_string($phpt)) {
             $source = new Source($phpt, '');
             $rfilepath = md5($phpt);
         }
         elseif ($phpt instanceof Source) {
-            $source = $phpt;
-            $rfilepath = md5($phpt->getFile());
+            $source = (string)$phpt;
+            $rfilepath = trim(str_replace([root_path(), '.t.php'], '', $phpt->getFile()), '/ ');dd($rfilepath);
+            $config = $this->getConfigFromPath($phpt->getFile());
         }
         else {
             throw new Exception("Invalid argument supplied");
@@ -103,7 +105,7 @@ class Template
             $node = $parser->parse($source);
 
             // parse it
-            $factory = new NodeParser($this->cache, $this->config, $this->eventHolder);
+            $factory = new NodeParser($this->cache, $config, $this->eventHolder);
             $entity = $factory->make($node, new StartupEntity($this->config, $rfilepath));
             $entity->parse();
 
@@ -258,6 +260,11 @@ class Template
     public function getEventHolder()
     {
         return $this->eventHolder;
+    }
+    
+    protected function getPathRelative(string $absolutePath): string
+    {
+        
     }
 
     protected function getCache()

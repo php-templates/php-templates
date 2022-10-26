@@ -26,6 +26,7 @@ class Parser
         $this->currentLineRange = [$source->getStartLine(), $source->getStartLine()];
         $this->srcFile = $source->getFile();
         $str = (string) $source;
+        $str = $this->removeHtmlComments($str);
         $str = $this->collectAndReplaceNoises($str);
 
         $arr = explode('>', $str);
@@ -74,7 +75,7 @@ class Parser
             // end node
             if (preg_match('/^<\/\s*(\w+[-_\w]*)>/', $str, $m)) {
                 if (end($hierarchyQueue)->nodeName != $m[1]) {
-                    throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
+                    throw new InvalidNodeException('Missing or wrong closing tag ' . $m[1] . ', ' . end($hierarchyQueue)->nodeName . ' expected', end($hierarchyQueue));
                 }
                 $node = array_pop($hierarchyQueue);
                 $node->indentEnd = !trim($prev) && strpos($prev, "\n") !== false;
@@ -119,7 +120,6 @@ class Parser
             throw new InvalidNodeException('Missing or wrong closing tag', end($hierarchyQueue));
         }
 
-//dd($hierarchyQueue[0]->childNodes[0]->debug());
         if (isset($hierarchyQueue[0])) {
             return $hierarchyQueue[0];
         }
