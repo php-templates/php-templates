@@ -76,7 +76,7 @@ class Config
         $cfg = new Config($name, $srcPath, $this);
         $this->childs[] = $cfg;
 
-        return $this;
+        return $cfg;
     }
 
     /**
@@ -157,10 +157,14 @@ class Config
         return $this->childs;
     }
     
-    private function flatten(array &$payload, $config)
+    private function flatten(array &$payload, $config = null)
     {
+        if (!$config) {
+            $config = $this;
+        }
+        
         $payload[] = $config;
-        foreach ($this->getChilds() as $child) {
+        foreach ($config->getChilds() as $child) {
             $this->flatten($payload, $child);
         }
     }
@@ -189,18 +193,15 @@ class Config
                 $result = $c;
             }
         }
-        
-        if (!$result) {
-            return $configs[0];
-        }
-        
+        $result = $result ? $result : $configs[0];
+       
         return $result;
     }
 
     public function getRoot()
     {
         $cfg = $this;
-        while ($this->getParent()) {
+        while ($cfg->getParent()) {
             $cfg = $this->getParent();
         }
 
@@ -224,11 +225,12 @@ class Config
     public function getAliased(string $name)
     {
         $cfg = $this;
+        $domain = '';
         do {
             if (isset($cfg->aliased[$name])) {
-                return $cfg->aliased[$name];
+                return $domain.$cfg->aliased[$name];
             }
-        } while ($cfg = $cfg->getParent());
+        } while (($cfg = $cfg->getParent()) && $domain = $cfg->getName() . ':');
     }
 
     public function getDirective(string $name)

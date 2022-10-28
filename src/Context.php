@@ -84,6 +84,9 @@ class Context
 
     public function &get($prop)
     {
+        if ($prop == '_context') {
+            return $this;
+        }
         if ($prop == '_attrs') {
             return $this->data['_attrs'];
         }

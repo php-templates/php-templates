@@ -1,8 +1,5 @@
-solve all todos
-
 solve indent
-
-{% short php syntax %} replace @php @endphp with this
+throw error config not found by key
 
 todo: v.1.1
 butter node parser using preg offset

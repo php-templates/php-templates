@@ -129,6 +129,7 @@ class TemplateEntity extends AbstractEntity
             $rfilepath = $config->getAliased($this->node->nodeName);
         }
 
+        // aliased may return domain:rfilepath in case of not directly own the alias, or refer directly from module namespace
         if (strpos($rfilepath, ':')) {
             list($cfgKey, $rfilepath) = explode(':', $rfilepath);
             $config = $config->getRoot()->find($cfgKey);
@@ -144,7 +145,6 @@ class TemplateEntity extends AbstractEntity
         if ($cache->has($this->name)) {
             return;
         }
-
 
         $srcFile = $this->resolvePath($rfilepath, $config);
         // add file as dependency to template for creating hash of states
