@@ -166,7 +166,7 @@ Do you like Php Templates?
   </select>
 ```
 
-In Php Templates, inspired by Twig, loops are scoped (only `foreach` syntax), meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Inside `foreach` loops you may access `$loop` variable which holds methods like `isFirst` or `isLast` usefull to determine loops edges. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
+In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Inside `foreach` loops you may access `$loop` variable which holds methods like `isFirst` or `isLast` usefull to determine loops edges. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
 
 // examples/hello.t.php
 ```
