@@ -40,8 +40,8 @@ class SlotEntity extends AbstractEntity
             $this->factory->make($wrapperDefault, $this->context)->parse();
         }
 
-        $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $this->slot');
-        $r = '($this->slot)(' . $dataString . ')';
+        $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $slot');
+        $r = '($slot)(' . $dataString . ')';
         $append->appendChild(new DomNode('#php', '<?php ' . $r . '; ?>'));
         $this->node->appendChild($append);
     }
