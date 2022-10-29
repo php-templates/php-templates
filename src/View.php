@@ -95,8 +95,12 @@ class View
      * @param  $pos
      * @return array
      */
-    public function slots($pos): array
+    public function slots(string $pos = null): array
     {
+        if (!$pos) {
+            return $this->slots;
+        }
+        
         if (isset($this->slots[$pos])) {
             return $this->slots[$pos];
         }
