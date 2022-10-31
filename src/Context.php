@@ -13,7 +13,11 @@ class Context
     {
         $this->data = $data ?? [];
         $this->parent = $parent;
-        if (!isset($this->data['_attrs'])) {
+        
+        if ($parent) {
+            $this->data['_attrs'] = &$parent->_attrs;
+        }
+        elseif (!isset($this->data['_attrs'])) {
             $this->data['_attrs'] = [];
         }
     }

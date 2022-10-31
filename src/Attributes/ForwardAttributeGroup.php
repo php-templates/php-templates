@@ -68,7 +68,7 @@ class ForwardAttributeGroup extends AbstractAttributeGroup
     public function add(DomNodeAttr $attr)
     {
         if (is_null($attr->nodeValue) || trim($attr->nodeValue) === '') {
-            $attr->nodeValue = "''";
+            $attr->nodeValue = "'&nbsp;'";
         }
         $this->attrs[] = $attr;
     }

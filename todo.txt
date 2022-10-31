@@ -1,6 +1,8 @@
 solve indent
 throw error config not found by key
 
+bug fix :class="$x" :class="[$y]" p-bind="" + performance
+
 todo: v.1.1
 butter node parser using preg offset
 events as classes path support, no, better .. event *
@@ -15,5 +17,3 @@ configure parser to auto close tags without throwing errors
 indent nu merge ok la func, php etc
 loopstart si loopend vor fi un closure: poate se poate
 domnodeattribute implements domnoneattrinterface
-
-d

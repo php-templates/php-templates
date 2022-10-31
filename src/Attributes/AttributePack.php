@@ -114,7 +114,6 @@ class AttributePack extends DomNodeAttr
     {
         $arr = [];
         foreach ($this->groups as $group) {
-            strpos($group->bindArrayToNode(), '] [') && dd($group);
             $arr[] = $group->bindArrayToNode();
         }
 

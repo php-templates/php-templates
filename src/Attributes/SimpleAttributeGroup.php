@@ -39,10 +39,12 @@ class SimpleAttributeGroup extends AbstractAttributeGroup
         $arr = [];
         $binds = false;
         $normal = false;
+        $bindArr = false;
         foreach ($this->attrs as $attr) {
             if ($attr->nodeName[0] == ':') {
                 $binds = true;
                 $arr[] = "{$attr->nodeValue}";
+                $bindArr = $bindArr || trim($attr->nodeValue)[0] == '[';
             }
             else {
                 $normal = true;
