@@ -1,6 +1,6 @@
 <div class="foo" :class="['bar' => 1]" p-bind="['class' => 'baz']" p-bind="['class' => 'bam']" @class="'ba'" p-raw="1 ? 'checked' : ''" p-raw="1 ? 'yes' : ''"></div>
 =====
-<div class="foo bar baz bam ba" checked yes></div>
+<div class="foo bar baz bam" @class="'ba'" checked yes></div>
 
 -----
 
