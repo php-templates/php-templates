@@ -38,6 +38,8 @@ class Context
         } else {
             $this->data[$prop] = $val;
         }
+        
+        return $val;
     }
 
     public function __isset($prop)

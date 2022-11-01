@@ -13,127 +13,103 @@ function e($string)
     echo htmlspecialchars((string)$string);
 }
 
-/**
- * Gain array or string as param and echo it as class string
- *
- * @param mixed $data
- * @return void
- */
-function attr(...$data): string
+function e_attrs(...$data): void
 {
-    $class = [];
-    foreach ($data as $data) {
-        if (is_array($data)) {
-            $class[] = implode(' ', array_keys(array_filter($data)));
-        }
-        elseif(is_string($data)) {
-            $class[] = $data;
-        }
-    }
-    return implode(' ', $class);
-}
-
-/**
- * Gain array of arrays of key => value attrs, or flat arrays and returns one dimmension array of k->val
- *
- * @param array ...$arrays
- * @return void
- */
-function attr_merge(...$arrays) {
     $result = [];
-    foreach ($arrays as $arr) {
-        foreach ($arr as $k => $val) {
-            if (!is_string($val)) {
-                $val = json_encode($val);
+    
+    static $convertValue = null;
+    if (is_null($convertValue)) {
+        $convertValue = function($key, $val) {
+            if (is_array($val)) {
+                // [[class => [[foo => bar], ...]], ...]         
+                return json_encode($val);
             }
-            $result[$k][] = $val;
-        }
+            elseif (is_bool($val) && $val) {
+                // [[class => [foo => x > y]], ...]
+                return $key;
+            }
+            elseif (is_numeric($key)) {
+                // [[class => [foo, bar, ...]], ...]
+                return $val;
+            }
+            elseif ($val) {
+                return $key;
+            }
+        };
     }
-
-    foreach ($result as $k => $val) {
-        $result[$k] = implode(' ', array_unique($val));
-    }
-
-    return $result;
-}
-
-/**
- * accepts an array with attributes from a group, returns concated strings of it evaluated
- * supported syntaxes: attr_filter(['foo', '', 'foo' => true])
- * returns string concat
- *
- * @param array $attrs
- * @return void
- */
-function attr_filter(array $attrs)
-{
-    $arr = [];
-    foreach ($attrs as $attr) {
+    
+    foreach ($data as $attr) {
         if (is_array($attr)) {
-            foreach ($attr as $k => $val) {
-                if (is_string($k)) {
-                    // case :class="[foo => true]"
-                    if ($val) {
-                        $arr[] = $k;
+            // [[class => ...], ...$binds]
+            foreach ($attr as $attr => $val) {
+                if (is_array($val)) {
+                    // [[class => [...]], ...]
+                    foreach ($val as $key => $val) {
+                        if (!is_null($val = $convertValue($key, $val))) {
+                            $result[$attr][] = $val;
+                        }
                     }
                 }
-                elseif (!is_string($val)) {
-                    $arr[] = json_encode($val);
+                elseif (is_bool($val) && $val) {
+                    // [[class => xyz], ...]          
+                    $result[] = $attr;
                 }
-                elseif ($val !== '') { // case class="[true ? bar : '']"
-                    $arr[] = $val;
+                else {
+                    // [[class => xyz], ...]          
+                    $result[$attr][] = $val;
                 }
             }
         }
-        elseif (!is_string($attr)) {
-            $arr[] = json_encode($attr);
-        }
-        elseif ($attr !== '') {
-            $arr[] = $attr;
+        elseif (is_string($attr)) {
+            // [? required : '', ...] 
+            $result[] = $attr;
         }
     }
-
-    return implode(' ', array_unique($arr));
+    
+    $echo = [];
+    foreach ($result as $attr => $val) {
+        if ($attr && !$val) {
+            $echo[] = $attr;
+        }
+        elseif ($attr == 'class' && is_array($val)) {
+            $echo[] = $attr . '="' . implode(' ', $val) . '"';
+        }
+        elseif (is_array($val)) {
+            $echo[] = $attr . '="' . end($val) . '"'; // todo: attrs cumulative only class
+        }
+        else {
+            $echo[] = $val;
+        }
+    }
+    
+    echo implode(' ', $echo);
 }
 
-/**
- * gain an array of k => val attributes and echo them as valid html dom node attr string
- *
- * @param array ...$attrs
- * @return void
- */
-function bind(...$attrs)
+function r_attrs(...$data): array
 {
+    //print_r($data);
     $result = [];
-    foreach ($attrs as $attr) {
-        foreach ($attr as $k => $val) {
-            if (!is_string($val)) {
-                $val = json_encode($val);
+    
+    foreach ($data as $attr) {
+        if (!is_array($attr)) {
+            // unreachable
+            continue;
+        }
+        
+        foreach ($attr as $attr => $val) {
+            if ($attr == 'p-raw') {
+                continue;
             }
-
-            if (is_numeric($k)) {
-                if ($val) {
-                    $result[] = $val;
-                }
-            }
-            elseif (isset($result[$k])) {
-                $result[$k] .= ' ' . $val;
+            elseif ($attr == 'p-bind') {
+                $result = array_merge($result, $val);
             }
             else {
-                $result[$k] = $val;
+                $result[$attr] = $val;
             }
         }
     }
-
-    $output = [];
-    foreach ($result as $name => $value) {
-        if (is_numeric($name)) {
-            $output[] = $value;
-        } else {
-            $output[] = $name . '="' . $value .'"';
-        }
-    }
-    echo implode(' ', $output);
+    //print_r($result);
+    return $result;
 }
 
 /**

@@ -6,127 +6,85 @@ use PhpTemplates\Dom\DomNodeAttr;
 
 class AttributePack extends DomNodeAttr
 {
-    private static $candidates;
-
-    private $groups = [];
+    private $attrs = [];
 
     public function __construct()
     {
-        if (is_null(self::$candidates)) {
-            self::$candidates = $this->globAttributes();
-        }
+
     }
 
     public function add(DomNodeAttr $attr)
     {
-        foreach (self::$candidates as $candidate) {
-            if (!$candidate::test($attr)) {
-                continue;
-            }
-
-            $group = new $candidate();
-            $group->add($attr); // aici
-            $k = $group->getNodeName();
-
-            if (!$k) {
-                $this->groups[] = $group;
-            } elseif (isset($this->groups[$k])) {
-                $this->groups[$k]->add($attr);
-            } else {
-                $this->groups[$k] = $group;
-            }
-            break;
-        }
-    }
-
-    private function globAttributes(): array
-    {
-        $files = array_filter(glob(__DIR__ . '/*'), 'is_file');
-
-        $entities = [];
-        foreach ($files as $file) {
-            $entity = preg_split('/(\\/|\\\)/', $file);
-            $entity = str_replace('.php', '', end($entity));
-            if (in_array($entity, ['AttributePack', 'AbstractAttributeGroup'])) {
-                continue;
-            }
-            $entity = '\\PhpTemplates\\Attributes\\' . $entity;
-            $entities[] = $entity;
-        }
-
-        usort($entities, function ($b, $a) {
-            return $a::WEIGHT - $b::WEIGHT;
-        });
-
-        return $entities;
+        $this->attrs[] = $attr;
     }
 
     public function __toString()
     {
-        foreach ($this->groups as $group) {
-            if ($group instanceof BindArrayAttributeGroup) {
-                return $this->bindArrayToNode();
+        $normalNodes = [];
+        $arrayNodes = [];
+        foreach ($this->attrs as $attr) {
+            $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
+            if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
+                $arrayNodes[] = $attr->nodeValue;
             }
+            elseif (strpos($attr->nodeName, ':') === 0) {
+                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $attr->nodeValue . ']';
+            }
+            else {
+                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
+            }
+            
+            if (is_null($normalNodes) || $isSpecialNode) {
+                $normalNodes = null; // close normal nodes codeflow
+                continue;
+            }                     
+            $normalNodes[] = $this->attrToString($attr);
         }
-
-        return $this->bindToNodeAttr();
-
-        $arr = [];
-        foreach ($this->groups as $group) {
-            $arr[] = $group->stringContext();
+        
+        if (!is_null($normalNodes)) {
+            // only normal nodes found
+            return implode(' ', $normalNodes);
         }
-
-        return implode(' ', $arr);
+        
+        $result = implode(', ', $arrayNodes);
+        
+        return "<?php e_attrs($result); ?>";
     }
 
     public function toArrayString()
     {
-        foreach ($this->groups as $group) {
-            if ($group instanceof BindArrayAttributeGroup) {
-                return $this->bindArrayToTemplate();
+        $arrayNodes = [];
+        foreach ($this->attrs as $attr) {
+            // $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
+            if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
+                $arrayNodes[] = $attr->nodeValue;
+            }
+            elseif (strpos($attr->nodeName, ':') === 0) {
+                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $attr->nodeValue . ']';
+            }
+            elseif (strpos($attr->nodeName, '@') === 0) {
+                $arrayNodes['_attrs'][] = "'" . ltrim($attr->nodeName, '@') . "' => " . $attr->nodeValue;
+            }
+            else {
+                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
             }
         }
-
-        return $this->bindToTemplateAttr();
-    }
-
-    private function bindToTemplateAttr()
-    {
-        $arr = [];
-        foreach ($this->groups as $group) {
-            $arr[] = $group->bindToTemplateAttr();
+        
+        if (isset($arrayNodes['_attrs'])) {
+            $arrayNodes['_attrs'] = "['_attrs' => [" . implode(', ', $arrayNodes['_attrs']) . ']]';
         }
-
-        return '[' . implode(', ', $arr) . ']';
+        
+        $result = implode(', ', $arrayNodes);
+        
+        return "r_attrs($result)";
     }
-
-    private function bindToNodeAttr()
+    
+    private function attrToString(DomNodeAttr $attr) 
     {
-        $arr = [];
-        foreach ($this->groups as $group) {
-            $arr[] = $group->bindToNodeAttr();
+        if (!$attr->nodeName || $attr->nodeName == 'p-bind') {
+            return $attr->nodeValue;
         }
-
-        return implode(' ', $arr);
-    }
-
-    private function bindArrayToNode()
-    {
-        $arr = [];
-        foreach ($this->groups as $group) {
-            $arr[] = $group->bindArrayToNode();
-        }
-
-        return '<?php bind(attr_merge(' . implode(', ', $arr) . ')); ?>';
-    }
-
-    private function bindArrayToTemplate()
-    {
-        $arr = [];
-        foreach ($this->groups as $group) {
-            $arr[] = $group->bindArrayToTemplate();
-        }
-
-        return 'array_merge(' . implode(', ', $arr) . ')';
+        
+        return ltrim($attr->nodeName, '@: ') . ($attr->nodeValue ? '="' . $attr->nodeValue . '"' : '');
     }
 }
