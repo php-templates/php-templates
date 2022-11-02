@@ -1,7 +1,8 @@
 solve indent
+solve attr bind whitespaces
 throw error config not found by key
 
-bug fix :class="$x" :class="[$y]" p-bind="" + performance
+on pc: change @x="" to :@rows="10"
 
 todo: v.1.1
 butter node parser using preg offset

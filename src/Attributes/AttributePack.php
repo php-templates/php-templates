@@ -24,11 +24,12 @@ class AttributePack extends DomNodeAttr
         $arrayNodes = [];
         foreach ($this->attrs as $attr) {
             $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
+            $_val = trim($attr->nodeValue) === '' ? "''" : $attr->nodeValue;
             if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
-                $arrayNodes[] = $attr->nodeValue;
+                $arrayNodes[] = $_val;
             }
             elseif (strpos($attr->nodeName, ':') === 0) {
-                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $attr->nodeValue . ']';
+                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $_val . ']';
             }
             else {
                 $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
@@ -55,15 +56,15 @@ class AttributePack extends DomNodeAttr
     {
         $arrayNodes = [];
         foreach ($this->attrs as $attr) {
-            // $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
+            $_val = trim($attr->nodeValue) === '' ? "''" : $attr->nodeValue;
             if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
-                $arrayNodes[] = $attr->nodeValue;
+                $arrayNodes[] = $_val;
             }
             elseif (strpos($attr->nodeName, ':') === 0) {
-                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $attr->nodeValue . ']';
+                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $_val . ']';
             }
             elseif (strpos($attr->nodeName, '@') === 0) {
-                $arrayNodes['_attrs'][] = "'" . ltrim($attr->nodeName, '@') . "' => " . $attr->nodeValue;
+                $arrayNodes['_attrs'][] = "'" . ltrim($attr->nodeName, '@') . "' => " . $_val;
             }
             else {
                 $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
