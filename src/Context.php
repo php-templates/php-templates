@@ -120,4 +120,9 @@ class Context
     {
         return $this->data;
     }
+    
+    public function except(array $except)
+    {
+        return array_diff_key($this->data, array_flip($except));
+    }
 }

@@ -2,8 +2,6 @@ solve indent
 solve attr bind whitespaces
 throw error config not found by key
 
-on pc: change @x="" to :@rows="10"
-
 todo: v.1.1
 butter node parser using preg offset
 events as classes path support, no, better .. event *

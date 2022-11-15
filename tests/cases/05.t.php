@@ -4,7 +4,7 @@
 
 -----
 
-<x-form-group :label="'y'" class="foo" @type="'text'" @id="'theid'" @value="123" p-bind="['label' => 'mylabel', 'value' => 1]" p-raw="1 ? 'checked' : ''" p-raw="1 ? 'yes' : ''"/>
+<x-form-group :label="'y'" class="foo" @type="text" @id="theid" @value="123" p-bind="['label' => 'mylabel', 'value' => 1]" p-raw="1 ? 'checked' : ''" p-raw="1 ? 'yes' : ''"/>
 =====
 <div class="form-group foo">
     <label class="form-label">mylabel</label>
