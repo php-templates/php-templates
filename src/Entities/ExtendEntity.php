@@ -5,6 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Process;
 
 class ExtendEntity extends TemplateEntity
 {
@@ -19,6 +20,20 @@ class ExtendEntity extends TemplateEntity
     public static function test(DomNode $node, EntityInterface $context): bool
     {
         return $node->nodeName == 'tpl' && $node->hasAttribute('extends');
+    }
+
+    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    {
+        $this->node = $node;
+        $this->context = $context;
+        $this->process = $process;
+        $this->id = uniqid();
+        
+        $this->name = $node->getAttribute('extends');
+        
+        list($rfilepath, $config) = \PhpTemplates\parse_path($this->name, $process->config);
+        
+        $process->subprocess($rfilepath, $config)->run();
     }
 
     /**
@@ -40,7 +55,7 @@ class ExtendEntity extends TemplateEntity
 
         foreach ($slots as $slot) {
             $this->node->appendChild($slot);
-            $this->factory->make($slot, new StartupEntity($this->config))->parse();
+            AbstractEntity::make($slot, new StartupEntity($this->process->config), $this->process)->parse();
         }
 
         $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);

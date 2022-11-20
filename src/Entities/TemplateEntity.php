@@ -2,6 +2,7 @@
 
 namespace PhpTemplates\Entities;
 
+use PhpTemplates\Process;
 use PhpTemplates\Config;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
@@ -14,7 +15,8 @@ use PhpTemplates\Dom\PhpNodes\SlotAssign;
 class TemplateEntity extends AbstractEntity
 { // de documentat p-scope scos default $slot
     const WEIGHT = 100;
-
+    
+    protected $name;
     protected $attrs = [
         'is' => null,
     ];
@@ -32,6 +34,17 @@ class TemplateEntity extends AbstractEntity
         $config = $context->getConfig();
 
         return !!$config->getAliased($node->nodeName);
+    }
+    
+    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    {
+        parent::__construct($node, $context, $process);
+        
+        $this->name = $node->getAttribute('is');
+        
+        list($rfilepath, $config) = \PhpTemplates\parse_path($this->name, $process->config);
+        
+        $process->subprocess($rfilepath, $config)->run();
     }
 
     /**
@@ -54,7 +67,7 @@ class TemplateEntity extends AbstractEntity
 
         foreach ($slots as $slot) {
             $this->node->appendChild($slot);
-            $this->factory->make($slot, new StartupEntity($this->config))->parse();
+            AbstractEntity::make($slot, new StartupEntity($this->process->config), $this->process)->parse();
         }
 
         $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
@@ -111,98 +124,6 @@ class TemplateEntity extends AbstractEntity
      */
     public function verbatimContext()
     {
-    }
-
-    /**
-     * Resolve/separately parse this componnt template into a new process and store the results into current cache
-     *
-     * @param CacheInterface $cache
-     * @param EventHolder $eventHolder
-     * @return void
-     */
-    public function resolve(CacheInterface $cache, EventHolder $eventHolder)
-    {
-        $config = $this->context->getConfig();
-        if ($this->node->nodeName == 'tpl' && $this->node->hasAttribute('is')) {
-            $rfilepath = $this->node->getAttribute('is');
-        } else {
-            $rfilepath = $config->getAliased($this->node->nodeName);
-        }
-
-        // aliased may return domain:rfilepath in case of not directly own the alias, or refer directly from module namespace
-        if (strpos($rfilepath, ':')) {
-            list($cfgKey, $rfilepath) = explode(':', $rfilepath);
-            $config = $config->getRoot()->find($cfgKey);
-        }
-
-        if (!$config->isDefault()) {
-            $this->name = $config->getName() . ':' . $rfilepath;
-        } else {
-            $this->name = $rfilepath;
-        }
-
-        // cache already has this template, no parse needed
-        if ($cache->has($this->name)) {
-            return;
-        }
-
-        $srcFile = $this->resolvePath($rfilepath, $config);
-        // add file as dependency to template for creating hash of states
-        ob_start();
-        $cb = require($srcFile);
-        $source = ob_get_contents();
-        ob_end_clean();
-
-        $source = new Source($source, $srcFile);
-        $parser = new Parser();
-        $node = $parser->parse($source);
-
-        // we create a virtual dom to make impossible loosing actual node inside events (which would break the system)
-        $wrapper = new DomNode('#root');
-        $wrapper->appendChild($node->detach());
-
-        $eventHolder->event('parsing', $this->name, $node);
-        is_callable($cb) && $cb($node, $eventHolder);
-
-        $entity = $this->factory->make($wrapper, new StartupEntity($config));
-        $entity->simpleNodeContext();
-
-        $eventHolder->event('parsed', $this->name, $wrapper);
-
-        $fnSrc = (string)$this->buildTemplateFunction($node);
-
-        $fn = Closure::fromSource(new Source($fnSrc, $srcFile), 'namespace PhpTemplates;');
-
-        $cache->set($this->name, $fn, new Source($fnSrc, $srcFile));
-    }
-
-    /**
-     * Gain a relative path and test it against config paths with fallback on default config (in case)
-     *
-     * @param string $rfilepath
-     * @param Config $config
-     * @return string
-     */
-    private function resolvePath(string $rfilepath, Config $config): string
-    {
-        $srcFile = null;
-        // try to find file on current config, else try to load it from default config
-        foreach ($config->getPath() as $srcPath) {
-            $filepath = rtrim($srcPath, '/') . '/' . $rfilepath . '.t.php';
-            if (file_exists($filepath)) {
-                $srcFile = $filepath;
-                break;
-            }
-            $tried[] = $filepath;
-        }
-
-        // file not found in any2 config
-        if (!$srcFile) {
-            $message = implode(' or ', $tried);
-            throw new \Exception("View file $message not found");
-        }
-
-        return $srcFile;
     }
 
     /**

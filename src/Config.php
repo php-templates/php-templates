@@ -69,9 +69,10 @@ class Config
      */
     public function subconfig(string $name, string $srcPath): self
     {
-        if ($this->find($name)) {
+        try {
+            $config = $this->getRoot()->find($name);
             throw new Exception("A config with '$name' key already exists");
-        }
+        } catch(Exception $e) {}
 
         $cfg = new Config($name, $srcPath, $this);
         $this->childs[] = $cfg;
@@ -106,7 +107,7 @@ class Config
             }
         }
 
-        return null;
+        throw new Exception("Config not found: '$cfgkey'");
     }
 
     private function addDefaultDirectives()

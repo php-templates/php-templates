@@ -6,6 +6,7 @@ use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodes\PhpNode;
+use PhpTemplates\Process;
 
 class SlotEntity extends AbstractEntity
 {
@@ -17,6 +18,13 @@ class SlotEntity extends AbstractEntity
     public static function test(DomNode $node, EntityInterface $context): bool
     {
         return $node->nodeName == 'slot';
+    }
+    
+    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    {
+        parent::__construct($node, $context, $process);
+        
+        $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }
 
     /**
@@ -37,7 +45,7 @@ class SlotEntity extends AbstractEntity
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
             $wrapperDefault->setAttribute('p-if', $if);
 
-            $this->factory->make($wrapperDefault, $this->context)->parse();
+            AbstractEntity::make($wrapperDefault, $this->context, $this->process)->parse();
         }
 
         $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $slot');
@@ -87,9 +95,4 @@ class SlotEntity extends AbstractEntity
      */
     public function textNodeContext()
     {}
-
-    public function resolve(CacheInterface $cache, EventHolder $eventHolder)
-    {
-        $this->hasSlotDefault = count($this->node->childNodes) > 0;
-    }
 }

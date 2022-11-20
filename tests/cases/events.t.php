@@ -1,8 +1,8 @@
 <?php
 
-return function($node, $e) 
+return function($process) 
 {
-
+$e = $process->events;
 $e->on('parsing', 'the/events', function() {
     echo 1;//1
 }, 5);

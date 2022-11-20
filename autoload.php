@@ -1,11 +1,10 @@
 <?php
-
-
+/*
 error_reporting(E_ALL);
 error_reporting(-1);
 ini_set('error_reporting', E_ALL);
 
-/* if (!function_exists('dd')) {
+ if (!function_exists('dd')) {
     function dd(...$data) {
         $x = debug_backtrace();
         print_r($x[0]['file'].':'.$x[0]['line'].PHP_EOL);
@@ -29,7 +28,8 @@ function d(...$data) {
         //echo '</pre>';
         echo PHP_EOL;
     }
-} */
+} 
+*/
 
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');

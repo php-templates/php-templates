@@ -24,6 +24,10 @@ $eventHolder = new EventHolder();
 $viewFactory = new Template(__DIR__.'/results', $cfg, $eventHolder);
 //$cfgHolder = $viewFactory->getConfig();
 
+$eventHolder->on('parsing', 'cases2:cfg2-3', function($node) {
+    $node->querySelector('div')->appendChild('text');
+});
+
 $cfg->setAlias([
     'x-form-group' => 'components/form-group',
     'x-input-group' => 'components/input-group',
@@ -32,7 +36,7 @@ $cfg->setAlias([
 ]);
 
 $cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
-$cfg->setAlias('x-form-group', 'components/form-group', 'cases2');
+$cfg->setAlias('x-form-group', 'cases2:components/form-group');
 $cfg->setDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
 });

@@ -200,6 +200,9 @@ class DomNode
     {
         // for debug
         $bt = debug_backtrace(5);
+        $bt = array_values(array_filter($bt, function($bt) {
+            return isset($bt['file']);
+        }));
         while (count($bt) > 1 &&  strpos($bt[0]['file'], 'DomNode.php') !== false) {
             array_shift($bt);
         }

@@ -31,7 +31,7 @@ class SimpleNodeEntity extends AbstractEntity
     {
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
-            $this->factory->make($slot, $this)->parse();
+            AbstractEntity::make($slot, $this, $this->process)->parse();
         }
 
         $this->node->addAttribute($data);
@@ -54,7 +54,7 @@ class SimpleNodeEntity extends AbstractEntity
         $this->node->addAttribute($data);
 
         foreach ($this->node->childNodes as $cn) {
-            $this->factory->make($cn, $this)->parse();
+            AbstractEntity::make($cn, $this, $this->process)->parse();
         }
     }
 
