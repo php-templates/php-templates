@@ -15,6 +15,9 @@ class EventHolder
      * @param [type] $template - template instance
      * @return void
      */
+    public function trigger(string $ev, string $name, $template) {
+        $this->event($ev, $name, $template);
+    }
     public function event(string $ev, string $name, $template)
     {
         //d('event ' . $ev . ' ' . $name);

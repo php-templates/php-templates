@@ -6,6 +6,7 @@ use Exception;
 use PhpTemplates\Entities\StartupEntity;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Source;
+use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Config;
 use PhpTemplates\Dom\Parser;
 use PhpTemplates\Cache\FileSystemCache;
@@ -85,12 +86,12 @@ class Template
     {
         $config = $this->config;
         if (is_string($phpt)) {
-            $source = new Source($phpt, '');
             $rfilepath = md5($phpt);
+            $source = new Source($phpt, $rfilepath);
         }
         elseif ($phpt instanceof Source) {
             $source = (string)$phpt;
-            $rfilepath = trim(str_replace([root_path(), '.t.php'], '', $phpt->getFile()), '/ ');dd($rfilepath);
+            $rfilepath = trim(str_replace([root_path(), '.t.php'], '', $phpt->getFile()), '/ ');dd($rfilepath);// todo
             $config = $this->getConfigFromPath($phpt->getFile());
         }
         else {
@@ -101,13 +102,9 @@ class Template
 
         // paths will fallback on default Config in case of file not found or setting not found
         if (!$this->cache->load($rfilepath)) {
-            $parser = new Parser();
-            $node = $parser->parse($source);
-
             // parse it
-            $factory = new NodeParser($this->cache, $config, $this->eventHolder);
-            $entity = $factory->make($node, new StartupEntity($this->config, $rfilepath));
-            $entity->parse();
+            $process = new Process($source, $this->cache, $this->config, $this->eventHolder); 
+            $process->run();
 
             $this->cache->write($rfilepath);
         }
@@ -133,9 +130,8 @@ class Template
         // paths will fallback on default Config in case of file not found or setting not found
         if (!$this->cache->load($rfilepath)) {
             // parse it
-            $factory = new NodeParser($this->cache, $this->config, $this->eventHolder);
-            $entity = $factory->make(new DomNode('tpl', ['is' => $rfilepath]), new StartupEntity($this->config));
-            $entity->parse();
+            $process = new Process($rfilepath, $this->cache, $this->config, $this->eventHolder);
+            $process->run();
 
             $this->cache->write($rfilepath);
         }

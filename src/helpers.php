@@ -127,3 +127,23 @@ function check_dependencies(array $files)
     }
     return true;
 }
+
+function parse_path(string $rfilepath, Config $config): array
+{
+    $cfgkey = '';
+    if (strpos($rfilepath, ':')) {
+        list($cfgkey, $rfilepath) = explode(':', $rfilepath);
+    }
+    
+    if (!$cfgkey) {
+        return [$rfilepath, $config->getRoot()];
+    }
+    
+    if ($cfgkey == '@') {
+        return [$rfilepath, $config];
+    }
+    
+    $config = $config->getRoot()->find($cfgkey);
+        
+    return [$rfilepath, $config];
+}
