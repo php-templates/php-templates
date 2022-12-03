@@ -74,7 +74,7 @@ class AttributePack extends DomNodeAttr
             }
         }
         
-        if (isset($arrayNodes['_attrs'])) {
+        if (!empty($arrayNodes['_attrs'])) {
             $arrayNodes['_attrs'] = "['_attrs' => [" . implode(', ', $arrayNodes['_attrs']) . ']]';
         }
         

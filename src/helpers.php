@@ -147,3 +147,11 @@ function parse_path(string $rfilepath, Config $config): array
         
     return [$rfilepath, $config];
 }
+
+function arr_except(array $arr, $except) {
+    foreach ((array)$except as $except) {
+        unset($arr[$except]);
+    }
+    
+    return $arr;
+}

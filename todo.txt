@@ -1,5 +1,7 @@
 solve indent
 solve attr bind whitespaces
+improve performance of r_attrs by limiting only on classes as cumulative
+
 
 todo: v.1.1
 butter node parser using preg offset
