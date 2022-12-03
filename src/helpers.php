@@ -50,9 +50,11 @@ function e_attrs(...$data): void
                         }
                     }
                 }
-                elseif (is_bool($val) && $val) {
-                    // [[class => xyz], ...]          
-                    $result[] = $attr;
+                elseif (is_bool($val)) {
+                    // [[class => xyz], ...] 
+                    if ($val) {
+                        $result[] = $attr;
+                    }
                 }
                 else {
                     // [[class => xyz], ...]          
@@ -68,7 +70,7 @@ function e_attrs(...$data): void
     
     $echo = [];
     foreach ($result as $attr => $val) {
-        if ($attr && !$val) {
+        if ($attr && (!$val || $val === true)) {
             $echo[] = $attr;
         }
         elseif ($attr == 'class' && is_array($val)) {
@@ -77,7 +79,7 @@ function e_attrs(...$data): void
         elseif (is_array($val)) {
             $echo[] = $attr . '="' . end($val) . '"'; // todo: attrs cumulative only class
         }
-        else {
+        elseif($val) {
             $echo[] = $val;
         }
     }

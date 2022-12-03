@@ -13,13 +13,6 @@ class Context
     {
         $this->data = $data ?? [];
         $this->parent = $parent;
-        
-        if ($parent) {
-            $this->data['_attrs'] = &$parent->_attrs;
-        }
-        elseif (!isset($this->data['_attrs'])) {
-            $this->data['_attrs'] = [];
-        }
     }
 
     public function &__get($prop)
@@ -93,25 +86,18 @@ class Context
         if ($prop == '_context') {
             return $this;
         }
-        if ($prop == '_attrs') {
-            return $this->data['_attrs'];
-        }
         if ($prop == '_data') {
             return $this->data;
         }
 
         if (array_key_exists($prop, $this->data)) {
             return $this->data[$prop];
-        } elseif (isset($this->data['_attrs']) && array_key_exists($prop, $this->data['_attrs'])) {
-            return $this->data['_attrs'][$prop];
-        } elseif ($this->parent) {
+        } 
+        elseif ($this->parent) {
             return $this->parent->get($prop);
         }
 
         $this->data[$prop] = null;
-        if ($prop == '_attrs') {
-            $this->data['_attrs'] = [];
-        }
 
         return $this->data[$prop];
     }

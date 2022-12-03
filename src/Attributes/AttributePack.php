@@ -24,7 +24,7 @@ class AttributePack extends DomNodeAttr
         $arrayNodes = [];
         foreach ($this->attrs as $attr) {
             $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
-            $_val = trim($attr->nodeValue) === '' ? "''" : $attr->nodeValue;
+            $_val = trim($attr->nodeValue) === '' ? "true" : $attr->nodeValue;
             if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
                 $arrayNodes[] = $_val;
             }
@@ -38,7 +38,7 @@ class AttributePack extends DomNodeAttr
             if (is_null($normalNodes) || $isSpecialNode) {
                 $normalNodes = null; // close normal nodes codeflow
                 continue;
-            }                     
+            }
             $normalNodes[] = $this->attrToString($attr);
         }
         
@@ -54,28 +54,19 @@ class AttributePack extends DomNodeAttr
 
     public function toArrayString()
     {
+        // we need a structure like [[foo=>bar], ...] where each element is an attribute, because there are cases like :class="[]" or p-bind and we need to cover them. It may be a performance issue, TODO:
         $arrayNodes = [];
         foreach ($this->attrs as $attr) {
-            $_val = trim($attr->nodeValue) === '' ? "''" : $attr->nodeValue;
+            $_val = trim($attr->nodeValue) === '' ? "true" : $attr->nodeValue;
             if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
                 $arrayNodes[] = $_val;
             }
-            elseif (strpos($attr->nodeName, ':@') === 0) {
-                $arrayNodes['_attrs'][] = "'" . ltrim($attr->nodeName, ':@') . "' => " . $_val;
-            }
-            elseif (strpos($attr->nodeName, '@') === 0) {
-                $arrayNodes['_attrs'][] = "'" . ltrim($attr->nodeName, '@') . "' => '". addslashes($attr->nodeValue) . "'";
-            }
-            elseif (strpos($attr->nodeName, ':') === 0) {
+            elseif (trim($attr->nodeValue) === '' || strpos($attr->nodeName, ':') === 0) {
                 $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $_val . ']';
             }
             else {
-                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
+                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($_val) . "']";
             }
-        }
-        
-        if (!empty($arrayNodes['_attrs'])) {
-            $arrayNodes['_attrs'] = "['_attrs' => [" . implode(', ', $arrayNodes['_attrs']) . ']]';
         }
         
         $result = implode(', ', $arrayNodes);
