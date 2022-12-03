@@ -1,17 +1,10 @@
 ***Php-Templates*** is a template engine which goal is to bring full modularity to 'view' part of an app. It also has a nice to read and write syntax. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
 
-## Install
-`composer require php-templates/php-templates`
-or simply download project and include `autoload.php` file
-
 ## Setting up
 View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
 
 ```
 <\?php
-
-require __DIR__ . '/vendor/autoload.php';
-
 use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Template;
@@ -24,7 +17,6 @@ $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Te
 $view->render();
 ```
 ```
- 
 <h1>Hello Php Templates</h1> 
 ```
 
@@ -116,7 +108,7 @@ will result:
 
 ```
 <input type="text" value="Lorem ipsum" name="fname">
-<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
+<input type="text" value="@php echo 'this not gonna work'; @endphp" php echo 'neither this'; @endphp>
 ```
 
 If you wonder how then conditionally rendering attributes is possible, take a look at 'Directives' section. First, we have to cover control structures.
@@ -166,7 +158,7 @@ Do you like Php Templates?
   </select>
 ```
 
-In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Inside `foreach` loops you may access `$loop` variable which holds methods like `isFirst` or `isLast` usefull to determine loops edges. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
+In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
 
 // examples/hello.t.php
 ```
@@ -187,7 +179,6 @@ will result:
       <option value="1">Yes</option>
       <option value="0">No</option>
   </select>
-
 I will survive!!!
 ```
 
@@ -226,7 +217,7 @@ $viewFactory->make('examples/hello', ["attrs" => [ "type" => "text", "name" => "
 will result:
 
 ```
-<input type="text" name="name" disabled>
+<input type="text" name="name" 0="disabled">
 ```
 
 `checked` - used on input type radio / checkbox
@@ -244,9 +235,9 @@ $viewFactory->make('examples/hello', ["theradio" => 1])->render();
 will result:
 
 ```
-<input name="thecheckbox" type="checkbox" value="1" >
+<input name="thecheckbox" type="checkbox" value="1">
 <input name="theradio" type="radio" value="1" checked>
-<input name="theradio" type="radio" value >
+<input name="theradio" type="radio" value="0">
 ```
 
 `selected` - used on select input
@@ -266,9 +257,9 @@ will result:
 
 ```
 <select name="fruits">
-      <option value="a" >avocado</option>
+      <option value="a">avocado</option>
       <option value="b" selected="selected">banana</option>
-      <option value="c" >cherry</option>
+      <option value="c">cherry</option>
   </select>
 ```
 
@@ -319,8 +310,9 @@ $viewFactory->make('examples/hello', [])->render();
 will result:
 
 ```
-<div>Guest</div>
-<div class="active"></div>
+<div p-guest>Guest</div>
+<div p-auth>Auth</div>
+<div p-active="3 < 4"></div>
 ```
 
 Note that `$val` param passed to callback function is the string value of the directive attribute, in our case `3 < 4`.
@@ -331,6 +323,9 @@ You can learn more about DomNode manipulation at Working with DOM section.
 You can reuse parts of design by making them components. Just put the html code into another file in `src_path` in any folder structure you preffer. For example, you can have:
 // components/form-group.t.php
 ```
+@php
+$_attrs = $_context->except(['label','class']); // this will take any passed attribute not in listed array
+@endphp
 <div class="form-group" :class="!empty($class) ? $class : ''">
     <label class="form-label">{{ $label }}</label>
     <input p-if="$type === 'text'" type="text" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">
@@ -356,7 +351,7 @@ and use it like this:
 
 // examples/hello.t.php
 ```
-<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" :value="$value" />
 ```
 
 ```
@@ -365,18 +360,21 @@ $viewFactory->make('examples/hello', [ "label" => "The Label", "value" => "The V
 will result:
 
 ```
-<div class="form-group">
-  
-      
-    <label class="form-label">The Label</label>
+<div class="form-group ">
+      <label class="form-label">The Label</label>
         <input type="text" class="form-control" value="The Value" placeholder="The Label">
     </div>
 ```
 You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
 - bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
-- bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
+- bind attribute: using p-bind directive, which accepts an array of attributes
 You can also have control structures on components nodes.
+When working with multiple namespaces configs and your cfg2 has a component with same name, for example form-group:
+- form-group
+- cfg2:form-group
+- cfg2:some-file
+If you refer `form-group` in `cfg2:some-file`, you will get default one. You can instruct php-templates that you want local config template like this `<tpl is="cfg2:form-group"` or like this `<tpl is="@form-group"`.
 
 #### Components aliasing
 You can alias components into custom tags like this:
@@ -388,9 +386,9 @@ $cfg->setAlias([
 Now, we can use our component:
 ```
 instead of this
-<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" value="$value" />
 like this
-<x-form-group type="text" :label="$label" @value="$value" />
+<x-form-group type="text" :label="$label" value="$value" />
 ```
 !!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
@@ -427,7 +425,7 @@ Now, we can use it like this:
 
 // examples/hello.t.php
 ```
-<x-form-group type="number" @min="1">
+<x-form-group type="number" min="1">
     <span slot="label">Custom label <i class="fa fa-download"></i></span>
     <input type="number" class="form-control"><!-- same as
     <input type="number" slot="default" class="form-control"> -->
@@ -440,12 +438,9 @@ $viewFactory->make('examples/hello', [])->render();
 will result:
 
 ```
-<div class="form-group">
-  
+<div class="form-group ">
   <span>Custom label <i class="fa fa-download"></i></span>
 <input type="number" class="form-control">
-<!-- same as
-    <input type="number" class="form-control"> -->
 </div>
 ```
 
@@ -507,28 +502,16 @@ will result:
           </thead>
     <tbody>
               <tr>
-                      <td><br />
-<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
-</td>
-                      <td><br />
-<b>Notice</b>:  Undefined index: name in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
-</td>
-          <br />
-<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>31</b><br />
-<div>
+                      <td></td>
+                      <td></td>
+          <div>
   <a href="edit-item-">Edit</a>
 </div>
         </tr>
               <tr>
-                      <td><br />
-<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
-</td>
-                      <td><br />
-<b>Notice</b>:  Undefined index: name in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>27</b><br />
-</td>
-          <br />
-<b>Notice</b>:  Undefined index: id in <b>F:\dev\exegeza\vendor\florin-botea\php-templates\tests\results\4c04a42cc6ff3c94282684919a592b71_6i84eoperc00.php</b> on line <b>31</b><br />
-<div>
+                      <td></td>
+                      <td></td>
+          <div>
   <a href="edit-item-">Edit</a>
 </div>
         </tr>
@@ -567,7 +550,6 @@ will result:
 <htm>
   <head>… </head>
   <body>
-    
         … I am shared with my parent<div class="card">… I am shared with my parent</div>
   </body>
 </htm>
@@ -639,10 +621,7 @@ will result:
       <li>banana</li>
       <li>berry</li>
       <li>cherry</li>
-  </ul> <!-- or like this -->
-
- 
-<ul>
+  </ul> <ul>
       <li>cherry</li>
       <li>berry</li>
       <li>banana</li>
@@ -678,33 +657,19 @@ $viewFactory->on('parsing', 'form', function($node) {
 ```
 and when we call our template (direct, or nested):
 $viewFactory->render('form', []);
- 
 <form action="action">
-  
-   
-<div class="form-group">
-  
-      
-    <label class="form-label">Firstname</label>
-        <input type="text" class="form-control" placeholder="Firstname">
-    </div>  
-<div class="form-group">
-  
-      
-    <label class="form-label">Lastname</label>
-        <input type="text" class="form-control" placeholder="Lastname">
-    </div>  
-<div class="form-group">
-  
-      
-    <label class="form-label">Age</label>
-        <input type="number" class="form-control" placeholder="Age">
-    </div>  
-<div class="form-group">
-  
-      
-    <label class="form-label">Zipcode</label>
-        <input type="text" class="form-control" placeholder="Zipcode">
+  <div class="form-group ">
+      <label class="form-label">Firstname</label>
+        <input type="text" class="form-control" name="firstname" shared="I share because I care" placeholder="Firstname">
+    </div> <div class="form-group ">
+      <label class="form-label">Lastname</label>
+        <input type="text" class="form-control" name="lastname" shared="I share because I care" placeholder="Lastname">
+    </div> <div class="form-group ">
+      <label class="form-label">Age</label>
+        <input type="number" class="form-control" name="age" shared="I share because I care" placeholder="Age">
+    </div> <div class="form-group ">
+      <label class="form-label">Zipcode</label>
+        <input type="text" class="form-control" name="zipcode" shared="I share because I care" placeholder="Zipcode">
     </div> </form> Because of cache system, parsing events are impossible to be tracked for changes to recompile the code. You have to reset them manually by deleting cached files, or better, pass null as cache path on Template instancing. This will parse templates on each request without caching them (do this only during development).
 
 ### On Rendering time
