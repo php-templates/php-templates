@@ -291,6 +291,9 @@ You can learn more about DomNode manipulation at Working with DOM section.
 You can reuse parts of design by making them components. Just put the html code into another file in `src_path` in any folder structure you preffer. For example, you can have:
 // components/form-group.t.php
 ```
+@php
+$_attrs = $_context->except(['label','class']); // this will take any passed attribute not in listed array
+@endphp
 <div class="form-group" :class="!empty($class) ? $class : ''">
     <label class="form-label">{{ $label }}</label>
     <input p-if="$type === 'text'" type="text" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">
@@ -315,15 +318,20 @@ You can reuse parts of design by making them components. Just put the html code 
 and use it like this:
 <?php tstart(); ?>
 ```
-<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" :value="$value" />
 ```
 <?php tresult(
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
 You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
 - bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
-- bind attribute: php syntax accepted, ex: @value="$value", or @value="'The value'". Those attributes passed like this will be gathered in an associative array under $_attrs variable in component scope. Combining this with p-bind directive helps you fill targeted node with attributes from component's outside, without explicitly declare each one.
+- bind attribute: using p-bind directive, which accepts an array of attributes
 You can also have control structures on components nodes.
+When working with multiple namespaces configs and your cfg2 has a component with same name, for example form-group:
+- form-group
+- cfg2:form-group
+- cfg2:some-file
+If you refer `form-group` in `cfg2:some-file`, you will get default one. You can instruct php-templates that you want local config template like this `<tpl is="cfg2:form-group"` or like this `<tpl is="@form-group"`.
 
 #### Components aliasing
 You can alias components into custom tags like this:
@@ -335,9 +343,9 @@ $cfg->setAlias([
 Now, we can use our component:
 ```
 instead of this
-<tpl is="components/form-group" type="text" :label="$label" @value="$value" />
+<tpl is="components/form-group" type="text" :label="$label" value="$value" />
 like this
-<x-form-group type="text" :label="$label" @value="$value" />
+<x-form-group type="text" :label="$label" value="$value" />
 ```
 !!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
@@ -373,7 +381,7 @@ components/form-group.t.php
 Now, we can use it like this:
 <?php tstart(); ?>
 ```
-<x-form-group type="number" @min="1">
+<x-form-group type="number" min="1">
     <span slot="label">Custom label <i class="fa fa-download"></i></span>
     <input type="number" class="form-control"><!-- same as
     <input type="number" slot="default" class="form-control"> -->

@@ -8,7 +8,7 @@ $false = 0;
 
 <!-- bindings in component -->
 yoy
-<tpl is="props/b" :true="$true" @false="$false" @foo="$foo"></tpl>
+<tpl is="props/b" :true="$true" false="$false" foo="$foo"></tpl>
 =====
 yoy
 <b true="1"><bind false="$false" foo="$foo"></bind></b>

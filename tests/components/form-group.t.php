@@ -1,3 +1,7 @@
+@php
+$_attrs = $_context->except(['class','label']);
+@endphp
+
 <div class="form-group" :class="!empty($class) ? $class : ''">
     <slot name="label">
         <label class="form-label">{{ $label }}</label>

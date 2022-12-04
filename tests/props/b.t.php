@@ -1,5 +1,5 @@
 
 
 <b :true="$true">
-    <bind p-bind="$_attrs"></bind>    
+    <bind p-bind="$_context->except(['true'])"></bind>    
 </b>

@@ -1,5 +1,5 @@
 <tpl is="cases2:cfg2-1"></tpl>
-<x-form-group type="text" label="x" @value="y"></x-form-group>
+<x-form-group type="text" label="x" value="y"></x-form-group>
 =====
 <div mydirective="2">
     <div mydirective="2">
