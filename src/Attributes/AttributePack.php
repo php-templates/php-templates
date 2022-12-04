@@ -18,68 +18,134 @@ class AttributePack extends DomNodeAttr
         $this->attrs[] = $attr;
     }
 
+    /**
+     * used inside html
+     */
     public function __toString()
     {
-        $normalNodes = [];
-        $arrayNodes = [];
+        $attrs = [];
+        $binds = [];
+        $excludes = ['class'];
         foreach ($this->attrs as $attr) {
-            $isSpecialNode = $attr->nodeName && ($attr->nodeName[0] == ':' || in_array($attr->nodeName, ['p-bind', 'p-raw']));
-            $_val = trim($attr->nodeValue) === '' ? "true" : $attr->nodeValue;
-            if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
-                $arrayNodes[] = $_val;
+            $isBind = strpos($attr->nodeName, ':') === 0;
+            $k = ltrim($attr->nodeName, ' :');
+            $val = trim($attr->nodeValue);
+            
+            if ($k == 'p-raw') {
+                $val = "<?php echo $val; ?>";
+                $attrs[$val] = '';
             }
-            elseif (strpos($attr->nodeName, ':') === 0) {
-                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $_val . ']';
+            elseif ($k == 'p-bind') {
+                // collect separate p-bind to treat them ignoring existing attrs
+                $binds[] = $val;
+            }
+            elseif ($k == 'class') {
+                if ($isBind && strpos($val, '[') === 0) {
+                    $val = "<?php e(resolve_class($val)); ?>";
+                } 
+                elseif ($isBind) {
+                    $val = "<?php e($val); ?>";
+                }
+                $attrs[$k] = trim(($attrs[$k] ?? '') .' '. $val);
+            } 
+            elseif ($isBind) {
+                $attrs[$k] = "<?php e($val); ?>";
+                $excludes[] = $k;
             }
             else {
-                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($attr->nodeValue) . "']";
+                $attrs[$k] = $val;
+                $excludes[] = $k;
             }
-            
-            if (is_null($normalNodes) || $isSpecialNode) {
-                $normalNodes = null; // close normal nodes codeflow
-                continue;
-            }
-            $normalNodes[] = $this->attrToString($attr);
         }
         
-        if (!is_null($normalNodes)) {
-            // only normal nodes found
-            return implode(' ', $normalNodes);
+        $result = [];
+        foreach ($attrs as $k => $val) {
+            $result[] = $val ? ($k . '="' . $val . '"') : $k;
+        }
+        $excludes = "['" . implode("','", $excludes) . "']";
+        if (count($binds) > 1) {
+            $binds = 'array_merge(' . implode(', ', $binds) . ')';
+            $result[] = "<?php e_bind($binds, $excludes); ?>";
+        }
+        elseif ($binds) {
+            $result[] = "<?php e_bind($binds[0], $excludes); ?>";
         }
         
-        $result = implode(', ', $arrayNodes);
-        
-        return "<?php e_attrs($result); ?>";
+        return implode(' ', $result);
     }
 
+    /**
+     * used on php entities calls
+     */
     public function toArrayString()
     {
-        // we need a structure like [[foo=>bar], ...] where each element is an attribute, because there are cases like :class="[]" or p-bind and we need to cover them. It may be a performance issue, TODO:
-        $arrayNodes = [];
+        $attrs = [];
+        $binds = [];
+        $excludes = ['class'];
         foreach ($this->attrs as $attr) {
-            $_val = trim($attr->nodeValue) === '' ? "true" : $attr->nodeValue;
-            if (in_array($attr->nodeName, ['p-bind', 'p-raw'])) {
-                $arrayNodes[] = $_val;
+            $isBind = strpos($attr->nodeName, ':') === 0;
+            $k = ltrim($attr->nodeName, ' :');
+            $val = trim($attr->nodeValue);
+            
+            if ($k == 'p-raw') {
+                $attrs[$val] = 'true';
             }
-            elseif (trim($attr->nodeValue) === '' || strpos($attr->nodeName, ':') === 0) {
-                $arrayNodes[] = "['" . ltrim($attr->nodeName, ':') . "' => " . $_val . ']';
+            elseif ($k == 'p-bind') {
+                // collect separate p-bind to treat them ignoring existing attrs
+                $binds[] = $val;
+            }
+            elseif ($k == 'class') {
+                if ($isBind && strpos($val, '[') === 0) {
+                    $val = "resolve_class($val)";
+                } 
+                elseif (!$isBind) {
+                    $val = "'$val'";
+                }
+                $attrs["'$k'"] = trim(($attrs["'$k'"] ?? '') .' . '. $val, ' .');
+            } 
+            elseif ($isBind) {
+                $attrs["'$k'"] = $val;
+                $excludes[] = $k;
+            }
+            elseif (!$val) {
+                $attrs["'$k'"] = 'true';
+                $excludes[] = $k;
             }
             else {
-                $arrayNodes[] = "['" . $attr->nodeName . "' => '". addslashes($_val) . "']";
+                $attrs["'$k'"] = "'" . addslashes($val) . "'";
+                $excludes[] = $k;
             }
         }
         
-        $result = implode(', ', $arrayNodes);
+        $result = [];
+        foreach ($attrs as $k => $val) {
+            $result[] = "$k=>$val";
+        }
+        $result = ['[' . implode(',', $result) . ']'];
+        $excludes = "['" . implode("','", $excludes) . "']";
+        if (count($binds) > 1) {
+            $binds = 'array_merge(' . implode(', ', $binds) . ')';
+            $result[] = "arr_except($binds, $excludes)";
+        }
+        elseif ($binds) {
+            $result[] = "arr_except($binds[0], $excludes)";
+        }
+        if (count($result) > 1) {
+            return "array_merge(" . implode(',', $result) . ")";
+        }
         
-        return "r_attrs($result)";
+        return $result[0];
     }
     
+    /**
+     * @Deprecated
+     */
     private function attrToString(DomNodeAttr $attr) 
     {
         if (!$attr->nodeName || $attr->nodeName == 'p-bind') {
             return $attr->nodeValue;
         }
         
-        return ltrim($attr->nodeName, '@: ') . ($attr->nodeValue ? '="' . $attr->nodeValue . '"' : '');
+        return ltrim($attr->nodeName, ': ') . ($attr->nodeValue ? '="' . $attr->nodeValue . '"' : '');
     }
 }

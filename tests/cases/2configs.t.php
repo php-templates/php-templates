@@ -15,5 +15,5 @@
 </div>
 <div class="form-group">
     <label class="form-label">x</label>
-    <input type="text" class="form-control" value="y" placeholder="x">
+    <input type="text" class="form-control" placeholder="x" value="y">
 </div>

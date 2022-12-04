@@ -13,6 +13,9 @@ function e($string)
     echo htmlspecialchars((string)$string);
 }
 
+/**
+ * @deprecated
+ */
 function e_attrs(...$data): void
 {
     $result = [];
@@ -112,6 +115,49 @@ function r_attrs(...$data): array
     }
     //print_r($result);
     return $result;
+}
+
+function resolve_class(array $class) 
+{
+    $result = [];
+    foreach ($class as $k => $val) {
+        if (is_numeric($k)) {
+            // class="[foo ? bar : '']"
+            if ($val) {
+                $result[] = $val;
+            }
+        }
+        elseif ($val) {
+            // class="[foo => true]"
+            $result[] = $k;
+        }
+    }
+    
+    return implode(' ', $result);
+}
+
+function e_bind(array $array, array $except = [])
+{
+    $array = array_diff_key($array, array_flip($except));
+    $result = [];
+    foreach ($array as $k => $val) {
+        if (is_bool($val)) {
+            if ($val) {
+                $result[] = $k;
+            }
+            continue;
+        }
+        
+        $val = !is_string($val) ? json_encode($val) : $val;
+        if (strlen(trim($val))) {
+            $result[] = $k . '="' . $val . '"';
+        }
+        elseif ($k) {
+            $result[] = $k;
+        }
+    }
+    
+    echo implode(' ', $result);
 }
 
 /**

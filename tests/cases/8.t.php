@@ -2,4 +2,4 @@
     <slot></slot>
 </button>
 =====
-<button class="btn btn-primary disabled btn-sm yes" onclick="doSomething()" disabled></button>
+<button class="btn btn-primary disabled btn-sm yes" disabled onclick="doSomething()"></button>
