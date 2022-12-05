@@ -34,7 +34,7 @@ class SimpleNodeEntity extends AbstractEntity
             AbstractEntity::make($slot, $this, $this->process)->parse();
         }
 
-        $this->node->addAttribute($data);
+        $data->addToNode($this->node);
     }
 
     /**
@@ -51,7 +51,7 @@ class SimpleNodeEntity extends AbstractEntity
     public function templateContext()
     {
         $data = $this->depleteNode($this->node);
-        $this->node->addAttribute($data);
+        $data->addToNode($this->node);
 
         foreach ($this->node->childNodes as $cn) {
             AbstractEntity::make($cn, $this, $this->process)->parse();

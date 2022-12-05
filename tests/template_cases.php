@@ -42,7 +42,9 @@ $cfg->setDirective('mydirective', function($node, $val) {
 });
 
 //$cfg->getRoot()->find('cases2'); die('66');
-
+if (!is_dir('./results')) {
+    mkdir('./results');
+}
 $files = array_diff(scandir('./results'), array('.', '..'));
 foreach($files as $file){ // iterate files
     $file = './results/' . $file;

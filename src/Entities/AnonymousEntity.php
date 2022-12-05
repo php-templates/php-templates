@@ -31,7 +31,7 @@ class AnonymousEntity extends AbstractEntity
         foreach ($this->node->childNodes as $cn) {
             AbstractEntity::make($cn, $this, $this->process)->parse();
         }
-        $this->node->addAttribute($data);
+        $data->addToNode($this->node);
     }
 
     /**

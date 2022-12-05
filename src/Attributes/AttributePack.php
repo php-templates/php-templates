@@ -2,9 +2,10 @@
 
 namespace PhpTemplates\Attributes;
 
+use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\DomNodeAttr;
 
-class AttributePack extends DomNodeAttr
+class AttributePack
 {
     private $attrs = [];
 
@@ -21,7 +22,7 @@ class AttributePack extends DomNodeAttr
     /**
      * used inside html
      */
-    public function __toString()
+    public function addToNode(DomNode $node)
     {
         $attrs = [];
         $binds = [];
@@ -57,21 +58,18 @@ class AttributePack extends DomNodeAttr
                 $excludes[] = $k;
             }
         }
-        
-        $result = [];
+       
         foreach ($attrs as $k => $val) {
-            $result[] = $val ? ($k . '="' . $val . '"') : $k;
+            $node->addAttribute($k, $val);
         }
         $excludes = "['" . implode("','", $excludes) . "']";
         if (count($binds) > 1) {
             $binds = 'array_merge(' . implode(', ', $binds) . ')';
-            $result[] = "<?php e_bind($binds, $excludes); ?>";
+            $node->addAttribute("<?php e_bind($binds, $excludes); ?>");
         }
         elseif ($binds) {
-            $result[] = "<?php e_bind($binds[0], $excludes); ?>";
+            $node->addAttribute("<?php e_bind($binds[0], $excludes); ?>");
         }
-        
-        return implode(' ', $result);
     }
 
     /**
