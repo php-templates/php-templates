@@ -119,6 +119,14 @@ class View
 
         return $this;
     }
+    
+    // called when slot in slot
+    public function setSlot($pos, $slots): self
+    {
+        $this->slots[$pos] = (array)$slots;
+
+        return $this;
+    }
 
     /**
      * Instantiate a new template from cache, within given context

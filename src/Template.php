@@ -28,7 +28,7 @@ class Template
      *
      * @var array
      */
-    private $shared = [];
+    private $shared;
 
     /**
      * Output cache destination path. If null, NullCache will be used
@@ -50,12 +50,17 @@ class Template
      * @var EventHolder
      */
     private $eventHolder;
+    
+    private $options;
 
-    public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder)
+    public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder, array $options = [])
     {
         $this->outputFolder = $outputFolder;
         $this->config = $config;
         $this->eventHolder = $eventHolder;
+        $this->options = $options;
+        
+        $this->shared = new Context();
     }
 
     /**
@@ -68,10 +73,10 @@ class Template
      */
     public function render(string $rfilepath, array $data = [], $slots = [])
     {
-        // $start_time = microtime(true);
+        //$start_time = microtime(true);
         $template = $this->make($rfilepath, $data, $slots);
         $template->render();
-        // print_r('<br>'.(microtime(true) - $start_time));
+        //print_r('<br>'.(microtime(true) - $start_time));
     }
 
     /**
@@ -95,13 +100,13 @@ class Template
             $config = $this->getConfigFromPath($phpt->getFile());
         }
         else {
-            throw new Exception("Invalid argument supplied");
+            throw new \Exception("Invalid argument supplied");
         }
 
         $this->cache = $this->getCache();
 
         // paths will fallback on default Config in case of file not found or setting not found
-        if (!$this->cache->load($rfilepath)) {
+        if (!empty($this->options['debug']) || !$this->cache->load($rfilepath)) {
             // parse it
             $process = new Process($source, $this->cache, $this->config, $this->eventHolder); 
             $process->run();
@@ -109,7 +114,7 @@ class Template
             $this->cache->write($rfilepath);
         }
 
-        $result = $this->get($rfilepath, new Context($data));
+        $result = $this->get($rfilepath, $this->shared->subcontext($data));
 
         return $result
             ->setSlots($slots);
@@ -123,20 +128,21 @@ class Template
      * @param array $slots - array of closures keyed by slot position
      * @return void
      */
-    public function make(string $rfilepath, array $data = [], $slots = [])
+    public function make(string $name, array $data = [], $slots = [])
     {
         $this->cache = $this->getCache();
         // init the document with custom settings as src_path, aliases
         // paths will fallback on default Config in case of file not found or setting not found
-        if (!$this->cache->load($rfilepath)) {
+        if (!empty($this->options['debug']) || !$this->cache->load($name)) {
             // parse it
-            $process = new Process($rfilepath, $this->cache, $this->config, $this->eventHolder);
+            list($rfilepath, $config) = parse_path($name, $this->config);
+            $process = new Process($rfilepath, $this->cache, $config, $this->eventHolder);
             $process->run();
 
-            $this->cache->write($rfilepath);
+            $this->cache->write($name);
         }
 
-        $result = $this->get($rfilepath, new Context($data));
+        $result = $this->get($name, new Context($data));
 
         return $result
             ->setSlots($slots);
@@ -157,7 +163,7 @@ class Template
             $data[$key] = $value;
         }
 
-        $this->shared = array_merge($this->shared, $data);
+        $this->shared->merge($data);
     }
 
     /**
@@ -169,7 +175,7 @@ class Template
      * @param integer $weight - order - higher weight = exected first
      * @return void
      */
-    public function on(string $ev, string $name, \Closure $cb, $weight = 0)
+    public function on(string $ev, $name, \Closure $cb, $weight = 0)
     {
         $this->eventHolder->on($ev, $name, $cb, $weight);
     }
@@ -247,7 +253,6 @@ class Template
      */
     public function get(string $name, Context $context): View
     {
-        $context->merge($this->shared);
         $this->compose($name, $context);
 
         return (new View($this, $name, $this->cache->get($name), $context));

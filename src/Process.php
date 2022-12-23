@@ -26,6 +26,8 @@ class Process
     
     protected $callback;
     
+    protected $onDone = [];
+    
     public function __construct($rfilepath, CacheInterface $cache, Config $config, EventHolder $events, self $parent = null) 
     {
         $this->data = $parent ? $parent->data : (object)[];
@@ -41,6 +43,10 @@ class Process
             $this->rfilepath = $source->getFile();
             $this->srcFile = '';
             return;
+        }
+        
+        if (strpos($rfilepath, ':')) {
+            throw new \InvalidArgumentException("Process::__construct must receive a path with no hint and a config for that hint; received: $rfilepath");
         }
         
         $this->rfilepath = $rfilepath;
@@ -85,14 +91,14 @@ class Process
         
         // event before
         $this->events->trigger('parsing', $this->getName(), $this->node);
-
-        AbstractEntity::make($wrapper, new StartupEntity($this->config), $this)
-        ->simpleNodeContext();
-
-        // event after
+        // event before
         if ($this->callback) {
             ($this->callback)($this);
-        }        
+        }
+        
+        AbstractEntity::make($wrapper, new StartupEntity($this->config), $this)
+        ->simpleNodeContext();
+        
         $this->events->trigger('parsed', $this->getName(), $wrapper);
 
         $fnSrc = (string)$this->buildTemplateFunction($this->node);
@@ -108,6 +114,7 @@ class Process
      * @param CacheInterface $cache
      * @param EventHolder $eventHolder
      * @return void
+     * @deprecated
      */
     private function resolve()
     {
@@ -141,8 +148,7 @@ class Process
 
         // file not found in any2 config
         if (!$srcFile) {
-            $message = implode(' or ', $tried);
-            throw new \Exception("View file $message not found");
+            throw new \Exception("View file '$rfilepath' not found");
         }
 
         return $srcFile;
@@ -256,4 +262,11 @@ class Process
         return $string;
     }
 
+    public function on($phase, $templ, callable $cb) {
+        $this->events->on($phase, $templ, $cb);
+    }
+    
+    public function getCache(): CacheInterface {
+        return $this->cache;
+    }
 }

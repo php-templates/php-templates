@@ -83,7 +83,8 @@ echo "\n```
 
 ?>
 
-***Php-Templates*** is a template engine which goal is to bring full modularity to 'view' part of an app. It also has a nice to read and write syntax. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code in your templates. In fact, all templates are compiled into plain PHP code and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute, like in React/Vue.js syntax.
+***Php-Templates*** is a template engine which goal is to bring full modularity into 'View' part of a web app. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code and functions in your templates as a 'measure of security'. It gives you the freedom to organizes your templates as you wish. 
+In fact, all templates are compiled into plain PHP code and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute.
 
 ## Setting up
 View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
@@ -138,7 +139,7 @@ In order to bind values to node attributes, just write your attributes prefixed 
 <?php tresult(
 'examples/hello',
 '["value" => "No value"]'); ?>
-In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"', means you can replace '$value' with any valid php syntax.
+In fact, the syntax above will be translated to 'value="<\?php echo htmlentities($value); ?>"', means you can replace '$value' with any valid php syntax.
 <?php tstart(); ?>
 ```
 <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
@@ -147,12 +148,13 @@ In fact, the syntax above will be translated to 'value="<\?php echo $value; ?>"'
 'examples/hello',
 '["value" => "No value"]'); ?>
 
-Arrays are accepted too. You can:
+Class attribute is a special case, because we often have many of them, or we need to conditionate some of them. You can:
 - give an array of values, ex: `:class="['class1', true ? 'class2' : '']"` and expect as result `class="class1 class2"`
 - give an associative array where keys are attribute values and values are filter criteria, ex: `:class="['class3' => 1, 'class4' => 0]"` will result `class="class3"`;
+Classes are cumulative, so having many attributes of them, will concatenate their values into a single class atrribute.
 
 ## Php syntax
-In order to cover other features and to avoid any ambiguosity, template files are loaded using 'require(template)'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `@php ... @endphp` tags, or single line tags `{% ... %}`
+In order to cover other features and to avoid any ambiguosity in parse process, template files are loaded using php 'require'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `@php ... @endphp` tags, or single line tags `{% ... %}`
 <?php tstart(); ?>
 ```
 @php $text = 'Lorem ipsum'; @endphp
@@ -179,7 +181,7 @@ You can use them to conditionally render a node. Just add them as attribute on t
 <?php tresult(
 'examples/hello', "['type' => 'textarea', 'value' => 'Lorem']"); ?>
 
-Here is a foreach example:
+Here is a `foreach` example:
 <?php tstart(); ?>
 ```
 Do you like Php Templates?
@@ -190,7 +192,7 @@ Do you like Php Templates?
 <?php tresult(
 'examples/hello', "['options' => ['1' => 'Yes', '0' => 'No']]"); ?>
 
-In Php Templates, inspired by Twig, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, $lbl and $val would be available below the loop. Not in this case:
+In Php Templates, loops are scoped, meaning that anything declared inside a loop, will stay in the loop and not be available outside of it. Also, anything from outside of the loop can't be overriden from inside the loop. In the above example, in a normal php script, `$lbl` and `$val` would be available below the loop. Not in this case:
 <?php tstart(); ?>
 ```
 @php $lbl = 'I will survive!!!'; @endphp
@@ -203,7 +205,7 @@ In Php Templates, inspired by Twig, loops are scoped, meaning that anything decl
 'examples/hello', "['options' => ['1' => 'Yes', '0' => 'No']]"); ?>
 
 ## Directives
-Directives are parsing time commands and are usefull when you need to declare complex logic under a small alias. They are DOMNode attributes prefixed with 'p-', like control structures.
+Directives are 'parsing phase' commands and are usefull when you need to declare complex logic under a small alias. They are node attributes prefixed with 'p-', like control structures.
 
 ### Built-in directives
 `raw` - usefull when you need to conditionally render content on a tag declaration:
@@ -214,7 +216,7 @@ Directives are parsing time commands and are usefull when you need to declare co
 <?php tresult(
 'examples/hello',
 '["condition" => true]'); ?>
-Please note that is IMPORTANT to escape nested quotes using backslash.
+Please note that is IMPORTANT to escape nested quotes using backslash. Or just avoid it by using next directive (`bind`).
 Using this directive on a component node will take no effect.
 
 `bind` - declare node attributes inside an associative array. This is usefull if you need to conditionate rendering of some specific attributes.
@@ -225,6 +227,7 @@ Using this directive on a component node will take no effect.
 <?php tresult(
 'examples/hello',
 '["attrs" => [ "type" => "text", "name" => "name", "disabled"] ]'); ?>
+As a matter of rendering performance, the limitation is that you cannot `bind` class attribute, or any attribute already declared on node.
 
 `checked` - used on input type radio / checkbox
 <?php tstart(); ?>
@@ -260,7 +263,7 @@ Using this directive on a component node will take no effect.
 
 ### Custom directives
 
-Directives are dispatched before any node attribute be parsed. So, basically, they are populating the DomNode with attributes which become parsed. You can declare your own custom directives like this:
+Directives are dispatched before any node attribute be parsed. So, basically, they are populating the DomNode with attributes which becomes parsed. You can declare your own custom directives like this:
 
 ```
 $cfg->setDirective('guest', function($node, $val) {
@@ -322,12 +325,13 @@ and use it like this:
 ```
 <?php tresult(
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
-You can pass values to componenent context in 3 ways:
+
+Components will have their own scope (no access to upper context of values) so you have to irrigate them with data. You can pass values to componenent context in 3 ways:
 - simple attribute: will be passed as string value, ex.: value="somevalue"
 - bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
 - bind attribute: using p-bind directive, which accepts an array of attributes
 You can also have control structures on components nodes.
-When working with multiple namespaces configs and your cfg2 has a component with same name, for example form-group:
+When working with multiple namespaces configs and your cfg2 has a component with same name, for example `form-group`:
 - form-group
 - cfg2:form-group
 - cfg2:some-file
@@ -350,7 +354,10 @@ like this
 !!! Disclaimer: ***Php-Templates*** won't protect you against infinite reccursivity, so avoid aliasing components to valid html tags like `<section>` component having another section as body tag.
 
 ### Slots
-Slots increases a component reusability by leting us to control a defined layout from outside. Slots may have default content as child node, which will be rendered when no slot defined. Slots may be named, or default.
+Slots increases a component reusability by leting us to control a defined layout from outside. Slots may have default content as child node, which will be rendered when no slot defined. Slots may be named, or default. 
+Slots are sub-scoped:
+- compiled outside the component in which they are passed
+- having access to variables declared in this 'outside' scope, but cannot modify them
 Considering our form-group component with slots would be:
 components/form-group.t.php
 ```
@@ -603,7 +610,6 @@ $(document).on("change", 'input[type="file"].preview', function() {
     });
 } ?\>
 ```
-Parsed event is executed after a template is fully parsed.
 Events may be declared eliptic in name using *, (meaning anything except '/').
 Events declaration may accept a weight as 4'th argument which will define listener execution order (high to low).
 In the above example, we needed to detach the $script and keep a reference of it, because in event callback would be too late because the component would be already transformed to template function at that point and any change made would take no effect. Also, layout rendering event was triggered before this point.

@@ -43,6 +43,6 @@ class SlotAssign extends DomNode
     
     public function getNodeName()
     {
-        return '#php-'.$this->nodeName;
+        return '#slot-assign';
     }
 }

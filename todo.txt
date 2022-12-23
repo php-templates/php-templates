@@ -1,9 +1,14 @@
-solve indent
-solve attr bind whitespaces
-improve performance of r_attrs by limiting only on classes as cumulative
-
+optiune de freeze
+renunta la new closure
+fix all old legacy code from every repo
+fix todos
+fix readme
+publish first v
 
 todo: v.1.1
+solve indent
+slot in slot with empty slot should not reset
+bind slots
 butter node parser using preg offset
 events as classes path support, no, better .. event *
 throw parse error, line unexpected " or ' or

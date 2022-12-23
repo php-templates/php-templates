@@ -64,8 +64,16 @@ class SlotEntity extends AbstractEntity
      * <tpl is="comp/x"><slot></slot></tpl>
      */
     public function templateContext()
-    {
-        // unreachable because of View::simpleNodeContext dom manipulation
+    {// when slot default, never come here, bcz templateentity
+        $data = $this->depleteNode($this->node);
+        $dataString = $data->toArrayString();
+
+        $this->node->changeNode('#slot'); // prevent rendering the node as it is
+
+        $append = new PhpNode('if', '$this->slots("' . $this->attrs['name'] . '")');
+        $assign = sprintf('$this->comp["%s"]->setSlot("%s", $this->slots("%s"))', $this->context->getId(), $this->attrs['slot'], $this->attrs['name']);
+        $append->appendChild(new DomNode('#php', '<?php ' . $assign . '; ?>'));
+        $this->node->appendChild($append);        
     }
 
     /**

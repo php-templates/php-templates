@@ -63,13 +63,15 @@ class EventHolder
      * @param integer $weight - weighter callbacks are executed first
      * @return void
      */
-    public function on(string $ev, string $name, callable $cb, $weight = 0)
+    public function on(string $ev, $name, callable $cb, $weight = 0)
     {
-        $k = explode('*', $name)[0];
-        self::$events[$ev][$k][] = [
-            'name' => $name,
-            'fn' => $cb,
-            'weight' => $weight
-        ];
+        foreach ((array)$name as $name) {
+            $k = explode('*', $name)[0];
+            self::$events[$ev][$k][] = [
+                'name' => $name,
+                'fn' => $cb,
+                'weight' => $weight
+            ];
+        }
     }
 }

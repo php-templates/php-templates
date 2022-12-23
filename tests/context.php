@@ -1,54 +1,79 @@
 <?php
 
 namespace PhpTemplates;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require('../autoload.php');
 
 use PhpTemplates\View;
 use PhpTemplates\TemplateRepository;
 use PhpTemplates\Context;
 
-$context = new Context();
-$context->x = 123;
-$context->x = 12;
-dd($context->x);
+$context = $c = new Context();
 
-$tr = new TemplateRepository();
-$tr->add('default:props/c', function (Context $context) {
-   $context->val = [1,2]; $context->name = "myname";   ?>
-  <c>
-        <?php  $context->loopStart(); foreach ($this->slots("default") as $slot) {
-            ($slot)(['val' => $context->val, 'name' => $context->name]);
-          } $context->loopEnd();  ?>
-  </c> <?php
-});
-$tr->add('default:comp/comp_slot', function (Context $context) {
-?>
-  <div class="comp_slot">
-    <span>
-          <?php  $context->loopStart(); foreach ($this->slots("default") as $slot) {
-              ($slot)(['name' => $context->name]);
-            } $context->loopEnd();  ?>
-    </span>
-  </div> <?php
-});
-$x = new View($tr, 'default:./temp/props2', function () {
-    $context = new Context;
-    $this->comp["62f3e2389c8b8"] = $this->template("default:props/c", new Context([]));
-      $this->comp["62f3e2389c8b8"]->addSlot("default", function(array $data = []) use ($context) {
-        $context = $context->subcontext($data);  ?>
-    1<?php  e($context->name);
-      });
-      $this->comp["62f3e2389c8b8"]->addSlot("default", function(array $data = []) use ($context) {
-        $context = $context->subcontext($data);
-          $this->comp["62f3e2389dc66"] = $this->template("default:comp/comp_slot", new Context([]));
-            $this->comp["62f3e2389dc66"]->addSlot("default", function(array $data = []) use ($context) {
-              $context = $context->subcontext($data); dd($context); ?>2<?php  e($context->name);
-            });
-            $this->comp["62f3e2389dc66"]->render();
-      });
-      $this->comp["62f3e2389c8b8"]->render();  ?>
------
- <?php
-});
+final class K /*extends \__PHP_Incomplete_Class*/ {
+    public function __toString() {
+        return '';
+    }
+    
+    public function __toBoolean() {
+        return false;
+    }
+    public function __toBool() {
+        return false;
+    }
+}
+if (new \stdClass) {
+    echo 1;
+}
+print_r(get_class_methods(new \__PHP_Incomplete_Class));
 
-$x->render();
+
+die();
+$c->a = 1;
+$c->a;
+var_dump($c->a === 1);
+$c->x = $c->d;
+var_dump(is_null($c->x) && is_null($c->d) && count($c->all()) == 2);
+$c->x['y']['z'] = $c->d;
+$c->x = 1; $c->x;
+var_dump($c->x === 1);
+$c->n['b'] = 1;
+var_dump(isset($c->n));
+$c->l['m'] = 1;
+var_dump(isset($c->all()['l']));
+
+/*
+//$c->x = $c->d;
+//$context->x['y']['z'];
+$context->x['y']['z'] = 123;
+$context->y;
+$context->g['n']['c']['r'] = 3;
+var_dump($context->yoy);
+var_dump(isset($context->yoy));
+var_dump(!empty($context->yoy));
+echo $context->yoy;
+print_r($context->all());
+
+//if (!empty($context->body_scripts)) {
+    (new Loop($context->_context, $context->body_scripts))->run(function($context) {
+        echo $context->bscript;
+    }, 'bscript', null);
+//}
+
+//if ($context->size) {
+  $context->class[] = 'form-control-';//.$context->size;
+//}
+$context->class[] = 1;// = implode(' ', $context->class);
+$context->undef = $context->undef;
+$context->undefi = (array)$context->undefi;
+$c->c['val'] = 1;
+$c->c = 2;
+$c->c;
+
+print_r($context);
+die('done');
+*/

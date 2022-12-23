@@ -1,9 +1,9 @@
 <div><slot></slot></div>
 <?php
 
- return function($process) {
+ return function($node) {
   // $append = \PhpTemplates\Dom\DomNode::fromString('<slot tobeappended></slot>');
-  $this->querySelector('slot')->appendChild('<slot tobeappended><slot></slot></slot>');
+  $node->querySelector('slot')->appendChild('<slot tobeappended><slot></slot></slot>');
 }
 ?>
 

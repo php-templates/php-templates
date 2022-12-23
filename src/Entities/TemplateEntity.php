@@ -16,35 +16,26 @@ class TemplateEntity extends AbstractEntity
 { // de documentat p-scope scos default $slot
     const WEIGHT = 100;
     
+    private $subprocess;
     protected $name;
     protected $attrs = [
         'is' => null,
     ];
 
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        if (!$node->nodeName) {
-            return false;
-        }
-
-        if ($node->nodeName == 'tpl' && $node->hasAttribute('is')) {
-            return true;
-        }
-
-        $config = $context->getConfig();
-
-        return !!$config->getAliased($node->nodeName);
-    }
-    
     public function __construct(DomNode $node, EntityInterface $context, Process $process)
     {
         parent::__construct($node, $context, $process);
         
-        $this->name = $node->getAttribute('is');
+        $name = $node->getAttribute('is');
+        list($rfilepath, $config) = \PhpTemplates\parse_path($name, $process->config);
+        if ($config->isDefault()) {
+            $name = $rfilepath;
+        }
+        $this->name = $name;
         
-        list($rfilepath, $config) = \PhpTemplates\parse_path($this->name, $process->config);
-        
-        $process->subprocess($rfilepath, $config)->run();
+        if (!$this->process->getCache()->has($name)) {
+            $this->subprocess = $process->subprocess($rfilepath, $config);
+        }
     }
 
     /**
@@ -56,7 +47,7 @@ class TemplateEntity extends AbstractEntity
         $dataString = $data->toArrayString();
 
         $nodeValue = sprintf(
-            '<?php $this->comp["%s"] = $this->template("%s", new Context(%s)); ?>',
+            '<?php $this->comp["%s"] = $this->template("%s", $_context->root()->subcontext(%s)); ?>',
             $this->id,
             $this->name,
             $dataString
@@ -66,12 +57,20 @@ class TemplateEntity extends AbstractEntity
         $this->node->appendChild(new DomNode('#php', $nodeValue));
 
         foreach ($slots as $slot) {
-            $this->node->appendChild($slot);
-            AbstractEntity::make($slot, new StartupEntity($this->process->config), $this->process)->parse();
+            if (count($slot->childNodes) === 2 && $slot->childNodes[1]->nodeName == 'slot' && !$slot->childNodes[1]->childNodes) {
+                $slot = $slot->childNodes[1]->detach();
+                $this->node->appendChild($slot);
+                AbstractEntity::make($slot, $this, $this->process)->parse();
+            } else {
+                $this->node->appendChild($slot);// only 1 slot and is slot node
+                AbstractEntity::make($slot, new StartupEntity($this->process->config), $this->process)->parse();
+            }
         }
 
         $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
         $this->node->appendChild(new DomNode('#php', $nodeValue));
+        
+        $this->subprocess && $this->subprocess->run();
     }
 
     /**
@@ -144,6 +143,7 @@ class TemplateEntity extends AbstractEntity
             }
             $slots[$pos]->appendChild($cn->detach());
         }
+        
         return array_reverse($slots);
     }
 }

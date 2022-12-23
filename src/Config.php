@@ -69,10 +69,13 @@ class Config
      */
     public function subconfig(string $name, string $srcPath): self
     {
+        $config = null;
         try {
             $config = $this->getRoot()->find($name);
-            throw new Exception("A config with '$name' key already exists");
         } catch(Exception $e) {}
+        if ($config) {
+            throw new Exception("A config with '$name' key already exists");
+        }
 
         $cfg = new Config($name, $srcPath, $this);
         $this->childs[] = $cfg;
@@ -106,8 +109,12 @@ class Config
                 return $cfg;
             }
         }
-
-        throw new Exception("Config not found: '$cfgkey'");
+        
+        if (!$this->parent) {
+            throw new Exception("Config not found: '$cfgkey'");
+        }
+        
+        return null;
     }
 
     private function addDefaultDirectives()
@@ -229,6 +236,7 @@ class Config
         $domain = '';
         do {
             if (isset($cfg->aliased[$name])) {
+                $domain = strpos($cfg->aliased[$name], ':') ? '' : $domain;
                 return $domain.$cfg->aliased[$name];
             }
         } while (($cfg = $cfg->getParent()) && $domain = $cfg->getName() . ':');

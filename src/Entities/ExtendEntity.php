@@ -10,6 +10,7 @@ use PhpTemplates\Process;
 class ExtendEntity extends TemplateEntity
 {
     const WEIGHT = 101;
+    private $subprocess;
 
     protected $attrs = [
         'template' => null,
@@ -29,11 +30,17 @@ class ExtendEntity extends TemplateEntity
         $this->process = $process;
         $this->id = uniqid();
         
-        $this->name = $node->getAttribute('extends');
+        $name = $node->getAttribute('extends');
         
-        list($rfilepath, $config) = \PhpTemplates\parse_path($this->name, $process->config);
+        list($rfilepath, $config) = \PhpTemplates\parse_path($name, $process->config);
+        if ($config->isDefault()) {
+            $name = $rfilepath;
+        }
+        $this->name = $name;
         
-        $process->subprocess($rfilepath, $config)->run();
+        if (!$this->process->getCache()->has($name)) {
+            $this->subprocess = $process->subprocess($rfilepath, $config);
+        }        
     }
 
     /**
@@ -60,6 +67,8 @@ class ExtendEntity extends TemplateEntity
 
         $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
         $this->node->appendChild(new DomNode('#php', $nodeValue));
+        
+        $this->subprocess && $this->subprocess->run();
     }
 
     public function resolve(CacheInterface $document, EventHolder $eventHolder)

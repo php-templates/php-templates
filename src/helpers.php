@@ -10,7 +10,10 @@ namespace PhpTemplates;
  */
 function e($string)
 {
-    echo htmlspecialchars((string)$string);
+    if ($string && !is_string($string)) {
+        $string = json_encode($string);
+    }
+    echo htmlentities((string)$string);
 }
 
 /**
@@ -77,10 +80,10 @@ function e_attrs(...$data): void
             $echo[] = $attr;
         }
         elseif ($attr == 'class' && is_array($val)) {
-            $echo[] = $attr . '="' . implode(' ', $val) . '"';
+            $echo[] = $attr . '="' . htmlentities(implode(' ', $val)) . '"';
         }
         elseif (is_array($val)) {
-            $echo[] = $attr . '="' . end($val) . '"'; // todo: attrs cumulative only class
+            $echo[] = $attr . '="' . htmlentities(end($val)) . '"'; // todo: attrs cumulative only class
         }
         elseif($val) {
             $echo[] = $val;
@@ -89,7 +92,7 @@ function e_attrs(...$data): void
     
     echo implode(' ', $echo);
 }
-
+// todo remove
 function r_attrs(...$data): array
 {
     //print_r($data);
@@ -136,9 +139,9 @@ function resolve_class(array $class)
     return implode(' ', $result);
 }
 
-function e_bind(array $array, array $except = [])
+function e_bind($array, array $except = [])
 {
-    $array = array_diff_key($array, array_flip($except));
+    $array = array_diff_key((array)$array, array_flip($except));
     $result = [];
     foreach ($array as $k => $val) {
         if (is_bool($val)) {
@@ -150,7 +153,7 @@ function e_bind(array $array, array $except = [])
         
         $val = !is_string($val) ? json_encode($val) : $val;
         if (strlen(trim($val))) {
-            $result[] = $k . '="' . $val . '"';
+            $result[] = $k . '="' . htmlentities($val) . '"';
         }
         elseif ($k) {
             $result[] = $k;
@@ -190,7 +193,7 @@ function parse_path(string $rfilepath, Config $config): array
     if ($cfgkey == '@') {
         return [$rfilepath, $config];
     }
-    
+  
     $config = $config->getRoot()->find($cfgkey);
         
     return [$rfilepath, $config];

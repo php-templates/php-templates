@@ -23,7 +23,11 @@ class NullCache extends FileSystemCache implements CacheInterface
         }
 
         $cache = $this;
-        if (($loaded = require($file)) === false) {
+        $loaded = false;
+        try {
+            $loaded = require($file);
+        } catch(\Throwable $e) {}
+        if ($loaded === false) {
             return false;
         }
 

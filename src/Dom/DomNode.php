@@ -367,6 +367,22 @@ class DomNode
 
         return $node;
     }
+    // todo dox this
+    public function prependChild($node)
+    {
+        if (is_string($node)) {
+            $node = self::fromString($node);
+        }
+        else {
+            $this->assertNotContained($this, $node);
+        }
+
+        // set parent node first
+        $node->parent($this);
+        array_unshift($this->childNodes, $node);
+
+        return $node;
+    }
 
     /**
      * Insert a child node before another given childnode

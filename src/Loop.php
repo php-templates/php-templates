@@ -11,7 +11,7 @@ class Loop
     public function __construct(Context $context, $subject) 
     {
         $this->context = $context->subcontext();
-        $this->subject = (array)$subject;
+        $this->subject = !is_iterable($subject) ? (array)$subject : $subject;
         $this->context->loop = $this;
     }
     

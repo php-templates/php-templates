@@ -8,7 +8,9 @@
 return function($process)
 {
     $script2 = $this->querySelector('script')->detach();
-    $process->data->scripts['footer'][] = $script2;
-    $process->data->scripts['header'][] = '<script src="cdn">cdn script</script>';
+    $process->on('parsed', 'temp/comp-script', function($dom) use ($script2) {
+        $dom->querySelector('head')->appendChild('<script src="cdn">cdn script</script>');
+        $dom->querySelector('body')->appendChild($script2);
+    });
 }
 ?>
