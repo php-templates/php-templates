@@ -4,7 +4,7 @@ namespace PhpTemplates;
 
 use Closure;
 use PhpTemplates\Closure as PhpTemplatesClosure;
-
+// todo doc this
 class View
 {
     /**

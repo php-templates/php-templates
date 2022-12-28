@@ -2,7 +2,7 @@
 
 namespace PhpTemplates;
 
-// todo: added to support syntaxes like context[undefined][undefined] = x; but I have to abort bcz this is a get, and i have to return false value in case of undefined 
+// todo: remove this class added to support syntaxes like context[undefined][undefined] = x; but I have to abort bcz this is a get, and i have to return false value in case of undefined 
 class SafeArray extends \ArrayObject implements \Stringable
 {
     private $parent;

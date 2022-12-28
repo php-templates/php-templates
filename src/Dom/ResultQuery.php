@@ -5,7 +5,7 @@ namespace PhpTemplates\Dom;
 /**
  * @see DomNode
  */
-class ResultQuery
+class ResultQuery // in v2
 {
     private $nodes = [];
     

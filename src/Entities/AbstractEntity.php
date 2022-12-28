@@ -12,7 +12,7 @@ use PhpTemplates\NodeParser;
 
 abstract class AbstractEntity implements EntityInterface
 {
-    const WEIGHT = 0;
+    const WEIGHT = 0; // todo remive
 
     /**
      * class used to instantiate entities in nodes recursion

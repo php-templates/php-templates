@@ -1,7 +1,7 @@
 <?php
 
 namespace PhpTemplates;
-
+// todo doc this class
 class Loop
 {
     private $context;

@@ -116,6 +116,7 @@ class Process
      * @return void
      * @deprecated
      */
+     // todo remove
     private function resolve()
     {
         if ($this->node->nodeName == 'tpl' && $this->node->hasAttribute('is')) {

@@ -5,7 +5,7 @@ namespace PhpTemplates;
 use Closure as BaseClosure;
 use Exception;
 use PhpTemplates\Source;
-
+// todo remove this class
 class Closure
 {
     private $source;

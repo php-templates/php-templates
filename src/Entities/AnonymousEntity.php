@@ -12,7 +12,7 @@ use PhpTemplates\Dom\DomNode;
  */
 class AnonymousEntity extends AbstractEntity
 {
-    const WEIGHT = 90;
+    const WEIGHT = 90; // todo: remove weight & test frow evr
 
     protected $attrs = [];
 

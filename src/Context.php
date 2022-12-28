@@ -1,12 +1,12 @@
 <?php
 
 namespace PhpTemplates;
-
+// todo doc this class
 class Context
 {
     public $parent;
-    public $loopContext;
-    private $loopDepth = 0;
+    public $loopContext; // and this
+    private $loopDepth = 0; // todo remove this
     private $data;
     
     /**

@@ -9,11 +9,6 @@ class AttributePack
 {
     private $attrs = [];
 
-    public function __construct()
-    {
-
-    }
-
     public function add(DomNodeAttr $attr)
     {
         $this->attrs[] = $attr;
