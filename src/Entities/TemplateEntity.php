@@ -22,7 +22,7 @@ class TemplateEntity extends AbstractEntity
         'is' => null,
     ];
 
-    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
     {
         parent::__construct($node, $context, $process);
         

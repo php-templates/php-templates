@@ -1,5 +1,5 @@
 <tpl is="comp/01">
-    <span class="x" slot="sn" p-for="$i=0;$i<2;$i++"></span>
+    <span class="x" slot="sn" p-foreach="[0,1] as $i"></span>
 </tpl>
 =====
 <div class="sdefsdef">

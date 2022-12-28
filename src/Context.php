@@ -1,16 +1,18 @@
 <?php
 
 namespace PhpTemplates;
-// todo doc this class
+
+/**
+ * Context is the way I trait variables inside a scope (slot, component, etc) in order to better control them
+ */
 class Context
 {
     public $parent;
-    public $loopContext; // and this
-    private $loopDepth = 0; // todo remove this
     private $data;
     
     /**
-     * This member propose is to handle cases like $foo.undefined.baz = x, bcz seting a null data on GET would affect $attrs bind() (involving objects would fail IF statements)
+     * This member propose is to handle cases like $foo.undefined.baz = x, bcz seting a null data on GET 
+     * would affect $attrs bind() (involving objects would fail IF statements)
      */
     private $newvar = [
         'name' => null, // $varname
@@ -25,22 +27,13 @@ class Context
 
     public function &__get($prop)
     {
-        if ($this->loopContext) {// legacy if
-            return $this->loopContext->get($prop);
-        }
-
         return $this->get($prop);
     }
 
     public function __set($prop, $val)
     {
-        // @deprecated if
-        if ($this->loopContext) {
-            $this->loopContext->$prop = $val;
-        } else {
-            $this->data[$prop] = $val;
-        }
-        
+        $this->data[$prop] = $val;
+
         return $val;
     }
 
@@ -51,41 +44,18 @@ class Context
 
     public function merge(array $data)
     {
-        //array_unshift($data, $this->data);
-        //$this->data = call_user_func_array('array_merge', $data);
         $this->data = array_merge($this->data, $data);
         
         return $this;
     }
 
-    public function leaseMerge(array $data)
-    {// legacy
-        $this->data = array_merge($data, $this->data);
-    }
-
-    public function subcontext(array $data = [])
+    public function subcontext(array $data = []): self
     {
         if ($this->loopContext) {
             return new Context($data, $this->loopContext);
         }
 
         return new Context($data, $this);
-    }
-//@deprecated
-    public function loopStart()
-    {
-        if ($this->loopDepth <= 0) {
-            $this->loopContext = $this->subcontext();
-        }
-        $this->loopDepth++;
-    }
-//@deprecated
-    public function loopEnd()
-    {
-        $this->loopDepth--;
-        if ($this->loopDepth <= 0) {
-            $this->loopContext = null;
-        }
     }
 
     public function has(string $prop)
@@ -155,6 +125,14 @@ class Context
         return new Context($this->data);
     }
     
+    /**
+     * Generates a new context where root context shares additional data only for this subcontext tree
+     * root would be a clone of original root
+     * Used for fancy operations
+     *
+     * @param array|null $data
+     * @return void
+     */
     public function share($data) 
     {
         if (!$data || !is_array($data)) {
@@ -168,6 +146,7 @@ class Context
         
         $newRoot = $this->root()->clone();
         $this->parent = $newRoot->share($data);
+
         return $this;
     }
 }

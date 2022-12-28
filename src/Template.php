@@ -2,18 +2,16 @@
 
 namespace PhpTemplates;
 
-use Exception;
-use PhpTemplates\Entities\StartupEntity;
-use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Source;
-use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Config;
-use PhpTemplates\Dom\Parser;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\Cache\NullCache;
 
 require_once(__DIR__.'/helpers.php');
-// todo doc this
+
+/**
+ * Main class
+ */
 class Template
 {
     /**
@@ -26,7 +24,7 @@ class Template
     /**
      * Shared data across all templates
      *
-     * @var array
+     * @var Context
      */
     private $shared;
 
@@ -73,10 +71,8 @@ class Template
      */
     public function render(string $rfilepath, array $data = [], $slots = [])
     {
-        //$start_time = microtime(true);
         $template = $this->make($rfilepath, $data, $slots);
         $template->render();
-        //print_r('<br>'.(microtime(true) - $start_time));
     }
 
     /**
@@ -87,7 +83,7 @@ class Template
      * @param array $slots
      * @return void
      */
-    public function makeRaw($phpt, array $data = [], array $slots = [])
+    public function makeRaw($phpt, array $data = [], array $slots = []): View
     {
         $config = $this->config;
         if (is_string($phpt)) {
@@ -96,8 +92,8 @@ class Template
         }
         elseif ($phpt instanceof Source) {
             $source = (string)$phpt;
-            $rfilepath = trim(str_replace([root_path(), '.t.php'], '', $phpt->getFile()), '/ ');dd($rfilepath);// todo
-            $config = $this->getConfigFromPath($phpt->getFile());
+            $rfilepath = md5($phpt->getFile());
+            $config = $config->getConfigFromPath($phpt->getFile());
         }
         else {
             throw new \Exception("Invalid argument supplied");
@@ -126,9 +122,9 @@ class Template
      * @param string $rfilepath - template name
      * @param array $data - array of key => value data to be bassed to view
      * @param array $slots - array of closures keyed by slot position
-     * @return void
+     * @return View
      */
-    public function make(string $name, array $data = [], $slots = [])
+    public function make(string $name, array $data = [], $slots = []): View
     {
         $this->cache = $this->getCache();
         // init the document with custom settings as src_path, aliases
@@ -249,7 +245,7 @@ class Template
      *
      * @param string $name
      * @param Context $context
-     * @return void
+     * @return View
      */
     public function get(string $name, Context $context): View
     {
@@ -261,11 +257,6 @@ class Template
     public function getEventHolder()
     {
         return $this->eventHolder;
-    }
-    
-    protected function getPathRelative(string $absolutePath): string
-    {
-        
     }
 
     protected function getCache()

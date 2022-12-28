@@ -120,7 +120,7 @@ class Config
     private function addDefaultDirectives()
     {
         $cfg = $this;
-        $controlStructures = ['if', 'elseif', 'else', 'for', 'foreach'];
+        $controlStructures = ['if', 'elseif', 'else', 'foreach'];
 
         foreach ($controlStructures as $statement) {
             $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
@@ -154,13 +154,14 @@ class Config
     // =================================================== //
     // ===================== GETTERS ===================== //
     // =================================================== //
-// todo: doc this
+
     public function getParent()
     {
         return $this->parent;
     }
     
-    public function getChilds()
+
+    public function getChilds(): array
     {
         return $this->childs;
     }
@@ -183,8 +184,7 @@ class Config
         $this->flatten($configs, $this);
         $absolutePath = str_replace('\\', '/', $absolutePath);
         
-        $result = null;
-        $matchPath = null;
+        $result = '';
         foreach ($configs as $c) {
             $match = array_filter($c->getPath(), function($path) use ($absolutePath) {
                 return strpos($absolutePath, str_replace('\\', '/', $path)) !== false;
@@ -197,7 +197,7 @@ class Config
                 return strlen($b) - strlen($a);
             });
             
-            if (strlen(reset($match)) > strlen($matchPath)) {
+            if (strlen(reset($match)) > strlen($result)) {
                 $result = $c;
             }
         }

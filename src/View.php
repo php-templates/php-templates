@@ -4,7 +4,10 @@ namespace PhpTemplates;
 
 use Closure;
 use PhpTemplates\Closure as PhpTemplatesClosure;
-// todo doc this
+
+/**
+ * This is a view resource class, the renderable return of parse process
+ */
 class View
 {
     /**

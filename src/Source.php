@@ -1,7 +1,10 @@
 <?php
 
 namespace PhpTemplates;
-// todo doc this
+
+/**
+ * This class propose is to represent a source file and its executable content
+ */
 class Source
 {
     private $code;

@@ -169,7 +169,7 @@ If you wonder how then conditionally rendering attributes is possible, take a lo
 
 ## Control structures
 Allowed control structures are:
-`if, elseif, else, for, foreach`
+`if, elseif, else, foreach`
 You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
 <?php tstart(); ?>
 ```

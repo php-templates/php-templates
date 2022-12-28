@@ -10,10 +10,8 @@ use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\NodeParser;
 
-abstract class AbstractEntity implements EntityInterface
+abstract class AbstractEntity 
 {
-    const WEIGHT = 0; // todo remive
-
     /**
      * class used to instantiate entities in nodes recursion
      *
@@ -21,6 +19,11 @@ abstract class AbstractEntity implements EntityInterface
      */
     protected $factory;
 
+    /**
+     * Parse process
+     *
+     * @var Process
+     */
     protected $process;
 
     /**
@@ -75,7 +78,7 @@ abstract class AbstractEntity implements EntityInterface
     /**
      * Creating a new instance by giving the main process as param, the node and the contex
      */
-    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
     {
         $this->node = $node;
         $this->context = $context;
@@ -170,7 +173,7 @@ abstract class AbstractEntity implements EntityInterface
         return $this->process->config;
     }
     
-    public static function make(DomNode $node, EntityInterface $context, Process $process)
+    public static function make(DomNode $node, AbstractEntity $context, Process $process)
     {
         if ($node->nodeName == '#text') {
             return new TextNodeEntity($node, $context, $process);

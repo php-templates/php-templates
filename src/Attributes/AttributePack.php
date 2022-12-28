@@ -129,16 +129,4 @@ class AttributePack
         
         return $result[0];
     }
-    
-    /**
-     * @Deprecated
-     */
-    private function attrToString(DomNodeAttr $attr) 
-    {
-        if (!$attr->nodeName || $attr->nodeName == 'p-bind') {
-            return $attr->nodeValue;
-        }
-        
-        return ltrim($attr->nodeName, ': ') . ($attr->nodeValue ? '="' . $attr->nodeValue . '"' : '');
-    }
 }

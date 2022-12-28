@@ -8,23 +8,22 @@ class PhpNode extends DomNode
 {
     public function __toString()
     {
-        if ($this->nodeName == 'foreach') {
+        if (in_array($this->nodeName, ['foreach'])) {
             return $this->toScopedLoop();
         }
         
         // NODE START
         $indentNL = $this->getIndent();
         $return = $indentNL;
-        $isLoop = in_array($this->nodeName, ['for']);
 
         if ($this->nodeName && $this->nodeName != '#text' && ($this->nodeValue || $this->nodeValue == '0')) {
             $expr = "{$this->nodeName} ({$this->nodeValue}) {";
-        } elseif ($this->nodeName && $this->nodeName != '#text') {
+        } elseif ($this->nodeName && $this->nodeName != '#text') { // case Else
             $expr = $this->nodeName . ' {';
         } else {
             $expr = $this->nodeValue . ';';
         }
-        $return .= '<?php ' . ($isLoop ? '$loopStart(); ' : '') . $expr . ' ?>';
+        $return .= '<?php ' . $expr . ' ?>';
 
         // NODE CONTENT
         foreach ($this->childNodes as $cn) {
@@ -33,7 +32,7 @@ class PhpNode extends DomNode
 
         // NODE END
         if ($this->nodeName && $this->nodeName != '#text') {
-            $return .= $indentNL . '<?php } ' . ($isLoop ? '$loopEnd(); ' : '') . '?>';
+            $return .= $indentNL . '<?php } ?>';
         }
 
         return $return;

@@ -1,6 +1,6 @@
 
 <tpl is="comp/cns">
-    <span class="x" slot="sn" p-for="$i=0;$i<2;$i++"></span>
+    <span class="x" slot="sn" p-foreach="[0,1] as $i"></span>
     <span class="y" slot="sn1"></span>
     <p slot="sn3">3</p>
     <tpl is="comp/simple" slot="sn5"></tpl>

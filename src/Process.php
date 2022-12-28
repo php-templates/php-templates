@@ -109,25 +109,6 @@ class Process
     }
 
     /**
-     * Resolve/separately parse this componnt template into a new process and store the results into current cache
-     *
-     * @param CacheInterface $cache
-     * @param EventHolder $eventHolder
-     * @return void
-     * @deprecated
-     */
-     // todo remove
-    private function resolve()
-    {
-        if ($this->node->nodeName == 'tpl' && $this->node->hasAttribute('is')) {
-            $rfilepath = $this->node->getAttribute('is');
-        } else {
-            $rfilepath = $this->config->getAliased($this->node->nodeName);
-        }
-        
-    }
-
-    /**
      * Gain a relative path and test it against config paths with fallback on default config (in case)
      *
      * @param string $rfilepath

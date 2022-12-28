@@ -367,7 +367,14 @@ class DomNode
 
         return $node;
     }
-    // todo dox this
+
+    /**
+     * Preprend a new child node to current node and returns preprended child instance.
+     * If preprended node already exists in this node flow, it will throw an error to prevent infinite recursion
+     *
+     * @param self|string $node - when string, we will call self::fromString to obtain a virtual node
+     * @return self
+     */
     public function prependChild($node)
     {
         if (is_string($node)) {

@@ -10,17 +10,10 @@ use PhpTemplates\Process;
 
 class SlotEntity extends AbstractEntity
 {
-    const WEIGHT = 80;
-
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
-
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return $node->nodeName == 'slot';
-    }
     
-    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
     {
         parent::__construct($node, $context, $process);
         

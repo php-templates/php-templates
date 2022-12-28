@@ -12,14 +12,7 @@ use PhpTemplates\Dom\DomNode;
  */
 class AnonymousEntity extends AbstractEntity
 {
-    const WEIGHT = 90; // todo: remove weight & test frow evr
-
     protected $attrs = [];
-
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return $node->nodeName == 'tpl';
-    }
 
     /**
      * <div><tpl>...</tpl></div>

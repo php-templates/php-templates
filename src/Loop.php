@@ -1,7 +1,10 @@
 <?php
 
 namespace PhpTemplates;
-// todo doc this class
+
+/**
+ * This is a scoped loop class, used to scope loops
+ */
 class Loop
 {
     private $context;

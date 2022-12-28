@@ -5,15 +5,8 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Config;
 use PhpTemplates\Dom\DomNode;
 
-class VerbatimEntity implements EntityInterface
+class VerbatimEntity implements AbstractEntity
 {
-    const WEIGHT = 1000;
-
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return $node->hasAttribute('verbatim');
-    }
-
     public function templateContext()
     {
     }

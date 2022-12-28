@@ -9,7 +9,6 @@ use PhpTemplates\Process;
 
 class ExtendEntity extends TemplateEntity
 {
-    const WEIGHT = 101;
     private $subprocess;
 
     protected $attrs = [
@@ -18,12 +17,8 @@ class ExtendEntity extends TemplateEntity
         'extends' => null,
     ];
 
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return $node->nodeName == 'tpl' && $node->hasAttribute('extends');
-    }
 
-    public function __construct(DomNode $node, EntityInterface $context, Process $process)
+    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
     {
         $this->node = $node;
         $this->context = $context;

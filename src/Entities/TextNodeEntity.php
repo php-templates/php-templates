@@ -6,13 +6,6 @@ use PhpTemplates\Dom\DomNode;
 
 class TextNodeEntity extends SimpleNodeEntity
 {
-    const WEIGHT = 70;
-
-    public static function test(DomNode $node, EntityInterface $context): BOOL
-    {
-        return $node->nodeName == '#text';
-    }
-
     /**
      * <div>abc</div>
      */

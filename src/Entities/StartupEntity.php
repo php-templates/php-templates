@@ -8,15 +8,10 @@ use PhpTemplates\Dom\DomNode;
 /**
  * Wrapper used to initialize parse process
  */
-class StartupEntity implements EntityInterface
+class StartupEntity implements AbstractEntity
 {
     private $config;
     private $name;
-
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return false;
-    }
 
     public function __construct(Config $config, string $name = '')
     {

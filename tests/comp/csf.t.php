@@ -1,3 +1,3 @@
 <div class="comp_slot">
-    <slot p-for="$i=0;$i<2;$i++">1</slot>
+    <slot p-foreach="[0,1] as $i">1</slot>
 </div>

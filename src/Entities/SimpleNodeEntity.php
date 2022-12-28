@@ -11,11 +11,6 @@ class SimpleNodeEntity extends AbstractEntity
 {
     protected $attrs = [];
 
-    public static function test(DomNode $node, EntityInterface $context): bool
-    {
-        return true;
-    }
-
     /**
      * <tpl><div></div></tpl>
      */
