@@ -1,7 +1,4 @@
-optiune de freeze
-renunta la new closure
-fix all old legacy code from every repo
-fix todos
+
 fix readme
 publish first v1
 
