@@ -3,9 +3,7 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Closure;
-use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Source;
-use PhpTemplates\Dom\DomNodeAttr;
 
 class SimpleNodeEntity extends AbstractEntity
 {

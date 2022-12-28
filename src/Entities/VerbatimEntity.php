@@ -3,7 +3,6 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Config;
-use PhpTemplates\Dom\DomNode;
 
 class VerbatimEntity implements AbstractEntity
 {

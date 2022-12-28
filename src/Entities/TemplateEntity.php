@@ -3,19 +3,11 @@
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Process;
-use PhpTemplates\Config;
-use PhpTemplates\Cache\CacheInterface;
-use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Source;
-use PhpTemplates\Dom\Parser;
-use PhpTemplates\Closure;
 use PhpTemplates\Dom\PhpNodes\SlotAssign;
 
 class TemplateEntity extends AbstractEntity
-{ // de documentat p-scope scos default $slot
-    const WEIGHT = 100;
-    
+{
     private $subprocess;
     protected $name;
     protected $attrs = [

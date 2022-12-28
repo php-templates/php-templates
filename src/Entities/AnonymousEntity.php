@@ -2,9 +2,6 @@
 
 namespace PhpTemplates\Entities;
 
-use IvoPetkov\HTML5DOMDocument;
-use PhpTemplates\TemplateFunction;
-use PhpTemplates\Helper;
 use PhpTemplates\Dom\DomNode;
 
 /**

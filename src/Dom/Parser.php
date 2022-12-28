@@ -85,7 +85,7 @@ class Parser
             }
             // start node
             elseif (preg_match('/^<(\w+[-_\w]*)/', $str, $m)) {
-                $node = new DomNode($m[1]);
+                $node = new DomNode((string)$m[1]);
                 $attrs = $this->getTagAttributes($str);
                 foreach ($attrs as $attr) {
                     $node->addAttribute(new DomNodeAttr($attr[0], $attr[1]));

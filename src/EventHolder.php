@@ -2,17 +2,18 @@
 
 namespace PhpTemplates;
 
+use PhpTemplates\Dom\DomNode;
+
 class EventHolder
 {
     private static $events = [];
-    private static $cache = [];
 
     /**
      * Trigger Event
      *
      * @param string $ev - parsing, parsed or rendering
      * @param string $name - template name
-     * @param [type] $template - template instance
+     * @param DomNode $template - template instance
      * @return void
      */
     public function trigger(string $ev, string $name, $template) {

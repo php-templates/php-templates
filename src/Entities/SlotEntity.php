@@ -2,8 +2,6 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Cache\CacheInterface;
-use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodes\PhpNode;
 use PhpTemplates\Process;

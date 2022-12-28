@@ -51,9 +51,11 @@ class Template
     
     private $options;
 
-    public function __construct(?string $outputFolder, Config $config, EventHolder $eventHolder, array $options = [])
+    public function __construct(string $sourceFolder, string $outputFolder, array $options = [])
     {
         $this->outputFolder = $outputFolder;
+        $config = new Config('default', $sourceFolder);
+        $eventHolder = new EventHolder;
         $this->config = $config;
         $this->eventHolder = $eventHolder;
         $this->options = $options;
@@ -264,7 +266,7 @@ class Template
         if ($this->outputFolder) {
             $cache = new FileSystemCache($this->outputFolder);
         } else {
-            $cache = new NullCache();
+            $cache = new NullCache(); // future
         }
 
         return $cache;

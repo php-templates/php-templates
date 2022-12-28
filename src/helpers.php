@@ -86,6 +86,7 @@ function parse_path(string $rfilepath, Config $config): array
         return [$rfilepath, $config->getRoot()];
     }
     
+    // support for spearing proggrammer of write module namespace each time on a component
     if ($cfgkey == '@') {
         return [$rfilepath, $config];
     }

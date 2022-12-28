@@ -8,8 +8,13 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Entities\StartupEntity;
 
+/**
+ * Each parse has its own process in order to not conflict each other or make garbage
+ */
 class Process
 {
+    // parse may go deeper when nested components are present, 
+    // so each component may have different configurations depending on namespace
     protected $parent;
     
     protected $rfilepath;
@@ -22,11 +27,10 @@ class Process
     
     protected $events;
     
+    // each component may push custom data into process and handle that data on the end
     protected $data;
     
     protected $callback;
-    
-    protected $onDone = [];
     
     public function __construct($rfilepath, CacheInterface $cache, Config $config, EventHolder $events, self $parent = null) 
     {
@@ -54,6 +58,7 @@ class Process
         
         // add file as dependency to template for creating hash of states
         ob_start();
+        /** @var \Closure */
         $cb = require($this->srcFile);
         $source = ob_get_contents();
         ob_end_clean();

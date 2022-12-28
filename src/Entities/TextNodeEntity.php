@@ -2,8 +2,6 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Dom\DomNode;
-
 class TextNodeEntity extends SimpleNodeEntity
 {
     /**
