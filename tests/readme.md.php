@@ -12,10 +12,10 @@ use PhpTemplates\Dom\DomNodeAttr;
 
 ob_start();
 
-$cfg = new Config('default', __DIR__);
 //$dependenciesMap = new DependenciesMap('./dep.php', __DIR__.'/results/');
 $eventHolder = new EventHolder();
-$viewFactory = new Template( __DIR__.'/results' , $cfg, $eventHolder);
+$viewFactory = new Template(__DIR__, __DIR__.'/results' , ['debug' => true]);
+$cfg = $viewFactory->getConfig();
 
 $cfg->setAlias([
     'x-form-group' => 'components/form-group',
@@ -62,7 +62,7 @@ function tresult($file, $data = '[]')
     $tpl = ob_get_contents();
     ob_end_clean();
     echo "
-// $file.t.php\n$tpl";
+`// $file.t.php`\n$tpl";
     eval('$_data = '.$data.';');
     echo "
 ```
@@ -95,9 +95,9 @@ use PhpTemplates\Config;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Template;
 
-$cfg = new Config('default', __DIR__);
-$eventHolder = new EventHolder();
-$viewFactory = new Template(__DIR__.'/cached', $cfg, $eventHolder);
+// we set debug true to force discard any cached file for now
+$viewFactory = new Template(__DIR__, __DIR__.'/cached', ['debug' => true]); 
+$cfg = $viewFactory->getConfig();
 
 $view = $viewFactory->makeRaw('<h1>Hello {{ $world }}</h1>', ['world' => 'Php Templates']);
 $view->render();
@@ -139,7 +139,7 @@ In order to bind values to node attributes, just write your attributes prefixed 
 <?php tresult(
 'examples/hello',
 '["value" => "No value"]'); ?>
-In fact, the syntax above will be translated to 'value="<\?php echo htmlentities($value); ?>"', means you can replace '$value' with any valid php syntax.
+In fact, the syntax above will be translated to `value="<php echo htmlentities($value); ?>"`, means you can replace `$value` with any valid php syntax.
 <?php tstart(); ?>
 ```
 <input type="text" :value="str_ireplace('no ', '', $value) . ' given'">
@@ -170,7 +170,7 @@ If you wonder how then conditionally rendering attributes is possible, take a lo
 ## Control structures
 Allowed control structures are:
 `if, elseif, else, foreach`
-You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with 'p-'.
+You can use them to conditionally render a node. Just add them as attribute on targeted node, prefixed with `p-`.
 <?php tstart(); ?>
 ```
 @php $inp = ['text', 'number', 'email']; @endphp
@@ -291,7 +291,7 @@ You can learn more about DomNode manipulation at Working with DOM section.
 
 ## Entities
 ### Components
-You can reuse parts of design by making them components. Just put the html code into another file in `src_path` in any folder structure you preffer. For example, you can have:
+You can reuse parts of design by making them components. Just put the html code into another file in your source path in any folder structure you preffer. For example, you can have:
 // components/form-group.t.php
 ```
 @php
@@ -327,15 +327,15 @@ and use it like this:
 'examples/hello', '[ "label" => "The Label", "value" => "The Value" ]'); ?>
 
 Components will have their own scope (no access to upper context of values) so you have to irrigate them with data. You can pass values to componenent context in 3 ways:
-- simple attribute: will be passed as string value, ex.: value="somevalue"
+- simple attribute: will be passed as string value, ex.: `value="somevalue"`
 - bind syntax: php syntax accepted, ex.: `:value="$value"`, or `:value="'The value'"`
-- bind attribute: using p-bind directive, which accepts an array of attributes
+- bind attribute: using `p-bind` directive, which accepts an array of attributes
 You can also have control structures on components nodes.
-When working with multiple namespaces configs and your cfg2 has a component with same name, for example `form-group`:
+When working with multiple namespaces configs (`$viewFactory->subConfig($name='cfg2', $sourcePath)`) and your  has a component with same name, for example `form-group`:
 - form-group
 - cfg2:form-group
 - cfg2:some-file
-If you refer `form-group` in `cfg2:some-file`, you will get default one. You can instruct php-templates that you want local config template like this `<tpl is="cfg2:form-group"` or like this `<tpl is="@form-group"`.
+If you refer `form-group` in `cfg2:some-file`, you will get default one. You can instruct php-templates that you want local config template like this `<tpl is="cfg2:form-group"` or like this `<tpl is="@form-group"` (`@` will tell php-templates to look for a specific component in current config path, with fallback on default path).
 
 #### Components aliasing
 You can alias components into custom tags like this:
@@ -409,16 +409,16 @@ Consider you have a component responsable for rendering a table:
             <th p-if="$this->slots('action')">Action</th>
         </thead>
         <tbody>
-            <tr p-foreach="$data as $i => $_data">
-                <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
-                <slot name="action" :id="$_data['id']" :i="$i"></slot>
+            <tr p-foreach="$data as $i => $item">
+                <td p-foreach="$headings as $k => $v">{{ $item[$k] }}</td>
+                <slot name="action" :id="$item['id']" :i="$i"></slot>
             </tr>
         </tbody>
     </table>
 </div>
 ```
 Two things here:
-- we checked if any slot passed by calling $this->slots($slotName)
+- we checked if any slot passed by calling `$this->slots($slotName)`
 - we passed some data on slot node declaration ($id and $i), then we can access this values outside component, like this `$slot->varName`
 Now, we can use the component like this:
 <?php tstart(); ?>
@@ -685,7 +685,7 @@ Supported selectors are:
 .class	(ex: .intro)	- Selects all elements with class="intro"
 .class1.class2 (ex: .name1.name2) - Selects all elements with both name1 and name2 set within its class attribute
 .class1 .class2	(ex: .name1 .name2)	- Selects all elements with name2 that is a descendant of an element with name1
-#id	(ex: #firstname) - Selects the element with id="firstname"
+\#id	(ex: #firstname) - Selects the element with id="firstname"
 element	(ex: p) - Selects all &lt;p&gt; elements
 element.class (ex: p.intro) - Selects all &lt;p&gt; elements with class="intro"
 element element	(ex: div p) - Selects all &lt;p&gt; elements inside &lt;div&gt; elements
@@ -695,6 +695,7 @@ element1~element2 (ex: p ~ ul) - Selects every &lt;ul&gt; element that is preced
 [attribute]	(ex: [target="value"]) - Selects all elements with a target attribute having value 'value'
 
 ### `querySelectorAll(string $selector)`
+Returns any node found which match the given selector
 Non complex css selectors supported
 
 <?php

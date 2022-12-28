@@ -5,9 +5,9 @@
                 <th p-if="$this->slots('action')">Action</th>
             </thead>
             <tbody>
-                <tr p-foreach="$data as $i => $_data">
-                    <td p-foreach="$headings as $k => $v">{{ $_data[$k] }}</td>
-                    <slot name="action" :id="$_data['id']" :i="$i"></slot>
+                <tr p-foreach="$data as $i => $item">
+                    <td p-foreach="$headings as $k => $v">{{ $item[$k] }}</td>
+                    <slot name="action" :id="$item['id']" :i="$i"></slot>
                 </tr>
             </tbody>
         </table>
