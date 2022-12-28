@@ -3,7 +3,7 @@ renunta la new closure
 fix all old legacy code from every repo
 fix todos
 fix readme
-publish first v
+publish first v1
 
 todo: v.1.1
 solve indent
