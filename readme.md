@@ -3,6 +3,7 @@ In fact, all templates are compiled into plain PHP code and cached until they ar
 
 ## Setting up
 `composer require php-templates/php-templates`
+or just include `autoload.php` file in your script.
 
 View files will have the `.t.php` extension and be placed in configured source path. They will be refered by their relative name, without extension and without source path prepended.
 
