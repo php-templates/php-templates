@@ -1,7 +1,3 @@
-
-fix readme
-publish first v1
-
 todo: v.1.1
 solve indent
 slot in slot with empty slot should not reset
