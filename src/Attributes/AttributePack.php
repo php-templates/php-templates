@@ -42,6 +42,9 @@ class AttributePack
                 elseif ($isBind) {
                     $val = "<?php e($val); ?>";
                 }
+                else {
+                    $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
+                }
                 $attrs[$k] = trim(($attrs[$k] ?? '') .' '. $val);
             } 
             elseif ($isBind) {
@@ -49,6 +52,7 @@ class AttributePack
                 $excludes[] = $k;
             }
             else {
+                $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
                 $attrs[$k] = $val;
                 $excludes[] = $k;
             }

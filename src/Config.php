@@ -294,7 +294,7 @@ class Config
 
     public function setSrcPath($val)
     {
-        $this->srcPath = $val;
+        $this->srcPath = (array) $val;
     }
 
     public function setName(string $name)

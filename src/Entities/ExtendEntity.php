@@ -44,10 +44,10 @@ class ExtendEntity extends TemplateEntity
     public function simpleNodeContext()
     {
         $data = $this->depleteNode($this->node);
-        // $dataString = $data->toArrayString(); -> can t bind explicit data to extends, because it shares same context, use tpl instead
+        $dataString = $data->toArrayString(); // -> can t bind explicit data to extends, because it shares same context,…  use tpl instead…  so what… 
 
         $nodeValue = sprintf(
-            '<?php $this->comp["%s"] = $this->template("%s", $context); ?>',
+            '<?php $this->comp["%s"] = $this->template("%s", $context->merge('.$dataString.')); ?>',
             $this->id,
             $this->name
         );

@@ -135,7 +135,8 @@ class Process
 
         // file not found in any2 config
         if (!$srcFile) {
-            throw new \Exception("View file '$rfilepath' not found");
+            $pf = $this->config->isDefault() ? $this->config->getName() . ':' : '';
+            throw new TemplateNotFoundException("View file '". $pf . $rfilepath ."' not found");
         }
 
         return $srcFile;
