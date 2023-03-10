@@ -1,5 +1,5 @@
 <?php
-
+// todo scoate context din param fn, il fac bind pe this
 namespace PhpTemplates\Dom\PhpNodes;
 
 use PhpTemplates\Dom\DomNode;
@@ -61,7 +61,7 @@ class PhpNode extends DomNode
             $key = 'null';
         }
 
-        $return .= "<?php (new Loop(\$_context, $subject))->run(function(\$context) { ?>";
+        $return .= "<?php (new Loop(\$this, $subject, $value, $key))->run(function() { ?>";
 
         // NODE CONTENT
         foreach ($this->childNodes as $cn) {
@@ -69,7 +69,7 @@ class PhpNode extends DomNode
         }
 
         // NODE END
-        $return .= $indentNL . "<?php }, $value, $key); ?>";
+        $return .= $indentNL . "<?php }); ?>";
         
         return $return;
     }

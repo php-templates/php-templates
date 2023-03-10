@@ -126,11 +126,6 @@ class Parser
         return null;
     }
 
-    public function beggfforeCallback(Closure $cb)
-    {
-        $this->beforeCallback = $cb;
-    }
-
     protected function removeHtmlComments($content = '') {
     	return preg_replace_callback('~<!--.+?-->~ms', function($m) {
     	    return str_repeat("\n", substr_count($m[0], "\n")+1);
@@ -145,10 +140,10 @@ class Parser
         }
         $attrs = [];
         $originalStr = $str;
-        $noises = [
+        $noises = array_merge($this->noises, [
             '\\"' => '&quot_;',
             '\\\'' => '&#039_;',
-        ];
+        ]);
         $str = str_replace(array_keys($noises), $noises, $str);
         $str = preg_replace_callback('/(((?![= ]).)*)=("(((?!").)*)"|\'(((?!\').)*)\')/s', function($m) use (&$attrs, $str) {
             $attrs[] = [

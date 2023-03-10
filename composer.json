@@ -15,5 +15,8 @@
         "psr-4": {
             "PhpTemplates\\": "src/"
         }
+    },
+    "require": {
+        "nikic/php-parser": "^4.15"
     }
 }

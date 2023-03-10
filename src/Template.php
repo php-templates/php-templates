@@ -60,7 +60,7 @@ class Template
         $this->eventHolder = $eventHolder;
         $this->options = $options;
         
-        $this->shared = new Context();
+        $this->shared = new Shared();
     }
 
     /**
@@ -88,33 +88,50 @@ class Template
     public function makeRaw($phpt, array $data = [], array $slots = []): View
     {
         $config = $this->config;
+        $file = '';
         if (is_string($phpt)) {
-            $rfilepath = md5($phpt);
-            $source = new Source($phpt, $rfilepath);
+            $name = md5($phpt);
+            $source = new Source($phpt, $name);
         }
         elseif ($phpt instanceof Source) {
             $source = (string)$phpt;
-            $rfilepath = md5($phpt->getFile());
+            $file = $phpt->getFile();
+            $name = md5($phpt->getFile());
             $config = $config->getConfigFromPath($phpt->getFile());
         }
         else {
             throw new \Exception("Invalid argument supplied");
         }
 
-        $this->cache = $this->getCache();
-
+        // init per process singlethon registry
+        $registry = $this->newProcessRegistry();
         // paths will fallback on default Config in case of file not found or setting not found
-        if (!empty($this->options['debug']) || !$this->cache->load($rfilepath)) {
-            // parse it
-            $process = new Process($source, $this->cache, $this->config, $this->eventHolder); 
-            $process->run();
-
-            $this->cache->write($rfilepath);
+        try {
+            $class = $registry->cache->get($name); // try to load file, returns init class name
+        } catch (\Throwable $e) {
+            $class = null;
+        }
+        if (!empty($this->options['debug']) || !$class) {
+            // parse start
+            // aka $template = $registry->finder->find($name); // name, file, config
+            $template = [
+                'name' => $name,
+                'file' => $file,
+                'config' => $config
+            ];
+            $template += $registry->loader->loadSource($source); // returns new class and new TemplateClassBuilder
+       
+            //$node = $registry->dom->parse(new Source($template['code'], $template['file']));
+            $tpl = $registry->parser->parse($template, $template['config']); // returns a string which will compose the render fn
+            $template['class']->addMethod('render', $tpl);
+           
+            $registry->cache->add($template);
+            $class = $registry->cache->write($name);
         }
 
-        $result = $this->get($rfilepath, $this->shared->subcontext($data));
+        $view = new $class($registry, $data);
 
-        return $result
+        return $view
             ->setSlots($slots);
     }
 
@@ -128,21 +145,31 @@ class Template
      */
     public function make(string $name, array $data = [], $slots = []): View
     {
-        $this->cache = $this->getCache();
-        // init the document with custom settings as src_path, aliases
+        // init per process singlethon registry
+        $registry = $this->newProcessRegistry();
         // paths will fallback on default Config in case of file not found or setting not found
-        if (!empty($this->options['debug']) || !$this->cache->load($name)) {
-            // parse it
-            list($rfilepath, $config) = parse_path($name, $this->config);
-            $process = new Process($rfilepath, $this->cache, $config, $this->eventHolder);
-            $process->run();
-
-            $this->cache->write($name);
+        try {
+            $class = $registry->cache->get($name); // try to load file, returns init class name
+        } catch (\Throwable $e) {
+            $class = null;
         }
+        if (!empty($this->options['debug']) || !$class) {
+            // parse start
+            $template = $registry->finder->find($name); // name, file, config
+            $template += $registry->loader->load($template['file'], $template['name']); // returns new class and new TemplateClassBuilder
+       
+            //$node = $registry->dom->parse(new Source($template['code'], $template['file']));
+            $tpl = $registry->parser->parse($template, $template['config']); // returns a string which will compose the render fn
+            $template['class']->addMethod('render', $tpl);
+           
+            $registry->cache->add($template);
+            $class = $registry->cache->write($name);
+        }
+        
+        // $this->compose($name, $context);
+        $view = new $class($registry, $data);
 
-        $result = $this->get($name, new Context($data));
-
-        return $result
+        return $view
             ->setSlots($slots);
     }
 
@@ -176,6 +203,11 @@ class Template
     public function on(string $ev, $name, \Closure $cb, $weight = 0)
     {
         $this->eventHolder->on($ev, $name, $cb, $weight);
+    }
+    
+    public function helper(string $name, \Closure $fn)
+    {
+        $this->config->helper($name, $fn);
     }
 
     /**
@@ -260,7 +292,7 @@ class Template
     {
         return $this->eventHolder;
     }
-
+// sus legacy
     protected function getCache()
     {
         if ($this->outputFolder) {
@@ -272,6 +304,7 @@ class Template
         return $cache;
     }
 
+// legacy, move on view class
     protected function compose(string $name, $attrs = [])
     {
         if (empty($this->composers[$name])) {
@@ -281,5 +314,23 @@ class Template
         foreach ($this->composers[$name] as $cb) {
             $cb($attrs);
         }
+    }
+    
+    private function newProcessRegistry() 
+    {
+        $registry = new Registry;
+        
+        // todo interface, setters
+        $registry->config = $this->config;
+        $registry->finder = new PHPTFinder($registry);
+        $registry->loader = new PHPTLoader($registry);
+        $registry->dom = new Dom\Parser();
+        $registry->parser = new PHPTParser($registry);
+        $registry->cache = new FileSystemCache($registry, $this->outputFolder);
+        $registry->event = $this->eventHolder;
+        $registry->shared = $this->shared;
+        $registry->composers = $this->composers;
+        
+        return $registry;
     }
 }

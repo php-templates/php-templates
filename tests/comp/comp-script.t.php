@@ -5,12 +5,12 @@
 <script>execution</script>
 
 <?php 
-return function($process)
+return new class
 {
-    $script2 = $this->querySelector('script')->detach();
-    $process->on('parsed', 'temp/comp-script', function($dom) use ($script2) {
-        $dom->querySelector('head')->appendChild('<script src="cdn">cdn script</script>');
-        $dom->querySelector('body')->appendChild($script2);
-    });
+    public function parsing($dom, $registry) {//d($registry);
+        $script2 = $dom->querySelector('script')->detach();
+        $registry->data['head'][] = '<script src="cdn">cdn script</script>';
+        $registry->data['footer'][] = $script2;
+    }
 }
 ?>

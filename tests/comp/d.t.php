@@ -1,3 +1,3 @@
 <div class="form-group">
-    <textarea class="form-control" p-bind="$_context->all()"></textarea>
+    <textarea class="form-control" p-bind="$this->context->all()"></textarea>
 </div>

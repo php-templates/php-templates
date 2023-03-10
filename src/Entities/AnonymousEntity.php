@@ -19,7 +19,7 @@ class AnonymousEntity extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $this->node->changeNode('#template');
         foreach ($this->node->childNodes as $cn) {
-            AbstractEntity::make($cn, $this, $this->process)->parse();
+            $this->parser->make($cn, $this)->parse();
         }
         $data->addToNode($this->node);
     }

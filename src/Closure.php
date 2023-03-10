@@ -4,7 +4,7 @@ namespace PhpTemplates;
 
 use Closure as BaseClosure;
 use PhpTemplates\Source;
-
+// legacy
 class Closure
 {
     private $source;

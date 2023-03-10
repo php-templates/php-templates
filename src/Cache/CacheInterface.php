@@ -3,6 +3,7 @@
 namespace PhpTemplates\Cache;
 
 use PhpTemplates\Source;
+use PhpTemplates\View;
 
 interface CacheInterface
 {
@@ -12,7 +13,7 @@ interface CacheInterface
      * @param string $key - relative file path, aka template name
      * @return boolean - returns false in case of cache expired
      */
-    public function load(string $key): bool;
+    // legacy public function load(string $key): bool;
 
     /**
      * check if cache has template
@@ -20,7 +21,7 @@ interface CacheInterface
      * @param string $key
      * @return boolean
      */
-    public function has(string $key): bool;
+    public function has(string $key): ?array;
 
     /**
      * Set template to cache
@@ -30,7 +31,8 @@ interface CacheInterface
      * @param Source|null $source - when cache is built from parse
      * @return void
      */
-    public function set(string $key, callable $fn, Source $source = null): void;
+    public function set(string $key, \Closure $fn): void;
+    public function registerTemplate(string $key, Source $src): void;
 
     /**
      * returns cached template function
@@ -38,7 +40,7 @@ interface CacheInterface
      * @param string $key
      * @return callable
      */
-    public function get(string $key): callable;
+    public function get(string $key): ?View;
 
     /**
      * Burn parse results to a given file

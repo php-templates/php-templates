@@ -4,16 +4,16 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodes\PhpNode;
-use PhpTemplates\Process;
+use PhpTemplates\Registry;
 
 class SlotEntity extends AbstractEntity
 {
     protected $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
     
-    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
+    public function __construct(Registry $registry, DomNode $node, AbstractEntity $context)
     {
-        parent::__construct($node, $context, $process);
+        parent::__construct($registry, $node, $context);
         
         $this->hasSlotDefault = count($this->node->childNodes) > 0;
     }
@@ -36,11 +36,11 @@ class SlotEntity extends AbstractEntity
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
             $wrapperDefault->setAttribute('p-if', $if);
 
-            AbstractEntity::make($wrapperDefault, $this->context, $this->process)->parse();
+            $this->parser->make($wrapperDefault, $this->context)->parse();
         }
 
         $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $slot');
-        $r = '($slot)(' . $dataString . ')';
+        $r = '$slot->render(' . $dataString . ')';
         $append->appendChild(new DomNode('#php', '<?php ' . $r . '; ?>'));
         $this->node->appendChild($append);
     }

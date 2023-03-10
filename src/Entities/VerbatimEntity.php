@@ -4,7 +4,7 @@ namespace PhpTemplates\Entities;
 
 use PhpTemplates\Config;
 
-class VerbatimEntity implements AbstractEntity
+class VerbatimEntity extends AbstractEntity
 {
     public function templateContext()
     {
@@ -19,6 +19,14 @@ class VerbatimEntity implements AbstractEntity
     {
     }
     public function verbatimContext()
+    {
+    }
+    
+    public function extendContext()
+    {
+    }
+    
+    public function textNodeContext()
     {
     }
 

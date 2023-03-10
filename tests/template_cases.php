@@ -22,10 +22,27 @@ $cfg->setAlias([
     'x-helper' => 'components/helper'
 ]);
 
+$cfg->helper('doSomething', function($t) {
+    return $t->cfgKey().':doSomething';
+});
+$cfg->helper('t', function($t, $param) {
+    return $t->cfgKey() .'::'. $param;
+});
+
+$cfg->helper('doSomethingCommon', function($t, $x) {
+    return $t->cfgKey() . ':doSomethingCommonWith ' . $x;
+});
+
 $cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
 $cfg->setAlias('x-form-group', 'cases2:components/form-group');
 $cfg->setDirective('mydirective', function($node, $val) {
     $node->addAttribute(new DomNodeAttr('mydirective', 2));
+});
+$cfg->helper('doSomething', function($t) {
+    return $t->cfgKey().':doSomething';
+});
+$cfg->helper('tx', function($t, $param, $repl) {
+    return $t->cfgKey() . '::' . str_replace(':x', $repl, $param);
 });
 
 //$cfg->getRoot()->find('cases2'); die('66');
