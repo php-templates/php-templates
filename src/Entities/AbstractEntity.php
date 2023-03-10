@@ -9,6 +9,7 @@ use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\NodeParser;
+use PhpTemplates\Registry;
 
 abstract class AbstractEntity 
 {
@@ -22,9 +23,9 @@ abstract class AbstractEntity
     /**
      * Parse process
      *
-     * @var Process
+     * @var Registry
      */
-    protected $process;
+    protected $registry;
 
     /**
      * The pack of events to each template action
@@ -32,13 +33,6 @@ abstract class AbstractEntity
      * @var EventHolder
      */
     protected $eventHolder;
-
-    /**
-     * The cache system used to store the parse result
-     *
-     * @var CacheInterface
-     */
-    protected $cache;
 
     /**
      * Unique id -> used to parent-child comunication like: this->comp[id]->addSlot(...)
@@ -78,11 +72,11 @@ abstract class AbstractEntity
     /**
      * Creating a new instance by giving the main process as param, the node and the contex
      */
-    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
+    public function __construct(Registry $registry, DomNode $node, AbstractEntity $context)
     {
+        $this->registry = $registry;
         $this->node = $node;
         $this->context = $context;
-        $this->process = $process;
         $this->id = uniqid();
     }
 
@@ -103,7 +97,8 @@ abstract class AbstractEntity
      */
     protected function depleteNode(DomNode $node): AttributePack
     {
-        $attributePack = new AttributePack();
+        $config = $this->getConfig();
+        $attributePack = new AttributePack($this->getConfig());
         // dispatch any existing directive
         while ($node->attributes->count()) {
             $attrs = $node->attributes;
@@ -118,7 +113,7 @@ abstract class AbstractEntity
 
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
-                    if ($directive = $this->process->config->getDirective(substr($k, strlen($this->pf)))) {
+                    if ($directive = $config->getDirective(substr($k, strlen($this->pf)))) {
                         $directive($node, $a->nodeValue);
 
                         // directive unpacked his data, next attr!!!
@@ -153,6 +148,10 @@ abstract class AbstractEntity
     // ===================== GETTERS ===================== //
     // =================================================== //
 
+    public function __get($prop) {
+        return $this->registry->$prop;
+    }
+
     public function getId(): string
     {
         return $this->id;
@@ -168,12 +167,27 @@ abstract class AbstractEntity
         return $this->attrs[$key] ?? null;
     }
 
+    protected function parseTemplate($name) 
+    {
+        $template = $this->finder->find($name); // name, file, config
+        $template += $this->loader->load($template['file'], $template['name']); // returns new class and new TemplateClassBuilder
+   
+        //$node = $registry->dom->parse(new Source($template['code'], $template['file']));
+        $tpl = $this->parser->parse($template, $template['config']); // returns a string which will compose the render 
+        $template['class']->addMethod('render', $tpl);
+       
+        $this->cache->add($template);
+        
+        return $template;
+    }
+
     public function getConfig(): Config
     {
-        return $this->process->config;
+        // up to startupentity
+        return $this->context->getConfig();
     }
-    
-    public static function make(DomNode $node, AbstractEntity $context, Process $process)
+    //legacy
+    public static function mgake(DomNode $node, AbstractEntity $context, Process $process)
     {
         if ($node->nodeName == '#text') {
             return new TextNodeEntity($node, $context, $process);

@@ -49,6 +49,9 @@ class Config
      * @var array
      */
     public $directives = [];
+    public $customTags = [];
+    
+    private $helpers = [];
 
     public function __construct($name, $srcPath, self $parent = null)
     {
@@ -101,7 +104,7 @@ class Config
      */
     public function find(string $cfgkey): ?self
     {
-        if ($this->name == $cfgkey) {
+        if ($this->name == $cfgkey || !$cfgkey) {
             return $this;
         }
         foreach ($this->childs as $child) {
@@ -300,5 +303,28 @@ class Config
     public function setName(string $name)
     {
         $this->name = $name;
+    }
+    
+    public function helper(string $name, \Closure $fn = null) 
+    {
+        if ($fn) {
+            $this->helpers[$name] = $fn;
+            return;
+        }
+        
+        if (isset($this->helpers[$name])) {
+            return $this->helpers[$name];
+        }
+        
+        if ($this->parent) {
+            return $this->parent->helper($name);
+        }
+        
+        return null;
+    }
+    
+    public function customTag(string $name, \Closure $fn) 
+    {
+        $this->helpers[$name] = $fn;
     }
 }

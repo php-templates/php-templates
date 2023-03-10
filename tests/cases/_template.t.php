@@ -1,10 +1,10 @@
 
 @php  
-$this->addSlot('default', function() {
-    if (!empty(func_get_arg(0)['y'])) {
-     echo func_get_arg(0)['y'];
+$this->addSlot('default', new Slot($this, function() {
+    if (!empty($slot->y)) {
+     echo $slot->y;
     }
-});
+}));
 $val = 'val';
 @endphp
 

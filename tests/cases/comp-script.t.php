@@ -8,14 +8,25 @@
 </html>
 <?php 
 
-return function($process) {
-    $head = $this->querySelector('head');
-    $body = $this->querySelector('body');
-    foreach ($process->data->scripts['header'] ?? [] as $script) {
-        $head->appendChild($script);
+use PhpTemplates\Dom\Parser;
+use PhpTemplates\Dom\Parser as Testare;
+
+return new class {
+    public function parsed($node, $registry) {//dd($registry->data);
+        $head = $node->querySelector('head');
+        $body = $node->querySelector('body');
+        foreach ($registry->data['head'] ?? [] as $script) {
+            $head->appendChild($script);
+        }
+        foreach ($registry->data['footer'] ?? [] as $script) {
+            $body->appendChild($script);
+        }
+        // dd(''.$node);
     }
-    foreach ($process->data->scripts['footer'] ?? [] as $script) {
-        $body->appendChild($script);
+    
+    public function data($data) {
+        $data['parser'] = new Parser();
+        return $data;
     }
 }; ?>
 =====

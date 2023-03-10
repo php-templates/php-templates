@@ -53,9 +53,9 @@ val
 -----
 
 @php $val = 'val'; 
-$this->addSlot('default', function() {
+$this->addSlot('default', new Slot($this, function() {
     echo 123;
-});
+}));
 @endphp
 <tpl>{{ $val }}
   <slot>{{ $val }}</slot>

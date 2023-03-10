@@ -7,7 +7,7 @@ use PhpTemplates\Dom\Parser;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Entities\AbstractEntity;
 use PhpTemplates\Entities\StartupEntity;
-
+// legacy class
 /**
  * Each parse has its own process in order to not conflict each other or make garbage
  */
@@ -58,8 +58,8 @@ class Process
         
         // add file as dependency to template for creating hash of states
         ob_start();
-        /** @var \Closure */
-        $cb = require($this->srcFile);
+        $view = require($this->srcFile);
+        $this->callback = $view instanceof View ? $view : null;
         $source = ob_get_contents();
         ob_end_clean();
 
@@ -67,7 +67,6 @@ class Process
         $parser = new Parser();
         
         $this->node = $parser->parse($source);
-        $this->callback = is_callable($cb) ? \Closure::bind($cb, $this->node) : null;
     }
     
     public function getName(): string
@@ -95,51 +94,20 @@ class Process
         $wrapper->appendChild($this->node->detach());
         
         // event before
-        $this->events->trigger('parsing', $this->getName(), $this->node);
+        $this->events->trigger('parsing', $this->getName(), $wrapper);
+        $this->callback && $this->callback->parsing($wrapper);
         // event before
-        if ($this->callback) {
-            ($this->callback)($this);
-        }
         
         AbstractEntity::make($wrapper, new StartupEntity($this->config), $this)
         ->simpleNodeContext();
         
         $this->events->trigger('parsed', $this->getName(), $wrapper);
+        $this->callback && $this->callback->parsed($wrapper);
 
         $fnSrc = (string)$this->buildTemplateFunction($this->node);
+        $src = new Source($fnSrc, $this->srcFile);
 
-        $fn = Closure::fromSource(new Source($fnSrc, $this->srcFile), 'namespace PhpTemplates;');
-
-        $this->cache->set($this->getName(), $fn, new Source($fnSrc, $this->srcFile));
-    }
-
-    /**
-     * Gain a relative path and test it against config paths with fallback on default config (in case)
-     *
-     * @param string $rfilepath
-     * @param Config $config
-     * @return string
-     */
-    private function resolvePath(string $rfilepath): string
-    {
-        $srcFile = null;
-        // try to find file on current config, else try to load it from default config
-        foreach ($this->config->getPath() as $srcPath) {
-            $filepath = rtrim($srcPath, '/') . '/' . $rfilepath . '.t.php';
-            if (file_exists($filepath)) {
-                $srcFile = $filepath;
-                break;
-            }
-            $tried[] = $filepath;
-        }
-
-        // file not found in any2 config
-        if (!$srcFile) {
-            $pf = $this->config->isDefault() ? $this->config->getName() . ':' : '';
-            throw new TemplateNotFoundException("View file '". $pf . $rfilepath ."' not found");
-        }
-
-        return $srcFile;
+        $this->cache->registerTemplate($this->getName(), $src);
     }
     
     /**
@@ -150,7 +118,7 @@ class Process
      */
     protected function buildTemplateFunction(DomNode $node): string
     {
-        $fnDeclaration = 'function (Context $context) {' . PHP_EOL
+        $fnDeclaration = 'function () {' . PHP_EOL
             . '?> ' . $node . ' <?php' . PHP_EOL
             . '}';
 
@@ -170,9 +138,10 @@ class Process
         $preserve = [
             //'$this->' => '__r-' . uniqid(),
             //'Context $context' => '__r-' . uniqid(),
-            'use ($context)' => '__r-' . uniqid(),
+            //'use ($context)' => '__r-' . uniqid(),
             'array $data' => '__r-' . uniqid(),
-            '$context = $context->subcontext' => '__r-' . uniqid(),
+            '$_comp' => '__r-' . uniqid(),
+            //'$context = $context->subcontext' => '__r-' . uniqid(),
         ];
 
         $string = str_replace(array_keys($preserve), $preserve, $string);
@@ -218,7 +187,7 @@ class Process
         // match all $ not inside of a string declaration, considering escapes
         $count = null; //d($stringRanges);
         $string = preg_replace_callback('/(?<!\\\\)\$([a-zA-Z0-9_]*)/', function ($m) use (&$stringRange, &$stringRanges) { //d($m);
-            if (empty($m[1][0]) || $m[1][0] == 'this' || $m[1][0] == 'context') {
+            if (empty($m[1][0]) || $m[1][0] == 'this') {
                 return '$' . $m[1][0];
             }
             $var = $m[1][0];
@@ -242,7 +211,7 @@ class Process
             }
 
             if (!$stringRange || $stringRange['char'] != "'") {
-                return '$context->' . $var;
+                return '$this->' . $var;
             }
             return '$' . $var;
         }, $string, -1, $count, PREG_OFFSET_CAPTURE);

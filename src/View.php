@@ -1,5 +1,5 @@
 <?php
-
+//todo: add public props and attrs, function setprops
 namespace PhpTemplates;
 
 use Closure;
@@ -8,26 +8,22 @@ use PhpTemplates\Closure as PhpTemplatesClosure;
 /**
  * This is a view resource class, the renderable return of parse process
  */
-class View
+abstract class View
 {
-    /**
+    /** 
      * Called template function name
      * @var string
      */
-    protected $name;
-
+    protected static $name;
+    
     /**
      * Data passed to component using node attributes
      *
      * @var Context
      */
     public $context;
-
-    /**
-     * render function to be called
-     * @var Closure
-     */
-    protected $func;
+    
+    protected $registry;
 
     /**
      * Array of closures keyed by slot position
@@ -35,16 +31,21 @@ class View
      */
     public $slots = [];
 
-    public $slot; // used in loops to not poluate variables, like this: foreach this->slots as this->slot
+    //public $slot; // legacy used in loops to not poluate variables, like this: foreach this->slots as this->slot
     public $comp; // used in component build in order to not poluate variables, like this: this->comp[id] =
 
-    public function __construct(Template $repository, $name, PhpTemplatesClosure $fn, Context $context = null)
+    public function __construct(Registry $registry, $data)
     {
-        $this->repository = $repository;
-        $this->name = $name;
-        $this->context = $context;
-
-        $this->func = $fn->bindTo($this);
+        $this->registry = $registry;
+// todo: compose data here        
+        if (is_array($data)) {
+            $this->context = $registry->shared->subcontext($this->data($data));
+        } else {
+            // context given, aka extends
+            $this->context = $data;
+        }
+        
+        $registry->event->event('rendering', static::name, $this);
     }
 
     /**
@@ -52,14 +53,7 @@ class View
      *
      * @return void
      */
-    public function render()
-    {
-        $eventHolder = $this->repository->getEventHolder();
-        $eventHolder->event('rendering', $this->name, $this->context);
-
-        $func = $this->func;
-        $func($this->context);
-    }
+     public function render() {}
 
     /**
      * Set data to template
@@ -85,9 +79,9 @@ class View
      * @param Closure $renderable
      * @return self
      */
-    public function addSlot(string $pos, Closure $renderable): self
+    public function addSlot(string $pos, Slot $slot): self
     {
-        $this->slots[$pos][] = $renderable;
+        $this->slots[$pos][] = $slot;
 
         return $this;
     }
@@ -140,7 +134,7 @@ class View
      */
     public function template(string $name, Context $context = null): self
     {
-        return $this->repository->get($name, $context);
+        return $this->store->get($name, $context);
     }
     
     public function __toString() 
@@ -151,5 +145,36 @@ class View
         ob_end_clean();
         
         return $content;
+    }
+    
+    public function __get($prop) 
+    {
+        return $this->$prop ?? $this->registry->$prop ?? null;
+    }
+    
+    protected function data($data) 
+    {
+        return $data;
+    }
+    
+    public function getConfig() 
+    {
+        return $this->registry->config->find($this->cfgKey());
+    }
+    
+    public function cfgKey() 
+    {
+        return static::config;
+    }
+    
+    public function __call($m, $args) 
+    {
+        $name = $m;
+        $cfg = $this->getConfig();
+        if ($m = $cfg->helper($m)) {
+            array_unshift($args, $this);
+            return call_user_func_array($m, $args);
+        }
+        throw new \Exception(" Helper function $name not found");
     }
 }

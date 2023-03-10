@@ -1,24 +1,24 @@
 <?php
-
+// todo: this.context.root
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Process;
+use PhpTemplates\Registry;
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\PhpNodes\SlotAssign;
 
 class TemplateEntity extends AbstractEntity
 {
     private $subprocess;
-    protected $name;
+    protected $className;
     protected $attrs = [
         'is' => null,
     ];
 
-    public function __construct(DomNode $node, AbstractEntity $context, Process $process)
+    public function __construct(Registry $registry, DomNode $node, AbstractEntity $context)
     {
-        parent::__construct($node, $context, $process);
+        parent::__construct($registry, $node, $context);
         
-        $name = $node->getAttribute('is');
+        $name = $node->getAttribute('is');/*
         list($rfilepath, $config) = \PhpTemplates\parse_path($name, $process->config);
         if ($config->isDefault()) {
             $name = $rfilepath;
@@ -27,7 +27,14 @@ class TemplateEntity extends AbstractEntity
         
         if (!$this->process->getCache()->has($name)) {
             $this->subprocess = $process->subprocess($rfilepath, $config);
+        }*/
+        
+        $template = $this->cache->has($name);
+        if (!$template) {
+            $template = $this->parseTemplate($name);
         }
+        
+        $this->className = $template['class']->getName();
     }
 
     /**
@@ -39,9 +46,9 @@ class TemplateEntity extends AbstractEntity
         $dataString = $data->toArrayString();
 
         $nodeValue = sprintf(
-            '<?php $this->comp["%s"] = $this->template("%s", $_context->root()->subcontext(%s)); ?>',
+            '<?php $this->comp["%s"] = new %s($this->registry, %s); ?>',
             $this->id,
-            $this->name,
+            $this->className,
             $dataString
         );
         $this->node->changeNode('#php', '');
@@ -55,7 +62,7 @@ class TemplateEntity extends AbstractEntity
                 AbstractEntity::make($slot, $this, $this->process)->parse();
             } else {
                 $this->node->appendChild($slot);// only 1 slot and is slot node
-                AbstractEntity::make($slot, new StartupEntity($this->process->config), $this->process)->parse();
+                $this->parser->make($slot, new StartupEntity($this->getConfig()))->parse();
             }
         }
 

@@ -1,5 +1,5 @@
 <?php
-
+//todo remove fn src closure
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Closure;
@@ -24,7 +24,7 @@ class SimpleNodeEntity extends AbstractEntity
     {
         $data = $this->depleteNode($this->node);
         foreach ($this->node->childNodes as $slot) {
-            AbstractEntity::make($slot, $this, $this->process)->parse();
+            $this->parser->make($slot, $this)->parse();
         }
 
         $data->addToNode($this->node);

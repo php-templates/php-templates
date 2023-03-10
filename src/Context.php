@@ -5,7 +5,7 @@ namespace PhpTemplates;
 /**
  * Context is the way I trait variables inside a scope (slot, component, etc) in order to better control them
  */
-class Context
+class Context implements ContextInterface
 {
     public $parent;
     private $data;
@@ -19,7 +19,7 @@ class Context
         'value' => null // $varvalue
     ];
 
-    public function __construct(array $data = [], self $parent = null)
+    public function __construct(array $data = [], $parent = null)
     {
         $this->data = $data ?? [];
         $this->parent = $parent;
@@ -32,6 +32,7 @@ class Context
 
     public function __set($prop, $val)
     {
+        //d($prop . '=>' . (is_object($val) ? '' : $val));
         $this->data[$prop] = $val;
 
         return $val;
@@ -49,12 +50,8 @@ class Context
         return $this;
     }
 
-    public function subcontext(array $data = []): self
+    public function subcontext(array $data = [])
     {
-        if ($this->loopContext) {
-            return new Context($data, $this->loopContext);
-        }
-
         return new Context($data, $this);
     }
 
@@ -67,10 +64,10 @@ class Context
     public function &get($prop, $safe = true)
     {
         $this->sync();
-        if ($prop == '_context') {
+        if ($prop == '_context') {dd('legacy');
             return $this;
         }
-        if ($prop == '_data') {
+        if ($prop == '_data') {dd('legacy');
             return $this->data;
         }
 
@@ -126,6 +123,7 @@ class Context
     }
     
     /**
+     * legacy
      * Generates a new context where root context shares additional data only for this subcontext tree
      * root would be a clone of original root
      * Used for fancy operations
@@ -134,7 +132,7 @@ class Context
      * @return void
      */
     public function share($data) 
-    {
+    {dd('legacy');
         if (!$data || !is_array($data)) {
             return $this;
         }

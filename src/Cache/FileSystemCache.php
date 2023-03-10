@@ -3,51 +3,52 @@
 namespace PhpTemplates\Cache;
 
 use PhpTemplates\Source;
+use PhpTemplates\Registry;
+use PhpTemplates\View;
 
 class FileSystemCache implements CacheInterface
 {
+    protected $registry;
     protected $storePath;
     protected $store = [];
     protected $source = [];
 
-    public function __construct(string $storePath)
+    public function __construct(Registry $registry, $storePath)
     {
+        $this->registry = $registry;
         $this->storePath = $storePath;
     }
 
-    public function load(string $key): bool
+    public function get(string $key): ?View
     {
         $this->store = $this->source = $this->dependencies = [];
 
         $file = $this->getFilePath($key);
 
         if (!file_exists($file)) {
-            return false;
+            return null;
         }
 
-        $cache = $this; // <- include it into require
-        if (($loaded = require($file)) === false) {
-            return false;
-        }
-
-        return true;
+        return require($file);
     }
 
-    public function has(string $key): bool
+    public function has(string $key): ?array
     {
-        return isset($this->store[$key]);
+        return $this->store[$key] ?? null;
     }
 
-    public function set(string $key, callable $fn = null, Source $source = null): void
+    public function set(string $key, \Closure $fn = null): void
     {
         $this->store[$key] = $fn;
-        if ($source) {
-            $this->source[$key] = (string) $source;
-            $this->dependencies[] = $source->getFile();
-        }
     }
-
-    public function get(string $key): callable
+    
+    public function registerTemplate(string $key, Source $source): void
+    {
+        $this->source[$key] = (string) $source;
+        $this->dependencies[] = $source->getFile();
+    }
+// legacy
+    public function jget(string $key): callable
     {
         return $this->store[$key];
     }
@@ -61,27 +62,43 @@ class FileSystemCache implements CacheInterface
         } else {
             chmod($this->storePath, 0777);
         }
+        
+        $namespace = 'PHPT_' . uniqid();
 
         $tpl = '<?php ';
-        $tpl .= PHP_EOL . "namespace PhpTemplates;";
-        $tpl .= PHP_EOL . "use PhpTemplates\View;";
-        $tpl .= PHP_EOL . "use PhpTemplates\Cache\FileSystemCache;";
-        $tpl .= PHP_EOL . "use PhpTemplates\Context;";
+        $tpl .= PHP_EOL . "namespace PhpTemplates\\$namespace;";
+        $tpl .= PHP_EOL . "use function PhpTemplates\\check_dependencies;";
+        $tpl .= PHP_EOL . "use function PhpTemplates\\e;";
+        $tpl .= PHP_EOL . "use function PhpTemplates\\resolve_class;";
+        $tpl .= PHP_EOL . "use function PhpTemplates\\e_bind;";
+        $tpl .= PHP_EOL . "use function PhpTemplates\\arr_except;";
+        $tpl .= PHP_EOL . "use PhpTemplates\\Loop;";
+        $tpl .= PHP_EOL . "use PhpTemplates\\Slot;";
+        $tpl .= PHP_EOL . "use PhpTemplates\\View;";
+        $tpl .= PHP_EOL . "use PhpTemplates\\Cache\\FileSystemCache;";
+        $tpl .= PHP_EOL . "use PhpTemplates\\Context;";
+        foreach ($this->registry->uses as $use) {
+            $tpl .= PHP_EOL . "use \\$use;";
+        }
         $tpl .= PHP_EOL;
 
         $dependencies = [];
-        foreach ($this->store as $source) {
-            if ($source->getFile())
-                $dependencies[$source->getFile()] = filemtime($source->getFile());
+        foreach ($this->store as $template) {
+            if ($template['file']) {
+                $dependencies[$template['file']] = filemtime($template['file']);
+            }
         }
         $tpl .= PHP_EOL . 'if (!check_dependencies(' . var_export($dependencies, true) . ')) { return false; }' . PHP_EOL;
 
-        foreach ($this->source as $name => $fn) {
-            $tpl .= PHP_EOL . "\$cache->set('$name', new Closure($fn));";
+        foreach ($this->store as $name => $template) {
+            $tpl .= PHP_EOL.PHP_EOL . $template['class'];
         }
+        
+        $tpl .= PHP_EOL.PHP_EOL . 'return ' . $template['class']->getName() . '::class;';
 
         file_put_contents($path, $tpl);
-        $this->load($key);
+        
+        return require($path);
     }
 
     protected function getFilePath(string $key)
@@ -91,5 +108,10 @@ class FileSystemCache implements CacheInterface
         $name = trim(str_replace(['/', ':'], '_', $key), '/ ') . '_' . $hash;
 
         return $pf . $name . '.php';
+    }
+    
+    public function add($template): void
+    {
+        $this->store[$template['name']] = $template;
     }
 }

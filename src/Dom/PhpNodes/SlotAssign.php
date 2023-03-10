@@ -1,5 +1,5 @@
 <?php
-
+// todo scoate use context, il am pe this context, renunta la fngetargs
 namespace PhpTemplates\Dom\PhpNodes;
 
 use PhpTemplates\Dom\DomNode;
@@ -15,8 +15,8 @@ class SlotAssign extends DomNode
 
         $this->targetComp = $targetComp;
         $this->slotPos = $slotPos;
-        
-        $this->appendChild(new DomNode('#php', '<?php $context = $context->subcontext(["slot" => new Context(func_get_arg(0))]); ?>'));
+        // nooo, new slot(pos, fn)->render(data) // subcontext slot -> new context(dat)
+        // $this->appendChild(new DomNode('#php', '<php $context = $this->context->subcontext(["slot" => new Context(func_get_arg(0))]); ?'));
     }
 
     public function __toString()
@@ -25,7 +25,7 @@ class SlotAssign extends DomNode
         $indentNL = $this->getIndent();
         $return = $indentNL;
         
-        $return .= sprintf('<?php $this->comp["%s"]->addSlot("%s", function(array $data = []) use ($context) { ?>' . PHP_EOL, 
+        $return .= sprintf('<?php $this->comp["%s"]->addSlot("%s", new Slot($this, function() { ?>' . PHP_EOL, 
             $this->targetComp,
             $this->slotPos
         );
@@ -36,7 +36,7 @@ class SlotAssign extends DomNode
         }
         
         // NODE END
-        $return .= $indentNL . '<?php }); ?>';
+        $return .= $indentNL . '<?php })); ?>';
         
         return $return;
     }

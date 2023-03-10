@@ -4,10 +4,17 @@ namespace PhpTemplates\Attributes;
 
 use PhpTemplates\Dom\DomNode;
 use PhpTemplates\Dom\DomNodeAttr;
+use PhpTemplates\Config;
 
 class AttributePack
 {
+    private $config;
     private $attrs = [];
+    
+    public function __construct(Config $config) 
+    {
+        $this->config = $config;
+    }
 
     public function add(DomNodeAttr $attr)
     {
@@ -43,7 +50,7 @@ class AttributePack
                     $val = "<?php e($val); ?>";
                 }
                 else {
-                    $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
+                    $val = $this->evaluateTags($val);
                 }
                 $attrs[$k] = trim(($attrs[$k] ?? '') .' '. $val);
             } 
@@ -52,7 +59,7 @@ class AttributePack
                 $excludes[] = $k;
             }
             else {
-                $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
+                $val = $this->evaluateTags($val);
                 $attrs[$k] = $val;
                 $excludes[] = $k;
             }
@@ -132,5 +139,21 @@ class AttributePack
         }
         
         return $result[0];
+    }
+    
+    private function evaluateTags($val) 
+    {
+        $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
+        return $val;
+        // custom tags
+        $t = $this->config->getCustomTags();
+        if (!$t) {
+            return $val;
+        }
+        $t = implode('|', $t);
+        return preg_replace_callback("/{($t) (((?!{($t) ).)*)}/", function($m) {
+            $fn = $this->config->customTag($m[1]);
+            return $fn($this->config, trim($m[2]));
+        }, $val);
     }
 }
