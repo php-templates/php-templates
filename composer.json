@@ -3,7 +3,7 @@
     "license": "MIT",
     "description": "Php templating engine",
     "keywords": ["php", "templates"],
-    "homepage": "https://github.com/florin-botea/php-templates",
+    "homepage": "https://github.com/php-templates/php-templates",
     "authors": [
         {
             "name": "Florin Botea",
@@ -17,6 +17,7 @@
         }
     },
     "require": {
-        "nikic/php-parser": "^4.15"
+        "nikic/php-parser": "^4.15",
+        "php-templates/dom-parser": "^1.0"
     }
 }
