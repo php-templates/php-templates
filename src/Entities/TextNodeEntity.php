@@ -2,6 +2,8 @@
 
 namespace PhpTemplates\Entities;
 
+use function PhpTemplates\enscope_variables;
+
 class TextNodeEntity extends SimpleNodeEntity
 {
     /**
@@ -34,7 +36,7 @@ class TextNodeEntity extends SimpleNodeEntity
 
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
-                $eval = $eval;
+                $eval = enscope_variables($eval);
                 return "<?php e($eval); ?>";
             }
             return '';
@@ -42,7 +44,7 @@ class TextNodeEntity extends SimpleNodeEntity
 
         $html = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
             if ($eval = trim($m[1])) {
-                $eval = $eval;
+                $eval = enscope_variables($eval);
                 return "<?php echo $eval; ?>";
             }
             return '';
@@ -51,7 +53,7 @@ class TextNodeEntity extends SimpleNodeEntity
         // custom tags
         return preg_replace_callback("/{(\w+) (((?!{(\w+) ).)*)}/", function($m) {
             // todo check if method exist, throw error if not
-            return '<?php echo $this->'.$m[1].'('.trim($m[2]).'); ?>';
+            return '<?php echo $this->'.$m[1].'('.enscope_variables(trim($m[2])).'); ?>';
         }, $html);
     }
 }

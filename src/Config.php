@@ -3,8 +3,8 @@
 namespace PhpTemplates;
 
 use Exception;
-use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\PhpNodes\PhpNode;
+use PhpDom\Contracts\DomNodeInterface as DomNode;
+use PhpTemplates\Dom\PhpNode;
 
 class Config
 {
@@ -133,10 +133,7 @@ class Config
                     }
                 }
                 $phpnode = new PhpNode($statement, $args);
-                $phpnode->indentStart = $node->indentStart;
-                $phpnode->indentEnd = $node->indentEnd;
-
-                $node->parentNode->insertBefore($phpnode, $node);
+                $phpnode->insertBefore($node);
                 $phpnode->appendChild($node->detach());
             };
         }

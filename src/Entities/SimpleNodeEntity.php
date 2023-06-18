@@ -2,13 +2,13 @@
 //todo remove fn src closure
 namespace PhpTemplates\Entities;
 
+use PhpTemplates\Parser;
 use PhpTemplates\Closure;
+use PhpDom\DomNode;
 use PhpTemplates\Source;
 
-class SimpleNodeEntity extends AbstractEntity
+class SimpleNodeEntity extends Entity
 {
-    protected $attrs = [];
-
     /**
      * <tpl><div></div></tpl>
      */
@@ -23,8 +23,8 @@ class SimpleNodeEntity extends AbstractEntity
     public function simpleNodeContext()
     {
         $data = $this->depleteNode($this->node);
-        foreach ($this->node->childNodes as $slot) {
-            $this->parser->make($slot, $this)->parse();
+        foreach ($this->node->getChildNodes() as $slot) {
+            $this->child($slot)->parse();
         }
 
         $data->addToNode($this->node);
@@ -46,8 +46,8 @@ class SimpleNodeEntity extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $data->addToNode($this->node);
 
-        foreach ($this->node->childNodes as $cn) {
-            AbstractEntity::make($cn, $this, $this->process)->parse();
+        foreach ($this->node->getChildNodes() as $cn) {
+            $this->child($cn)->parse();
         }
     }
 
@@ -64,18 +64,7 @@ class SimpleNodeEntity extends AbstractEntity
      */
     public function startupContext()
     {
-
         $this->simpleNodeContext();
-
-        /** @var StartupEntity */
-        $context = $this->context;
-        if ($name = $context->getName()) {
-            $fnSrc = (string)$this->buildTemplateFunction($this->node);
-
-            $fn = Closure::fromSource(new Source($fnSrc, ''), 'namespace PhpTemplates;');
-
-            $this->cache->set($context->getName(), $fn, new Source($fnSrc, ''));
-        }
     }
 
     /**

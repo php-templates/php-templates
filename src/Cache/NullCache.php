@@ -2,11 +2,12 @@
 
 namespace PhpTemplates\Cache;
 
+use PhpTemplates\Contracts\Cache;
 use PhpTemplates\View;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Source;
 
-class NullCache extends FileSystemCache implements CacheInterface
+class NullCache extends FileSystemCache
 {
     public function __construct() {
         $this->storePath = sys_get_temp_dir();
