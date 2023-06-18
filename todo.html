@@ -1,0 +1,69 @@
+done(untested) todo bigfix daca  e eroare sintaxa refuza sa dea refresh comp
+done each file should return new class, error if extending anything
+done support use stmt
+
+done - big bug fix i ++ in foreach nu va merge...
+todo: v.1.1
+performance improvement by using string concat return instead of ob-start
+done - lazy share
+done - posibilitate adaugare tag uri custom, ca sa pot avea ceva de genul {t Ce mai faci}
+solve indent
+toate erorile thrown trb sa aiba indicatie spre t.php file, un comment cv.. ca la twig
+slot in slot with empty slot should not reset
+bind slots
+butter node parser using preg offset
+events as classes path support, no, better .. event *
+throw parse error, line unexpected " or ' or
+done - registry
+data set on registry should not be overriden
+file loader with exists method
+support for view->make() in rendering event
+throw error if not closing @php @endphp
+config throw error if directive not exists
+configure parser to auto close tags without throwing errors
+indent nu merge ok la func, php etc
+domnodeattribute implements domnoneattrinterface
+done - bug ">{% $slot->render([]); %}</t nu a fost evaluat ca php..
+new slot scope data destructuring function on p-scope="['x' => $x]"
+
+rename context to scope 
+se pot destructura assoc array, ca idee pt scoped slots data 
+do not parse if templ fn exists
+FormGroup extends Class {
+  props {} nu pot fi directe, ca altfel nu pot controla accesul la ele
+  data nu poate fi decat in context separat, si accesat cu this.context.get, altfel daca se definesc chestii publice, risc sa pierd controlul asupra lor 
+  
+  data(data) { trb sa faca un return, nu un set, alt_el nu pot controla accesul
+  
+  }
+  tagNameOfTag() {
+  
+  }
+  composerNameOfComposer() {
+  
+  }
+  data():array => processed
+  
+  ... 
+  final get () _attrs protected
+  ...
+ final render() 
+   template()
+   {
+    div^
+    Loop(fn {
+      this->context.x
+    })
+  }
+  
+  final setdata()
+  called before data, setting data in functie de props
+  data trb sa contina tot, props sunt optionale, altfel se umple attrs cu toate. attrs trb sa tina valorile originale
+  pe data raman toate, restul se duce in _attrs, care e privata si nu e pe scope, ci ramane pe componenta si e accesibila cu this.attrs()
+}
+
+
+<FormGroup>
+  <slot p-scope="['foo' => $bar]"></slot>
+</FormGroup>
+

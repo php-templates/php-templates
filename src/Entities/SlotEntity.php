@@ -2,20 +2,22 @@
 
 namespace PhpTemplates\Entities;
 
-use PhpTemplates\Dom\DomNode;
-use PhpTemplates\Dom\PhpNodes\PhpNode;
+use PhpDom\DomNode;
+use PhpTemplates\Parser;
+use PhpTemplates\Dom\PhpNode;
+use PhpTemplates\Dom\WrapperNode;
 use PhpTemplates\Registry;
 
-class SlotEntity extends AbstractEntity
+class SlotEntity extends Entity
 {
-    protected $attrs = ['name' => 'default', 'slot' => 'default'];
+    protected array $attrs = ['name' => 'default', 'slot' => 'default'];
     private $hasSlotDefault;
     
-    public function __construct(Registry $registry, DomNode $node, AbstractEntity $context)
+    public function __construct(Parser $parser, DomNode $node, Entity $context)
     {
-        parent::__construct($registry, $node, $context);
+        parent::__construct($parser, $node, $context);
         
-        $this->hasSlotDefault = count($this->node->childNodes) > 0;
+        $this->hasSlotDefault = $this->node->getChildNodes()->count() > 0;
     }
 
     /**
@@ -26,22 +28,22 @@ class SlotEntity extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $dataString = $data->toArrayString();
 
-        $this->node->changeNode('#slot'); // prevent rendering the node as it is
+        $this->node = $this->replaceNode($this->node, new WrapperNode);
         if ($this->hasSlotDefault) {
-            $wrapperDefault = new DomNode('#slot');
-            foreach ($this->node->childNodes as $cn) {
+            $wrapperDefault = new DomNode('tpl');
+            foreach ($this->node->getChildNodes() as $cn) {
                 $wrapperDefault->appendChild($cn->detach());
             }
             $this->node->appendChild($wrapperDefault);
             $if = sprintf('empty($this->slots("%s"))', $this->attrs['name']);
             $wrapperDefault->setAttribute('p-if', $if);
 
-            $this->parser->make($wrapperDefault, $this->context)->parse();
+            $this->child($wrapperDefault)->parse();
         }
 
         $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $slot');
         $r = '$slot->render(' . $dataString . ')';
-        $append->appendChild(new DomNode('#php', '<?php ' . $r . '; ?>'));
+        $append->appendChild(new PhpNode('', $r));
         $this->node->appendChild($append);
     }
 
@@ -59,11 +61,11 @@ class SlotEntity extends AbstractEntity
         $data = $this->depleteNode($this->node);
         $dataString = $data->toArrayString();
 
-        $this->node->changeNode('#slot'); // prevent rendering the node as it is
+        $this->node = $this->replaceNode($this->node, new WrapperNode); // prevent rendering the node as it is
 
         $append = new PhpNode('if', '$this->slots("' . $this->attrs['name'] . '")');
         $assign = sprintf('$this->comp["%s"]->setSlot("%s", $this->slots("%s"))', $this->context->getId(), $this->attrs['slot'], $this->attrs['name']);
-        $append->appendChild(new DomNode('#php', '<?php ' . $assign . '; ?>'));
+        $append->appendChild(new PhpNode('', $assign));
         $this->node->appendChild($append);        
     }
 
@@ -80,7 +82,7 @@ class SlotEntity extends AbstractEntity
      */
     public function anonymousContext()
     {
-        $this->simpleNodeContext();
+        $this->simpleNodeContext($parser);
     }
 
     /**

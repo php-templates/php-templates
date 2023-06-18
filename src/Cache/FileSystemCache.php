@@ -3,19 +3,18 @@
 namespace PhpTemplates\Cache;
 
 use PhpTemplates\Source;
-use PhpTemplates\Registry;
+use PhpTemplates\Contracts\Cache;
 use PhpTemplates\View;
+use PhpTemplates\ParsingTemplate;
 
-class FileSystemCache implements CacheInterface
+class FileSystemCache implements Cache
 {
-    protected $registry;
     protected $storePath;
     protected $store = [];
     protected $source = [];
 
-    public function __construct(Registry $registry, $storePath)
+    public function __construct(string $storePath)
     {
-        $this->registry = $registry;
         $this->storePath = $storePath;
     }
 
@@ -32,37 +31,26 @@ class FileSystemCache implements CacheInterface
         return require($file);
     }
 
-    public function has(string $key): ?array
+    public function yyyhadhs(string $key): ?array
     {
         return $this->store[$key] ?? null;
     }
 
-    public function set(string $key, \Closure $fn = null): void
+    public function yyyset(string $key, \Closure $fn = null): void
     {
         $this->store[$key] = $fn;
     }
-    
-    public function registerTemplate(string $key, Source $source): void
-    {
-        $this->source[$key] = (string) $source;
-        $this->dependencies[] = $source->getFile();
-    }
-// legacy
-    public function jget(string $key): callable
-    {
-        return $this->store[$key];
-    }
 
-    public function write(string $key)
+    public function remember(ParsingTemplate $template): void
     {
-        $path = $this->getFilePath($key);
+        $path = $this->getFilePath($template->getName());
 
         if (!is_dir($this->storePath)) {
             mkdir($this->storePath, 0777, true);
         } else {
             chmod($this->storePath, 0777);
         }
-        
+dd($template->defineClass());
         $namespace = 'PHPT_' . uniqid();
 
         $tpl = '<?php ';
@@ -98,7 +86,7 @@ class FileSystemCache implements CacheInterface
 
         file_put_contents($path, $tpl);
         
-        return require($path);
+        require_once($path);
     }
 
     protected function getFilePath(string $key)

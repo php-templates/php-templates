@@ -2,6 +2,12 @@
 
 namespace PhpTemplates;
 
+use PhpParser\NodeDumper;
+use PhpParser\ParserFactory;
+use PhpParser\BuilderFactory;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\PrettyPrinter;
+
 /**
  * Echo escaped string
  *
@@ -102,4 +108,34 @@ function arr_except(array $arr, $except) {
     }
     
     return $arr;
+}
+
+/**
+ * Make all variables from input source code to refer to $this->scope
+ */
+function enscope_variables(string $str): string
+{
+    $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
+    $asts = $parser->parse("<?php $str;");   
+    $r = function ($ast) use (&$r) 
+    {
+        if (isset($ast->name) && is_string($ast->name)) {
+            $ast->name = 'this->scope->' . $ast->name;
+        }
+          
+        if (! is_iterable($ast) && ! $ast instanceof \PhpParser\Node) {
+           return;
+        }
+
+        foreach ($ast as $ast) {
+            $r($ast);
+        }
+    };
+    $r($asts);
+
+    $prettyPrinter = new PrettyPrinter\Standard;
+    $result = $prettyPrinter->prettyPrint($asts);
+    $result = rtrim($result, ';');
+    
+    return $result;
 }
