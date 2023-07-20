@@ -6,6 +6,6 @@
 <div>
     cases2::Hi there, admin
     cases2::Hi there, admin. Cookies?
-    ::Hi there1, admin
+    default::Hi there1, admin
 </div>
-::Hi there2, admin
+default::Hi there2, admin

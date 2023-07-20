@@ -9,14 +9,11 @@ use PhpTemplates\Source;
 
 class SimpleNodeEntity extends Entity
 {
-    /**
-     * <tpl><div></div></tpl>
-     */
-    public function anonymousContext()
+    public function startupContext() 
     {
-        return $this->simpleNodeContext();
+        $this->simpleNodeContext();
     }
-
+    
     /**
      * <div><div></div></div>
      */
@@ -24,7 +21,7 @@ class SimpleNodeEntity extends Entity
     {
         $data = $this->depleteNode($this->node);
         foreach ($this->node->getChildNodes() as $slot) {
-            $this->child($slot)->parse();
+            $this->child($slot)->simpleNodeContext();
         }
 
         $data->addToNode($this->node);
@@ -47,7 +44,7 @@ class SimpleNodeEntity extends Entity
         $data->addToNode($this->node);
 
         foreach ($this->node->getChildNodes() as $cn) {
-            $this->child($cn)->parse();
+            $this->child($cn)->simpleNodeContext();
         }
     }
 
@@ -58,24 +55,4 @@ class SimpleNodeEntity extends Entity
     {
         $this->simpleNodeContext();
     }
-
-    /**
-     * <div></div> -> when we call template->makeRaw('<div></div>');
-     */
-    public function startupContext()
-    {
-        $this->simpleNodeContext();
-    }
-
-    /**
-     * Never reached
-     */
-    public function textNodeContext()
-    {}
-
-    /**
-     * Never reached
-     */
-    public function verbatimContext()
-    {}
 }

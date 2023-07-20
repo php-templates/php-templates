@@ -1,16 +1,10 @@
 
-@php  
-$this->addSlot('default', new Slot($this, function() {
-    if (!empty($slot->y)) {
-     echo $slot->y;
-    }
-}));
-$val = 'val';
-@endphp
+{% $this->addSlot('default', function() { echo func_get_arg(0)['y'] ?? ''; }, $this); %}
+{% $val = 'val'; %}
 
 <tpl is="comp/x">{{ $val }}
   <tpl is="comp/x">
-      {{ $val }}
+      <tpl slot="default">{{ $val }}</tpl>
       <span slot="s2"></span>
   </tpl>
 </tpl>
@@ -28,10 +22,13 @@ $val = 'val';
 
 -----
 
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl p-if="1" slot="s2">{{ $slot->i }}</tpl>
-  <span slot="s2"></span>
+{% $val = 'val'; %}
+<tpl is="comp/x">
+  <tpl slot="default">{{ $val }}</tpl>
+  <tpl slot="s2" p-scope="$slot">
+      <tpl p-if="1">{{ $slot['i'] }}</tpl>
+      <span></span>
+  </tpl>
 </tpl>
 =====
 <x>
@@ -44,14 +41,15 @@ $val = 'val';
 
 -----
 
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <tpl extends="comp/x">{{ $val }}</tpl>
+{% $val = 'val'; %}
+<tpl is="comp/x">
+  <tpl slot="default">
+    <tpl extends="comp/x">{{ $val }}</tpl>
+  </tpl>
   <tpl slot="s2"></tpl>
 </tpl>
 =====
 <x>
-    val
     <x>
         val
         s2-default 1
@@ -61,9 +59,12 @@ $val = 'val';
 
 -----
 
-@php $val = 'val'; @endphp
-<tpl is="comp/x">{{ $val }}
-  <slot>{{ $val }}</slot>
+{% $val = 'val'; %}
+<tpl is="comp/x">
+  <tpl slot="default">
+      {{ $val }}
+      <slot>{{ $val }}</slot>
+  </tpl>
 </tpl>
 =====
 <x>
@@ -74,7 +75,7 @@ $val = 'val';
 
 -----
 
-@php $val = 'val'; @endphp
+{% $val = 'val'; %}
 <tpl is="comp/x">{{ $val }}
   <tpl p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
   <tpl extends="comp/x" p-else>{{ $val }}</tpl>

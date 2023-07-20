@@ -2,6 +2,9 @@
 
 namespace PhpTemplates\Contracts;
 
+use PhpTemplates\TemplateClassDefinition;
+use PhpDom\Contracts\DomElementInterface as DomElement;
+
 interface EventDispatcher
 {
     /**
@@ -12,13 +15,8 @@ interface EventDispatcher
      * @param DomNode $template - template instance
      * @return void
      */
-    public function trigger(string $ev, string $name, $template);
-    
-    /**
-     * alias to on()
-     */
-    public function event(string $ev, string $name, $template);
-
+    public function trigger(string $ev, string $name, DomElement $node, TemplateClassDefinition $classDefinition);
+        
     /**
      * Add event listener to given process
      *
@@ -28,5 +26,9 @@ interface EventDispatcher
      * @param integer $weight - weighter callbacks are executed first
      * @return void
      */
-    public function on(string $ev, $name, callable $cb, $weight = 0);
+    public function on(string $ev, $name, $cb, $weight = 0);
+    
+    public function parsing($name, $cb, $weight = 0);
+    public function parsed($name, $cb, $weight = 0);
+    public function rendering($name, $cb, $weight = 0);
 }

@@ -1,13 +1,5 @@
-@php
-$headings = [
-    'id' => 'ID',
-    'name' => 'Name'
-];
-$data = [
-    ['id' => 67, 'name' => 'Mango'],
-    ['id' => 32, 'name' => 'Potatos'],
-];
-@endphp
+{% $headings = ['id' => 'ID', 'name' => 'Name'] %}
+{% $data = [['id' => 67, 'name' => 'Mango'],['id' => 32, 'name' => 'Potatos']] %}
 
 <div class="table-wrapper">
     <table>

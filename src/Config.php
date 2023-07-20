@@ -123,12 +123,12 @@ class Config
     private function addDefaultDirectives()
     {
         $cfg = $this;
-        $controlStructures = ['if', 'elseif', 'else', 'foreach'];
+        $controlStructures = ['if', 'elseif', 'else', 'foreach', 'for', 'while'];
 
         foreach ($controlStructures as $statement) {
             $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
                 if (in_array($statement, ['elseif', 'else'])) {
-                    if (!$node->prevSibling || !in_array(str_replace('#php-', '', $node->prevSibling->nodeName), ['if', 'elseif'])) {
+                    if (!$node->getPrevSibling() || !in_array($node->getPrevSibling()->getNodeName(), ['<?php if', '<?php elseif'])) {
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
                     }
                 }
@@ -139,15 +139,15 @@ class Config
         }
 
         $cfg->setDirective('checked', function (DomNode $node, string $val) {
-            $node->addAttribute('p-raw', $val . ' ? "checked" : ""');
+            $node->setAttribute('p-raw', $val . ' ? "checked" : ""');
         });
 
         $cfg->setDirective('selected', function (DomNode $node, string $val) {
-            $node->addAttribute('p-raw', $val . ' ? "selected=\"selected\"" : ""');
+            $node->setAttribute('p-raw', $val . ' ? "selected=\"selected\"" : ""');
         });
 
         $cfg->setDirective('disabled', function (DomNode $node, string $val) {
-            $node->addAttribute('p-raw', $val . ' ? "disabled" : ""');
+            $node->setAttribute('p-raw', $val . ' ? "disabled" : ""');
         });
     }
 
@@ -308,7 +308,7 @@ class Config
             $this->helpers[$name] = $fn;
             return;
         }
-        
+
         if (isset($this->helpers[$name])) {
             return $this->helpers[$name];
         }

@@ -10,6 +10,7 @@ use PhpParser\ParserFactory;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
+use PhpTemplates\InvalidNodeException;
 use function PhpTemplates\enscope_variables;
 
 class AttributePack
@@ -39,18 +40,14 @@ class AttributePack
             $isBind = strpos($attr->getName(), ':') === 0;
             $k = ltrim($attr->getName(), ' :');
             $val = $attr->getValue();
-            
+
             if ($isBind || strpos($k, 'p-') === 0) {
-                try {
-                    $val = enscope_variables($val);
-                } catch (\Throwable $e) {
-                    dd($e);
-                }
+                $val = $this->getEnscopedAttrValue($attr);
             }
             
             if ($k == 'p-raw') {
                 $val = "<?php echo $val; ?>";
-                $attrs[$val] = '';
+                $attrs[$val] = null;
             }
             elseif ($k == 'p-bind') {
                 // collect separate p-bind to treat them ignoring existing attrs
@@ -58,18 +55,24 @@ class AttributePack
             }
             elseif ($k == 'class') {
                 if ($isBind && strpos($val, '[') === 0) {
-                    $val = "<?php e(resolve_class($val)); ?>";
+                    $val = "<?php \$this->__e(\$this->__resolveClass($val)); ?>";
                 } 
                 elseif ($isBind) {
-                    $val = "<?php e($val); ?>";
+                    $val = "<?php \$this->__e($val); ?>";
                 }
                 else {
                     $val = $this->evaluateTags($val);
                 }
-                $attrs[$k] = trim(($attrs[$k] ?? '') .' '. $val);
+                
+                if (isset($attrs[$k])) {
+                    $attrs[$k] .= ' '. $val;
+                }
+                else {
+                    $attrs[$k] = $val;
+                }
             } 
             elseif ($isBind) {
-                $attrs[$k] = "<?php e($val); ?>";
+                $attrs[$k] = "<?php \$this->__e($val); ?>";
                 $excludes[] = $k;
             }
             else {
@@ -78,17 +81,18 @@ class AttributePack
                 $excludes[] = $k;
             }
         }
-       
+
         foreach ($attrs as $k => $val) {
             $node->setAttribute($k, $val);
         }
+        
         $excludes = "['" . implode("','", $excludes) . "']";
         if (count($binds) > 1) {
             $binds = 'array_merge(' . implode(', ', $binds) . ')';
-            $node->setAttribute("<?php e_bind($binds, $excludes); ?>");
+            $node->setAttribute("<?php \$this->__eBind($binds, $excludes); ?>");
         }
         elseif ($binds) {
-            $node->setAttribute("<?php e_bind($binds[0], $excludes); ?>");
+            $node->setAttribute("<?php \$this->__eBind($binds[0], $excludes); ?>");
         }
     }
 
@@ -114,7 +118,7 @@ class AttributePack
             }
             elseif ($k == 'class') {
                 if ($isBind && strpos($val, '[') === 0) {
-                    $val = "resolve_class($val)";
+                    $val = "t\\resolve_class($val)";
                 } 
                 elseif (!$isBind) {
                     $val = "'$val'";
@@ -143,10 +147,10 @@ class AttributePack
         $excludes = "['" . implode("','", $excludes) . "']";
         if (count($binds) > 1) {
             $binds = 'array_merge(' . implode(', ', $binds) . ')';
-            $result[] = "arr_except($binds, $excludes)";
+            $result[] = "\$this->__arrExcept($binds, $excludes)";
         }
         elseif ($binds) {
-            $result[] = "arr_except($binds[0], $excludes)";
+            $result[] = "\$this->__arrExcept($binds[0], $excludes)";
         }
         if (count($result) > 1) {
             return "array_merge(" . implode(',', $result) . ")";
@@ -157,7 +161,14 @@ class AttributePack
     
     private function evaluateTags($val) 
     {
-        $val = preg_replace('/{{(((?!{{).)*)}}/', '<?php e($1); ?>', $val);
+        if (is_null($val)) {
+            return null; // do not alterate null to ''
+        }
+        
+        $val = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
+            return '<?php $this->__e('. enscope_variables($m[1]) .'); ?>';
+        }, $val);
+        // todo
         return $val;
         // custom tags
         $t = $this->config->getCustomTags();
@@ -169,5 +180,15 @@ class AttributePack
             $fn = $this->config->customTag($m[1]);
             return $fn($this->config, trim($m[2]));
         }, $val);
+    }
+    
+    private function getEnscopedAttrValue($attr) 
+    {
+        $val = $attr->value;
+        try {
+            return enscope_variables($val);
+        } catch (\Throwable $e) {
+            throw new InvalidNodeException("Error trying to evaluate the syntax '{$val}': ". $e->getMessage(), $attr);
+        }
     }
 }

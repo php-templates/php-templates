@@ -1,6 +1,4 @@
-@php
-    $var = 0;
-@endphp
+{% $var = 0 %}
 
 <input type="checkbox" p-checked="1>$var">
 =====

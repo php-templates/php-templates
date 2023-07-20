@@ -7,7 +7,7 @@
 
 <?php
 
-return new class
+return new class extends PhpTemplates\Parsed\View
 {
     public function doSomethingElse() {
         return $this->cfgKey().':doSomethingElse';

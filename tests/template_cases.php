@@ -2,17 +2,29 @@
 
 require('../autoload.php');
 
-use PhpTemplates\Template;
-use PhpTemplates\Dom\DomNodeAttr;
+?>
+<style>
+    body {
+        background: black;
+        color: gray;
+    }
+</style>
+<?php
+
+use PhpTemplates\TemplateFactory;
+use PhpTemplates\Cache\FileSystemCache;
+use PhpTemplates\EventDispatcher;
+use PhpDom\DomNodeAttr;
+use PhpDom\TextNode;
 
 //header("Content-Type: text/plain");
-$viewFactory = new Template(__DIR__, __DIR__.'/results');
+$viewFactory = new TemplateFactory(__DIR__, __DIR__.'/results', new EventDispatcher());
 //$cfgHolder = $viewFactory->getConfig();
 
-$cfg = $viewFactory->getConfig();
-$eventHolder = $viewFactory->getEventHolder();
+$cfg = $viewFactory->config();
+$eventHolder = $viewFactory->event();
 $eventHolder->on('parsing', 'cases2:cfg2-3', function($node) {
-    $node->querySelector('div')->appendChild('text');
+    $node->querySelector('div')->appendChild(new TextNode('text'));
 });
 
 $cfg->setAlias([
@@ -36,7 +48,7 @@ $cfg->helper('doSomethingCommon', function($t, $x) {
 $cfg = $cfg->subconfig('cases2', __DIR__.'/cases2/');
 $cfg->setAlias('x-form-group', 'cases2:components/form-group');
 $cfg->setDirective('mydirective', function($node, $val) {
-    $node->addAttribute(new DomNodeAttr('mydirective', 2));
+    $node->setAttribute(new DomNodeAttr('mydirective', 2));
 });
 $cfg->helper('doSomething', function($t) {
     return $t->cfgKey().':doSomething';
@@ -85,7 +97,7 @@ foreach($files as $f) {
     ob_start();
     $data = [];
     try {
-        $view = $viewFactory->make($rfilepath);
+        $view = $viewFactory->fromPath($rfilepath);
         $view->render();
         $results = ob_get_clean();
     } catch(Exception $e) {
@@ -121,4 +133,4 @@ foreach($files as $f) {
     unlink($file);
 }
 
-$viewFactory->makeRaw('<x-form-group type="text" name="y"/>')->render();
+$viewFactory->fromRaw('<x-form-group type="text" name="y"/>')->render();

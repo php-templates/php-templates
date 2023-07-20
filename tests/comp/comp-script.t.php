@@ -5,12 +5,14 @@
 <script>execution</script>
 
 <?php 
-return new class
+return new class extends PhpTemplates\Parsed\View
 {
-    public function parsing($dom, $registry) {//d($registry);
-        $script2 = $dom->querySelector('script')->detach();
-        $registry->data['head'][] = '<script src="cdn">cdn script</script>';
-        $registry->data['footer'][] = $script2;
+    public function parsing($dom) {
+        $script = $dom->querySelector('script')->detach();
+        
+        \PhpTemplates\Event::once('parsed', 'temp/comp-script', function($dom) use($script) {
+            $dom->querySelector('head')->appendChild($script);
+        });
     }
 }
 ?>

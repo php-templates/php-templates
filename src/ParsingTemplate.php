@@ -3,7 +3,7 @@
 namespace PhpTemplates;
 
 use PhpDom\Source;
-use PhpDom\Contracts\DomNodeInterface as DomNode;
+use PhpDom\Contracts\DomElementInterface as DomNode;
 use PhpTemplates\Parsed\View;
 use PhpDom\Parser as DomParser;
 use PhpParser\NodeDumper;
@@ -19,17 +19,19 @@ class ParsingTemplate
     private Config $config;
     private DomNode $node;
     private $obj;
+    private $classDefinition;
     private string $code = '<?php return new class extends View {};';
     
     public function __construct(string $name, ?string $file, ?string $html, Config $config)
-    {
-        $this->name = $name;
+    {// todo setup from name?
+        [$this->name, $this->config] = $this->parsePath($name, $config);
         $this->file = $file;
         $this->html = $html;
-        $this->config = $config;
-        
+        $this->obj = new class extends View {};
+
         # init
         $this->node = $this->getDomNode();//$this->setAstObject();
+        //strpos($name, 'orm-gr') && print_r('->->->'.$this->node."");
     }
     
     public function getDomNode(): DomNode
@@ -52,23 +54,13 @@ class ParsingTemplate
             return $this->file;        
         }
         
-        if (strpos($this->name, ':') !== false) 
-        {
-            list($cfgkey, $this->name) = explode(':', $this->name);
-            $this->config = $this->config->getRoot()->find($cfgkey);
-        }
-
-        // called from subconfig, with hint lease
-        $path = $this->name;
-        if (!$this->config->isDefault()) {
-            $this->name = $config->getName() . ':' . $this->name;
-        }        
-        
+        $file = explode(':', $this->name);
+        $file = end($file);
         # find file
         // try to find file on current config, else try to load it from default config
         $srcFile = null;
         foreach ($this->config->getPath() as $srcPath) {
-            $filepath = rtrim($srcPath, '/') . '/' . $path . '.t.php';
+            $filepath = rtrim($srcPath, '/') . '/' . $file . '.t.php';
             if (file_exists($filepath)) {
                 $this->file = $filepath;
                 break;
@@ -79,7 +71,7 @@ class ParsingTemplate
         // file not found in any2 config
         if (! $this->file) {
             $pf = $this->config->isDefault() ? $this->config->getName() . ':' : '';
-            throw new TemplateNotFoundException("View file '". $pf . $rfilepath ."' not found");
+            throw new TemplateNotFoundException("View file '". $pf . $this->name ."' not found");
         }
 
         return $this->file;        
@@ -114,11 +106,35 @@ class ParsingTemplate
         return $this->html;        
     }
     
+    private function parsePath(string $name, Config $config)
+    {
+        if (strpos($name, ':') !== false) 
+        {
+            list($cfgkey, $name) = explode(':', $name);
+            $config = $config->getRoot()->find($cfgkey);
+        }
+
+        if (! $config->isDefault()) {
+            $name = $config->getName() . ':' . $name;
+        }
+        
+        return [$name, $config];
+    }
+    
     public function getCode(): string
     {
         $this->getHtml();
         
         return $this->code;
+    }
+    
+    public function getClassDefinition() 
+    {
+        if (! $this->classDefinition) {
+            $this->classDefinition = (new PhpParser())->parse($this);
+        }
+        
+        return $this->classDefinition;
     }
     
     protected function sgfgghetAstObject()
@@ -161,7 +177,7 @@ class ParsingTemplate
         
         $this->ast = $ast;
         $ast->name = 'PHPT_' . str_replace('/', '_', $this->name);// todo replace non alfanum
-        $ast->extends = new FullyQualified(['PhpTemplates', 'Parsed', 'View']);
+        $ast->extends = new FullyQualified(['PhpTemplates', 'Parsed', '_View']);
 
         foreach ($ast->stmts as $i => $stmt) {
             if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {

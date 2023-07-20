@@ -9,7 +9,7 @@
     </tpl>
 </div>
 <?php
-return new class
+return new class extends PhpTemplates\Parsed\View
 {
     public function doSomethingElse() {
         return $this->cfgKey().':doSomethingElse';
@@ -17,13 +17,13 @@ return new class
 }; ?>
 =====
 <div>
-    <div>:doSomething</div>
-    <div>:doSomethingElse</div>
-    <div>:doSomethingCommonWith 1</div>
+    <div>default:doSomething</div>
+    <div>default:doSomethingElse</div>
+    <div>default:doSomethingCommonWith 1</div>
     <div>
-        <div>:doSomething</div>
-        <div>:doSomethingElse</div>
-        <div>:doSomethingCommonWith 2</div>
+        <div>default:doSomething</div>
+        <div>default:doSomethingElse</div>
+        <div>default:doSomethingCommonWith 2</div>
         cases2:doSomething
         cases2:doSomethingElse
         cases2:doSomethingCommonWith 3

@@ -27,10 +27,9 @@ class PhpParser
     public function parse(ParsingTemplate $template): TemplateClassDefinition
     {
         $code = $template->getCode();
-        
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
         $asts = $parser->parse($code);
-
+        
         $ast = null;
         $uses = [];
         foreach ($asts as $_ast) {
@@ -55,7 +54,7 @@ class PhpParser
         
         $ast = $ast->expr->class;
         
-        $ast->name = 'PHPT_' . str_replace('/', '_', $template->getName());// todo replace non alfanum
+        $ast->name = 'PHPT_' . preg_replace('/[^A-Za-z0-9]/', '_', $template->getName() . '_' . uniqid());// todo replace non alfanum
 
         foreach ($ast->stmts as $i => $stmt) {
             if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
@@ -71,13 +70,9 @@ class PhpParser
         if (strpos($name, ':')) {
             list($config) = explode(':', $name);
         }
-        $prop = $factory->classConst('config', $config);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('name', $name);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('file', $source->getFile());
-        array_unshift($ast->stmts, $prop->getNode());
+
  */
+ 
         return new TemplateClassDefinition($ast, $uses);
     }
 }

@@ -1,4 +1,4 @@
-@php
+{%
 if (!empty($name)) {
     $error = isset($error) ? $error : ($errors ? $errors->first($name) : null);
     if ($formModel && !isset($_data['value'])) {
@@ -13,7 +13,7 @@ if (!empty($name)) {
         }, explode('.', $name)))
     }
 }
-@endphp
+%}
 
 <tpl p-if="isset($multilang)" is="bootstrap:forms/form-group" p-bind="$_context->all()">
   <span p-foreach="$languages as $lang" :class="'lang lang-'.$lang['value']">
