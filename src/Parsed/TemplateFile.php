@@ -59,6 +59,7 @@ class TemplateFile
         });
 
         $nameToClassName = [];
+        $dependencyMap = [];
         foreach ($this->templates as $template) {
             $dependencyMap[] = $template->getFile();
             $nameToClassName[$template->getName()] = $template->getClassDefinition()->getFullName();
@@ -88,11 +89,12 @@ class TemplateFile
                 //$dependencies[$template['file']] = filemtime($template['file']);
             //}
         //}
-        //$tpl .= PHP_EOL . 'if (!check_dependencies(' . var_export($dependencies, true) . ')) { return false; }' . PHP_EOL;
 
 
      
         $tpl .= "namespace {\n";
+        $tpl .= "if (!\PhpTemplates\check_dependencies(". var_export($dependencies, true) .")) return false;\n";
+
 /*        
         $tpl .= "use PhpTemplates\\Parsed\\View as BaseView;\n";
         $tpl .= "use PhpTemplates\\Loop;\n";
