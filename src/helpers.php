@@ -24,7 +24,7 @@ function check_dependencies(array $files)
     }
     return true;
 }
-
+/*
 function parse_path(string $rfilepath, Config $config): array
 {
     $cfgkey = '';
@@ -44,7 +44,7 @@ function parse_path(string $rfilepath, Config $config): array
     $config = $config->getRoot()->find($cfgkey);
         
     return [$rfilepath, $config];
-}
+}*/
 
 /**
  * Make all variables from input source code to refer to $this->scope
