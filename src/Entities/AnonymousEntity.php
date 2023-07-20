@@ -9,15 +9,20 @@ use PhpTemplates\Dom\WrapperNode;
  */
 class AnonymousEntity extends Entity
 {
+    public function startupContext() {
+        $this->simpleNodeContext();
+    }
+    
     /**
      * <div><tpl>...</tpl></div>
      */
     public function simpleNodeContext()
     {
         $data = $this->depleteNode($this->node);
-        $this->node = $this->replaceNode($this->node, new WrapperNode);
+        $this->node->setNodeName('');
+
         foreach ($this->node->getChildNodes() as $cn) {
-            $this->child($cn)->parse();
+            $this->child($cn)->startupContext();
         }
         $data->addToNode($this->node);
     }
@@ -34,7 +39,7 @@ class AnonymousEntity extends Entity
         $wrapper->insertBefore($this->node);
         $wrapper->appendChild($this->node->detach());
 
-        $this->child($wrapper)->parse();
+        $this->child($wrapper)->startupContext();
     }
 
     /**
@@ -59,20 +64,5 @@ class AnonymousEntity extends Entity
     public function anonymousContext()
     {
         $this->simpleNodeContext();
-    }
-
-    /**
-     * never reached
-     */
-    public function textNodeContext()
-    {
-    }
-
-
-    /**
-     * never reached
-     */
-    public function verbatimContext()
-    {
     }
 }

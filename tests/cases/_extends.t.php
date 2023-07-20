@@ -1,5 +1,5 @@
 
-@php $val = 'val'; @endphp
+{% $val = 'val'; %}
 <tpl extends="comp/x">
   {{ $val }}
   <tpl is="comp/x">{{ $val }}</tpl>
@@ -18,7 +18,7 @@
 
 -----
 
-@php $val = 'valp'; @endphp
+{% $val = 'valp'; %}
 <tpl extends="comp/x">{{ $val }}
   <simplenode>{{ $val }}</simplenode>
 </tpl>
@@ -32,7 +32,7 @@
 
 -----
 
-@php $val = 'valp'; @endphp
+{% $val = 'valp'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl>{{ $val }}</tpl>
 </tpl>
@@ -46,7 +46,7 @@
 
 -----
 
-@php $val = 'valp'; @endphp
+{% $val = 'valp'; %}
 <tpl extends="comp/x">{{ $val }}textnode {{ $val }}</tpl>
 =====
 <x>
@@ -57,7 +57,7 @@
 
 -----
 
-@php $val = 'valp'; @endphp
+{% $val = 'valp'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl extends="comp/x">{{ $val }}</tpl>
 </tpl>
@@ -88,7 +88,7 @@
 
 -----
 
-@php $val = 'y'; @endphp
+{% $val = 'y'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl is="comp/x" p-if="2" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
   <simplenode p-elseif="0">{{ $val }}</simplenode>
@@ -113,7 +113,7 @@
 
 -----
 
-@php $val = 'val'; @endphp
+{% $val = 'val'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl is="comp/x" p-if="0">{{ $val }}</tpl>
   <simplenode p-elseif="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</simplenode>
@@ -130,7 +130,7 @@
 
 -----
 
-@php $val = 'val'; @endphp
+{% $val = 'val'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl is="comp/x" p-if="0">{{ $val }}</tpl>
   <simplenode p-elseif="0">{{ $val }}</simplenode>
@@ -146,7 +146,7 @@
 
 -----
 
-@php $val = 'v'; @endphp
+{% $val = 'v'; %}
 <tpl extends="comp/x">{{ $val }}
   <simplenode p-if="0">{{ $val }}</simplenode>
   <tpl p-elseif="1" p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>textnode {{ $val }}
@@ -161,7 +161,7 @@
 
 -----
 
-@php $val = 'l'; @endphp
+{% $val = 'l'; %}
 <tpl extends="comp/x">{{ $val }}
   <simplenode p-if="0">{{ $val }}</simplenode>
   <tpl p-elseif="0">{{ $val }}</tpl>textnode {{ $val }}
@@ -176,7 +176,7 @@
 
 -----
 
-@php $val = 'a'; @endphp
+{% $val = 'a'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl p-if="1" p-foreach="[1, 2] as $i" :class="$i">{{ $i }}</tpl>textnode {{ $val }}
   <tpl extends="comp/x">{{ $val }}</tpl>
@@ -195,7 +195,7 @@
 
 -----
 
-@php $val = 'h'; @endphp
+{% $val = 'h'; %}
 <tpl extends="comp/x">{{ $val }}
   <tpl p-if="0">{{ $val }}</tpl>
   <tpl extends="comp/x" p-else p-foreach="[1, 2] as $i" :class="$i">{{ $val }}</tpl>
@@ -219,7 +219,7 @@
 
 -----
 
-@php $val = 'val'; @endphp
+{% $val = 'val'; %}
 <tpl extends="comp/x">{{ $val }}textnode {{ $val }}
   <tpl extends="comp/x" p-if="0">{{ $val }}</tpl>
   <slot p-else>{{ $val }}</slot>

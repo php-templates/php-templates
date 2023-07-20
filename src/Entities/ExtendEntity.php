@@ -5,34 +5,26 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\Dom\DomNode;
+use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\Registry;
-
+use PhpTemplates\Contracts\Entity as EntityInterface;
+use PhpDom\Contracts\DomElementInterface as DomElement;
+// todo throw error if null name
 class ExtendEntity extends TemplateEntity
 {
-    protected $className;
+    protected string $className;
 
-    protected $attrs = [
+    protected array $attrs = [
         'template' => null,
         'is' => null,
         'extends' => null,
     ];
 
-
-    public function __construct(Registry $registry, DomNode $node, AbstractEntity $context)
+    public function __construct(DomElement $node, EntityInterface $context)
     {
-        $this->node = $node;
-        $this->context = $context;
-        $this->registry = $registry;
-        $this->id = uniqid();
-        
         $name = $node->getAttribute('extends');
-        
-        $template = $this->cache->has($name);
-        if (!$template) {
-            $template = $this->parseTemplate($name);
-        }
-        
-        $this->className = $template['class']->getName();
+        $node->setAttribute('is', $name);
+        parent::__construct($node, $context);
     }
 
     /**
@@ -43,22 +35,19 @@ class ExtendEntity extends TemplateEntity
         $data = $this->depleteNode($this->node);
         $dataString = $data->toArrayString(); // -> can t bind explicit data to extends, because it shares same context,…  use tpl instead…  so what… 
 
-        $nodeValue = sprintf(
-            '<?php $this->comp["%s"] = new %s($this->registry, $this->context->merge('.$dataString.')); ?>',
-            $this->id,
-            $this->className
-        );
-        $this->node->changeNode('#php', '');
-        $slots = $this->parseSlots($this->node);
-        $this->node->appendChild(new DomNode('#php', $nodeValue));
-
+        $this->node->setNodeName('');
+        $slots = $this->getValidSlots($this->node);
+        $this->node->appendChild(new PhpNode('', sprintf(
+            '$this->comp["%s"] = $this->make("%s", %s)->setScope($this->scope->merge('.$dataString.'))',
+            $this->id, $this->name, $dataString)));
+            
         foreach ($slots as $slot) {
             $this->node->appendChild($slot);
-            $this->parser->make($slot, new StartupEntity($this->getConfig()))->parse();
+            $this->child($slot)->templateContext();            
         }
 
-        $nodeValue = sprintf('<?php $this->comp["%s"]->render(); ?>', $this->id);
-        $this->node->appendChild(new DomNode('#php', $nodeValue));
+        $nodeValue = sprintf('$this->comp["%s"]->render()', $this->id);
+        $this->node->appendChild(new PhpNode('', $nodeValue));
     }
 
 // legacy

@@ -4,13 +4,19 @@ namespace PhpTemplates;
 
 use PhpTemplates\Contracts\EventDispatcher;
 use PhpTemplates\Contracts\Cache;
-use PhpTemplates\Context\SharedContext;
+use PhpTemplates\Scopes\SharedScope;
 use PhpTemplates\Source;
 use PhpTemplates\Config;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\Cache\NullCache;
+use PhpTemplates\Parsed\View;
+use PhpTemplates\Entities\StartupEntity;
+use PhpTemplates\Parsed\TemplateFile;
+use PhpTemplates\Entities\TemplateEntity;
+use PhpDom\DomNode;
 
 require_once(__DIR__.'/helpers.php');
+define('PHPT_ROOT', __DIR__);
 
 /**
  * new TemplateFactory(...)->fromFile()->render()
@@ -23,14 +29,14 @@ class TemplateFactory
     private array $composers = [];
 
     /**
-     * SharedContext data across all templates
+     * SharedScope data across all templates
      */
-    private SharedContext $sharedContext;
+    private SharedScope $shared;
 
     /**
      * Output cache destination path
      */
-    private Cache $cache;
+    private string $cachePath;
 
     /**
      * Parsing Config - default config
@@ -47,40 +53,66 @@ class TemplateFactory
      */
     private array $options = [];
 
-    public function __construct(string $sourceFolder, Cache $cache, EventDispatcher $event, array $options = [])
+    public function __construct(string $sourcePath, string $cachePath, EventDispatcher $event, array $options = [])
     {
-        $this->config = new Config('default', $sourceFolder);
-        $this->cache = $cache;
-        $this->event = $event;
+        $this->config = new Config('default', $sourcePath);
+        $this->cachePath = $cachePath;
         $this->options = $options;
-        $this->sharedContext = new SharedContext();
+        $this->shared = new SharedScope();
+        $this->event = $event;
+        
+        Event::boot($event);
+    }
+
+    /**
+     * Make template object from relative given path/template name
+     */
+    public function fromPath(string $name, array $data = [], array $slots = [], Config $config = null): View
+    {
+        $file = new TemplateFile($this->cachePath, $name);
+        //try { todo
+            $viewFactory = $file->load();
+        //} catch (\Throwable $e) {
+            //$viewFactory = null;
+        //}
+
+        if (!empty($this->options['debug']) || !$viewFactory) {
+            # parse start
+            $parsingTemplate = new ParsingTemplate($name, null, null, $config ?? $this->config);
+            (new StartupEntity($parsingTemplate, $file))->parse();
+           
+            $viewFactory = $file->write();
+        }
+        
+        return $viewFactory::new([], $this->shared, $this->config, $this->event)
+        ->make($name, $data)
+        ->setSlots($slots);
     }
 
     /**
      * Make a template object from raw string
      */
-    public function fromRaw(string $code, array $data = [], array $slots = [], Config $config = null): Template
+    public function fromRaw(string $code, array $data = [], array $slots = [], Config $config = null): View
     {
         $config = $config ?? $this->config;
-        $file = '';
         $name = md5($code);
 
-        try {
-            $viewFactory = $this->cache->get($name);
-        } catch (\Throwable $e) {
-            $viewFactory = null;
-        }
-        
+        $file = new TemplateFile($this->cachePath, $name);
+        //try { todo
+            $viewFactory = $file->load();
+        //} catch (\Throwable $e) {
+            //$viewFactory = null;
+        //}
+
         if (!empty($this->options['debug']) || !$viewFactory) {
             # parse start
-            $parsingTemplate = new ParsingTemplate($name, $file, $code, $config);
-            $parser = $this->getParser();
-            $parser->parse($parsingTemplate);
-            
-            $viewFactory = $this->cache->get($name);
+            $parsingTemplate = new ParsingTemplate($name, $name, $code, $config ?? $this->config);
+            (new StartupEntity($parsingTemplate, $file))->parse();
+           
+            $viewFactory = $file->write();
         }
-
-        return $viewFactory
+        
+        return $viewFactory::new([], $this->shared, $this->config, $this->event)
         ->make($name, $data)
         ->setSlots($slots);
     }
@@ -104,31 +136,6 @@ class TemplateFactory
             $parser = $this->getParser();
             $parser->parse($parsingTemplate);
             
-            $viewFactory = $this->cache->get($name);
-        }
-
-        return $viewFactory
-        ->make($name, $data)
-        ->setSlots($slots);
-    }
-
-    /**
-     * Make template object from relative given path/template name
-     */
-    public function fromPath(string $name, array $data = [], array $slots = [], Config $config = null): View
-    {
-        try {
-            $viewFactory = $this->cache->get($name);
-        } catch (\Throwable $e) {
-            $viewFactory = null;
-        }
-        
-        if (!empty($this->options['debug']) || !$viewFactory) {
-            # parse start
-            $parsingTemplate = new ParsingTemplate($name, null, null, $config ?? $this->config);
-            $parser = $this->getParser();
-            $parsed = $parser->parse($parsingTemplate);
-            $this->cache->remember($parsed);
             $viewFactory = $this->cache->get($name);
         }
 
@@ -160,7 +167,7 @@ class TemplateFactory
             $data[$key] = $value;
         }
 
-        $this->sharedContext->merge($data);
+        $this->shared->merge($data);
     }
 
     /**

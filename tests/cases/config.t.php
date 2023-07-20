@@ -4,4 +4,5 @@
 =====
 <div>
     cases2
+    default
 </div>

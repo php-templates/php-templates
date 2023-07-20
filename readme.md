@@ -97,14 +97,14 @@ Class attribute is a special case, because we often have many of them, or we nee
 Classes are cumulative, so having many attributes of them, will concatenate their values into a single class atrribute.
 
 ## Php syntax
-In order to cover other features and to avoid any ambiguosity in parse process, template files are loaded using php 'require'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `@php ... @endphp` tags, or single line tags `{% ... %}`
+In order to cover other features and to avoid any ambiguosity in parse process, template files are loaded using php 'require'. This means you cannot use php tags for declaring render time stuffs, like variables, function calls, etc. Instead, you can use `{% ... %}` tags, or single line tags `{% ... %}`
 
 `// examples/hello.t.php`
 ```
-@php $text = 'Lorem ipsum'; @endphp
+{% $text = 'Lorem ipsum'; %}
 {% $name = 'fname'; %}
 <input type="text" :value="$text" :name="$name">
-<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
+<input type="text" value="{% echo 'this not gonna work'; %}" {% echo 'neither this'; %}>
 ```
 
 ```
@@ -114,7 +114,7 @@ will result:
 
 ```
 <input type="text" value="Lorem ipsum" name="fname">
-<input type="text" value="@php echo 'this not gonna work'; @endphp" @php echo 'neither this'; @endphp>
+<input type="text" value="{% echo 'this not gonna work'; %}" {% echo 'neither this'; %}>
 ```
 
 If you wonder how then conditionally rendering attributes is possible, take a look at 'Directives' section. First, we have to cover control structures.
@@ -126,7 +126,7 @@ You can use them to conditionally render a node. Just add them as attribute on t
 
 `// examples/hello.t.php`
 ```
-@php $inp = ['text', 'number', 'email']; @endphp
+{% $inp = ['text', 'number', 'email']; %}
 <input p-if="in_array($type, $inp)" :type="$type" :value="$value">
 <input type="checkbox" p-elseif="$type == 'checkbox'" value="1">
 <textarea p-else>{{ $value }}</textarea>
@@ -168,7 +168,7 @@ In Php Templates, loops are scoped, meaning that anything declared inside a loop
 
 `// examples/hello.t.php`
 ```
-@php $lbl = 'I will survive!!!'; @endphp
+{% $lbl = 'I will survive!!!'; %}
 <select>
    <option p-foreach="$options as $v => $lbl" :value="$v">{{ $lbl }}</option>
 </select>
@@ -331,9 +331,9 @@ You can learn more about DomNode manipulation at Working with DOM section.
 You can reuse parts of design by making them components. Just put the html code into another file in your source path in any folder structure you preffer. For example, you can have:
 // components/form-group.t.php
 ```
-@php
+{%
 $_attrs = $_context->except(['label','class']); // this will take any passed attribute not in listed array
-@endphp
+%}
 <div class="form-group" :class="!empty($class) ? $class : ''">
     <label class="form-label">{{ $label }}</label>
     <input p-if="$type === 'text'" type="text" class="form-control" p-bind="$_attrs" :placeholder="$placeholder ?? $label">

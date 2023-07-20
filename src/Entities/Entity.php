@@ -9,15 +9,18 @@ use PhpTemplates\Dom\AttributePack;
 use PhpDom\DomNode;
 use PhpDom\Contracts\DomNodeInterface;
 use PhpDom\Contracts\DomElementInterface as DomElement;
+use PhpTemplates\Contracts\Entity as EntityInterface;
 use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\NodeParser;
 use PhpTemplates\Registry;
+use PhpTemplates\Parsed\TemplateFile;
+use PhpDom\Contracts\TextNodeInterface;
 
 /**
  * Startup entity
  */
-class Entity 
+abstract class Entity implements EntityInterface
 {
     /**
      * Unique id -> used to parent-child comunication like: this->comp[id]->addSlot(...)
@@ -27,7 +30,7 @@ class Entity
     /**
      * Recursive parent context
      */
-    protected ?Entity $context;
+    protected EntityInterface $context;
 
     /**
      * Current inparse DomNode
@@ -43,6 +46,8 @@ class Entity
      * Found attributes on current node
      */
     protected array $attrs = [];
+    
+    protected TemplateFile $document;
 
     /**
      * prefix for special php blocks (p-if, p-for)
@@ -52,21 +57,13 @@ class Entity
     /**
      * Creating a new instance by giving the main process as param, the node and the contex
      */
-    public function __construct(Parser $parser, ?DomElement $node, ?Entity $context = null, Config $config = null)
+    public function __construct(?DomElement $node, EntityInterface $context)
     {
         $this->id = uniqid();
-        $this->parser = $parser;
         $this->node = $node;
         $this->context = $context;
-        if ($config) {
-            $this->config = $config;
-        }
-        elseif ($context && !$config) {
-            $this->config = $context->getConfig();
-        }
-        else {
-            throw new \Exception('Context or config must be given');
-        }
+        $this->config = $context->getConfig();
+        $this->document = $context->getDocument();
     }
 
     /**
@@ -74,7 +71,7 @@ class Entity
      */
     protected function depleteNode(DomElement $node): AttributePack
     {
-        $config = $this->getConfig();
+        $config = $this->config;
         $attributePack = new AttributePack($this->getConfig());
         // dispatch any existing directive
         while ($attrs = $node->getAttributes()) 
@@ -91,7 +88,7 @@ class Entity
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
                     if ($directive = $config->getDirective(substr($k, strlen($this->pf)))) {
-                        $directive($node, $a->getValue());
+                        $directive($node, (string)$a->getValue());
 
                         // directive unpacked his data, next attr!!!
                         continue;
@@ -112,20 +109,20 @@ class Entity
     {
         $config = $this->config;
 
-        if ($node->getNodeName() == '#text') {
-            return new TextNodeEntity($this->parser, $node, $this);
+        if ($node instanceof TextNodeInterface) {
+            return new TextNodeEntity($node, $this);
         }
         
         if ($node->getNodeName() == 'slot') {
-            return new SlotEntity($this->parser, $node, $this);
+            return new SlotEntity($node, $this);
         }
         
         if ($node->hasAttribute('verbatim')) {
-            return new VerbatimEntity($this->parser, $node, $this);
+            return new VerbatimEntity($node, $this);
         }
         
         if ($node->getNodeName() != 'tpl' && ($rfilepath = $config->getAliased($node->getNodeName()))) {
-            $node->changeNode('tpl');
+            $node->setNodeName('tpl');
             if ($rfilepath[0] == '@') {
                 $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
             }
@@ -138,7 +135,7 @@ class Entity
                 $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
                 $node->setAttribute('is', $rfilepath);
             }            
-            return new TemplateEntity($this->parser, $node, $this);
+            return new TemplateEntity($node, $this);
         }
         
         if ($node->getNodeName() == 'tpl' && $node->hasAttribute('extends')) {
@@ -147,14 +144,14 @@ class Entity
                 $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
                 $node->setAttribute('extends', $rfilepath);
             }       
-            return new ExtendEntity($this->parser, $node, $this);
+            return new ExtendEntity($node, $this);
         }
 
         if ($node->getNodeName() == 'tpl') {
-            return new AnonymousEntity($this->parser, $node, $this);
+            return new AnonymousEntity($node, $this);
         }
 
-        return new SimpleNodeEntity($this->parser, $node, $this);        
+        return new SimpleNodeEntity($node, $this);        
     }
 
     /**
@@ -162,19 +159,9 @@ class Entity
      */
     public function parse()
     {
-        if ($this->context) {
-            $fn = explode('\\', get_class($this->context));
-            $fn = end($fn);
-            if ($fn == 'Entity') {
-                $fn = 'startupContext';
-            } else {
-                $fn = str_replace('Entity', 'Context', lcfirst($fn));
-            }
-        } else {
-            $fn = 'simpleNodeContext';
+        foreach ($this->node->getChildNodes() as $cn) {
+            $this->child($cn)->startupContext();
         }
-
-        return $this->{$fn}();
     }
 
     // =================================================== //
@@ -185,7 +172,7 @@ class Entity
     {
         return $this->id;
     }
-
+/*
     public function getAttrs(): array
     {
         return $this->attrs;
@@ -194,49 +181,25 @@ class Entity
     public function getAttr(string $key)
     {
         return $this->attrs[$key] ?? null;
-    }
+    }*/
 
     public function getConfig(): Config
     {
-        // up to startupEntity
-        if (! $this->context) {
-            return $this->config;
-        }
-        
-        return $this->context->getConfig();
+        return $this->config;
     }
     
-    /**
-     * TO BE FILLED
-     */
-    public function templateContext()
+    public function getDocument(): TemplateFile
     {
+        return $this->document;
     }
-    public function slotContext()
-    {
-    }
-    public function simpleNodeContext()
-    {
-    }
-    public function anonymousContext()
-    {
-    }
-    public function verbatimContext()
-    {
-    }
-    public function textNodeContext()
-    {
-    }
-    public function extendContext()
-    {
-    }
+    
     
     // =================================================== //
     // ===================== HELPERS ===================== //
     // =================================================== //
     
     protected function replaceNode(DomNodeInterface $node, DomNodeInterface $with) 
-    {
+    {// todo unused
         foreach ($node->getChildNodes() as $cn) {
             $with->appendChild($cn);
         }
@@ -246,5 +209,16 @@ class Entity
         
         return $with;
     }
+    
+    public function __call($m, $args)
+    {
+        if (strpos($m, 'Context') && !method_exists($this, $m)) {
+            $m = 'startupContext';
+        }
+        
+        return call_user_func_array([$this, $m], $args);
+    }
+    
+    public function startupContext() {}
 }
 

@@ -1,25 +1,28 @@
 <?php
-
+// todo hamdle error syntax rrom {{ {% etc
 namespace PhpTemplates\Entities;
 
 use function PhpTemplates\enscope_variables;
 
-class TextNodeEntity extends SimpleNodeEntity
+class TextNodeEntity extends Entity
 {
+    public function startupContext() {
+        $this->simpleNodeContext();
+    }
+    
     /**
      * <div>abc</div>
      */
     public function simpleNodeContext()
     {
-        $this->node->changeNode('#text', $this->replaceSpecialTags($this->node->nodeValue));
-        parent::simpleNodeContext();
+        $this->node->setNodeValue($this->replaceSpecialTags($this->node->getNodeValue()));
     }
 
     /**
      * <tpl is="comp/x">abc</tpl>
      */
     public function templateContext()
-    {
+    {dd(4);
         // unreachable because of View::simpleNodeContext dom manipulation
     }
 
@@ -31,13 +34,15 @@ class TextNodeEntity extends SimpleNodeEntity
      */
     private function replaceSpecialTags(string $html): string
     {
-        $html = preg_replace('/(?<!@)@php(.*?)@endphp/s', '<?php $1 ?>', $html);
-        $html = preg_replace('/\{%(((?!\{%).)*)%\}/', '<?php $1; ?>', $html);
+        $html = preg_replace_callback('/\{%(((?!\{%).)*)%\}/', function($m) {
+            // todo throw error if syntax ends with;
+            return '<?php '. enscope_variables($m[1]) .'; ?>';
+        }, $html);
 
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
                 $eval = enscope_variables($eval);
-                return "<?php e($eval); ?>";
+                return "<?php \$this->__e($eval); ?>";
             }
             return '';
         }, $html);
@@ -53,7 +58,7 @@ class TextNodeEntity extends SimpleNodeEntity
         // custom tags
         return preg_replace_callback("/{(\w+) (((?!{(\w+) ).)*)}/", function($m) {
             // todo check if method exist, throw error if not
-            return '<?php echo $this->'.$m[1].'('.enscope_variables(trim($m[2])).'); ?>';
+            return '<?php echo '. enscope_variables(sprintf('$this->%s(%s)', $m[1], trim($m[2]))) .'; ?>';
         }, $html);
     }
 }

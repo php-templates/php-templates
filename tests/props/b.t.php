@@ -1,3 +1,3 @@
 <b :true="$true">
-    <bind p-bind="$this->context->except(['true'])"></bind>    
+    <bind p-bind="$this->scope->except(['true'])"></bind>    
 </b>

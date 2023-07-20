@@ -3,8 +3,8 @@
 namespace PhpTemplates\Contracts;
 
 use PhpTemplates\Source;
-use PhpTemplates\View;
-use PhpTemplates\ParsingTemplate;
+use PhpTemplates\Parsed\View;
+use PhpTemplates\ParsedTemplate;
 
 interface Cache
 {
@@ -22,15 +22,15 @@ interface Cache
     //public function has(string $key): ?array;
 
     /**
-     * Set parsing template to cache
+     * Write ViewFactory class definition in a random namespace and returns the class name to be instantiated
      */
-    public function remember(ParsingTemplate $template): void;
+    public function write(ParsedTemplate $template): string;
     //public function registerTemplate(string $key, Source $src): void;
 
     /**
      * returns cached template function
      */
-    public function get(string $key): ?View;
+    public function get(string $key): ?string;
 
     /**
      * Burn parse results to a given file

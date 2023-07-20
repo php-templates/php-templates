@@ -1,10 +1,8 @@
-@php
-$foo = 'foo';
-$bar = 'bar';
-$arr = ['arr1', 'arr2'];
-$true = 1;
-$false = 0;
-@endphp
+{% $foo = 'foo' %}
+{% $bar = 'bar' %}
+{% $arr = ['arr1', 'arr2'] %}
+{% $true = 1 %}
+{% $false = 0 %}
 
 <!-- bindings in component -->
 yoy
@@ -30,8 +28,8 @@ yoy
 
 <!-- bind from slot to surface -->
 <tpl is="props/c">
-    <tpl>
-        <div p-foreach="$slot->val as $v">{{ $slot->name.$v }}</div>
+    <tpl p-scope="$slot">
+        <div p-foreach="$slot['val'] as $v">{{ $slot['name'].$v }}</div>
     </tpl>
 </tpl>
 =====

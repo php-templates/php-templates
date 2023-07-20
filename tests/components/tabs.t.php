@@ -6,12 +6,12 @@
   </li>
 </ul>
 <div class="tab-content p-2">
-  @php 
+  {% 
     $ids = array_keys($tabs); 
-  @endphp
+  %}
   <tpl p-foreach="$this->slots('tab-pane') as $i => $slot">
     <div class="tab-pane fade" :class="$ids[$i] == $value ? 'show active' : ''" :id="$ids[$i]" role="tabpanel" :aria-labelledby="$ids[$i].'-tab'">
-      @php $slot(); @endphp
+      {% $slot(); %}
     </div>
   </tpl>
 </div>

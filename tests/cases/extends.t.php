@@ -12,7 +12,7 @@
 </parent4>
 
 -----
-@php $bind_me = 'bound'; @endphp
+{% $bind_me = 'bound'; %}
 <tpl extends="extends/parent2">
     <div>123</div>
 </tpl>

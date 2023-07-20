@@ -31,6 +31,9 @@ function d(...$data) {
 } 
 */
 
+require_once(__DIR__.'/../../autoload.php');
+require_once(__DIR__.'/../dom-parser/autoload.php');
+
 spl_autoload_register(function ($class) {
     $class = trim($class, '\\');
     $path = 'PhpTemplates\\';

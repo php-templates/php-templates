@@ -1,5 +1,5 @@
 <!-- multi-extends -->
-@php $bind_me = 'bound'; @endphp
+{% $bind_me = 'bound' %}
 <tpl is="extends/c" :bind_me="$bind_me"></tpl>
 =====
 <parent4>
