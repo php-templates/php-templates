@@ -58,7 +58,9 @@ class StartupEntity implements EntityInterface
             Event::trigger('parsed', $name, $wrapper, $classDefinition);
             method_exists($obj, 'parsed') && $obj->parsed($wrapper, $classDefinition);
             
-            $classDefinition->addMethod('template', (string)$wrapper);
+            if (! $classDefinition->hasMethod('template')) {
+                $classDefinition->addMethod('template', (string)$wrapper);
+            }
             $classDefinition->addProp('__name', $name, 3);
             $classDefinition->addProp('__config', $this->template->getConfig()->getName(), 3);
             

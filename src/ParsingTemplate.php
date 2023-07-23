@@ -89,6 +89,7 @@ class ParsingTemplate
         $obj = require($file);
         $html = ob_get_contents();
         ob_end_clean();
+        
         // object returned by template, serving as logic holder
         if (!is_object($obj)) {
             $obj = new class extends View {};
@@ -137,70 +138,6 @@ class ParsingTemplate
         return $this->classDefinition;
     }
     
-    protected function sgfgghetAstObject()
-    {// todo throw error if not anon class returned or extends something
-        if (!$this->getFile()) {
-            $source = file_get_contents($this->getFile());
-        } else {
-            $source = 'new class {}';
-        }
-            //$source = 'new class {}';
-
-        $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
-        $asts = $parser->parse($source);
-
-        $ast = null;
-        foreach ($asts as $_ast) {
-            if ($_ast instanceof \PhpParser\Node\Stmt\Use_) {
-                $use = implode('\\', $_ast->uses[0]->name->parts);
-                if (!empty($_ast->uses[0]->alias->name)) {
-                    $use .= ' as ' . $_ast->uses[0]->alias->name;
-                }
-                if (!in_array($use, $this->registry->uses)) {
-                    $this->registry->uses[] = $use;
-                }
-            }
-            if ($_ast instanceof \PhpParser\Node\Stmt\Return_) {
-                $ast = $_ast;
-                break;
-            }
-        }
-        
-        if (!$ast) {
-            throw new \Exception("Error parsing template");
-        }
-        
-        $ast = $ast->expr->class;
-        if (!empty($ast->extends)) {
-            throw new \Exception('Template files may return only class@anonymous objects (without extends): ' . $source->getFile());
-        }    
-        
-        $this->ast = $ast;
-        $ast->name = 'PHPT_' . str_replace('/', '_', $this->name);// todo replace non alfanum
-        $ast->extends = new FullyQualified(['PhpTemplates', 'Parsed', '_View']);
-
-        foreach ($ast->stmts as $i => $stmt) {
-            if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
-                continue;
-            }
-            if (in_array($stmt->name, ['render', 'parsing', 'parsed'])) {
-                unset($ast->stmts[$i]);
-            }
-        }
-        
-        $factory = new BuilderFactory;
-        $config = '';
-        if (strpos($name, ':')) {
-            list($config) = explode(':', $name);
-        }
-        $prop = $factory->classConst('config', $config);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('name', $name);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('file', $source->getFile());
-        array_unshift($ast->stmts, $prop->getNode());
-    }
-    
     public function getName(): string
     {
         return $this->name;
@@ -215,7 +152,7 @@ class ParsingTemplate
     {
         return $this->config;
     }
-    
+    // todo, 
     public function hasRenderFunction()
     {
         return method_exists($this->obj, 'render');

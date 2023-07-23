@@ -1,7 +1,7 @@
 <?php
 
 namespace PhpTemplates\Contracts;
-
+// todo comments
 interface Scope
 {
     public function merge(array $data);

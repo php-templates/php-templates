@@ -23,8 +23,8 @@ class PhpNode extends DomNode
         $return = '';
         if ($isLoop = in_array($this->expression, ['foreach', 'for', 'while'])) {
             $return .= "<?php \$this->__loopStart(); ?>\n";
-            // return $this->toScopedLoop();
         }
+        
         // wrap in if statement to not throw error
         $args = $this->args;
         if ($isLoop) {}

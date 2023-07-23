@@ -49,12 +49,4 @@ class ExtendEntity extends TemplateEntity
         $nodeValue = sprintf('$this->comp["%s"]->render()', $this->id);
         $this->node->appendChild(new PhpNode('', $nodeValue));
     }
-
-// legacy
-    public function resolve(CacheInterface $document, EventHolder $eventHolder)
-    {
-        $this->node->setAttribute('is', $this->node->getAttribute('extends'));
-
-        parent::resolve($document, $eventHolder);
-    }
 }

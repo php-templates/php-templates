@@ -25,16 +25,7 @@ class TemplateEntity extends Entity
     {
         parent::__construct($node, $context);
         
-        $this->name = $node->getAttribute('is');/*
-        list($rfilepath, $config) = \PhpTemplates\parse_path($name, $process->config);
-        if ($config->isDefault()) {
-            $name = $rfilepath;
-        }
-        $this->name = $name;
-        // todo deplate?
-        if (!$this->process->getCache()->has($name)) {
-            $this->subprocess = $process->subprocess($rfilepath, $config);
-        }*/
+        $this->name = $node->getAttribute('is');
         
         if (!$this->document->has($this->name)) {
             $this->resolve();
@@ -62,17 +53,6 @@ class TemplateEntity extends Entity
         foreach ($slots as $slot) {
             $this->node->appendChild($slot);
             $this->child($slot)->templateContext();            
-            
-            /*
-            $cn = $slot->getChildNodes();
-            if ($cn->count() === 2 && $cn->item(1)->getNodeName() == 'slot' && !$cn->item(1)->getChildNodes()->count()) {
-                $slot = $slot->getChildNodes()->item(1)->detach();
-                $this->node->appendChild($slot);
-                $this->child($slot)->templateContext();
-            } else {
-                $this->node->appendChild($slot);// only 1 slot and is slot node
-                $this->child($slot)->templateContext();
-            }*/
         }
 
         $nodeValue = sprintf('$this->comp["%s"]->render()', $this->id);
@@ -100,36 +80,6 @@ class TemplateEntity extends Entity
         $template = new ParsingTemplate($this->name, null, null, $this->config);
         
         (new StartupEntity($template, $this->document))->parse();
-        
-        
-        
-        return;
-        $node = $template->getDomNode();
-        $config = $template->getConfig();
-        $obj = $template->getObject();
-        $classDefinition = (new PhpParser())->parse($template);
-        
-        // wrap node in case anyone wants to wrap node with another node using events
-        $wrapper = new DomNode('');
-        $wrapper->appendChild($node);
-        Event::trigger('parsing', $template->getName(), $wrapper, $classDefinition);
-        method_exists($obj, 'parsing') && $obj->parsing($wrapper);
-        
-        $entity = new SimpleNodeEntity($wrapper, new StartupEntity($this->document, $config));
-        $entity->parse();
-        
-        // build template function only when all templates are parsed, that because we want to let conponents to register dependencies like scripts to html main
-        $this->document->add($template->getName(), function() use ($wrapper, $classDefinition)
-        {dd($template->getName());
-            Event::trigger('parsed', $template->getName(), $wrapper, $classDefinition);
-            method_exists($obj, 'parsed') && $obj->parsed($wrapper);
-            
-            $classDefinition->addMethod('template', (string)$wrapper);
-            $classDefinition->addProp('__name', $template->getName(), 3);
-            $classDefinition->addProp('__config', $template->getConfig()->getName(), 3);
-            
-            return $classDefinition;
-        });
     }
 
     /**
@@ -139,9 +89,11 @@ class TemplateEntity extends Entity
     {
         $slots = [];
         $isDefaultSlotWrappedAndNamed = false;
+        
         foreach ($node->getChildNodes() as $cn) {
             $pos = null;
             $scopeData = null;
+            
             if ($cn instanceof \PhpDom\Contracts\DomNodeInterface) {
                 $pos = $cn->getAttribute('slot');
                 $cn->removeAttribute('slot');
@@ -166,9 +118,26 @@ class TemplateEntity extends Entity
             if (!isset($slots[$pos])) {
                 $slots[$pos] = new SlotAssign($this->id, $pos, $scopeData);
             }
+            
             $slots[$pos]->appendChild($cn->detach());
         }
+
+        // support <tpl is=""><slot></slot></tpl> with default in background
+        foreach ($slots as &$slot) {
+            $firstChild = $slot->getChildNodes()->first();
+            $bool = $firstChild instanceof \PhpDom\Contracts\DomNodeInterface;
+            $bool = $bool && $slot->getChildNodes()->count() == 1;
+            $bool = $bool && $firstChild->getNodeName() == 'slot';
+            if ($bool && $firstChild->getChildNodes()->count() == 0) {
+                $pos = $firstChild->getAttribute('name') ?? 'default';
+                $slot->setAttribute('p-if', "\$this->slots('{$pos}')");
+            }
+            elseif ($bool && $firstChild->hasAttribute('p-if')) {// todo error if multiple if on node
+                $slot->setAttribute('p-if', $firstChild->getAttribute('p-if'));
+                $firstChild->removeAttribute('p-if');
+            }
+        }
         
-        return array_reverse($slots);
+        return $slots;
     }
 }

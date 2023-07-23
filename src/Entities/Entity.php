@@ -73,6 +73,7 @@ abstract class Entity implements EntityInterface
     {
         $config = $this->config;
         $attributePack = new AttributePack($this->getConfig());
+        
         // dispatch any existing directive
         while ($attrs = $node->getAttributes()) 
         {
@@ -197,18 +198,6 @@ abstract class Entity implements EntityInterface
     // =================================================== //
     // ===================== HELPERS ===================== //
     // =================================================== //
-    
-    protected function replaceNode(DomNodeInterface $node, DomNodeInterface $with) 
-    {// todo unused
-        foreach ($node->getChildNodes() as $cn) {
-            $with->appendChild($cn);
-        }
-        
-        $with->insertBefore($node);
-        $node->detach();
-        
-        return $with;
-    }
     
     public function __call($m, $args)
     {

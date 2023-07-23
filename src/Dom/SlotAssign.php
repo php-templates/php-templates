@@ -22,8 +22,6 @@ class SlotAssign extends DomNode
         $this->targetComp = $targetComp;
         $this->slotPos = $slotPos;
         $this->scopeData = $scopeData;
-        // nooo, new slot(pos, fn)->render(data) // subcontext slot -> new context(dat)
-        // $this->appendChild(new DomNode('#php', '<php $context = $this->context->subcontext(["slot" => new Context(func_get_arg(0))]); ?'));
     }
 // todo enscope somehow scope render foreach
     public function __toString()
