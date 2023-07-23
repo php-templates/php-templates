@@ -24,27 +24,6 @@ function check_dependencies(array $files)
     }
     return true;
 }
-/*
-function parse_path(string $rfilepath, Config $config): array
-{
-    $cfgkey = '';
-    if (strpos($rfilepath, ':')) {
-        list($cfgkey, $rfilepath) = explode(':', $rfilepath);
-    }
-    
-    if (!$cfgkey) {
-        return [$rfilepath, $config->getRoot()];
-    }
-    
-    // support for spearing proggrammer of write module namespace each time on a component
-    if ($cfgkey == '@') {
-        return [$rfilepath, $config];
-    }
-  
-    $config = $config->getRoot()->find($cfgkey);
-        
-    return [$rfilepath, $config];
-}*/
 
 /**
  * Make all variables from input source code to refer to $this->scope

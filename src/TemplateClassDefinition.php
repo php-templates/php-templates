@@ -90,6 +90,20 @@ class TemplateClassDefinition
         return $return;
     }
     
+    public function hasMethod(string $m): bool
+    {
+        foreach ($this->ast->stmts as $stmt) {
+            if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
+                continue;
+            }
+            if ($stmt->name == $m) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public function __toString() 
     {
         return $this->toString();

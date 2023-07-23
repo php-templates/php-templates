@@ -64,14 +64,6 @@ class PhpParser
                 unset($ast->stmts[$i]);
             }
         }
-        /* todo, in parser
-        $factory = new BuilderFactory;
-        $config = '';
-        if (strpos($name, ':')) {
-            list($config) = explode(':', $name);
-        }
-
- */
  
         return new TemplateClassDefinition($ast, $uses);
     }
