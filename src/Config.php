@@ -132,7 +132,7 @@ class Config
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
                     }
                 }
-                $phpnode = new PhpNode($statement, $args);
+                $phpnode = new PhpNode($args, $statement);
                 $phpnode->insertBefore($node);
                 $phpnode->appendChild($node->detach());
             };

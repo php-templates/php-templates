@@ -6,7 +6,7 @@ use PhpTemplates\Source;
 use PhpTemplates\Contracts\Cache;
 use PhpTemplates\Parsed\View;
 use PhpTemplates\ParsingTemplate;
-
+// todo rename in document
 class TemplateFile
 {
     protected string $rootPath;
@@ -61,60 +61,33 @@ class TemplateFile
         $nameToClassName = [];
         $dependencyMap = [];
         foreach ($this->templates as $template) {
-            $dependencyMap[] = $template->getFile();
+            if ($file = $template->getFile()) {
+                $dependencyMap[$file] = filemtime($template->getFile());
+            }
             $nameToClassName[$template->getName()] = $template->getClassDefinition()->getFullName();
         }
 
         $viewClass = 'View_' . uniqid();
 
-        $tpl = "<?php \n";
+        $tpl = "<?php namespace {\n";
         
-/*        $tpl .= PHP_EOL . "use function PhpTemplates\\check_dependencies;";
-        $tpl .= PHP_EOL . "use function PhpTemplates\\e;";
-        $tpl .= PHP_EOL . "use function PhpTemplates\\resolve_class;";
-        $tpl .= PHP_EOL . "use function PhpTemplates\\e_bind;";
-        $tpl .= PHP_EOL . "use function PhpTemplates\\arr_except;";
-        $tpl .= PHP_EOL . "use PhpTemplates\\Loop;";
-        $tpl .= PHP_EOL . "use PhpTemplates\\Slot;";
-        $tpl .= PHP_EOL . "use PhpTemplates\\Parsed\\View;";
-        $tpl .= PHP_EOL . "use PhpTemplates\\Cache\\FileSystemCache;";
-        //foreach ($this->registry->uses as $use) {
-            //$tpl .= PHP_EOL . "use \\$use;";
-        //}
-        $tpl .= PHP_EOL;*/
+        // dependencies check
+        $tpl .= "if (!\PhpTemplates\check_dependencies(". var_export($dependencyMap, true) .")) {\n\treturn false;\n}\n\n";
 
-        $dependencies = [];
-        //foreach ($this->store as $template) {
-            //if ($template['file']) {
-                //$dependencies[$template['file']] = filemtime($template['file']);
-            //}
-        //}
-
-
-     
-        $tpl .= "namespace {\n";
-        $tpl .= "if (!\PhpTemplates\check_dependencies(". var_export($dependencies, true) .")) return false;\n";
-
-/*        
-        $tpl .= "use PhpTemplates\\Parsed\\View as BaseView;\n";
-        $tpl .= "use PhpTemplates\\Loop;\n";
-        $tpl .= "use PhpTemplates\\Scopes\\LoopScope;\n";
-        $tpl .= "use PhpTemplates\\Parsed\\Slot;\n";
-        $tpl .= "use PhpTemplates\\Parsed as t;\n";
-        $tpl .= "require_once(PHPT_ROOT .'/Parsed/helpers.php');\n\n";
-*/        
-        $tpl .= "\tclass {$viewClass} extends \\PhpTemplates\\Parsed\\View {\n";
-        $tpl .= "\t\tprivate array \$templates = [\n";
+        // main view builder class (bootstrapper)
+        $tpl .= "class {$viewClass} extends \\PhpTemplates\\Parsed\\View {\n";
+        $tpl .= "\tprivate array \$templates = [\n";
         foreach ($nameToClassName as $name => $className) {
-            $tpl .= "\t\t\t'$name' => {$className}::class,\n";
+            $tpl .= "\t\t'$name' => {$className}::class,\n";
         }
-        $tpl .= "\t\t];\n\n";
-        $tpl .= "\t\tfinal public function make(string \$name, \$data) {\n";
-        $tpl .= "\t\t\treturn parent::make(\$this->templates[\$name], \$data);\n";
-        $tpl .= "\t\t}\n";
+        $tpl .= "\t];\n\n";
+        $tpl .= "\tfinal public function make(string \$name, \$data) {\n";
+        $tpl .= "\t\treturn parent::make(\$this->templates[\$name], \$data);\n";
         $tpl .= "\t}\n";
+        $tpl .= "}\n";
         $tpl .= "}\n\n";     
  
+        // each template class will extend above class to pass globally map between t.name and t.class name
         foreach ($this->templates as $t) {
             $tpl .= $t->getClassDefinition()->extends("\\{$viewClass}") . "\n\n";
         } 

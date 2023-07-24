@@ -37,7 +37,7 @@ class ExtendEntity extends TemplateEntity
 
         $this->node->setNodeName('');
         $slots = $this->getValidSlots($this->node);
-        $this->node->appendChild(new PhpNode('', sprintf(
+        $this->node->appendChild(new PhpNode(sprintf(
             '$this->comp["%s"] = $this->make("%s", %s)->setScope($this->scope->merge('.$dataString.'))',
             $this->id, $this->name, $dataString)));
             
@@ -47,6 +47,6 @@ class ExtendEntity extends TemplateEntity
         }
 
         $nodeValue = sprintf('$this->comp["%s"]->render()', $this->id);
-        $this->node->appendChild(new PhpNode('', $nodeValue));
+        $this->node->appendChild(new PhpNode($nodeValue));
     }
 }

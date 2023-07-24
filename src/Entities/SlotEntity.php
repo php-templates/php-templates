@@ -47,9 +47,7 @@ class SlotEntity extends Entity
             $this->child($wrapperDefault)->slotContext();
         }
 
-        $append = new PhpNode('foreach', '$this->slots("' . $this->attrs['name'] . '") as $slot');
-        $r = '$this->scope->slot->render(' . $dataString . ')';
-        $append->appendChild(new PhpNode('', $r));
+        $append = new PhpNode("\$this->renderSlots('" . $this->attrs['name'] . "', {$dataString})");
         $this->node->appendChild($append);
     }
 
@@ -64,9 +62,9 @@ class SlotEntity extends Entity
         $dataString = $data->toArrayString();
 
         $this->node->setNodeName('');
-        $append = new PhpNode('if', '$this->slots("' . $this->attrs['name'] . '")');
+        $append = new PhpNode('$this->slots("' . $this->attrs['name'] . '")', 'if');
         $assign = sprintf('$this->comp["%s"]->setSlot("%s", $this->slots("%s"))', $this->context->getId(), $this->attrs['slot'], $this->attrs['name']);
-        $append->appendChild(new PhpNode('', $assign));
+        $append->appendChild(new PhpNode($assign));
         $this->node->appendChild($append);        
     }
 
