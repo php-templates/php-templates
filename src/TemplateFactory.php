@@ -106,7 +106,7 @@ class TemplateFactory
 
         if (!empty($this->options['debug']) || !$viewFactory) {
             # parse start
-            $parsingTemplate = new ParsingTemplate($name, $name, $code, $config ?? $this->config);
+            $parsingTemplate = new ParsingTemplate($name, '', $code, $config ?? $this->config);
             (new StartupEntity($parsingTemplate, $file))->parse();
            
             $viewFactory = $file->write();

@@ -64,6 +64,13 @@ class View
         
         $this->template();
     }
+    
+    final public function renderSlots(string $pos, $data)
+    {
+        foreach ($this->slots($pos) as $slot) {
+            $slot->render($data);
+        }
+    }
 
     final public function setScope(Scope $scope) 
     {

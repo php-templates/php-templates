@@ -29,7 +29,7 @@ function check_dependencies(array $files)
  * Make all variables from input source code to refer to $this->scope
  */
 function enscope_variables(string $str): string
-{
+{try {
     $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
     $asts = $parser->parse("<?php $str;"); 
 
@@ -53,5 +53,5 @@ function enscope_variables(string $str): string
     $result = $prettyPrinter->prettyPrint($asts);
     $result = rtrim($result, ';');
 
-    return $result;
+    return $result;} catch (\Exception) {dump($str);}
 }

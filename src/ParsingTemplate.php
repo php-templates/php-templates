@@ -50,7 +50,7 @@ class ParsingTemplate
     
     public function getFile()
     {
-        if ($this->file) {
+        if (!is_null($this->file)) {
             return $this->file;        
         }
         
@@ -152,7 +152,7 @@ class ParsingTemplate
     {
         return $this->config;
     }
-    // todo, 
+    // todo, used ?
     public function hasRenderFunction()
     {
         return method_exists($this->obj, 'render');

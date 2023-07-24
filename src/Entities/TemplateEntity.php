@@ -46,7 +46,7 @@ class TemplateEntity extends Entity
 
         $this->node->setNodeName('');
         $slots = $this->getValidSlots($this->node);
-        $this->node->appendChild(new PhpNode('', sprintf(
+        $this->node->appendChild(new PhpNode(sprintf(
             '$this->comp["%s"] = $this->make("%s", %s)',
             $this->id, $this->name, $dataString)));
 
@@ -56,7 +56,7 @@ class TemplateEntity extends Entity
         }
 
         $nodeValue = sprintf('$this->comp["%s"]->render()', $this->id);
-        $this->node->appendChild(new PhpNode('', $nodeValue));
+        $this->node->appendChild(new PhpNode($nodeValue));
     }
 
     /**
