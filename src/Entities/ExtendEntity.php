@@ -15,7 +15,6 @@ class ExtendEntity extends TemplateEntity
     protected string $className;
 
     protected array $attrs = [
-        'template' => null,
         'is' => null,
         'extends' => null,
     ];
@@ -23,7 +22,9 @@ class ExtendEntity extends TemplateEntity
     public function __construct(DomElement $node, EntityInterface $context)
     {
         $name = $node->getAttribute('extends');
+        $node->removeAttribute('extends');
         $node->setAttribute('is', $name);
+        
         parent::__construct($node, $context);
     }
 

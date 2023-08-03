@@ -12,6 +12,8 @@ use PhpTemplates\Dom\WrapperNode;
 use PhpTemplates\InvalidNodeException;
 use PhpDom\DomNode;
 use PhpTemplates\PhpParser;
+use PhpTemplates\TemplateNotFoundException;
+use function PhpTemplates\enscope_variables;
 
 // todo p-scope tag that throws an error instant ca nu il poti folosi decat pe sloturi, e procesat automat
 class TemplateEntity extends Entity
@@ -25,7 +27,18 @@ class TemplateEntity extends Entity
     {
         parent::__construct($node, $context);
         
-        $this->name = $node->getAttribute('is');
+        $name = $node->getAttribute('is');
+        if (strpos($name, ':')) {
+            [$cfg, $name] = explode(':', $name);
+            if ($cfg != 'default') {
+                $name = $cfg . ':' . $name;
+            }
+        } 
+        elseif (! $this->config->isDefault()) {
+            $name = $this->config->getName() . ':' . $name;
+        }
+        
+        $this->name = $name;
         
         if (!$this->document->has($this->name)) {
             $this->resolve();
@@ -77,7 +90,11 @@ class TemplateEntity extends Entity
     
     private function resolve() 
     {
-        $template = new ParsingTemplate($this->name, null, null, $this->config);
+        try {
+            $template = new ParsingTemplate($this->name, null, null, $this->config);
+        } catch (TemplateNotFoundException $e) {
+            throw new InvalidNodeException($e->getMessage(), $this->node);
+        }
         
         (new StartupEntity($template, $this->document))->parse();
     }
@@ -88,38 +105,54 @@ class TemplateEntity extends Entity
     protected function getValidSlots(DomElement $node): array
     {
         $slots = [];
-        $isDefaultSlotWrappedAndNamed = false;
+        $orphanNodes = []; // gonna be slot defaults
+        $defaultScopeData = null;
         
         foreach ($node->getChildNodes() as $cn) {
             $pos = null;
             $scopeData = null;
             
             if ($cn instanceof \PhpDom\Contracts\DomNodeInterface) {
-                $pos = $cn->getAttribute('slot');
-                $cn->removeAttribute('slot');
-                $scopeData = $cn->getAttribute('p-scope');
-                $cn->removeAttribute('p-scope');
+                if ($cn->hasAttribute('slot')) 
+                {
+                    $pos = trim($cn->getAttribute('slot'));
+                    $cn->removeAttribute('slot');
+                    
+                    if (!$pos) {
+                        throw new InvalidNodeException('No slot position given', $cn);
+                    }
+                    
+                    $scopeData = $this->getScopeData($cn);
+                    
+                    if (isset($slots[$pos])) {
+                        throw new InvalidNodeException("Duplicate slot assignment for slot '$pos'", $cn);
+                    }
+                    
+                    $slots[$pos] = new SlotAssign($this->id, $pos, $scopeData);
+                    $slots[$pos]->appendChild($cn->detach());
+                } else {
+                    $orphanNodes[] = $cn;
+                    $defaultScopeData = $this->getScopeData($cn);                 
+                }
+            } else {
+                $orphanNodes[] = $cn;
             }
-            
-            # next we validate for messy slots assignations, duplicates, default slot unwrapped when with named slots
-            if ($pos == 'default') {
-                $isDefaultSlotWrappedAndNamed = empty($slots['default']);
-            }
-            
-            $pos = $pos ?? 'default';
-            if ($pos != 'default' && isset($slots['default'])  && !$isDefaultSlotWrappedAndNamed) {
-                throw new InvalidNodeException('When multiple slots are assigned, slot-default must be wrapped under a separate node with position specified as attribute', $cn); // todo test
-            }
-            
-            if ($pos != 'default' && isset($slots[$pos])) {
-                throw new InvalidNodeException("Duplicate slot assignment for slot '$pos'", $cn->getParentNode());
-            }
-            
-            if (!isset($slots[$pos])) {
-                $slots[$pos] = new SlotAssign($this->id, $pos, $scopeData);
-            }
-            
-            $slots[$pos]->appendChild($cn->detach());
+        }
+        
+        if ($defaultScopeData && count($orphanNodes) > 1) {
+            throw new InvalidNodeException('When using p-scope, passed default slots must be wrapped under a single node', $node);
+        }
+        
+        if ($orphanNodes && $slots) {
+            throw new InvalidNodeException('When multiple slots are assigned, slot-default must be wrapped under a separate node with position specified as attribute', $node);
+        }
+        
+        if ($orphanNodes) {
+            $slots['default'] = new SlotAssign($this->id, 'default', $defaultScopeData);
+        }
+        // add orphan nodes to slot default
+        foreach ($orphanNodes as $cn) {
+            $slots['default']->appendChild($cn->detach());
         }
 
         // support <tpl is=""><slot></slot></tpl> with default in background
@@ -129,7 +162,7 @@ class TemplateEntity extends Entity
             $bool = $bool && $slot->getChildNodes()->count() == 1;
             $bool = $bool && $firstChild->getNodeName() == 'slot';
             if ($bool && $firstChild->getChildNodes()->count() == 0) {
-                $pos = $firstChild->getAttribute('name') ?? 'default';
+                $pos = trim($firstChild->getAttribute('name') ?? 'default');
                 $slot->setAttribute('p-if', "\$this->slots('{$pos}')");
             }
             elseif ($bool && $firstChild->hasAttribute('p-if')) {// todo error if multiple if on node
@@ -139,5 +172,19 @@ class TemplateEntity extends Entity
         }
         
         return $slots;
+    }
+    
+    private function getScopeData($node) 
+    {
+        $defaultScopeData = null;
+        if ($defaultScopeData = $node->getAttribute('p-scope')) {
+            try { enscope_variables($defaultScopeData); } 
+            catch (\Throwable $e) {
+                throw new InvalidNodeException($e->getRawMessage(), $node);
+            }
+        }
+        $node->removeAttribute('p-scope');
+        
+        return $defaultScopeData;
     }
 }

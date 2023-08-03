@@ -134,7 +134,7 @@
 
 -----
 
-2<div p-if="$false" p-foreach="[1, 2] as $a" p-if="$a == 2">{{ $a }}</div>
+2<div p-if="$false && $a == 2" p-foreach="[1, 2] as $a">{{ $a }}</div>
 =====
 2
 

@@ -23,15 +23,15 @@ class ParsingTemplate
     private string $code = '<?php return new class extends View {};';
     
     public function __construct(string $name, ?string $file, ?string $html, Config $config)
-    {// todo setup from name?
+    {
+        // todo setup from name?
         [$this->name, $this->config] = $this->parsePath($name, $config);
         $this->file = $file;
         $this->html = $html;
         $this->obj = new class extends View {};
 
         # init
-        $this->node = $this->getDomNode();//$this->setAstObject();
-        //strpos($name, 'orm-gr') && print_r('->->->'.$this->node."");
+        $this->node = $this->getDomNode();
     }
     
     public function getDomNode(): DomNode

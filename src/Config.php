@@ -5,9 +5,26 @@ namespace PhpTemplates;
 use Exception;
 use PhpDom\Contracts\DomNodeInterface as DomNode;
 use PhpTemplates\Dom\PhpNode;
+use PhpDom\Parser as HtmlParser;
+//use PhpTemplates\Dom\DomNode;
 
 class Config
 {
+    private static $reservedDirectiveNames = [
+        'if', 
+        'elseif', 
+        'else', 
+        'foreach', 
+        'for', 
+        'while',
+        'checked',
+        'selected',
+        'disabled',
+        'p-raw',
+        'p-bind',
+        'p-scope',
+    ];
+    
     /**
      * Parent config, if any
      *
@@ -58,6 +75,7 @@ class Config
         $this->parent = $parent;
         $this->name = $name;
         $this->srcPath = (array) $srcPath;
+        
         if (!$this->parent) {
             $this->addDefaultDirectives();
         }
@@ -76,6 +94,7 @@ class Config
         try {
             $config = $this->getRoot()->find($name);
         } catch(Exception $e) {}
+        
         if ($config) {
             throw new Exception("A config with '$name' key already exists");
         }
@@ -122,11 +141,10 @@ class Config
 
     private function addDefaultDirectives()
     {
-        $cfg = $this;
         $controlStructures = ['if', 'elseif', 'else', 'foreach', 'for', 'while'];
 
         foreach ($controlStructures as $statement) {
-            $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
+            $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {// todo proxynode
                 if (in_array($statement, ['elseif', 'else'])) {
                     if (!$node->getPrevSibling() || !in_array($node->getPrevSibling()->getNodeName(), ['<?php if', '<?php elseif'])) {
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
@@ -138,17 +156,17 @@ class Config
             };
         }
 
-        $cfg->setDirective('checked', function (DomNode $node, string $val) {
+        $this->directives['checked'] = function (DomNode $node, string $val) {
             $node->setAttribute('p-raw', $val . ' ? "checked" : ""');
-        });
+        };
 
-        $cfg->setDirective('selected', function (DomNode $node, string $val) {
+        $this->directives['selected'] = function (DomNode $node, string $val) {
             $node->setAttribute('p-raw', $val . ' ? "selected=\"selected\"" : ""');
-        });
+        };
 
-        $cfg->setDirective('disabled', function (DomNode $node, string $val) {
+        $this->directives['disabled'] = function (DomNode $node, string $val) {
             $node->setAttribute('p-raw', $val . ' ? "disabled" : ""');
-        });
+        };
     }
 
     // =================================================== //
@@ -259,16 +277,14 @@ class Config
 
     /**
      * Register a directive - a way how a given syntax should be parsed
-     *
+     * //todo merge set get
      * @param string $key
      * @param \Closure $callable
      * @return void
      */
     public function setDirective(string $key, \Closure $callable): void
     {
-        $reserved = ['raw', 'bind', 'if', 'elseif', 'else', 'for', 'foreach'];
-
-        if (in_array($key, $reserved)) {
+        if (in_array($key, self::$reservedDirectiveNames)) {
             throw new \Exception("System directive '$key' cannot be overriden");
         }
 
@@ -277,7 +293,7 @@ class Config
 
     /**
      * Register an alaias to a template to easily refer it in other templates. An key => value array is supported
-     *
+     * //todo merge set get
      * @param array|string $key
      * @param string $component
      * @return void
@@ -289,14 +305,24 @@ class Config
         } else {
             $aliased = $key;
         }
-        $this->aliased = array_merge($this->aliased, $aliased);
+        
+        foreach ($aliased as $k => $val) {
+            if (HtmlParser::isHtmlTag($k)) {
+                throw new \Exception("Cannot declare alias because '$k' is a HTML tag name");
+            }
+            if (in_array($k, ['slot', 'tpl'])) {
+                throw new \Exception("Cannot declare alias because '$k' is a reserved tag name");
+            }
+            
+            $this->aliased[$k] = $val;
+        }
     }
 
     public function setSrcPath($val)
     {
         $this->srcPath = (array) $val;
     }
-
+//todo dangerous to keep
     public function setName(string $name)
     {
         $this->name = $name;

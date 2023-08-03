@@ -3,6 +3,7 @@
 namespace PhpTemplates\Dom;
 
 use PhpDom\DomNode;
+use PhpTemplates\InvalidNodeException;
 use function PhpTemplates\enscope_variables;
 
 class PhpNode extends DomNode
@@ -21,6 +22,10 @@ class PhpNode extends DomNode
     {
         // NODE START
         $return = '';
+        if ($line = $this->getLine()) {
+            $return = '<?php /*line:' . $line . '*/ ?>';
+        }
+        
         if ($isLoop = in_array($this->expression, ['foreach', 'for', 'while'])) {
             $return .= "<?php \$this->__loopStart(); ?>\n";
         }
@@ -29,13 +34,13 @@ class PhpNode extends DomNode
         $args = $this->args;
         if ($this->expression && ($args || $args == '0')) {
             $norm = $this->expression == 'elseif' ? 'if' : $this->expression;
-            $expr = enscope_variables("{$norm} ({$args}) {}");
+            $expr = $this->enscopeVariables("{$norm} ({$args}) {}");
             $expr = preg_replace("/^{$norm} *\(/", $this->expression . ' (', $expr);
             $expr = preg_replace('/\{[\s\t\r\n]*\}/', "{", $expr);
         } elseif ($this->expression) { // case Else
             $expr = $this->expression . " {";
         } else {
-            $expr = rtrim(enscope_variables($args . ';'), ';') . ';';
+            $expr = rtrim($this->enscopeVariables($args . ';'), ';') . ';';
         }
 
         $return .= "<?php " . $expr . " ?>\n";
@@ -60,5 +65,39 @@ class PhpNode extends DomNode
     public function getNodeName(): string
     {
         return '<?php ' . $this->expression;
+    }
+    
+    public function getLine() 
+    {
+        $refNode = $this;
+        if ($this->expression) {
+            while ($refNode->getChildNodes()->first()) {
+                $refNode = $refNode->getChildNodes()->first();
+                if ($refNode instanceof \PhpDom\DomNode && $refNode->getLine()) {
+                    $this->meta['file'] = $refNode->getFile();
+                    $this->meta['line'] = $refNode->getLine();
+                    return $refNode->getLine();
+                }
+            }
+            return;
+        }
+        
+        while ($refNode->getParentNode()) {
+            $refNode = $refNode->getParentNode();
+            if ($refNode instanceof \PhpDom\DomNode && $refNode->getLine()) {
+                $this->meta['file'] = $refNode->getFile();
+                $this->meta['line'] = $refNode->getLine();
+                return $refNode->getLine();
+            }
+        }
+    }
+    
+    private function enscopeVariables(string $str)
+    {
+        try {
+            return enscope_variables($str);
+        } catch (\Throwable $e) {
+            throw new InvalidNodeException($e->getRawMessage(), $this);
+        }
     }
 }

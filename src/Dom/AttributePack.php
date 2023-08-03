@@ -33,6 +33,11 @@ class AttributePack
      */
     public function addToNode(DomNode $node)
     {
+        $line = '';
+        if ($lineNr = $this->getLine($node)) {
+            $line = '/*line:'.$lineNr.'*/';
+        }
+        
         $attrs = [];
         $binds = [];
         $excludes = ['class'];
@@ -40,9 +45,13 @@ class AttributePack
             $isBind = strpos($attr->getName(), ':') === 0;
             $k = ltrim($attr->getName(), ' :');
             $val = $attr->getValue();
+            
+            if ($isBind && !strlen(trim($val))) {
+                throw new InvalidNodeException('Empty binding', $node);
+            }
 
             if ($isBind || strpos($k, 'p-') === 0) {
-                $val = $this->getEnscopedAttrValue($attr);
+                $val = $this->getEnscopedAttrValue($attr, $node);
             }
             
             if ($k == 'p-raw') {
@@ -83,16 +92,24 @@ class AttributePack
         }
 
         foreach ($attrs as $k => $val) {
+            if ($line && strpos($val, '<?php') === 0) {
+                $val = str_replace('<?php', '<?php '.$line, $val);
+                $line = '';
+            }
+            elseif ($line && strpos($k, '<?php') === 0) {
+                $k = str_replace('<?php', '<?php '.$line, $k);
+                $line = '';
+            }
             $node->setAttribute($k, $val);
         }
         
         $excludes = "['" . implode("','", $excludes) . "']";
         if (count($binds) > 1) {
             $binds = 'array_merge(' . implode(', ', $binds) . ')';
-            $node->setAttribute("<?php \$this->__eBind($binds, $excludes); ?>");
+            $node->setAttribute("<?php {$line}\$this->__eBind($binds, $excludes); ?>");
         }
         elseif ($binds) {
-            $node->setAttribute("<?php \$this->__eBind($binds[0], $excludes); ?>");
+            $node->setAttribute("<?php {$line}\$this->__eBind({$binds[0]}, $excludes); ?>");
         }
     }
 
@@ -100,7 +117,7 @@ class AttributePack
      * used on php entities calls
      */
     public function toArrayString()
-    {
+    {// todo, test this if used… or what, if scoped
         $attrs = [];
         $binds = [];
         $excludes = ['class'];
@@ -182,13 +199,28 @@ class AttributePack
         }, $val);
     }
     
-    private function getEnscopedAttrValue($attr) 
+    private function getEnscopedAttrValue($attr, $node) 
     {
         $val = $attr->value;
         try {
             return enscope_variables($val);
         } catch (\Throwable $e) {
-            throw new InvalidNodeException("Error trying to evaluate the syntax '{$val}': ". $e->getMessage(), $attr);
+            throw new InvalidNodeException("Error trying to evaluate the syntax '{$val}': ". $e->getMessage(), $node);
+        }
+    }
+    
+    public function getLine($node) 
+    {
+        if ($node->getLine()) {
+            return $node->getLine();
+        }
+        
+        $refNode = $node;
+        while ($refNode->getParentNode()) {
+            $refNode = $refNode->getParentNode();
+            if ($refNode instanceof \PhpDom\DomNode && $refNode->getLine()) {
+                return $refNode->getLine();
+            }
         }
     }
 }

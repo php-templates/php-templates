@@ -15,6 +15,7 @@ class View
     protected array $props = [];
     protected $__config = 'default';
     
+    private $line = null;
     private Scope $shared;
     private Scope $scope;
     private Config $config;
@@ -233,5 +234,9 @@ class View
         }
         
         return $arr;
+    }
+    
+    final public function __ln(int $line) {
+        $this->line = $line;
     }
 }
