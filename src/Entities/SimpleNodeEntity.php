@@ -20,8 +20,8 @@ class SimpleNodeEntity extends Entity
     public function simpleNodeContext()
     {
         $data = $this->depleteNode($this->node);
-        foreach ($this->node->getChildNodes() as $slot) {
-            $this->child($slot)->simpleNodeContext();
+        foreach ($this->node->getChildNodes() as $cn) {
+            $this->child($cn)->simpleNodeContext();
         }
 
         $data->addToNode($this->node);

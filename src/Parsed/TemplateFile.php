@@ -27,7 +27,7 @@ class TemplateFile
             return null;
         }
 
-        return require($file);
+        return require($this->file);
     }
 
     public function has(string $key): bool
@@ -96,7 +96,7 @@ class TemplateFile
         
         file_put_contents($this->file, $tpl);
         
-        return require_once($this->file);
+        return require($this->file);
     }
 
     protected function getFile(string $key)

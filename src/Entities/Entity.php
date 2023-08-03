@@ -14,8 +14,11 @@ use PhpTemplates\Cache\CacheInterface;
 use PhpTemplates\EventHolder;
 use PhpTemplates\NodeParser;
 use PhpTemplates\Registry;
+use PhpTemplates\Dom\PhpRefNode;
+use PhpTemplates\Dom\ProxyNode;
 use PhpTemplates\Parsed\TemplateFile;
 use PhpDom\Contracts\TextNodeInterface;
+use PhpTemplates\InvalidNodeException;
 
 /**
  * Startup entity
@@ -75,25 +78,41 @@ abstract class Entity implements EntityInterface
         $attributePack = new AttributePack($this->getConfig());
         
         // dispatch any existing directive
+        $refNode = null;
         while ($attrs = $node->getAttributes()) 
         {
+            // todo buggy not having attrs
             $node->removeAttribute('*');
 
             foreach ($attrs as $a) {
                 $k = $a->getName();
                 if (array_key_exists($k, $this->attrs)) {
-                    $this->attrs[$k] = $a->getValue();
+                    $this->attrs[$k] = trim($a->getValue());
                     continue;
                 }
 
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
-                    if ($directive = $config->getDirective(substr($k, strlen($this->pf)))) {
+                    if ($directive = $config->getDirective(substr($k, strlen($this->pf)))) 
+                    {
+                        // insert comment to help handle error displaying
+if (0 && ! $refNode && $node->getParentNode()) {
+                            $refNode = new PhpRefNode($node->getFile(), $node->getLine());
+                            $refNode->insertBefore($node);
+                        }
+                        
+                        // we send a node with limited access around it because parent nodes are already processed in this step and changing them would make possible problems
+                        // $proxyNode = new ProxyNode($node); todo
                         $directive($node, (string)$a->getValue());
-
                         // directive unpacked his data, next attr!!!
                         continue;
                     }
+                }
+                
+                // insert comment to help handle error displaying
+if (0 && !$refNode && $k[0] == ':' && $node->getParentNode()) {
+                    $refNode = new PhpRefNode($node->getFile(), $node->getLine());
+                    $refNode->insertBefore($node);
                 }
 
                 $attributePack->add($a);
@@ -115,6 +134,9 @@ abstract class Entity implements EntityInterface
         }
         
         if ($node->getNodeName() == 'slot') {
+            if ($node->hasAttribute('name') && !trim($node->getAttribute('name'))) {
+                throw new InvalidNodeException('No slot name given', $node);
+            }
             return new SlotEntity($node, $this);
         }
         
@@ -122,29 +144,35 @@ abstract class Entity implements EntityInterface
             return new VerbatimEntity($node, $this);
         }
         
+        // normalize aliased names
         if ($node->getNodeName() != 'tpl' && ($rfilepath = $config->getAliased($node->getNodeName()))) {
             $node->setNodeName('tpl');
-            if ($rfilepath[0] == '@') {
-                $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
-            }
             $node->setAttribute('is', $rfilepath);
         }
         
+        // validate component or extended
+        if ($node->getNodeName() == 'tpl') {
+            $this->validateTplNode($node);
+        }
+        else {
+            $this->validateNodeAttributes($node);
+        }
+        
         if ($node->getNodeName() == 'tpl' && $node->hasAttribute('is')) {
-            $rfilepath = $node->getAttribute('is');
-            if ($rfilepath[0] == '@') {
-                $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
-                $node->setAttribute('is', $rfilepath);
+            $rfilepath = trim($node->getAttribute('is'));
+            if (! $rfilepath) {
+                throw new InvalidNodeException("No template name given", $node);
             }            
+            
             return new TemplateEntity($node, $this);
         }
         
         if ($node->getNodeName() == 'tpl' && $node->hasAttribute('extends')) {
-            $rfilepath = $node->getAttribute('extends');
-            if ($rfilepath[0] == '@') {
-                $rfilepath = $config->getName() . ':' . ltrim($rfilepath, '@');
-                $node->setAttribute('extends', $rfilepath);
-            }       
+            $rfilepath = trim($node->getAttribute('extends'));
+            if (! $rfilepath) {
+                throw new InvalidNodeException("No template name given", $node);
+            }
+            
             return new ExtendEntity($node, $this);
         }
 
@@ -154,11 +182,32 @@ abstract class Entity implements EntityInterface
 
         return new SimpleNodeEntity($node, $this);        
     }
+    
+    private function validateTplNode($node)
+    {
+        if ($node->hasAttribute('is') && $node->hasAttribute('extends')) {
+            throw new InvalidNodeException("Cannot use 'is' and 'extends' on same node", $node);
+        }
+        
+        $this->validateNodeAttributes($node);
+    } 
+    
+    private function validateNodeAttributes($node) 
+    {
+        $duplicates = [];
+        foreach ($node->getAttributes() as $attr) {
+            $k = $attr->getName();
+            if (isset($duplicates[$k]) && !in_array($k, [':class', 'p-bind', 'p-raw'])) {
+                throw new InvalidNodeException("Duplicate attribute $k", $node);
+            }
+            $duplicates[$k] = true;
+        }        
+    }
 
     /**
      * Call recursive parse process giving context = this
      */
-    public function parse()
+    public function parse() // todo, used??
     {
         foreach ($this->node->getChildNodes() as $cn) {
             $this->child($cn)->startupContext();

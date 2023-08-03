@@ -46,7 +46,7 @@ class StartupEntity implements EntityInterface
         $node = $this->template->getDomNode();
         $wrapper = new DomNode('');
         $wrapper->appendChild($node);
-        
+
         Event::trigger('parsing', $name, $node, $classDefinition);
         method_exists($obj, 'parsing') && $obj->parsing($node, $classDefinition);
          

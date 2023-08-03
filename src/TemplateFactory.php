@@ -119,7 +119,7 @@ class TemplateFactory
 
     /**
      * Make a template object from full file path
-     */
+     
     public function fromFile(string $file, array $data = [], array $slots = [], Config $config = null): Template
     {
         // todo: obtain code
@@ -142,17 +142,7 @@ class TemplateFactory
         return $viewFactory
         ->make($name, $data)
         ->setSlots($slots);
-    }
-    
-    /**
-     * Setup new Parser instance
-     */
-     public function getParser(): Parser
-     {
-         $parser = new Parser($this->event);
-         
-         return $parser;
-     }
+    }*/
 
     /**
      * Share global data to all views

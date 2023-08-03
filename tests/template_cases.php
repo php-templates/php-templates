@@ -104,6 +104,7 @@ foreach($files as $f) {
         $_f = str_replace('\\', '/', $e->getFile());
         $_f = explode('/', $_f);
         echo $e->getMessage() . ' in ' . end($_f) . ' at line ' . $e->getLine();
+        die();
     }
     //$results = explode('<body>', $results);
     //$results = end($results);
