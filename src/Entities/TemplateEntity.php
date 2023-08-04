@@ -9,10 +9,10 @@ use PhpTemplates\Event;
 use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\ParsingTemplate;
 use PhpTemplates\Dom\WrapperNode;
-use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Exceptions\InvalidNodeException;
 use PhpDom\DomNode;
 use PhpTemplates\PhpParser;
-use PhpTemplates\TemplateNotFoundException;
+use PhpTemplates\Exceptions\TemplateNotFoundException;
 use function PhpTemplates\enscope_variables;
 
 // todo p-scope tag that throws an error instant ca nu il poti folosi decat pe sloturi, e procesat automat

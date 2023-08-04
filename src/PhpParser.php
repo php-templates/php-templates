@@ -24,7 +24,7 @@ class PhpParser
     /**
      * Pass parser in each entity, at the end gather an array of every parsed template and its meta
      */
-    public function parse(ParsingTemplate $template): TemplateClassDefinition
+    public function parse(ParsingTemplate $template): ViewDefinition
     {
         $code = $template->getCode();
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
@@ -65,6 +65,6 @@ class PhpParser
             }
         }
  
-        return new TemplateClassDefinition($ast, $uses);
+        return new ViewDefinition($ast, $uses);
     }
 }

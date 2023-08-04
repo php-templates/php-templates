@@ -5,7 +5,7 @@
 <script>execution</script>
 
 <?php 
-return new class extends PhpTemplates\Parsed\View
+return new class extends PhpTemplates\View
 {
     public function parsing($dom) {
         $script = $dom->querySelector('script')->detach();

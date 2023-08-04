@@ -2,7 +2,7 @@
 
 use PhpTemplates\Event as Event;
 
-return new class extends PhpTemplates\Parsed\View
+return new class extends PhpTemplates\View
 {
     public function parsing($n, $r) {
         Event::on('parsing', 'the/events', function() {

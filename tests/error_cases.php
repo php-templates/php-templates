@@ -15,14 +15,14 @@ ini_set('error_reporting', E_ALL);
 </style>
 <?php
 
-use PhpTemplates\TemplateFactory;
+use PhpTemplates\PhpTemplates;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\EventDispatcher;
 use PhpDom\DomNodeAttr;
 use PhpDom\TextNode;
 
 //header("Content-Type: text/plain");
-$viewFactory = new TemplateFactory(__DIR__, __DIR__.'/error_results', new EventDispatcher());
+$viewFactory = new PhpTemplates(__DIR__, __DIR__.'/error_results', new EventDispatcher());
 //$cfgHolder = $viewFactory->getConfig();
 
 $cfg = $viewFactory->config();

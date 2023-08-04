@@ -11,14 +11,14 @@ require('../autoload.php');
 </style>
 <?php
 
-use PhpTemplates\TemplateFactory;
+use PhpTemplates\PhpTemplates;
 use PhpTemplates\Cache\FileSystemCache;
 use PhpTemplates\EventDispatcher;
 use PhpDom\DomNodeAttr;
 use PhpDom\TextNode;
 
 //header("Content-Type: text/plain");
-$viewFactory = new TemplateFactory(__DIR__, __DIR__.'/results', new EventDispatcher());
+$viewFactory = new PhpTemplates(__DIR__, __DIR__.'/results', new EventDispatcher());
 //$cfgHolder = $viewFactory->getConfig();
 
 $cfg = $viewFactory->config();

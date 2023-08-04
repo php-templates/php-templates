@@ -24,7 +24,7 @@
 
 <?php
 // todo: e aiurea namespace
-return new class extends \PhpTemplates\Parsed\View
+return new class extends \PhpTemplates\View
 {
     protected array $props = [
         'type' => 'text',
