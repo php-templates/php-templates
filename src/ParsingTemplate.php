@@ -4,7 +4,7 @@ namespace PhpTemplates;
 
 use PhpDom\Source;
 use PhpDom\Contracts\DomElementInterface as DomNode;
-use PhpTemplates\Parsed\View;
+use PhpTemplates\View;
 use PhpDom\Parser as DomParser;
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;

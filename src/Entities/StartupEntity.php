@@ -5,18 +5,18 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Config;
 use PhpTemplates\Event;
 use PhpTemplates\ParsingTemplate;
-use PhpTemplates\Parsed\TemplateFile;
+use PhpTemplates\Document;
 use PhpDom\Contracts\DomElementInterface as DomElement;
 use PhpDom\DomNode;
 use PhpTemplates\Contracts\Entity as EntityInterface;
 
 class StartupEntity implements EntityInterface
 {
-    private TemplateFile $document;
+    private Document $document;
     private Config $config;
     private ParsingTemplate $template;
     
-    public function __construct(ParsingTemplate $template, TemplateFile $document)
+    public function __construct(ParsingTemplate $template, Document $document)
     {
         $this->document = $document;
         $this->config = $template->getConfig();
@@ -28,7 +28,7 @@ class StartupEntity implements EntityInterface
         return $this->config;
     }
     
-    public function getDocument(): TemplateFile
+    public function getDocument(): Document
     {
         return $this->document;
     }

@@ -1,4 +1,4 @@
-<?php return new class extends \PhpTemplates\Parsed\View
+<?php return new class extends \PhpTemplates\View
 {
     public function template() {
         echo 'yes';

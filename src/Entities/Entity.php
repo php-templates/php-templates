@@ -16,9 +16,9 @@ use PhpTemplates\NodeParser;
 use PhpTemplates\Registry;
 use PhpTemplates\Dom\PhpRefNode;
 use PhpTemplates\Dom\ProxyNode;
-use PhpTemplates\Parsed\TemplateFile;
+use PhpTemplates\Document;
 use PhpDom\Contracts\TextNodeInterface;
-use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Exceptions\InvalidNodeException;
 
 /**
  * Startup entity
@@ -50,7 +50,7 @@ abstract class Entity implements EntityInterface
      */
     protected array $attrs = [];
     
-    protected TemplateFile $document;
+    protected Document $document;
 
     /**
      * prefix for special php blocks (p-if, p-for)
@@ -238,7 +238,7 @@ if (0 && !$refNode && $k[0] == ':' && $node->getParentNode()) {
         return $this->config;
     }
     
-    public function getDocument(): TemplateFile
+    public function getDocument(): Document
     {
         return $this->document;
     }

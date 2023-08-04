@@ -10,7 +10,7 @@ use PhpParser\ParserFactory;
 use PhpParser\BuilderFactory;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
-use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Exceptions\InvalidNodeException;
 use function PhpTemplates\enscope_variables;
 
 class AttributePack

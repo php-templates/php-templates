@@ -3,7 +3,7 @@
 namespace PhpTemplates\Dom;
 
 use PhpDom\DomNode;
-use PhpTemplates\InvalidNodeException;
+use PhpTemplates\Exceptions\InvalidNodeException;
 use function PhpTemplates\enscope_variables;
 
 class PhpNode extends DomNode
