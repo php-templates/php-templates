@@ -235,8 +235,4 @@ class View
         
         return $arr;
     }
-    
-    final public function __ln(int $line) {
-        $this->line = $line;
-    }
 }
