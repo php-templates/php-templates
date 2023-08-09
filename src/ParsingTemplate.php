@@ -20,7 +20,7 @@ class ParsingTemplate
     private DomNode $node;
     private $obj;
     private $classDefinition;
-    private string $code = '<?php return new class extends View {};';
+    private string $code = '<?php return new class {};';
     
     public function __construct(string $name, ?string $file, ?string $html, Config $config)
     {
@@ -28,7 +28,7 @@ class ParsingTemplate
         [$this->name, $this->config] = $this->parsePath($name, $config);
         $this->file = $file;
         $this->html = $html;
-        $this->obj = new class extends View {};
+        $this->obj = new class {};
 
         # init
         $this->node = $this->getDomNode();
@@ -92,13 +92,17 @@ class ParsingTemplate
         
         // object returned by template, serving as logic holder
         if (!is_object($obj)) {
-            $obj = new class extends View {};
+            $obj = new class {};
         } else {
             $this->code = file_get_contents($file);
         }
         
-        if (! $obj instanceof View) {
-            throw new \Exception("Template file {$file} must return a valid object extending View::class");
+        if (get_parent_class($obj)) {
+            throw new \Exception("Template file {$this->file} must return a new class {} without parent");
+        }
+
+        if (strpos(get_class($obj), 'class@anonymous') !== 0) {
+            throw new \Exception("Template file {$file} must return a new class {}");
         }
         
         $this->obj = $obj;

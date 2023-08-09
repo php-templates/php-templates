@@ -26,9 +26,9 @@ interface EventDispatcher
      * @param integer $weight - weighter callbacks are executed first
      * @return void
      */
-    public function on(string $ev, $name, $cb, $weight = 0);
+    public function on(string $ev, $name, callable $cb, $weight = 0);
     // todo comments
-    public function parsing($name, $cb, $weight = 0);
-    public function parsed($name, $cb, $weight = 0);
-    public function rendering($name, $cb, $weight = 0);
+    public function parsing($name, callable $cb, $weight = 0);
+    public function parsed($name, callable $cb, $weight = 0);
+    public function rendering($name, callable $cb, $weight = 0);
 }

@@ -9,8 +9,7 @@
     </tpl>
 </div>
 <?php
-return new class extends PhpTemplates\View
-{
+return new class {
     public function doSomethingElse() {
         return $this->cfgKey().':doSomethingElse';
     }

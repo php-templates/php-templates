@@ -25,11 +25,10 @@ class View
     /** trick the anonymous class to not yall about missing params */
     final public static function new(array $data, Scope $shared, Config $config, EventDispatcher $event) 
     {
-        $view = new static();
-        return $view->construct($data, $shared, $config, $event);
+        return new static($data, $shared, $config, $event);
     } 
     
-    final public function construct(array $data, Scope $shared, Config $config, EventDispatcher $event): static
+    final public function __construct(array $data, Scope $shared, Config $config, EventDispatcher $event)
     {
         foreach ($data as $k => $val) {
             if (! array_key_exists($k, $this->props)) {
@@ -37,17 +36,18 @@ class View
             }
         }
         
-        $data = array_merge($this->props, $this->data($data));
+        $data = array_merge($this->props, (array)$this->data($data));
         
         $this->shared = $shared;
         $this->scope = $shared->innerScope($data);
         $this->config = $config->find($this->__config);
         $this->event = $event;
-        
-        return $this;
     }
     
-    public function data($data) 
+    /**
+     * Ment to be overriden in new class {}
+     */
+    public function data($data): array
     {
         return $data;
     }
@@ -57,7 +57,7 @@ class View
      */
     private array $slots = [];
 
-    public array $comp; // used in component build in order to not poluate variables, like this: this->comp[id] =
+    public array $comp; // used in component build in order to not poluate variables, like this: this->comp[id] = todo, still neded?
 
     final public function render() 
     {
@@ -138,10 +138,22 @@ class View
         return $this;
     }
     
+    final public function __toString(): string
+    {
+        ob_start();
+        $this->render();
+        $content = ob_get_contents();
+        ob_end_clean();
+
+        return $content;
+    }
+    
     final public function __call($m, $args) 
     {
         $name = $m;
         $cfg = $this->config;
+        // todo if in private this methods and public function addMethod on rendering
+        
         if ($m = $cfg->helper($m)) {
             # bind this context to args list
             array_unshift($args, $this);
@@ -164,20 +176,20 @@ class View
         return $this->{$prop};
     }
     
-    final public function __loopStart() {
+    final protected function __loopStart() {
         $this->scope = $this->scope->innerScope();
     }
     
-    final public function __loopEnd() {
+    final protected function __loopEnd() {
         $this->scope = $this->scope->outerScope();
     }
    
-    final public function cfgKey() 
+    final protected function cfgKey() 
     {
         return $this->config->getName();
     }
     
-    final public function __e($string) 
+    final protected function __e($string) 
     {
         if ($string && !is_string($string)) {
             $string = json_encode($string);
@@ -185,7 +197,7 @@ class View
         echo htmlentities((string)$string);        
     }
     
-    final public function __eBind($array, array $except = [])
+    final protected function __eBind($array, array $except = [])
     {
         $array = array_diff_key((array)$array, array_flip($except));
         $result = [];
@@ -209,7 +221,7 @@ class View
         echo implode(' ', $result);
     }
         
-    final public function __resolveClass(array $class) 
+    final protected function __resolveClass(array $class) 
     {
         $result = [];
         foreach ($class as $k => $val) {
@@ -228,7 +240,7 @@ class View
         return implode(' ', $result);
     }
    
-    final public function __arrExcept(array $arr, $except) {
+    final protected function __arrExcept(array $arr, $except) {
         foreach ((array)$except as $except) {
             unset($arr[$except]);
         }

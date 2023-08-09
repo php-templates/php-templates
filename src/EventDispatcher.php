@@ -59,7 +59,7 @@ class EventDispatcher implements EventDispatcherInterface
      * Add event listener to given process, 
      * an array may be given for param name
      */
-    public function on(string $ev, $name, $cb, $weight = 0)
+    public function on(string $ev, $name, callable $cb, $weight = 0)
     {
         foreach ((array)$name as $name) {
             $k = explode('*', $name)[0];
@@ -75,7 +75,7 @@ class EventDispatcher implements EventDispatcherInterface
      * Add event listener to given process, with execution only once
      * an array may be given for param name
      */
-    public function once(string $ev, $name, $cb, $weight = 0)
+    public function once(string $ev, $name, callable $cb, $weight = 0)
     {
         foreach ((array)$name as $name) {
             $k = explode('*', $name)[0];
@@ -96,7 +96,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Event on parsing template, most used
      */
-    public function parsing($name, $cb, $weight = 0) 
+    public function parsing($name, callable $cb, $weight = 0) 
     {
         $this->on('parsing', $name, $cb, $weight);
     }
@@ -104,7 +104,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Event on parsed template
      */
-    public function parsed($name, $cb, $weight = 0) 
+    public function parsed($name, callable $cb, $weight = 0) 
     {
         $this->on('parsed', $name, $cb, $weight);
     }
@@ -112,7 +112,7 @@ class EventDispatcher implements EventDispatcherInterface
     /**
      * Event on rendering template, most used
      */
-    public function rendering($name, $cb, $weight = 0) 
+    public function rendering($name, callable $cb, $weight = 0) 
     {
         $this->on('rendering', $name, $cb, $weight);
     }
