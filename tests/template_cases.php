@@ -18,7 +18,7 @@ use PhpDom\DomNodeAttr;
 use PhpDom\TextNode;
 
 //header("Content-Type: text/plain");
-$viewFactory = new PhpTemplates(__DIR__, __DIR__.'/results', new EventDispatcher());
+$GLOBALS['VIEW'] = $viewFactory = new PhpTemplates(__DIR__, __DIR__.'/results', new EventDispatcher());
 //$cfgHolder = $viewFactory->getConfig();
 
 $cfg = $viewFactory->config();

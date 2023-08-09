@@ -10,13 +10,13 @@ done - posibilitate adaugare tag uri custom, ca sa pot avea ceva de genul {t Ce 
 solve indent
 done partial(not on runtime) - toate erorile thrown trb sa aiba indicatie spre t.php file, un comment cv.. ca la twig
 done - slot in slot with empty slot should not reset
-bind slots
+later - bind slots
 done - butter node parser using preg offset
-events as classes path support, no, better .. event *
+not needed bcz of callable nature - events as classes path support, no, better .. event *, PhpTemplates::extends('tpl', Class::class or new Class)
 done - throw parse error, line unexpected " or ' or
 done - registry
 done - file loader with exists method
-support for view->make() in rendering event
+done - support for view->make() in rendering event
 not needed - throw error if not closing {% %}
 not needed (todo test case p-not-directive) - config throw error if directive not exists
 done - configure parser to auto close tags without throwing errors
@@ -30,44 +30,6 @@ done - se pot destructura assoc array, ca idee pt scoped slots data
 done - do not parse if templ fn exists
 done - shared should be accessed on parent view:
 done - class si :class pe tpl
-
-new comp1(
-  slotfn() {
-    new comp2(should inherit shared from comp1, but not data)
-
-FormGroup extends Class {
-  props {} nu pot fi directe, ca altfel nu pot controla accesul la ele
-  data nu poate fi decat in context separat, si accesat cu this.context.get, altfel daca se definesc chestii publice, risc sa pierd controlul asupra lor 
-  
-  data(data) { trb sa faca un return, nu un set, alt_el nu pot controla accesul
-  
-  }
-  tagNameOfTag() {
-  
-  }
-  composerNameOfComposer() {
-  
-  }
-  data():array => processed
-  
-  ... 
-  final get () _attrs protected
-  ...
- final render() 
-   template()
-   {
-    div^
-    Loop(fn {
-      this->context.x
-    })
-  }
-  
-  final setdata()
-  called before data, setting data in functie de props
-  data trb sa contina tot, props sunt optionale, altfel se umple attrs cu toate. attrs trb sa tina valorile originale
-  pe data raman toate, restul se duce in _attrs, care e privata si nu e pe scope, ci ramane pe componenta si e accesibila cu this.attrs()
-}
-
 done - todo throw error daca slots sunt divortate
 <template>
     <div slot1></div>

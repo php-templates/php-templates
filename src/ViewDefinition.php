@@ -40,7 +40,6 @@ class ViewDefinition
     public function addProp(string $name, string $value, int $accessLevel = 3) 
     {
         $factory = new BuilderFactory;
-        //dd(get_class_methods($factory));
         $prop = $factory->property($name);
         $prop->setDefault($value);
         $prop->makeProtected();
@@ -52,13 +51,6 @@ class ViewDefinition
         $factory = new BuilderFactory;
         $prop = $factory->classConst($name, $value);
         array_unshift($this->ast->stmts, $prop->getNode());
-   return;
-        $prop = $factory->classConst('config', $config);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('name', $name);
-        array_unshift($ast->stmts, $prop->getNode());
-        $prop = $factory->classConst('file', $source->getFile());
-        array_unshift($ast->stmts, $prop->getNode());
     }
     
     public function extends(string $class) 

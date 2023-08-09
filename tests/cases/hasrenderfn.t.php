@@ -1,4 +1,4 @@
-<?php return new class extends \PhpTemplates\View
+<?php return new class
 {
     public function template() {
         echo 'yes';
