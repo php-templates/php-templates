@@ -23,7 +23,7 @@
 </div>
 
 <?php
-// todo: e aiurea namespace
+
 return new class
 {
     protected array $props = [

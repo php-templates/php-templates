@@ -9,7 +9,7 @@ use PhpTemplates\Dom\PhpNode;
 use PhpTemplates\Registry;
 use PhpTemplates\Contracts\Entity as EntityInterface;
 use PhpDom\Contracts\DomElementInterface as DomElement;
-// todo throw error if null name
+
 class ExtendEntity extends TemplateEntity
 {
     protected string $className;

@@ -6,7 +6,7 @@ use PhpTemplates\Source;
 use PhpTemplates\Contracts\Cache;
 use PhpTemplates\View;
 use PhpTemplates\ParsingTemplate;
-// todo rename in document
+
 class Document
 {
     protected string $rootPath;

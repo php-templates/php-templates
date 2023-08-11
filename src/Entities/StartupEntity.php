@@ -38,7 +38,7 @@ class StartupEntity implements EntityInterface
     /**
      * Call recursive parse process giving context = this
      */
-    public function parse()// todo add in interface
+    public function parse()
     {
         $name = $this->template->getName();
         $classDefinition = $this->template->getClassDefinition();

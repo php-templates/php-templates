@@ -144,7 +144,7 @@ class Config
         $controlStructures = ['if', 'elseif', 'else', 'foreach', 'for', 'while'];
 
         foreach ($controlStructures as $statement) {
-            $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {// todo proxynode
+            $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
                 if (in_array($statement, ['elseif', 'else'])) {
                     if (!$node->getPrevSibling() || !in_array($node->getPrevSibling()->getNodeName(), ['<?php if', '<?php elseif'])) {
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);
@@ -316,16 +316,6 @@ class Config
             
             $this->aliased[$k] = $val;
         }
-    }
-
-    public function setSrcPath($val)
-    {
-        $this->srcPath = (array) $val;
-    }
-//todo dangerous to keep
-    public function setName(string $name)
-    {
-        $this->name = $name;
     }
     
     public function helper(string $name, \Closure $fn = null) 

@@ -20,9 +20,9 @@ class InvalidNodeException extends \Exception
             return $node->getLine();
         }
         
-        $refNode = $node;// todo prevsibling too=
-        while ($refNode->getParentNode()) {
-            $refNode = $refNode->getParentNode();
+        $refNode = $node;
+        while ($refNode->getPrevSibling() || $refNode->getParentNode()) {
+            $refNode = $refNode->getPrevSibling() ?? $refNode->getParentNode();
             if ($refNode instanceof \PhpDom\DomNode && $refNode->getLine()) {
                 return $refNode->getLine();
             }

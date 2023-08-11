@@ -1,5 +1,5 @@
 <?php
-// todo scoate context din param fn, il fac bind pe this
+
 namespace PhpTemplates\Dom;
 
 use PhpDom\DomNode;

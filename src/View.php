@@ -163,7 +163,7 @@ class View
         throw new \Exception("Helper function $name not found");
     }
     
-    final protected function attrs($key = null) {
+    final public function attrs($key = null) {
         if ($key) {
             return $this->attrs[$key] ?? null;
         }
@@ -176,20 +176,20 @@ class View
         return $this->{$prop};
     }
     
-    final protected function __loopStart() {
+    final public function __loopStart() {
         $this->scope = $this->scope->innerScope();
     }
     
-    final protected function __loopEnd() {
+    final public function __loopEnd() {
         $this->scope = $this->scope->outerScope();
     }
    
-    final protected function cfgKey() 
+    final public function cfgKey() 
     {
         return $this->config->getName();
     }
     
-    final protected function __e($string) 
+    final public function __e($string) 
     {
         if ($string && !is_string($string)) {
             $string = json_encode($string);
@@ -197,7 +197,7 @@ class View
         echo htmlentities((string)$string);        
     }
     
-    final protected function __eBind($array, array $except = [])
+    final public function __eBind($array, array $except = [])
     {
         $array = array_diff_key((array)$array, array_flip($except));
         $result = [];
@@ -221,7 +221,7 @@ class View
         echo implode(' ', $result);
     }
         
-    final protected function __resolveClass(array $class) 
+    final public function __resolveClass(array $class) 
     {
         $result = [];
         foreach ($class as $k => $val) {
@@ -240,7 +240,7 @@ class View
         return implode(' ', $result);
     }
    
-    final protected function __arrExcept(array $arr, $except) {
+    final public function __arrExcept(array $arr, $except) {
         foreach ((array)$except as $except) {
             unset($arr[$except]);
         }

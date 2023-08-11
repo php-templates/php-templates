@@ -90,6 +90,10 @@ abstract class Entity implements EntityInterface
                     $this->attrs[$k] = trim($a->getValue());
                     continue;
                 }
+                
+                if ($k == 'p-scope') {
+                    throw new InvalidNodeException('p-scope directive can be used only in component scopes context', $node);
+                }
 
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
@@ -202,16 +206,6 @@ if (0 && !$refNode && $k[0] == ':' && $node->getParentNode()) {
             }
             $duplicates[$k] = true;
         }        
-    }
-
-    /**
-     * Call recursive parse process giving context = this
-     */
-    public function parse() // todo, used??
-    {
-        foreach ($this->node->getChildNodes() as $cn) {
-            $this->child($cn)->startupContext();
-        }
     }
 
     // =================================================== //

@@ -54,7 +54,7 @@ class PhpParser
         
         $ast = $ast->expr->class;
         
-        $ast->name = 'PHPT_' . preg_replace('/[^A-Za-z0-9]/', '_', $template->getName() . '_' . uniqid());// todo replace non alfanum
+        $ast->name = 'PHPT_' . preg_replace('/[^A-Za-z0-9]/', '_', $template->getName() . '_' . uniqid());
 
         foreach ($ast->stmts as $i => $stmt) {
             if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
