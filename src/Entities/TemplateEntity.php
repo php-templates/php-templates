@@ -165,7 +165,7 @@ class TemplateEntity extends Entity
                 $pos = trim($firstChild->getAttribute('name') ?? 'default');
                 $slot->setAttribute('p-if', "\$this->slots('{$pos}')");
             }
-            elseif ($bool && $firstChild->hasAttribute('p-if')) {// todo error if multiple if on node
+            elseif ($bool && $firstChild->hasAttribute('p-if')) {
                 $slot->setAttribute('p-if', $firstChild->getAttribute('p-if'));
                 $firstChild->removeAttribute('p-if');
             }

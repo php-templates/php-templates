@@ -27,7 +27,6 @@ interface EventDispatcher
      * @return void
      */
     public function on(string $ev, $name, callable $cb, $weight = 0);
-    // todo comments
     public function parsing($name, callable $cb, $weight = 0);
     public function parsed($name, callable $cb, $weight = 0);
     public function rendering($name, callable $cb, $weight = 0);

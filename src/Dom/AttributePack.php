@@ -117,7 +117,7 @@ class AttributePack
      * used on php entities calls
      */
     public function toArrayString()
-    {// todo, test this if used… or what, if scoped
+    {
         $attrs = [];
         $binds = [];
         $excludes = ['class'];
@@ -185,18 +185,13 @@ class AttributePack
         $val = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             return '<?php $this->__e('. enscope_variables($m[1]) .'); ?>';
         }, $val);
-        // todo
-        return $val;
+
         // custom tags
-        $t = $this->config->getCustomTags();
-        if (!$t) {
-            return $val;
-        }
-        $t = implode('|', $t);
-        return preg_replace_callback("/{($t) (((?!{($t) ).)*)}/", function($m) {
-            $fn = $this->config->customTag($m[1]);
-            return $fn($this->config, trim($m[2]));
+        $val = preg_replace_callback("/{(\w+) (((?!{(\w+) ).)*)}/", function($m) {
+            return '<?php echo '. enscope_variables(sprintf('$this->%s(%s)', $m[1], trim($m[2]))) .'; ?>';
         }, $val);
+        
+        return $val;
     }
     
     private function getEnscopedAttrValue($attr, $node) 

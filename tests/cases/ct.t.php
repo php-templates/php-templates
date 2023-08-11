@@ -9,3 +9,9 @@
     default::Hi there1, admin
 </div>
 default::Hi there2, admin
+
+-----
+
+<div class="{t 'Olla'}"></div>
+=====
+<div class="default::Olla"></div>

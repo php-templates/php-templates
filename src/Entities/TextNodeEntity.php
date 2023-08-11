@@ -1,5 +1,5 @@
 <?php
-// todo hamdle error syntax rrom {{ {% etc
+
 namespace PhpTemplates\Entities;
 
 use function PhpTemplates\enscope_variables;
@@ -22,7 +22,7 @@ class TextNodeEntity extends Entity
      * <tpl is="comp/x">abc</tpl>
      */
     public function templateContext()
-    {dd(4);
+    {
         // unreachable because of View::simpleNodeContext dom manipulation
     }
 

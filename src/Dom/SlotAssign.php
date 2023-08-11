@@ -1,11 +1,10 @@
 <?php
-// todo scoate use context, il am pe this context, renunta la fngetargs
+
 namespace PhpTemplates\Dom;
 
 use PhpDom\DomNode;
 use function PhpTemplates\enscope_variables;
 
-// todo error reserved tags
 class SlotAssign extends DomNode
 {
     private $targetComp;
@@ -23,9 +22,9 @@ class SlotAssign extends DomNode
         $this->slotPos = $slotPos;
         $this->scopeData = $scopeData;
     }
-// todo enscope somehow scope render foreach
+
     public function __toString()
-    {// todo handle error syntax assign
+    {
         // NODE START
         $return = sprintf('<?php $this->comp["%s"]->addSlot("%s", function($data) { ?>' . PHP_EOL, 
             $this->targetComp,

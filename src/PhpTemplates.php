@@ -16,7 +16,6 @@ use PhpTemplates\Entities\TemplateEntity;
 use PhpDom\DomNode;
 
 require_once(__DIR__.'/helpers.php'); // todo, in composer
-define('PHPT_ROOT', __DIR__); // todo for what?
 
 /**
  * new TemplateFactory(...)->fromFile()->render()
@@ -70,11 +69,11 @@ class PhpTemplates
     public function fromPath(string $name, array $data = [], array $slots = [], Config $config = null): View
     {
         $file = new Document($this->cachePath, $name);
-        //try { todo
+        try {
             $viewFactory = $file->load();
-        //} catch (\Throwable $e) {
-            //$viewFactory = null;
-        //}
+        } catch (\Throwable $e) {
+            $viewFactory = null;
+        }
 
         if (!empty($this->options['debug']) || !$viewFactory) {
             # parse start
@@ -98,11 +97,11 @@ class PhpTemplates
         $name = md5($code);
 
         $file = new Document($this->cachePath, $name);
-        //try { todo
+        try {
             $viewFactory = $file->load();
-        //} catch (\Throwable $e) {
-            //$viewFactory = null;
-        //}
+        } catch (\Throwable $e) {
+            $viewFactory = null;
+        }
 
         if (!empty($this->options['debug']) || !$viewFactory) {
             # parse start
@@ -116,33 +115,6 @@ class PhpTemplates
         ->make($name, $data)
         ->setSlots($slots);
     }
-
-    /**
-     * Make a template object from full file path
-     
-    public function fromFile(string $file, array $data = [], array $slots = [], Config $config = null): Template
-    {
-        // todo: obtain code
-        
-        try {
-            $viewFactory = $this->cache->get($name);
-        } catch (\Throwable $e) {
-            $viewFactory = null;
-        }
-        
-        if (!empty($this->options['debug']) || !$viewFactory) {
-            # parse start
-            $parsingTemplate = new ParsingTemplate($name, $file, $code, $config);
-            $parser = $this->getParser();
-            $parser->parse($parsingTemplate);
-            
-            $viewFactory = $this->cache->get($name);
-        }
-
-        return $viewFactory
-        ->make($name, $data)
-        ->setSlots($slots);
-    }*/
 
     /**
      * Share global data to all views

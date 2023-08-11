@@ -24,7 +24,6 @@ class ParsingTemplate
     
     public function __construct(string $name, ?string $file, ?string $html, Config $config)
     {
-        // todo setup from name?
         [$this->name, $this->config] = $this->parsePath($name, $config);
         $this->file = $file;
         $this->html = $html;
@@ -155,10 +154,5 @@ class ParsingTemplate
     public function getConfig()
     {
         return $this->config;
-    }
-    // todo, used ?
-    public function hasRenderFunction()
-    {
-        return method_exists($this->obj, 'render');
     }
 }

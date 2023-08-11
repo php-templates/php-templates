@@ -1,5 +1,5 @@
 <?php
-//todo remove fn src closure
+
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Parser;

@@ -7,18 +7,15 @@ use Closure;
 
 class Slot
 {
+    private $parent;
     /**
      * Data passed to component using node attributes
-     *
-     * @var Scope todo
      */
-    private $parent;
     public $scope;
     public $comp = [];
 
     /**
      * render function to be called
-     * @var Closure
      */
     protected $render;
 
