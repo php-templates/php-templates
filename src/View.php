@@ -57,13 +57,13 @@ class View
      */
     private array $slots = [];
 
-    public array $comp; // used in component build in order to not poluate variables, like this: this->comp[id] = todo, still neded?
+    public array $comp; // used in component build in order to not poluate variables, like this: this->comp[id]
 
     final public function render() 
     {
         $this->event->trigger('rendering', $this->__name, $this);
-        
         $this->template();
+        unset($this->comp);
     }
     
     final public function renderSlots(string $pos, $data)

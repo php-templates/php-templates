@@ -78,33 +78,19 @@ abstract class Entity implements EntityInterface
         $attributePack = new AttributePack($this->getConfig());
         
         // dispatch any existing directive
-        $refNode = null;
-        while ($attrs = $node->getAttributes()) 
+        while ($attrs = $node->getAttributes())
         {
-            // todo buggy not having attrs
-            $node->removeAttribute('*');
-
             foreach ($attrs as $a) {
                 $k = $a->getName();
                 if (array_key_exists($k, $this->attrs)) {
                     $this->attrs[$k] = trim($a->getValue());
                     continue;
                 }
-                
-                if ($k == 'p-scope') {
-                    throw new InvalidNodeException('p-scope directive can be used only in component scopes context', $node);
-                }
 
                 if (strpos($k, $this->pf) === 0) {
                     // check if is a directive and unpack its result as attributes
                     if ($directive = $config->getDirective(substr($k, strlen($this->pf)))) 
                     {
-                        // insert comment to help handle error displaying
-if (0 && ! $refNode && $node->getParentNode()) {
-                            $refNode = new PhpRefNode($node->getFile(), $node->getLine());
-                            $refNode->insertBefore($node);
-                        }
-                        
                         // we send a node with limited access around it because parent nodes are already processed in this step and changing them would make possible problems
                         // $proxyNode = new ProxyNode($node); todo
                         $directive($node, (string)$a->getValue());
@@ -112,14 +98,14 @@ if (0 && ! $refNode && $node->getParentNode()) {
                         continue;
                     }
                 }
-                
-                // insert comment to help handle error displaying
-if (0 && !$refNode && $k[0] == ':' && $node->getParentNode()) {
-                    $refNode = new PhpRefNode($node->getFile(), $node->getLine());
-                    $refNode->insertBefore($node);
-                }
 
                 $attributePack->add($a);
+            }
+            
+            // keep in mind that directives may insert other directives too
+            // so we want to remove only current nest level attributes and further parse these directives
+            foreach ($attrs as $a) {
+                $node->removeAttribute($a);
             }
         }
 
@@ -201,6 +187,10 @@ if (0 && !$refNode && $k[0] == ':' && $node->getParentNode()) {
         $duplicates = [];
         foreach ($node->getAttributes() as $attr) {
             $k = $attr->getName();
+            if ($k == 'p-scope') {
+                throw new InvalidNodeException('p-scope directive can be used only in component scopes context', $node);
+            }
+            
             if (isset($duplicates[$k]) && !in_array($k, [':class', 'p-bind', 'p-raw'])) {
                 throw new InvalidNodeException("Duplicate attribute $k", $node);
             }

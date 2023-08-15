@@ -30,8 +30,12 @@ function check_dependencies(array $files)
  */
 function enscope_variables(string $str): string
 {
+    $str = trim($str);
+    if (strpos($str, '<?php ') !== 0) {
+        $str = "<?php $str;";
+    }
     $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
-    $asts = $parser->parse("<?php $str;"); 
+    $asts = $parser->parse($str); 
 
     $r = function ($ast) use (&$r) 
     {

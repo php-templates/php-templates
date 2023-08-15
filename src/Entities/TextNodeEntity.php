@@ -35,7 +35,6 @@ class TextNodeEntity extends Entity
     private function replaceSpecialTags(string $html): string
     {
         $html = preg_replace_callback('/\{%(((?!\{%).)*)%\}/', function($m) {
-            // todo throw error if syntax ends with;
             return '<?php '. enscope_variables($m[1]) .'; ?>';
         }, $html);
 
@@ -57,7 +56,6 @@ class TextNodeEntity extends Entity
         
         // custom tags
         return preg_replace_callback("/{(\w+) (((?!{(\w+) ).)*)}/", function($m) {
-            // todo check if method exist, throw error if not
             return '<?php echo '. enscope_variables(sprintf('$this->%s(%s)', $m[1], trim($m[2]))) .'; ?>';
         }, $html);
     }
