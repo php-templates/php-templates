@@ -99,13 +99,14 @@ foreach($files as $f) {
     try {
         $view = $viewFactory->fromPath($rfilepath);
         $view->render();
-        $results = ob_get_clean();
-    } catch(Exception $e) {
+        $results = ob_get_contents();
+    } catch(Throwable $e) {
         $_f = str_replace('\\', '/', $e->getFile());
         $_f = explode('/', $_f);
         echo $e->getMessage() . ' in ' . end($_f) . ' at line ' . $e->getLine();
         die();
     }
+    ob_end_clean();
     //$results = explode('<body>', $results);
     //$results = end($results);
     $results = explode('-----',$results);

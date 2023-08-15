@@ -1,5 +1,5 @@
 <?php
-// todo: this.context.root
+
 namespace PhpTemplates\Entities;
 
 use PhpTemplates\Contracts\Entity as EntityInterface;
@@ -15,7 +15,6 @@ use PhpTemplates\PhpParser;
 use PhpTemplates\Exceptions\TemplateNotFoundException;
 use function PhpTemplates\enscope_variables;
 
-// todo p-scope tag that throws an error instant ca nu il poti folosi decat pe sloturi, e procesat automat
 class TemplateEntity extends Entity
 {
     protected string $name;

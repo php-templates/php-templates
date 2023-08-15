@@ -15,7 +15,7 @@ use PhpTemplates\Document;
 use PhpTemplates\Entities\TemplateEntity;
 use PhpDom\DomNode;
 
-require_once(__DIR__.'/helpers.php'); // todo, in composer
+require_once(__DIR__.'/helpers.php');
 
 /**
  * new TemplateFactory(...)->fromFile()->render()

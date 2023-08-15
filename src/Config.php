@@ -277,7 +277,7 @@ class Config
 
     /**
      * Register a directive - a way how a given syntax should be parsed
-     * //todo merge set get
+     * 
      * @param string $key
      * @param \Closure $callable
      * @return void
@@ -293,7 +293,7 @@ class Config
 
     /**
      * Register an alaias to a template to easily refer it in other templates. An key => value array is supported
-     * //todo merge set get
+     * 
      * @param array|string $key
      * @param string $component
      * @return void
@@ -335,7 +335,7 @@ class Config
         
         return null;
     }
-    
+    // todo remove this
     public function customTag(string $name, \Closure $fn) 
     {
         $this->helpers[$name] = $fn;
