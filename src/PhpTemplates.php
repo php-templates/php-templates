@@ -55,6 +55,11 @@ class PhpTemplates
     public function __construct(string $sourcePath, string $cachePath, EventDispatcher $event, array $options = [])
     {
         $this->config = new Config('default', $sourcePath);
+        if (isset($options['aliases']) && is_array($options['aliases'])) {
+            $this->config->setAlias($options['aliases']);
+            unset($options['aliases']);
+        }
+        
         $this->cachePath = $cachePath;
         $this->options = $options;
         $this->shared = new SharedScope();
@@ -115,6 +120,33 @@ class PhpTemplates
         ->make($name, $data)
         ->setSlots($slots);
     }
+    
+
+    /**
+     * Make template object from file fullpath
+     */
+    public function fromFile(string $path, array $data = [], array $slots = [], Config $config = null, string $name = null): View
+    {
+        $name = $name ?? md5($path);
+        $file = new Document($this->cachePath, $name);
+        try {
+            $viewFactory = $file->load();
+        } catch (\Throwable $e) {
+            $viewFactory = null;
+        }
+
+        if (!empty($this->options['debug']) || !$viewFactory) {
+            # parse start
+            $parsingTemplate = new ParsingTemplate($name, $path, null, $config ?? $this->config);
+            (new StartupEntity($parsingTemplate, $file))->parse();
+           
+            $viewFactory = $file->write();
+        }
+        
+        return $viewFactory::new([], $this->shared, $this->config, $this->event)
+        ->make($name, $data)
+        ->setSlots($slots);
+    }
 
     /**
      * Share global data to all views
@@ -135,6 +167,11 @@ class PhpTemplates
     /**
      * Return Config by key, or null. If no key given, default config is returned
      */
+    public function getConfig(string $key = null): ?Config
+    {
+        return $this->config($key);
+    }
+    
     public function config(string $key = null): ?Config
     {
         if ($key) {
