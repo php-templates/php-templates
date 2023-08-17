@@ -2,8 +2,6 @@
 
 namespace PhpTemplates\Entities;
 
-use function PhpTemplates\enscope_variables;
-
 class TextNodeEntity extends Entity
 {
     public function startupContext() {
@@ -35,12 +33,12 @@ class TextNodeEntity extends Entity
     private function replaceSpecialTags(string $html): string
     {
         $html = preg_replace_callback('/\{%(((?!\{%).)*)%\}/', function($m) {
-            return '<?php '. enscope_variables($m[1]) .'; ?>';
+            return '<?php '. $this->enscopeVariables($m[1]) .'; ?>';
         }, $html);
 
         $html = preg_replace_callback('/{{(((?!{{).)*)}}/', function($m) {
             if ($eval = trim($m[1])) {
-                $eval = enscope_variables($eval);
+                $eval =$this->enscopeVariables($eval);
                 return "<?php \$this->__e($eval); ?>";
             }
             return '';
@@ -48,7 +46,7 @@ class TextNodeEntity extends Entity
 
         $html = preg_replace_callback('/{\!\!(((?!{\!\!).)*)\!\!}/', function($m) {
             if ($eval = trim($m[1])) {
-                $eval = enscope_variables($eval);
+                $eval = $this->enscopeVariables($eval);
                 return "<?php echo $eval; ?>";
             }
             return '';
@@ -56,7 +54,9 @@ class TextNodeEntity extends Entity
         
         // custom tags
         return preg_replace_callback("/{(\w+) (((?!{(\w+) ).)*)}/", function($m) {
-            return '<?php echo '. enscope_variables(sprintf('$this->%s(%s)', $m[1], trim($m[2]))) .'; ?>';
+            return '<?php echo '. $this->enscopeVariables(sprintf('$this->%s(%s)', $m[1], trim($m[2]))) .'; ?>';
         }, $html);
     }
+    
+    
 }

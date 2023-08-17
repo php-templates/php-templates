@@ -19,6 +19,7 @@ use PhpTemplates\Dom\ProxyNode;
 use PhpTemplates\Document;
 use PhpDom\Contracts\TextNodeInterface;
 use PhpTemplates\Exceptions\InvalidNodeException;
+use function PhpTemplates\enscope_variables;
 
 /**
  * Startup entity
@@ -196,6 +197,15 @@ abstract class Entity implements EntityInterface
             }
             $duplicates[$k] = true;
         }        
+    }
+    
+    protected function enscopeVariables(string $str)
+    {
+        try {
+            return enscope_variables($str);
+        } catch (\Throwable $e) {
+            throw new InvalidNodeException($e->getRawMessage(), $this->node);
+        }
     }
 
     // =================================================== //

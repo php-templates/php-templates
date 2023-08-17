@@ -5,6 +5,7 @@ namespace PhpTemplates;
 use PhpDom\Source;
 use PhpDom\Contracts\DomElementInterface as DomNode;
 use PhpTemplates\View;
+use PhpTemplates\Exceptions\TemplateNotFoundException;
 use PhpDom\Parser as DomParser;
 use PhpParser\NodeDumper;
 use PhpParser\ParserFactory;
@@ -58,6 +59,7 @@ class ParsingTemplate
         # find file
         // try to find file on current config, else try to load it from default config
         $srcFile = null;
+        $tried = [];
         foreach ($this->config->getPath() as $srcPath) {
             $filepath = rtrim($srcPath, '/') . '/' . $file . '.t.php';
             if (file_exists($filepath)) {
@@ -70,7 +72,7 @@ class ParsingTemplate
         // file not found in any2 config
         if (! $this->file) {
             $pf = $this->config->isDefault() ? $this->config->getName() . ':' : '';
-            throw new TemplateNotFoundException("View file '". $pf . $this->name ."' not found");
+            throw new TemplateNotFoundException("View file '". $pf . $this->name ."' not found", $tried);
         }
 
         return $this->file;        
