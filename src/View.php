@@ -177,15 +177,6 @@ class View
         return $this->attrs;
     }
     
-    final public function boolAttr($key) 
-    {
-        if (!isset($this->attrs[$key]) || $this->attrs[$key] == 'false' || $this->attrs[$key] == '0') {
-            return false;
-        }
-        
-        return true;
-    }
-    
     final public function __get($prop) 
     {
         return $this->{$prop};
