@@ -22,7 +22,6 @@ class View
     private EventDispatcher $event;
     private array $attrs = [];
  
-    /** trick the anonymous class to not yall about missing params */
     final public static function new(array $data, Scope $shared, Config $config, EventDispatcher $event) 
     {
         return new static($data, $shared, $config, $event);
@@ -138,6 +137,13 @@ class View
         return $this;
     }
     
+    final public function share(array $data): self
+    {
+        $this->shared = $this->shared->innerScope($data);
+        
+        return $this;
+    }
+    
     final public function __toString(): string
     {
         ob_start();
@@ -169,6 +175,15 @@ class View
         }
         
         return $this->attrs;
+    }
+    
+    final public function boolAttr($key) 
+    {
+        if (!isset($this->attrs[$key]) || $this->attrs[$key] == 'false' || $this->attrs[$key] == '0') {
+            return false;
+        }
+        
+        return true;
     }
     
     final public function __get($prop) 

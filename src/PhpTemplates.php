@@ -147,6 +147,11 @@ class PhpTemplates
         ->make($name, $data)
         ->setSlots($slots);
     }
+    
+    public function make(string $name, array $data = [], array $slots = [], Config $config = null): View
+    {
+        return $this->fromPath($name, $data, $slots, $config);
+    }
 
     /**
      * Share global data to all views

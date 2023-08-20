@@ -156,6 +156,11 @@ class Config
             };
         }
 
+        $this->directives['p-share'] = function (DomNode $node, string $val) {
+            $phpnode = new PhpNode("\$this->share($val)");   
+            $node->appendChild($phpnode);
+        };
+        
         $this->directives['checked'] = function (DomNode $node, string $val) {
             $node->setAttribute('p-raw', $val . ' ? "checked" : ""');
         };

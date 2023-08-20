@@ -60,7 +60,7 @@ class PhpParser
             if (! $stmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
                 continue;
             }
-            if (in_array($stmt->name, ['render', 'parsing', 'parsed'])) {
+            if (preg_match('/^(node)\w+/', $stmt->name) || in_array($stmt->name, ['render', 'parsing', 'parsed'])) {
                 unset($ast->stmts[$i]);
             }
         }
