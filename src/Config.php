@@ -20,9 +20,10 @@ class Config
         'checked',
         'selected',
         'disabled',
-        'p-raw',
-        'p-bind',
-        'p-scope',
+        'raw',
+        'bind',
+        'scope',
+        'share',
     ];
     
     /**
@@ -156,9 +157,9 @@ class Config
             };
         }
 
-        $this->directives['p-share'] = function (DomNode $node, string $val) {
+        $this->directives['share'] = function (DomNode $node, string $val) {
             $phpnode = new PhpNode("\$this->share($val)");   
-            $node->appendChild($phpnode);
+            $node->prependChild($phpnode);
         };
         
         $this->directives['checked'] = function (DomNode $node, string $val) {

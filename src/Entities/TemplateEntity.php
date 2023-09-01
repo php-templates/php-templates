@@ -87,7 +87,7 @@ class TemplateEntity extends Entity
         $this->simpleNodeContext();
     }
     
-    private function resolve() 
+    protected function resolve() 
     {
         try {
             $template = new ParsingTemplate($this->name, null, null, $this->config);
@@ -173,7 +173,7 @@ class TemplateEntity extends Entity
         return $slots;
     }
     
-    private function getScopeData($node) 
+    protected function getScopeData($node) 
     {
         $defaultScopeData = null;
         if ($defaultScopeData = $node->getAttribute('p-scope')) {

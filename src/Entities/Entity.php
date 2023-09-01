@@ -166,6 +166,15 @@ abstract class Entity implements EntityInterface
             
             return new ExtendEntity($node, $this);
         }
+        
+        if ($node->getNodeName() == 'tpl' && $node->hasAttribute('include')) {
+            $rfilepath = trim($node->getAttribute('include'));
+            if (! $rfilepath) {
+                throw new InvalidNodeException("No template name given", $node);
+            }
+            
+            return new IncludeEntity($node, $this);
+        }
 
         if ($node->getNodeName() == 'tpl') {
             return new AnonymousEntity($node, $this);

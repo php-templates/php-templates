@@ -140,7 +140,7 @@ class View
     final public function share(array $data): self
     {
         $this->shared = $this->shared->innerScope($data);
-        
+
         return $this;
     }
     
