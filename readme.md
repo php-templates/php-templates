@@ -1,3 +1,5 @@
+# This package is under development
+
 ***Php-Templates*** is a template engine which goal is to bring full modularity into 'View' part of a web app. Unlike some PHP templating engines, ***Php-Templates*** does not restrict you from using plain PHP code and functions in your templates as a 'measure of security'. It gives you the freedom to organizes your templates as you wish. 
 In fact, all templates are compiled into plain PHP code and cached until they are modified, meaning ***Php-Templates*** adds essentially zero overhead to your application, also it has a clear syntax due to the fact that control structures are placed as targeted tag attribute.
 
