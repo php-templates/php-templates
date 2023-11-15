@@ -70,8 +70,8 @@ class ViewDefinition
     {
         $prettyPrinter = new PrettyPrinter\Standard;
         $string = $prettyPrinter->prettyPrint([$this->ast]); 
-        $string = preg_replace('/\?>([ \t\n\r]*)<\?php/', '$1', $string);
-        
+        $string = preg_replace('/\?>([ \t\n\r]*)<\?php([ \t\n\r]*(elseif|else))/', '$1$2', $string);
+   
         $return = "namespace {$this->namespace} {\n";
         foreach ($this->uses as $use) {
             $return .= "use {$use};\n";

@@ -27,7 +27,7 @@ class Document
             return null;
         }
 
-        return require($this->file);
+        return static::require_once($this->file);
     }
 
     public function has(string $key): bool
@@ -96,7 +96,7 @@ class Document
         
         file_put_contents($this->file, $tpl);
         
-        return require($this->file);
+        return static::require_once($this->file);
     }
 
     protected function getFile(string $key)
@@ -106,5 +106,20 @@ class Document
         $name = trim(str_replace(['/', ':'], '_', $key), '/ ') . '_' . $hash;
 
         return $pf . $name . '.php';
+    }
+    
+    /**
+     * Files are returning init class name only once
+     */
+    private static function require_once($file) 
+    {
+        static $required;
+        
+        $hash = md5(realpath($file));
+        if (empty($required[$hash])) {
+            $required[$hash] = require($file);
+        }
+        
+        return $required[$hash];
     }
 }

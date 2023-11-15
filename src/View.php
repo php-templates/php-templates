@@ -208,6 +208,10 @@ class View
         $array = array_diff_key((array)$array, array_flip($except));
         $result = [];
         foreach ($array as $k => $val) {
+            if (is_null($val)) {
+                continue;
+            }
+            
             if (is_bool($val)) {
                 if ($val) {
                     $result[] = $k;

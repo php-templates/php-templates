@@ -22,8 +22,9 @@ class PhpNode extends DomNode
     {
         // NODE START
         $return = '';
-        if ($line = $this->getLine()) {
-            $return = '<?php /*line:' . $line . '*/ ?>';
+        $line = '';
+        if ($_line = $this->getLine()) {
+            $line = '/*line:' . $line . '*/';
         }
         
         if ($isLoop = in_array($this->expression, ['foreach', 'for', 'while'])) {
@@ -43,7 +44,7 @@ class PhpNode extends DomNode
             $expr = rtrim($this->enscopeVariables($args . ';'), ';') . ';';
         }
 
-        $return .= "<?php " . $expr . " ?>\n";
+        $return .= "<?php $expr $line ?>\n";
 
         // NODE CONTENT
         foreach ($this->childNodes as $cn) {
