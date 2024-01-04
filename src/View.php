@@ -30,7 +30,9 @@ class View
     final public function __construct(array $data, Scope $shared, Config $config, EventDispatcher $event)
     {
         foreach ($data as $k => $val) {
-            if (! array_key_exists($k, $this->props)) {
+            if (array_key_exists($k, $this->props)) {
+                $this->props[$k] = $data[$k];
+            } else {
                 $this->attrs[$k] = $data[$k];
             }
         }
@@ -197,7 +199,7 @@ class View
     
     final public function __e($string) 
     {
-        if ($string && !is_string($string)) {
+        if ($string && !is_string($string) && !($string instanceof \Stringable)) {
             $string = json_encode($string);
         }
         echo htmlentities((string)$string);        
