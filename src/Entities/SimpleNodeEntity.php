@@ -5,6 +5,7 @@ namespace PhpTemplates\Entities;
 use PhpTemplates\Parser;
 use PhpTemplates\Closure;
 use PhpDom\DomNode;
+use PhpDom\TextNode;
 use PhpTemplates\Source;
 
 class SimpleNodeEntity extends Entity
@@ -24,7 +25,9 @@ class SimpleNodeEntity extends Entity
             $this->child($cn)->simpleNodeContext();
         }
 
-        $data->addToNode($this->node);
+        if (!$this->node instanceof TextNode) {
+            $data->addToNode($this->node);
+        }
     }
 
     /**

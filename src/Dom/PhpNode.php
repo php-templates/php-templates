@@ -33,6 +33,13 @@ class PhpNode extends DomNode
 
         // wrap in if statement to not throw error
         $args = $this->args;
+        if ($this->expression == 'foreach') { // force iterablw
+            $temp = explode(' as ', $args);
+            $arr = array_shift($temp);
+            $as = implode(' as ', $temp);
+            $args = "\$this->__iterable($arr) as $as";
+        }
+        
         if ($this->expression && ($args || $args == '0')) {
             $norm = $this->expression == 'elseif' ? 'if' : $this->expression;
             $expr = $this->enscopeVariables("{$norm} ({$args}) {}");

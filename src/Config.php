@@ -5,6 +5,7 @@ namespace PhpTemplates;
 use Exception;
 use PhpDom\Contracts\DomNodeInterface as DomNode;
 use PhpTemplates\Dom\PhpNode;
+use PhpTemplates\Exceptions\InvalidNodeException;
 use PhpDom\Parser as HtmlParser;
 //use PhpTemplates\Dom\DomNode;
 
@@ -146,6 +147,7 @@ class Config
 
         foreach ($controlStructures as $statement) {
             $this->directives[$statement] = function (DomNode $node, string $args) use ($statement) {
+                // auto cast to array
                 if (in_array($statement, ['elseif', 'else'])) {
                     if (!$node->getPrevSibling() || !in_array($node->getPrevSibling()->getNodeName(), ['<?php if', '<?php elseif'])) {
                         throw new InvalidNodeException("Unespected control structure '$statement'", $node);

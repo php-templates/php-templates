@@ -205,6 +205,15 @@ class View
         echo htmlentities((string)$string);        
     }
     
+    final public function __iterable($array) 
+    {
+        if (!is_iterable($array)) {
+            return (array)$array;
+        }
+        
+        return $array;
+    }
+    
     final public function __eBind($array, array $except = [])
     {
         $array = array_diff_key((array)$array, array_flip($except));

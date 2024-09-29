@@ -122,4 +122,9 @@ class Document
         
         return $required[$hash];
     }
+    
+    public function getRootPath()
+    {
+        return $this->rootPath;
+    }
 }

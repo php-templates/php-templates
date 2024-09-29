@@ -8,7 +8,7 @@ todo: v.1.1
 impossible - performance improvement by using string concat return instead of ob-start
 done - lazy share
 done - posibilitate adaugare tag uri custom, ca sa pot avea ceva de genul {t Ce mai faci}
-solve indent
+done - solve indent
 done partial(not on runtime) - toate erorile thrown trb sa aiba indicatie spre t.php file, un comment cv.. ca la twig
 done - slot in slot with empty slot should not reset
 later - bind slots
@@ -21,7 +21,7 @@ done - support for view->make() in rendering event
 not needed - throw error if not closing {% %}
 not needed (todo test case p-not-directive) - config throw error if directive not exists
 done - configure parser to auto close tags without throwing errors
-indent nu merge ok la func, php etc
+done - indent nu merge ok la func, php etc
 done - domnodeattribute implements domnoneattrinterface
 done - bug ">{% $slot->render([]); %}</t nu a fost evaluat ca php..
 done - new slot scope data destructuring function on p-scope="['x' => $x]"
@@ -36,3 +36,9 @@ done - todo throw error daca slots sunt divortate
     <div slot1></div>
     <div slot1></div>
 </template>
+
+done - force iterble when foreach directive
+done - fix t.php pure textnode
+tpl.extends cand se termina in />, sa ia tot content-ul de dedesubt din acelasi nivel
+
+p-bind on root by default

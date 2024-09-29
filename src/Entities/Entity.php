@@ -7,6 +7,7 @@ use PhpTemplates\Config;
 use PhpTemplates\Process;
 use PhpTemplates\Dom\AttributePack;
 use PhpDom\DomNode;
+use PhpDom\TextNode;
 use PhpDom\Contracts\DomNodeInterface;
 use PhpDom\Contracts\DomElementInterface as DomElement;
 use PhpTemplates\Contracts\Entity as EntityInterface;
@@ -77,6 +78,10 @@ abstract class Entity implements EntityInterface
     {
         $config = $this->config;
         $attributePack = new AttributePack($this->getConfig());
+
+        if ($node instanceof TextNode) {
+            return $attributePack;
+        }
         
         // dispatch any existing directive
         while ($attrs = $node->getAttributes())
